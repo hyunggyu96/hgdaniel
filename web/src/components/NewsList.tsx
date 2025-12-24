@@ -292,6 +292,22 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
                 </div>
             </div>
 
+            {/* Keywords */}
+            {analysis.main.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-1">
+                    {analysis.main.slice(0, 1).map((k, i) => (
+                        <span key={`main-${i}`} className="text-[9px] font-bold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded border border-emerald-400/20">
+                            {k}
+                        </span>
+                    ))}
+                    {analysis.sub.slice(0, 3).map((k, i) => (
+                        <span key={`sub-${i}`} className="text-[8px] text-white/60 bg-white/5 px-1.5 py-0.5 rounded border border-white/5">
+                            {k}
+                        </span>
+                    ))}
+                </div>
+            )}
+
             {(summaryText) && (
                 <p className="text-[10px] text-white/40 leading-relaxed line-clamp-1 pr-4">
                     {summaryText}
@@ -367,7 +383,6 @@ const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, 
                 {/* Bottom Row: Included Keywords */}
                 {/* Col 6: Included Keywords */}
                 <div className="flex flex-wrap gap-0.5 opacity-60 group-hover:opacity-100 transition-opacity">
-                    <span className="text-[8px] text-white/30 font-medium self-center mr-0.5">Includes:</span>
                     {analysis.sub.length > 0 ? (
                         analysis.sub.map((k, i) => (
                             <span key={i} className="text-[8px] text-white/60 bg-white/5 px-1 py-0.5 rounded border border-white/5">
