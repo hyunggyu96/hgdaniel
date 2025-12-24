@@ -135,9 +135,9 @@ export default async function NewsList({ selectedCategory, currentPage = 1, sear
     return (
         <div className="flex-1 space-y-12">
             {/* Header */}
-            <div className="pt-12 px-6 lg:px-12">
+            <div className="pt-8 md:pt-12 px-4 md:px-6 lg:px-12">
                 <div className="flex flex-col gap-4 mb-4">
-                    <h2 className="text-3xl lg:text-5xl font-black uppercase tracking-tighter text-white leading-tight">
+                    <h2 className="text-2xl md:text-3xl lg:text-5xl font-black uppercase tracking-tighter text-white leading-tight">
                         {isCollectionsView ? 'Collections' : selectedCategory ? selectedCategory : 'Market Intelligence'}
                     </h2>
                     <div className="flex items-start gap-2">
@@ -183,7 +183,7 @@ export default async function NewsList({ selectedCategory, currentPage = 1, sear
             </div>
 
             {/* List */}
-            <div className="px-6 lg:px-12 pb-24">
+            <div className="px-4 md:px-6 lg:px-12 pb-24">
                 {isCollectionsView ? (
                     <CollectionsView allNews={allNews} today={today} />
                 ) : selectedCategory || searchQuery ? (

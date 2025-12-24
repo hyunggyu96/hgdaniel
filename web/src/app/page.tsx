@@ -42,7 +42,7 @@ export default async function Page({ searchParams }: PageProps) {
                     />
                 </Suspense>
                 {!showCollections && (
-                    <div className="px-6 lg:px-12 pb-24 text-white">
+                    <div className="px-4 md:px-6 lg:px-12 pb-24 text-white">
                         <TrendChart />
                     </div>
                 )}
