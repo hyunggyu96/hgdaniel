@@ -276,7 +276,7 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
                     href={article.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs font-bold text-white/90 group-hover/article:text-[#3182f6] transition-colors leading-snug line-clamp-2"
+                    className="text-xs font-bold text-white/90 group-hover/article:text-[#3182f6] transition-colors leading-tight line-clamp-2"
                 >
                     {/* Show Main Keyword if available, else Sector */}
 
