@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 20% 98%; /* Very light grey/white */
+    --foreground: 222 47% 11%; /* Deep navy/slate */
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 221 83% 45%; /* Premium Blue */
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 221 83% 45%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* GQAI Style: Clean, Solid Blue aesthetics */
+  .blue-gradient-header {
+    @apply bg-gradient-to-r from-blue-900 to-blue-800 text-white shadow-md;
+  }
+
+  .card-premium {
+    @apply bg-white dark:bg-slate-800 rounded-xl shadow-[0_2px_12px_-4px_rgba(59,130,246,0.15)] border border-blue-100 dark:border-slate-700;
+  }
+
+  .gradient-text-blue {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-600 dark:from-blue-400 dark:to-indigo-400;
+  }
+}
