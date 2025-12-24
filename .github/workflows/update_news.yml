@@ -1,6 +1,6 @@
 name: Update News
 
-on:
+on: # Workflow update trigger
   schedule:
     - cron: '*/30 * * * *' # Run every 30 minutes
   workflow_dispatch: # Allow manual trigger
