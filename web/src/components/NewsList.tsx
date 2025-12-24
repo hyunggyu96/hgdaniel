@@ -294,7 +294,7 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
 
             {/* Keywords */}
             {analysis.sub.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-0.5">
+                <div className="flex flex-wrap gap-1">
                     {analysis.sub.slice(0, 3).map((k, i) => (
                         <span key={`sub-${i}`} className="text-[8px] text-white/60 bg-white/5 px-1.5 py-0.5 rounded border border-white/5">
                             {k}
