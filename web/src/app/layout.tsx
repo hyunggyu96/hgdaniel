@@ -41,7 +41,7 @@ export default function RootLayout({
                 </Link>
 
                 {/* Center: Search */}
-                <div className="hidden sm:flex flex-1 justify-center max-w-2xl px-4">
+                <div className="flex flex-1 justify-center max-w-2xl px-2 sm:px-4">
                   <Suspense fallback={<div className="w-full max-w-md h-10 bg-white/5 rounded-xl border border-white/10 animate-pulse" />}>
                     <SearchBar />
                   </Suspense>
