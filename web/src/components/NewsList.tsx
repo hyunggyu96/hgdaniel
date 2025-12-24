@@ -293,13 +293,8 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
             </div>
 
             {/* Keywords */}
-            {analysis.main.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-1">
-                    {analysis.main.slice(0, 1).map((k, i) => (
-                        <span key={`main-${i}`} className="text-[9px] font-bold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded border border-emerald-400/20">
-                            {k}
-                        </span>
-                    ))}
+            {analysis.sub.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-0.5">
                     {analysis.sub.slice(0, 3).map((k, i) => (
                         <span key={`sub-${i}`} className="text-[8px] text-white/60 bg-white/5 px-1.5 py-0.5 rounded border border-white/5">
                             {k}
@@ -335,21 +330,12 @@ const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, 
     return (
         <article className={`group py-1.5 px-3 hover:bg-white/[0.03] transition-colors border-b border-white/5 flex flex-col gap-1 relative ${isToday ? 'bg-blue-900/5' : ''}`}>
 
-            {/* Top Row: Meta & Main Keyword */}
+            {/* Top Row: Meta */}
             <div className="flex items-center gap-2 text-[9px] h-4">
                 {/* Col 7: Publishing Time */}
                 <span className={`font-mono font-bold tracking-tight text-[10px] ${isToday ? 'text-blue-400' : 'text-white/50'}`}>
                     {dateStr} <span className="text-[9px] font-medium opacity-80 ml-0.5">{timeStr}</span>
                 </span>
-
-                {/* Col 5: Main Keyword */}
-                {analysis.main.length > 0 && (
-                    <span className="font-bold text-emerald-400 uppercase tracking-tight text-[9px]">
-                        {analysis.main[0]}
-                    </span>
-                )}
-
-
 
                 {isToday && (
                     <span className="ml-auto text-[8px] font-bold text-white bg-red-600 px-1 py-0.5 rounded shadow-sm">TODAY</span>
