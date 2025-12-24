@@ -267,7 +267,7 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
     }
 
     return (
-        <div className="group/article flex flex-col gap-1 w-full pb-2 border-b border-dashed border-white/5 last:border-0 last:pb-0 relative pl-3">
+        <div className="group/article flex flex-col gap-0 w-full pb-2 border-b border-dashed border-white/5 last:border-0 last:pb-0 relative pl-3">
             {/* Left accent line */}
             <div className={`absolute left-0 top-1.5 bottom-1.5 w-[2px] rounded-full transition-colors ${isToday ? 'bg-[#3182f6]' : 'bg-white/10 group-hover/article:bg-blue-500/50'}`} />
 
