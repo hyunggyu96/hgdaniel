@@ -80,10 +80,10 @@ export default function LoginButton() {
     return (
         <button
             onClick={() => setShowInput(true)}
-            className="flex items-center gap-2 bg-[#3182f6] hover:bg-[#1b64da] px-5 h-10 rounded-xl text-white text-[11px] font-bold transition-all shadow-lg shadow-blue-500/10 active:scale-95 group uppercase tracking-widest shrink-0"
+            className="flex items-center gap-2 bg-[#3182f6] hover:bg-[#1b64da] px-3 sm:px-5 h-10 rounded-xl text-white text-[11px] font-bold transition-all shadow-lg shadow-blue-500/10 active:scale-95 group uppercase tracking-widest shrink-0"
         >
             <LogIn className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-            <span>Connect</span>
+            <span className="hidden sm:inline">Connect</span>
         </button>
     );
 }

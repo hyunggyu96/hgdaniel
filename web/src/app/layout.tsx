@@ -32,16 +32,16 @@ export default function RootLayout({
             <header className="px-4 md:px-6 py-3 md:py-4 border-b border-white/5 bg-[#101012]/80 backdrop-blur-md sticky top-0 z-50">
               <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4 md:gap-8 h-auto md:h-12">
                 {/* Left: Brand */}
-                <Link href="/" className="flex items-center gap-3 shrink-0 hover:opacity-80 transition-opacity">
+                <Link href="/" className="flex items-center gap-0 sm:gap-3 shrink-0 hover:opacity-80 transition-opacity">
                   <div className="w-9 h-9 md:w-10 md:h-10 bg-[#3182f6] rounded-[10px] md:rounded-[14px] flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/20 text-sm md:text-base">HG</div>
-                  <div className="block">
+                  <div className="hidden sm:block">
                     <span className="font-bold text-base md:text-lg tracking-tight block leading-none">Industry Intelligence</span>
                     <span className="text-[10px] text-white/40 uppercase tracking-widest font-medium">Professional Terminal</span>
                   </div>
                 </Link>
 
                 {/* Center: Search */}
-                <div className="flex-1 flex justify-center max-w-2xl px-4">
+                <div className="hidden sm:flex flex-1 justify-center max-w-2xl px-4">
                   <Suspense fallback={<div className="w-full max-w-md h-10 bg-white/5 rounded-xl border border-white/10 animate-pulse" />}>
                     <SearchBar />
                   </Suspense>
