@@ -13,7 +13,7 @@ import MobileNav from '@/components/MobileNav';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Aesthetics Intelligence | AI Media Terminal for Medical Market",
+  title: "Aesthetic Intelligence | AI Media Terminal for Medical Market",
   description: "Real-time industry stream and professional analysis for the medical aesthetics market.",
   viewport: "width=device-width, initial-scale=1, maximum-scale=1",
 };
@@ -35,7 +35,7 @@ export default function RootLayout({
                 <Link href="/" prefetch={false} className="flex items-center gap-0 sm:gap-3 shrink-0 hover:opacity-80 transition-opacity">
                   <div className="w-9 h-9 md:w-10 md:h-10 bg-[#3182f6] rounded-[10px] md:rounded-[14px] flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/20 text-sm md:text-base">HG</div>
                   <div className="hidden sm:block">
-                    <span className="font-bold text-base md:text-lg tracking-tight block leading-none">Industry Intelligence</span>
+                    <span className="font-bold text-base md:text-lg tracking-tight block leading-none">Aesthetic Intelligence</span>
                     <span className="text-[10px] text-white/40 uppercase tracking-widest font-medium">Professional Terminal</span>
                   </div>
                 </Link>
