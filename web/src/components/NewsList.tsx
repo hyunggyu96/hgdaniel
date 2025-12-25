@@ -269,7 +269,11 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
     return (
         <div className="group/article flex flex-col gap-0 w-full pb-2 border-b border-dashed border-white/5 last:border-0 last:pb-0 relative pl-3">
             {/* Left accent line */}
-            <div className={`absolute left-0 top-1.5 bottom-1.5 w-[2px] rounded-full transition-colors ${isToday ? 'bg-[#3182f6]' : 'bg-white/10 group-hover/article:bg-blue-500/50'}`} />
+            {isToday && (
+                <div className="mb-1">
+                    <span className="text-[8px] font-bold text-white bg-red-600 px-1 py-0.5 rounded shadow-sm uppercase tracking-tighter">TODAY</span>
+                </div>
+            )}
 
             <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
@@ -285,28 +289,25 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
                 <div className={`shrink-0 flex flex-col items-end text-[10px] font-mono font-bold leading-tight w-[52px] text-right ${isToday ? 'text-blue-400' : 'text-white/40'}`}>
                     <span>{dateStr}</span>
                     <span className="text-[9px] font-medium opacity-80">{pubDate ? pubDate.toLocaleTimeString('ko-KR', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', hour12: false }) : ''}</span>
-                    {isToday && (
-                        <span className="mt-1 text-[8px] font-bold text-white bg-red-600 px-1 py-0.5 rounded shadow-sm scale-90 origin-right">TODAY</span>
-                    )}
+                    <div className="mt-1">
+                        <CollectionButton newsLink={article.link} size={12} />
+                    </div>
                 </div>
             </div>
 
-            {/* Keywords & Collection */}
-            <div className="flex items-center gap-2 mt-1">
-                <CollectionButton newsLink={article.link} size={14} />
-                {analysis.sub.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                        {analysis.sub.slice(0, 3).map((k, i) => (
-                            <span key={`sub-${i}`} className="text-[8px] text-white/60 bg-white/5 px-1.5 py-0.5 rounded border border-white/5 whitespace-nowrap">
-                                {k}
-                            </span>
-                        ))}
-                    </div>
-                )}
-            </div>
+            {/* Keywords */}
+            {analysis.sub.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-1">
+                    {analysis.sub.slice(0, 3).map((k, i) => (
+                        <span key={`sub-${i}`} className="text-[8px] text-white/60 bg-white/5 px-1.5 py-0.5 rounded border border-white/5 whitespace-nowrap">
+                            {k}
+                        </span>
+                    ))}
+                </div>
+            )}
 
             {(summaryText) && (
-                <p className="text-[10px] text-white/40 leading-relaxed line-clamp-1 pr-4">
+                <p className="text-[10px] text-white/40 leading-relaxed line-clamp-1 pr-4 mt-0.5">
                     {summaryText}
                 </p>
             )}
@@ -346,6 +347,9 @@ const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, 
 
             {/* Middle Row: Title & Summary */}
             <div className="flex gap-2 items-start">
+                <div className="pt-0.5">
+                    <CollectionButton newsLink={article.link} size={14} />
+                </div>
                 <div className="flex-1 min-w-0 flex flex-col md:flex-row gap-2 md:items-start md:justify-between">
                     {/* Col 3: Headline */}
                     <div className="flex-1 min-w-0">
@@ -366,23 +370,22 @@ const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, 
                         </p>
                     </div>
                 </div>
+            </div>
 
-                {/* Bottom Row: Included Keywords & Collection */}
-                <div className="flex items-center gap-3 opacity-60 group-hover:opacity-100 transition-opacity">
-                    <CollectionButton newsLink={article.link} size={14} />
-                    <div className="flex flex-wrap gap-0.5">
-                        {analysis.sub.length > 0 ? (
-                            analysis.sub.map((k, i) => (
-                                <span key={i} className="text-[8px] text-white/60 bg-white/5 px-1 py-0.5 rounded border border-white/5">
-                                    {k}
-                                </span>
-                            ))
-                        ) : (
-                            <span className="text-[8px] text-white/20">-</span>
-                        )}
-                    </div>
+            {/* Bottom Row: Included Keywords */}
+            <div className="flex items-center gap-3 opacity-60 group-hover:opacity-100 transition-opacity pl-7">
+                <div className="flex flex-wrap gap-0.5">
+                    {analysis.sub.length > 0 ? (
+                        analysis.sub.map((k, i) => (
+                            <span key={i} className="text-[8px] text-white/60 bg-white/5 px-1 py-0.5 rounded border border-white/5">
+                                {k}
+                            </span>
+                        ))
+                    ) : (
+                        <span className="text-[8px] text-white/20">-</span>
+                    )}
                 </div>
             </div>
-        </article >
+        </article>
     );
 });
