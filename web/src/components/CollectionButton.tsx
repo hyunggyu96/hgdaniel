@@ -4,7 +4,7 @@ import { Star } from 'lucide-react';
 import { useCollection } from './CollectionContext';
 import { useUser } from './UserContext';
 
-export default function CollectionButton({ newsLink, size = 14 }: { newsLink: string, size?: number }) {
+export default function CollectionButton({ newsLink, newsTitle, size = 14 }: { newsLink: string, newsTitle: string, size?: number }) {
     const { isInCollection, toggleCollection } = useCollection();
     const { userId } = useUser();
     const inCollection = isInCollection(newsLink);
@@ -14,7 +14,7 @@ export default function CollectionButton({ newsLink, size = 14 }: { newsLink: st
         e.preventDefault();
         e.stopPropagation();
         if (isLoggedIn) {
-            toggleCollection(newsLink);
+            toggleCollection(newsLink, newsTitle);
         }
     };
 

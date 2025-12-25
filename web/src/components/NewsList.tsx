@@ -302,7 +302,7 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
                     ))}
                 </div>
                 <div className="shrink-0 w-[52px] flex justify-end items-center">
-                    <CollectionButton newsLink={article.link} size={20} />
+                    <CollectionButton newsLink={article.link} newsTitle={article.title} size={20} />
                 </div>
             </div>
 
@@ -348,7 +348,7 @@ const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, 
             {/* Middle Row: Title & Summary */}
             <div className="flex gap-2 items-start">
                 <div className="pt-0.5">
-                    <CollectionButton newsLink={article.link} size={14} />
+                    <CollectionButton newsLink={article.link} newsTitle={article.title} size={14} />
                 </div>
                 <div className="flex-1 min-w-0 flex flex-col md:flex-row gap-2 md:items-start md:justify-between">
                     {/* Col 3: Headline */}
@@ -386,7 +386,7 @@ const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, 
                     )}
                 </div>
                 <div className="shrink-0 border-l border-white/10 pl-3 ml-2">
-                    <CollectionButton newsLink={article.link} size={20} />
+                    <CollectionButton newsLink={article.link} newsTitle={article.title} size={20} />
                 </div>
             </div>
         </article>

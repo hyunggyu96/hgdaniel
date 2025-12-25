@@ -7,7 +7,7 @@ import { useUser } from './UserContext';
 interface CollectionContextType {
     collections: string[];
     isInCollection: (link: string) => boolean;
-    toggleCollection: (link: string) => void;
+    toggleCollection: (link: string, title?: string) => void;
     collectionCount: number;
     isLoading: boolean;
 }
@@ -70,7 +70,7 @@ export function CollectionProvider({ children }: { children: React.ReactNode }) 
     }, [collections]);
 
     // Toggle collection with optimistic update & server sync
-    const handleToggleCollection = useCallback(async (link: string) => {
+    const handleToggleCollection = useCallback(async (link: string, title?: string) => {
         const inCollection = collections.includes(link);
         console.log(`[Collections] Toggling ${inCollection ? 'REMOVE' : 'ADD'} for ${link.slice(0, 30)}...`);
 
@@ -92,7 +92,7 @@ export function CollectionProvider({ children }: { children: React.ReactNode }) 
                 const res = await fetch('/api/collections', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId, link })
+                    body: JSON.stringify({ userId, link, title })
                 });
                 if (!res.ok) console.error('[Collections] POST failed');
             } else {
