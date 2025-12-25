@@ -23,6 +23,7 @@ export default function SideBar() {
                     <div className="space-y-1">
                         <Link
                             href="/"
+                            prefetch={false}
                             className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 group flex items-center justify-between ${isOverview ? 'bg-[#3182f6] text-white' : 'text-white/50 hover:bg-white/5 hover:text-white'}`}
                         >
                             <span className="text-sm font-bold uppercase tracking-tight">Overview</span>
