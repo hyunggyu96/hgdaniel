@@ -16,8 +16,22 @@ from typing import List, Dict
 
 from dotenv import load_dotenv
 from supabase import create_client
-import google.generativeai as genai
-from openai import AsyncOpenAI
+import firebase_admin
+from firebase_admin import credentials, firestore
+
+# Firebase Setup
+try:
+    if not firebase_admin._apps:
+        cred_json = os.environ.get("FIREBASE_SERVICE_ACCOUNT")
+        if cred_json:
+            cred = credentials.Certificate(json.loads(cred_json))
+            firebase_admin.initialize_app(cred)
+        else:
+            firebase_admin.initialize_app()
+    db = firestore.client()
+except Exception as e:
+    print(f"⚠️ Firebase Init Warning: {e}")
+    db = None
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
@@ -73,6 +87,7 @@ async def analyze_article_expert_async(title, description, search_keyword):
         f"2. included_keywords: Array of all words from the Pool found in text.\n"
         f"3. issue_nature: Categorize the news into ONE of: 제품 출시/허가, 임상/연구데이터, 실적/수출/경영, 법적분쟁/규제, 투자/M&A, 학회/마케팅, 거시경제/정책, 기타.\n"
         f"4. brief_summary: A professional 1-line Korean summary. Be informative (~70 chars).\n"
+        f"5. impact_level: Integer 1-5. (1: Minor news, 5: Critical market-shifting info).\n"
     )
     user_prompt = f"Crawl Keyword: {search_keyword}\nHeadline: {title}\nBody: {description}"
 
@@ -156,13 +171,10 @@ async def process_item(item, worksheet):
         return False
 
     # Data transformation
-    main_kw = analysis.get("main_keyword", "기타")
-    included_kws = analysis.get("included_keywords", [])
-    issue_nature = analysis.get("issue_nature", "기타")
-    summary = analysis.get("brief_summary", "-")
+    main_id = f"[{main_kw} | {issue_nature} | {summary}]"
+    impact = analysis.get("impact_level", 3)
     
-    # 1. Update Production DB
-    main_tag = f"[{main_kw} | {issue_nature} | {summary}]"
+    # 1. Update Production DB (Supabase)
     prod_data = {
         "title": title,
         "description": desc,
@@ -170,14 +182,38 @@ async def process_item(item, worksheet):
         "published_at": pub_date,
         "source": "Naver",
         "keyword": keyword,
-        "main_keywords": [main_tag] + included_kws
+        "main_keywords": [main_id] + included_kws
     }
     
     try:
         supabase.table("articles").insert(prod_data).execute()
         
-            # 2. Update Google Sheets
-            if worksheet:
+        # 2. Update Firestore (New Central DB)
+        if db:
+            kst_now = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
+            doc_ref = db.collection("articles").document()
+            firestore_data = {
+                **prod_data,
+                "impact_level": impact,
+                "analyzed_at": kst_now.isoformat(),
+                "summary": summary,
+                "issue_nature": issue_nature
+            }
+            doc_ref.set(firestore_data)
+            
+            # CRITICAL ALERT LOGIC
+            if impact >= 4:
+                db.collection("critical_alerts").add({
+                    "article_id": doc_ref.id,
+                    "title": title,
+                    "impact_level": impact,
+                    "timestamp": kst_now.isoformat(),
+                    "link": link
+                })
+                print(f" 🔥 [CRITICAL] High impact news detected (Level {impact})!")
+
+        # 3. Update Google Sheets
+        if worksheet:
                 kst_now = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
                 now_str = kst_now.strftime("%Y-%m-%d %H:%M:%S")
                 
