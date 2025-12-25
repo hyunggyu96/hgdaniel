@@ -293,13 +293,15 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
             </div>
 
             {/* Keywords & Star */}
-            <div className="flex items-center gap-2 mt-1">
+            <div className="flex items-center justify-between mt-1">
                 <div className="flex flex-wrap items-center gap-1">
                     {analysis.sub.length > 0 && analysis.sub.slice(0, 3).map((k, i) => (
                         <span key={`sub-${i}`} className="text-[8px] text-white/60 bg-white/5 px-1.5 py-0.5 rounded border border-white/5 whitespace-nowrap">
                             {k}
                         </span>
                     ))}
+                </div>
+                <div className="shrink-0 w-[52px] flex justify-end">
                     <CollectionButton newsLink={article.link} size={12} />
                 </div>
             </div>
