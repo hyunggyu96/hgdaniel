@@ -13,7 +13,7 @@ import MobileNav from '@/components/MobileNav';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Industry Intelligence | Aesthetics Terminal",
+  title: "Aesthetics Intelligence | AI Media Terminal for Medical Market",
   description: "Real-time industry stream and professional analysis for the medical aesthetics market.",
   viewport: "width=device-width, initial-scale=1, maximum-scale=1",
 };
