@@ -12,6 +12,8 @@ export default function MobileNav() {
     const pathname = usePathname();
     const selectedCategory = searchParams?.get('category');
     const isCollections = searchParams?.get('collections') === 'true';
+    const searchQuery = searchParams?.get('search');
+    const isOverview = !selectedCategory && !isCollections && !searchQuery;
 
     // Close menu when route changes
     useEffect(() => {
@@ -37,9 +39,9 @@ export default function MobileNav() {
             <nav className="fixed bottom-0 left-0 right-0 h-16 bg-[#101012] border-t border-white/10 z-50 md:hidden flex items-center justify-around px-2 backdrop-blur-xl bg-[#101012]/90">
                 <Link
                     href="/"
-                    className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all w-16 ${!selectedCategory && !isCollections ? 'text-[#3182f6]' : 'text-white/40 hover:text-white'}`}
+                    className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all w-16 ${isOverview ? 'text-[#3182f6]' : 'text-white/40 hover:text-white'}`}
                 >
-                    <Home className={`w-5 h-5 ${!selectedCategory && !isCollections ? 'fill-current' : ''}`} />
+                    <Home className={`w-5 h-5 ${isOverview ? 'fill-current' : ''}`} />
                     <span className="text-[9px] font-bold uppercase tracking-wider">Home</span>
                 </Link>
 
@@ -81,13 +83,13 @@ export default function MobileNav() {
                         <div className="space-y-2 pb-10 overflow-y-auto">
                             <Link
                                 href="/"
-                                className={`w-full flex items-center justify-between px-4 py-4 rounded-xl border transition-all ${!selectedCategory && !isCollections ? 'bg-[#3182f6] border-[#3182f6] text-white' : 'bg-white/5 border-white/5 text-white/60 hover:bg-white/10'}`}
+                                className={`w-full flex items-center justify-between px-4 py-4 rounded-xl border transition-all ${isOverview ? 'bg-[#3182f6] border-[#3182f6] text-white' : 'bg-white/5 border-white/5 text-white/60 hover:bg-white/10'}`}
                             >
                                 <div className="flex items-center gap-3">
                                     <Home className="w-4 h-4" />
                                     <span className="font-bold text-sm uppercase tracking-wide">Overview</span>
                                 </div>
-                                {(!selectedCategory && !isCollections) && <ChevronRight className="w-4 h-4" />}
+                                {isOverview && <ChevronRight className="w-4 h-4" />}
                             </Link>
 
                             <div className="h-px bg-white/5 my-2" />

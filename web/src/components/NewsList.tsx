@@ -301,8 +301,8 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
                         </span>
                     ))}
                 </div>
-                <div className="shrink-0 w-[52px] flex justify-end">
-                    <CollectionButton newsLink={article.link} size={12} />
+                <div className="shrink-0 w-[52px] flex justify-end items-center">
+                    <CollectionButton newsLink={article.link} size={20} />
                 </div>
             </div>
 
@@ -372,18 +372,21 @@ const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, 
                 </div>
             </div>
 
-            {/* Bottom Row: Included Keywords */}
-            <div className="flex items-center gap-3 opacity-60 group-hover:opacity-100 transition-opacity pl-7">
-                <div className="flex flex-wrap gap-0.5">
+            {/* Bottom Row: Included Keywords & Star */}
+            <div className="flex items-center justify-between opacity-60 group-hover:opacity-100 transition-opacity mt-1.5 pl-7">
+                <div className="flex flex-wrap items-center gap-1.5">
                     {analysis.sub.length > 0 ? (
                         analysis.sub.map((k, i) => (
-                            <span key={i} className="text-[8px] text-white/60 bg-white/5 px-1 py-0.5 rounded border border-white/5">
+                            <span key={i} className="text-[9px] text-white/60 bg-white/5 px-1.5 py-0.5 rounded border border-white/5 font-bold uppercase tracking-tight">
                                 {k}
                             </span>
                         ))
                     ) : (
                         <span className="text-[8px] text-white/20">-</span>
                     )}
+                </div>
+                <div className="shrink-0 border-l border-white/10 pl-3 ml-2">
+                    <CollectionButton newsLink={article.link} size={20} />
                 </div>
             </div>
         </article>

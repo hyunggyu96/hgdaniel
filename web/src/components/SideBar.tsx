@@ -10,6 +10,8 @@ export default function SideBar() {
     const searchParams = useSearchParams();
     const selectedCategory = searchParams?.get('category'); // null for Overview
     const isCollections = searchParams?.get('collections') === 'true';
+    const searchQuery = searchParams?.get('search');
+    const isOverview = !selectedCategory && !isCollections && !searchQuery;
 
     return (
         <aside className="w-64 flex-shrink-0 border-r border-white/5 bg-[#101012] p-6 hidden lg:block">
@@ -21,11 +23,11 @@ export default function SideBar() {
                     <div className="space-y-1">
                         <Link
                             href="/"
-                            className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 group flex items-center justify-between ${selectedCategory === null && !isCollections ? 'bg-[#3182f6] text-white' : 'text-white/50 hover:bg-white/5 hover:text-white'}`}
+                            className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 group flex items-center justify-between ${isOverview ? 'bg-[#3182f6] text-white' : 'text-white/50 hover:bg-white/5 hover:text-white'}`}
                         >
                             <span className="text-sm font-bold uppercase tracking-tight">Overview</span>
                             <ChevronRight
-                                className={`w-4 h-4 transition-transform ${selectedCategory === null && !isCollections ? 'translate-x-1' : 'opacity-0 group-hover:opacity-100'}`}
+                                className={`w-4 h-4 transition-transform ${isOverview ? 'translate-x-1' : 'opacity-0 group-hover:opacity-100'}`}
                             />
                         </Link>
                         {CATEGORIES.map((category) => (
