@@ -136,10 +136,16 @@ async def analyze_article_expert_async(title, description, search_keyword):
     except:
         pass
 
-    # CRITICAL: If all FREE options fail, STOP the process
-    print(f"\n❌ [CRITICAL] All FREE AI Models failed for: {title[:50]}...")
-    print(f"🚨 Stopping process to prevent usage of non-free models or low-quality data.")
-    sys.exit(1)
+    # Fallback if all AI models fail
+    print(f"⚠️ [FALLBACK] All AI models failed. Using raw content.")
+    return {
+        "main_keyword": "기타",
+        "included_keywords": [],
+        "issue_nature": "기타",
+        "brief_summary": title[:99],
+        "impact_level": 1,
+        "model": "Fallback-NoAI"
+    }
 
 async def process_item(item, worksheet):
     raw_id = item['id']
