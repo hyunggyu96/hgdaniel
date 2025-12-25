@@ -289,22 +289,20 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
                 <div className={`shrink-0 flex flex-col items-end text-[10px] font-mono font-bold leading-tight w-[52px] text-right ${isToday ? 'text-blue-400' : 'text-white/40'}`}>
                     <span>{dateStr}</span>
                     <span className="text-[9px] font-medium opacity-80">{pubDate ? pubDate.toLocaleTimeString('ko-KR', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', hour12: false }) : ''}</span>
-                    <div className="mt-1">
-                        <CollectionButton newsLink={article.link} size={12} />
-                    </div>
                 </div>
             </div>
 
-            {/* Keywords */}
-            {analysis.sub.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-1">
-                    {analysis.sub.slice(0, 3).map((k, i) => (
+            {/* Keywords & Star */}
+            <div className="flex items-center gap-2 mt-1">
+                <div className="flex flex-wrap items-center gap-1">
+                    {analysis.sub.length > 0 && analysis.sub.slice(0, 3).map((k, i) => (
                         <span key={`sub-${i}`} className="text-[8px] text-white/60 bg-white/5 px-1.5 py-0.5 rounded border border-white/5 whitespace-nowrap">
                             {k}
                         </span>
                     ))}
+                    <CollectionButton newsLink={article.link} size={12} />
                 </div>
-            )}
+            </div>
 
             {(summaryText) && (
                 <p className="text-[10px] text-white/40 leading-relaxed line-clamp-1 pr-4 mt-0.5">
