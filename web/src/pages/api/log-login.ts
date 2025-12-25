@@ -11,10 +11,22 @@ const SERVICE_ACCOUNT_FILE = process.env.SERVICE_ACCOUNT_FILE || '';
 async function getUserSheet(userId: string) {
     let creds;
     if (SERVICE_ACCOUNT_KEY) {
-        creds = JSON.parse(SERVICE_ACCOUNT_KEY);
-    } else {
+        try {
+            const cleanKey = SERVICE_ACCOUNT_KEY.trim().replace(/^['"]|['"]$/g, '');
+            creds = JSON.parse(cleanKey);
+        } catch (err) {
+            console.error('Failed to parse GOOGLE_SERVICE_ACCOUNT_KEY');
+            throw err;
+        }
+    } else if (SERVICE_ACCOUNT_FILE) {
         const credPath = path.resolve(SERVICE_ACCOUNT_FILE);
-        creds = JSON.parse(fs.readFileSync(credPath, 'utf8'));
+        if (fs.existsSync(credPath)) {
+            creds = JSON.parse(fs.readFileSync(credPath, 'utf8'));
+        } else {
+            throw new Error('Service account file not found');
+        }
+    } else {
+        throw new Error('No Google credentials provided');
     }
 
     const serviceAccountAuth = new JWT({

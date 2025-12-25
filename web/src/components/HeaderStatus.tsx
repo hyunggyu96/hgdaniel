@@ -12,7 +12,7 @@ export default function HeaderStatus() {
 
         const fetchVisitors = async () => {
             try {
-                const res = await fetch('/api/track-visit');
+                const res = await fetch(`/api/track-visit?_t=${Date.now()}`);
                 if (res.ok) {
                     const json = await res.json();
                     setVisitors(json.count);
