@@ -88,6 +88,9 @@ async def analyze_article_expert_async(title, description, search_keyword):
             }
             async with aiohttp.ClientSession() as http_sess:
                 async with http_sess.post(url, json=payload, timeout=15) as resp:
+                    if resp.status == 429 or resp.status == 503:
+                         print(f"  ⚠️ Gemini-{i+1} Quota/Busy ({resp.status}). Switching...")
+                         continue
                     if resp.status == 200:
                         result = await resp.json()
                         text = result['candidates'][0]['content']['parts'][0]['text']
