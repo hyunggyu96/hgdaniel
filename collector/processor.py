@@ -96,7 +96,21 @@ async def analyze_article_expert_async(title, description, search_keyword):
                         text = result['candidates'][0]['content']['parts'][0]['text']
                         data = json.loads(text)
                         return {**data, "model": f"Gemini-2.0-{i+1}"}
+
         except: continue
+
+    # Try Groq (Free Tier, Llama-3.3)
+    if groq_client:
+        try:
+            response = await groq_client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
+                response_format={"type": "json_object"}
+            )
+            data = json.loads(response.choices[0].message.content)
+            return {**data, "model": "Groq-Llama3.3"}
+        except Exception as e:
+            print(f"  ⚠️ Groq Error: {e}")
 
     if openrouter_client:
         try:
