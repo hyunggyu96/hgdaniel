@@ -313,10 +313,10 @@ async def process_news_item_expert(session, item, search_keyword, worksheet, exi
         title = item['title'].replace('<b>', '').replace('</b>', '').replace('&quot;', '"').replace('&amp;', '&')
         desc = item['description'].replace('<b>', '').replace('</b>', '').replace('&quot;', '"').replace('&amp;', '&')
         
-        # AI Analysis
-        analysis = await analyze_article_expert_async(title, desc, search_keyword)
-        if not analysis:
-            return 0 # Skip this item
+        # AI Analysis NO LONGER DONE IN COLLECTOR
+        # analysis = await analyze_article_expert_async(title, desc, search_keyword)
+        # if not analysis:
+        #     return 0 # Skip this item
         
         # Cleaning for Sections 2 & 8
         clean_search_kw = clean_text_expert(search_keyword)
@@ -333,30 +333,24 @@ async def process_news_item_expert(session, item, search_keyword, worksheet, exi
         row = [now_str, clean_search_kw, title, link, main_kw, ", ".join(included), pub_iso, clean_issue_nature, summary]
 
         try:
-            # Update Supabase
-            # Formatting as: [Main Keyword | Issue Nature | Summary] + included keywords
-            main_tag = f"[{main_kw} | {clean_issue_nature} | {summary}]"
+            # Update Supabase (Raw Staging)
             supabase_data = {
                 "title": title,
                 "description": desc,
                 "link": link,
-                "published_at": pub_iso,
-                "source": "Naver",
-                "keyword": clean_search_kw,
-                "main_keywords": [main_tag] + included
+                "pub_date": pub_iso,
+                "search_keyword": clean_search_kw,
+                "status": "pending"
             }
-            supabase.table("articles").insert(supabase_data).execute()
+            # Use raw_news table
+            supabase.table("raw_news").insert(supabase_data).execute()
             
-            # Sync to Sheet
-            if worksheet:
-                worksheet.append_row(row)
-                
-            print(f"✅ [{analysis['model']}] {title[:30]}... | {main_kw}")
+            print(f"📦 [RAW] Collected: {title[:40]}...")
             existing_links.add(link)
             return 1
         except Exception as e:
             if "duplicate key" not in str(e):
-                print(f"  ❌ Sync Error: {e}")
+                print(f"  ❌ Raw Sync Error: {e}")
             return 0
 
 # [7] Main Execution
@@ -378,12 +372,12 @@ async def main():
             # Load existing links from Supabase to prevent duplicates
             existing_links = set()
             try:
-                # Fetch only links to save bandwidth
-                rows = supabase.table("articles").select("link").execute().data
+                # Fetch links from raw_news to prevent duplicates
+                rows = supabase.table("raw_news").select("link").execute().data
                 existing_links = {r['link'] for r in rows}
-                print(f"📚 Loaded {len(existing_links)} existing articles from DB.")
+                print(f"📚 Loaded {len(existing_links)} existing raw articles from DB.")
             except Exception as e:
-                print(f"⚠️ Failed to load existing links: {e}")
+                print(f"⚠️ Failed to load existing raw links: {e}")
 
             # Google Sheet Setup
             worksheet = None

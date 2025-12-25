@@ -46,3 +46,4 @@ jobs:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       run: |
         python collector/async_collector.py
+        python collector/processor.py
