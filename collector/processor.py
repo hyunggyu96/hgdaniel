@@ -18,6 +18,7 @@ from dotenv import load_dotenv
 from supabase import create_client
 import firebase_admin
 from firebase_admin import credentials, firestore
+from alert_manager import send_slack_alert, send_discord_alert
 
 # Firebase Setup
 try:
@@ -211,6 +212,10 @@ async def process_item(item, worksheet):
                     "link": link
                 })
                 print(f" 🔥 [CRITICAL] High impact news detected (Level {impact})!")
+                
+                # SEND PROACTIVE MOBILE ALERTS
+                send_slack_alert(title, impact, link, summary)
+                send_discord_alert(title, impact, link, summary)
 
         # 3. Update Google Sheets
         if worksheet:

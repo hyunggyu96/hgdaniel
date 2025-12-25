@@ -40,10 +40,11 @@ jobs:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
         GOOGLE_SHEET_URL: ${{ secrets.GOOGLE_SHEET_URL }}
-        OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         GROQ_API_KEY_2: ${{ secrets.GROQ_API_KEY_2 }}
-        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
       run: |
         python collector/async_collector.py
         python collector/processor.py
