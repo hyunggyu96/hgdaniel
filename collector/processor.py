@@ -217,6 +217,10 @@ async def main():
         print("💤 No pending items to process.")
         return
 
+    # [IMPORTANT] Sort by pub_date ASC so that older items are processed first.
+    # When inserted at Row 2 (Top), the newest items end up at the very top.
+    pending_items.sort(key=lambda x: x.get('pub_date', ''))
+    
     print(f"🔎 Found {len(pending_items)} pending items.")
     worksheet = get_google_sheet()
     
