@@ -48,9 +48,7 @@ SERVICE_ACCOUNT_FILE = os.path.join(os.path.dirname(__file__), 'service_account.
 GEMINI_KEYS = [os.getenv("GEMINI_API_KEY"), os.getenv("GEMINI_API_KEY_2")]
 GEMINI_KEYS = [k for k in GEMINI_KEYS if k]
 
-openai_client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY")) if os.getenv("OPENAI_API_KEY") else None
 groq_client = AsyncOpenAI(api_key=os.getenv("GROQ_API_KEY"), base_url="https://api.groq.com/openai/v1") if os.getenv("GROQ_API_KEY") else None
-openrouter_client = AsyncOpenAI(api_key=os.getenv("OPENROUTER_API_KEY"), base_url="https://openrouter.ai/api/v1") if os.getenv("OPENROUTER_API_KEY") else None
 
 def get_google_sheet():
     try:
@@ -112,28 +110,16 @@ async def analyze_article_expert_async(title, description, search_keyword):
         except Exception as e:
             print(f"  ⚠️ Groq Error: {e}")
 
-    if openrouter_client:
-        try:
-            response = await openrouter_client.chat.completions.create(
-                model="anthropic/claude-3.5-sonnet",
-                messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
-                response_format={"type": "json_object"}
-            )
-            data = json.loads(response.choices[0].message.content)
-            return {**data, "model": "Claude-3.5"}
-        except: pass
-
     # Try Ollama (Local AI) - Final AI Fallback
     try:
         url = "http://localhost:11434/api/generate"
         payload = {
-            "model": "llama3", # User confirmed pulling llama3
+            "model": "llama3",
             "prompt": f"{system_prompt}\n\n{user_prompt}\n\nRespond in JSON format only.",
             "stream": False,
             "format": "json"
         }
         async with aiohttp.ClientSession() as http_sess:
-            # 60s Timeout for Local AI
             async with http_sess.post(url, json=payload, timeout=60) as resp:
                 if resp.status == 200:
                     res_json = await resp.json()
@@ -146,13 +132,13 @@ async def analyze_article_expert_async(title, description, search_keyword):
                         "brief_summary": data.get("brief_summary", title[:70]),
                         "model": "Ollama-Llama3"
                     }
-                else:
-                    print(f"  ⚠️ Ollama Status {resp.status}...")
-    except Exception as e:
-        print(f"  ⚠️ Ollama Error: {str(e)[:50]}...")
+    except:
+        pass
 
-    # Basic Fallback
-    return None
+    # CRITICAL: If all FREE options fail, STOP the process
+    print(f"\n❌ [CRITICAL] All FREE AI Models failed for: {title[:50]}...")
+    print(f"🚨 Stopping process to prevent usage of non-free models or low-quality data.")
+    sys.exit(1)
 
 async def process_item(item, worksheet):
     raw_id = item['id']
