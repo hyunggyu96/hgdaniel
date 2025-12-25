@@ -138,7 +138,7 @@ export default async function NewsList({ selectedCategory, currentPage = 1, sear
             <div className="pt-8 md:pt-12 px-4 md:px-6 lg:px-12">
                 <div className="flex flex-col gap-4 mb-4">
                     <h1 className="text-2xl md:text-3xl lg:text-5xl font-black uppercase tracking-tighter text-white leading-tight">
-                        {isCollectionsView ? 'Collections' : selectedCategory ? selectedCategory : 'Aesthetic Intelligence'}
+                        {isCollectionsView ? 'Collections' : selectedCategory ? selectedCategory : 'Market Intelligence'}
                     </h1>
                     <div className="flex items-start gap-2">
                         <span className="relative flex h-2 w-2 mt-1 shrink-0">
