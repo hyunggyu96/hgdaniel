@@ -385,9 +385,7 @@ const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, 
                         <span className="text-[8px] text-white/20">-</span>
                     )}
                 </div>
-                <div className="shrink-0 border-l border-white/10 pl-3 ml-2">
-                    <CollectionButton newsLink={article.link} newsTitle={article.title} size={20} />
-                </div>
+
             </div>
         </article>
     );
