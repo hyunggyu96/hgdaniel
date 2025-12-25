@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "firebase-tools": "^15.1.0",
+    "supabase": "^2.70.5"
+  }
+}

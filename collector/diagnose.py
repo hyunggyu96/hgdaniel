@@ -2,10 +2,20 @@ import os
 import requests
 import datetime
 import json
-from supabase import create_client
 from dotenv import load_dotenv
-import firebase_admin
-from firebase_admin import credentials, firestore
+
+try:
+    from supabase import create_client
+    HAS_SUPABASE = True
+except ImportError:
+    HAS_SUPABASE = False
+
+try:
+    import firebase_admin
+    from firebase_admin import credentials, firestore
+    HAS_FIREBASE = True
+except ImportError:
+    HAS_FIREBASE = False
 
 load_dotenv()
 
@@ -22,29 +32,35 @@ def diagnose():
         print("🌐 Vercel Frontend: [OFFLINE]")
 
     # 2. Supabase
-    try:
-        sb_url = os.getenv("SUPABASE_URL")
-        sb_key = os.getenv("SUPABASE_KEY")
-        supabase = create_client(sb_url, sb_key)
-        count = supabase.table("articles").select("id", count="exact").limit(1).execute().count
-        print(f"🗄️ Supabase DB: [OK] ({count} articles total)")
-    except Exception as e:
-        print(f"🗄️ Supabase DB: [FAIL] ({e})")
+    if HAS_SUPABASE:
+        try:
+            sb_url = os.getenv("SUPABASE_URL")
+            sb_key = os.getenv("SUPABASE_KEY")
+            supabase = create_client(sb_url, sb_key)
+            count = supabase.table("articles").select("id", count="exact").limit(1).execute().count
+            print(f"🗄️ Supabase DB: [OK] ({count} articles total)")
+        except Exception as e:
+            print(f"🗄️ Supabase DB: [FAIL] ({e})")
+    else:
+        print("🗄️ Supabase DB: [SKIPPED] (Install: pip install supabase)")
 
     # 3. Firestore
-    try:
-        if not firebase_admin._apps:
-            cred_json = os.environ.get("FIREBASE_SERVICE_ACCOUNT")
-            if cred_json:
-                cred = credentials.Certificate(json.loads(cred_json))
-                firebase_admin.initialize_app(cred)
-            else:
-                firebase_admin.initialize_app()
-        db = firestore.client()
-        alerts = db.collection("critical_alerts").limit(5).get()
-        print(f"🔥 Firestore: [OK] ({len(alerts)} recent critical alerts found)")
-    except Exception as e:
-        print(f"🔥 Firestore: [FAIL] ({e})")
+    if HAS_FIREBASE:
+        try:
+            if not firebase_admin._apps:
+                cred_json = os.environ.get("FIREBASE_SERVICE_ACCOUNT")
+                if cred_json:
+                    cred = credentials.Certificate(json.loads(cred_json))
+                    firebase_admin.initialize_app(cred)
+                else:
+                    firebase_admin.initialize_app()
+            db = firestore.client()
+            alerts = db.collection("critical_alerts").limit(5).get()
+            print(f"🔥 Firestore: [OK] ({len(alerts)} recent critical alerts found)")
+        except Exception as e:
+            print(f"🔥 Firestore: [FAIL] ({e})")
+    else:
+        print("🔥 Firestore: [SKIPPED] (Install: pip install firebase-admin)")
 
     # 4. Google Sheets
     sheet_url = os.getenv("GOOGLE_SHEET_URL")

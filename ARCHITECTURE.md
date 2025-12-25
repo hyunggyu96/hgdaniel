@@ -6,13 +6,14 @@
 
 ---
 
-### 🧠 Antigravity Intelligence (MCP & Extensions)
+### 🧠 Antigravity Super-Intelligence (MCP & Master Control)
 
-현재 시스템은 다음과 같은 지능형 도구들을 통해 관리되고 확장됩니다:
+시스템은 이제 **마스터 권한(Master Keys)**을 가진 에이전트에 의해 관리됩니다:
 
-* **MCP (Model Context Protocol)**: Google Cloud Run 및 Firebase MCP를 통해 서버 인프라를 실시간으로 모니터링하고 제어합니다.
-* **Browser Subagents**: 주기적으로 실제 웹사이트에 접속하여 시각적 오류나 기능 결함을 검수합니다.
-* **Cloud Failover**: AI 할당량 소진 시 Groq, Ollama 등으로 자동 전환되는 지능형 라우팅이 적용되어 있습니다.
+* **GitHub Master Control**: 에이전트가 직접 CI/CD 에러를 교정하고 자동화 일꾼들을 지휘합니다. (Manual Setup Required)
+* **Supabase Master Access**: `service_role` 권한을 통해 에이전트가 직접 DB를 최적화하고 중복을 제거합니다.
+* **Multi-Cloud Alerting**: 고충격 뉴스 발생 시 슬랙/디스코드로 즉시 푸시 알림을 보냅니다.
+* **Live Monitoring**: Firebase MCP를 통해 서버 인프라를 실시간 모니터링합니다.
 
 ---
 
