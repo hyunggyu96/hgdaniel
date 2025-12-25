@@ -61,43 +61,39 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const sheet = await getVisitsSheet();
 
         const now = new Date();
-        const kstNow = new Date(now.getTime() + (9 * 60 * 60 * 1000)); // Manual KST shift if needed, but toLocaleString is better
+        const kstDateString = now.toLocaleDateString('ko-KR', {
+            timeZone: 'Asia/Seoul',
+            year: 'numeric', month: '2-digit', day: '2-digit'
+        }); // "2024. 12. 25."
 
-        const timestampFormat = new Date().toLocaleString('ko-KR', {
+        const timestampStr = now.toLocaleString('ko-KR', {
             timeZone: 'Asia/Seoul',
             year: 'numeric', month: '2-digit', day: '2-digit',
             hour: '2-digit', minute: '2-digit', second: '2-digit',
-        });
-
-        const datePrefix = new Date().toLocaleDateString('ko-KR', {
-            timeZone: 'Asia/Seoul',
-            year: 'numeric', month: '2-digit', day: '2-digit'
-        }).replace(/\. /g, '.').replace(/\.$/, ''); // Match "2024.12.25" style
+        }); // "2024. 12. 25. 오후 10:00:00"
 
         // 1. Add current visit
-        await sheet.addRow({ timestamp: timestampFormat, ip, country });
+        await sheet.addRow({ timestamp: timestampStr, ip, country });
 
         // 2. Count today's visits
-        // Note: getRows() gets the last 500 rows or so by default if no offset, 
-        // but for a small/medium tracker it returns all.
         const rows = await sheet.getRows();
 
         // Filter rows by today's date prefix
         const todayVisits = rows.filter(row => {
             const ts = row.get('timestamp') as string;
-            return ts && ts.includes(datePrefix);
+            // Check if it starts with "2024. 12. 25."
+            return ts && ts.startsWith(kstDateString);
         });
 
-        // Deduplicate by IP to get "Unique Visitors Today"
         const uniqueIps = new Set(todayVisits.map(v => v.get('ip')));
 
         return res.status(200).json({
             count: uniqueIps.size,
-            totalRows: rows.length,
-            debug: { datePrefix, sample: rows.length > 0 ? rows[rows.length - 1].get('timestamp') : null }
+            totalToday: todayVisits.length,
+            dateKey: kstDateString
         });
-    } catch (e) {
+    } catch (e: any) {
         console.error('track-visit error:', e);
-        return res.status(200).json({ count: 0, error: String(e) });
+        return res.status(200).json({ count: 0, error: e.message });
     }
 }
