@@ -105,14 +105,31 @@ async def main():
     while True:
         try:
             print(f"\n⏰ Cycle Start: {datetime.datetime.now()}")
-            start_date = datetime.datetime(2025, 12, 1) 
             
-            # Load existing links
+            # [Dynamic Start Date] Get latest published_at from articles table
+            try:
+                latest_res = supabase.table("articles").select("published_at").order("published_at", desc=True).limit(1).execute()
+                if latest_res.data:
+                    latest_iso = latest_res.data[0]['published_at']
+                    # Parse ISO format (e.g., 2025-12-25T08:19:00+00:00)
+                    if 'T' in latest_iso:
+                        start_date = datetime.datetime.fromisoformat(latest_iso.replace('Z', '+00:00')).replace(tzinfo=None)
+                    else:
+                        start_date = datetime.datetime.strptime(latest_iso, "%Y-%m-%d %H:%M:%S+00:00").replace(tzinfo=None)
+                    print(f"📅 Latest News Date Found: {start_date}")
+                else:
+                    start_date = datetime.datetime(2025, 12, 19)
+                    print(f"📅 No articles found. Using Default: {start_date}")
+            except Exception as e:
+                start_date = datetime.datetime(2025, 12, 19)
+                print(f"⚠️ Start Date Error ({e}). Using Default: {start_date}")
+
+            # Load existing links (last 2000 for deduplication speed)
             existing_links = set()
             try:
-                rows = supabase.table("raw_news").select("link").execute().data
+                rows = supabase.table("raw_news").select("link").order("created_at", desc=True).limit(2000).execute().data
                 existing_links = {r['link'] for r in rows}
-                print(f"📚 Loaded {len(existing_links)} existing raw links.")
+                print(f"📚 Loaded {len(existing_links)} recent raw links for deduplication.")
             except Exception as e:
                 print(f"⚠️ Link Load Error: {e}")
 
