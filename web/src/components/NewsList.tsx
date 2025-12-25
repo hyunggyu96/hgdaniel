@@ -281,7 +281,7 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
                         href={article.link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-xs font-bold text-white/90 group-hover/article:text-[#3182f6] transition-colors leading-tight line-clamp-2"
+                        className="text-sm font-bold text-white/90 group-hover/article:text-[#3182f6] transition-colors leading-tight line-clamp-2"
                     >
                         {article.title}
                     </a>
@@ -307,7 +307,7 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
             </div>
 
             {(summaryText) && (
-                <p className="text-[10px] text-white/40 leading-relaxed line-clamp-1 pr-4 mt-0.5">
+                <p className="text-[11px] text-white/40 leading-relaxed line-clamp-1 pr-4 mt-1">
                     {summaryText}
                 </p>
             )}
