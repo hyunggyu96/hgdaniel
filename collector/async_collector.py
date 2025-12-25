@@ -12,6 +12,7 @@ import aiohttp
 import json
 import email.utils
 import datetime
+import pathlib
 import re
 from typing import List, Dict
 
@@ -106,23 +107,45 @@ async def main():
         try:
             print(f"\n⏰ Cycle Start: {datetime.datetime.now()}")
             
-            # [Dynamic Start Date] Get latest published_at from articles table
-            try:
-                latest_res = supabase.table("articles").select("published_at").order("published_at", desc=True).limit(1).execute()
-                if latest_res.data:
-                    latest_iso = latest_res.data[0]['published_at']
-                    # Parse ISO format (e.g., 2025-12-25T08:19:00+00:00)
-                    if 'T' in latest_iso:
-                        start_date = datetime.datetime.fromisoformat(latest_iso.replace('Z', '+00:00')).replace(tzinfo=None)
+            # ---- Determine start_date ----
+            import json, pathlib
+            last_update_path = pathlib.Path(__file__).parents[1] / "last_update.json"
+            if last_update_path.exists():
+                try:
+                    data = json.loads(last_update_path.read_text(encoding="utf-8"))
+                    last_run_str = data.get("last_run")
+                    if last_run_str:
+                        start_date = datetime.datetime.fromisoformat(last_run_str.replace('Z', '+00:00')).replace(tzinfo=None)
+                        print(f"📅 start_date from last_update.json: {start_date}")
                     else:
-                        start_date = datetime.datetime.strptime(latest_iso, "%Y-%m-%d %H:%M:%S+00:00").replace(tzinfo=None)
-                    print(f"📅 Latest News Date Found: {start_date}")
-                else:
+                        raise ValueError("last_run missing")
+                except Exception as e:
+                    print(f"⚠️ Failed to parse last_update.json ({e}), falling back to DB")
+                    start_date = None
+            else:
+                start_date = None
+
+            # Fallback: get latest published_at from articles table if needed
+            if not start_date:
+                try:
+                    latest_res = supabase.table("articles").select("published_at").order("published_at", desc=True).limit(1).execute()
+                    if latest_res.data:
+                        latest_iso = latest_res.data[0]["published_at"]
+                        if "T" in latest_iso:
+                            start_date = datetime.datetime.fromisoformat(latest_iso.replace('Z', '+00:00')).replace(tzinfo=None)
+                        else:
+                            start_date = datetime.datetime.strptime(latest_iso, "%Y-%m-%d %H:%M:%S+00:00").replace(tzinfo=None)
+                        print(f"📅 start_date from DB: {start_date}")
+                    else:
+                        start_date = datetime.datetime(2025, 12, 19)
+                        print(f"📅 No articles in DB, using default: {start_date}")
+                except Exception as e:
                     start_date = datetime.datetime(2025, 12, 19)
-                    print(f"📅 No articles found. Using Default: {start_date}")
-            except Exception as e:
+                    print(f"⚠️ DB start_date error ({e}), using default: {start_date}")
+            # Ensure start_date is set
+            if not start_date:
                 start_date = datetime.datetime(2025, 12, 19)
-                print(f"⚠️ Start Date Error ({e}). Using Default: {start_date}")
+                print(f"📅 Final fallback start_date: {start_date}")
 
             # Load existing links (last 2000 for deduplication speed)
             existing_links = set()

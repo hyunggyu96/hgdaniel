@@ -10,6 +10,7 @@ const TrendChart = dynamic_next(() => import('@/components/TrendChart'), {
 });
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 interface PageProps {
     searchParams: {

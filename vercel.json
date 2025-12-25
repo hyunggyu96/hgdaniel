@@ -10,10 +10,5 @@
             "src": "/(.*)",
             "dest": "web/$1"
         }
-    ],
-    "functions": {
-        "web/src/pages/api/**/*.ts": {
-            "maxDuration": 60
-        }
-    }
+    ]
 }

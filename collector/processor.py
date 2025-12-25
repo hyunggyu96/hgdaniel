@@ -220,7 +220,7 @@ async def main():
     print(f"🚀 Expert News Processor Started at {datetime.datetime.now()}")
     
     # Fetch pending items
-    res = supabase.table("raw_news").select("*").eq("status", "pending").limit(50).execute()
+    res = supabase.table("raw_news").select("*").eq("status", "pending").limit(200).execute()
     pending_items = res.data
     
     if not pending_items:
