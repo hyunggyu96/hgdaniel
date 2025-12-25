@@ -8,9 +8,9 @@ Expert News Processor V1.0:
 
 import sys
 import os
+import json
 import asyncio
 import aiohttp
-import json
 import datetime
 from typing import List, Dict
 
