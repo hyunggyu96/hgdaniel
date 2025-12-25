@@ -53,7 +53,7 @@ export default function CollectionsView({ allNews, today }: CollectionsViewProps
 
                     return (
                         <article key={article.id} className={`group py-1.5 px-3 hover:bg-white/[0.03] transition-colors border-b border-white/5 flex gap-2 items-start ${isToday ? 'bg-blue-900/5' : ''}`}>
-                            <CollectionButton newsLink={article.link} />
+                            <CollectionButton newsLink={article.link} newsTitle={article.title} />
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 text-[9px] h-4 mb-1">
                                     <span className={`font-mono font-bold tracking-tight text-[10px] ${isToday ? 'text-blue-400' : 'text-white/50'}`}>
