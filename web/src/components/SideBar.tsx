@@ -8,8 +8,8 @@ import CollectionCount from './CollectionCount';
 
 export default function SideBar() {
     const searchParams = useSearchParams();
-    const selectedCategory = searchParams.get('category'); // null for Overview
-    const isCollections = searchParams.get('collections') === 'true';
+    const selectedCategory = searchParams?.get('category'); // null for Overview
+    const isCollections = searchParams?.get('collections') === 'true';
 
     return (
         <aside className="w-64 flex-shrink-0 border-r border-white/5 bg-[#101012] p-6 hidden lg:block">

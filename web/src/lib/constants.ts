@@ -20,7 +20,7 @@ export function groupNewsByCategory(news: any[]) {
 
     // 2. Iterate through each news article
     news.forEach(article => {
-        let bestCategory = null;
+        let bestCategory: string | null = null;
         let highestScore = 0;
         let corporateNewsScore = 0; // Track specifically for fallback
 

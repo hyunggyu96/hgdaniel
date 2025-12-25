@@ -108,7 +108,7 @@ export default async function NewsList({ selectedCategory, currentPage = 1, sear
     const itemsPerPage = 20;
 
     // Filter news by category first
-    let filteredNews = [];
+    let filteredNews: any[] = [];
     if (selectedCategory) {
         filteredNews = newsByCategory[selectedCategory] || [];
     } else {

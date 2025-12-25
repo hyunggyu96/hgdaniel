@@ -7,16 +7,16 @@ import { useState, useEffect } from 'react';
 export default function SearchBar() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+    const [searchQuery, setSearchQuery] = useState(searchParams?.get('search') || '');
 
     useEffect(() => {
-        setSearchQuery(searchParams.get('search') || '');
+        setSearchQuery(searchParams?.get('search') || '');
     }, [searchParams]);
 
     const handleSearch = (value: string) => {
         setSearchQuery(value);
 
-        const params = new URLSearchParams(searchParams.toString());
+        const params = new URLSearchParams(searchParams?.toString() || '');
         if (value.trim()) {
             params.set('search', value.trim());
             params.delete('page'); // Reset to page 1 when searching
@@ -29,7 +29,7 @@ export default function SearchBar() {
 
     const clearSearch = () => {
         setSearchQuery('');
-        const params = new URLSearchParams(searchParams.toString());
+        const params = new URLSearchParams(searchParams?.toString() || '');
         params.delete('search');
         router.push(`/?${params.toString()}`);
     };
