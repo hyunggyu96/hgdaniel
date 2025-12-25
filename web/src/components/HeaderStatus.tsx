@@ -44,13 +44,6 @@ export default function HeaderStatus() {
             <div className="text-[11px] font-bold text-white/70 uppercase tracking-widest bg-white/5 px-4 py-1.5 rounded-full border border-white/10 shadow-sm transition-all hover:bg-white/10">
                 {dateStr}
             </div>
-            {timeStr && (
-                <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-bold text-white bg-red-600/90 px-2.5 py-0.5 rounded-full shadow-lg shadow-red-900/20 animate-pulse">
-                        TODAY {timeStr}
-                    </span>
-                </div>
-            )}
             {visitors !== null && (
                 <div className="text-[10px] font-bold text-emerald-400 drop-shadow-sm flex items-center gap-1">
                     <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />

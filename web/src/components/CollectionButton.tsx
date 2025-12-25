@@ -4,7 +4,7 @@ import { Star } from 'lucide-react';
 import { useCollection } from './CollectionContext';
 import { useUser } from './UserContext';
 
-export default function CollectionButton({ newsLink }: { newsLink: string }) {
+export default function CollectionButton({ newsLink, size = 14 }: { newsLink: string, size?: number }) {
     const { isInCollection, toggleCollection } = useCollection();
     const { userId } = useUser();
     const inCollection = isInCollection(newsLink);
@@ -27,7 +27,8 @@ export default function CollectionButton({ newsLink }: { newsLink: string }) {
             className={`group/star p-1 rounded-lg transition-all ${isLoggedIn ? 'hover:bg-white/10' : 'cursor-not-allowed opacity-30 shadow-none'}`}
         >
             <Star
-                className={`w-3.5 h-3.5 transition-all ${inCollection
+                style={{ width: `${size}px`, height: `${size}px` }}
+                className={`transition-all ${inCollection
                     ? 'fill-yellow-400 text-yellow-400'
                     : isLoggedIn ? 'text-white/30 group-hover/star:text-yellow-400' : 'text-white/20'
                     }`}
