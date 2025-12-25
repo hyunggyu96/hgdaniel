@@ -149,6 +149,16 @@ async def process_item(item, worksheet):
     pub_date = item['pub_date']
     keyword = item['search_keyword']
 
+    # [Strict Rule] Double check if already in production articles to prevent duplicates
+    try:
+        check = supabase.table("articles").select("id").eq("link", link).execute()
+        if check.data:
+            print(f"  ⏩ Skipping (Already in DB): {title[:30]}...")
+            supabase.table("raw_news").update({"status": "skipped"}).eq("id", raw_id).execute()
+            return True
+    except Exception as e:
+        print(f"  ⚠️ Duplicate check error: {e}")
+
     print(f"🤖 Processing: {title[:40]}...")
     
     analysis = await analyze_article_expert_async(title, desc, keyword)

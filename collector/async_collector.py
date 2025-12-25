@@ -63,7 +63,7 @@ async def fetch_naver_news_expert(session, keyword, start_date):
                 items = data.get('items', [])
                 for item in items:
                     pub_date = email.utils.parsedate_to_datetime(item['pubDate'])
-                    if pub_date.replace(tzinfo=None) >= start_date:
+                    if pub_date.replace(tzinfo=None) > start_date:
                         all_items.append(item)
     except Exception as e:
         print(f"  ⚠️ Naver API Error for [{keyword}]: {e}")
