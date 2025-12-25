@@ -7,6 +7,7 @@ on: # Workflow update trigger
 
 jobs:
   update-news:
+    runs-on: ubuntu-latest
     permissions:
       contents: write
 
