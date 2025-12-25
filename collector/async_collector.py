@@ -320,17 +320,11 @@ async def process_news_item_expert(session, item, search_keyword, worksheet, exi
         
         # Cleaning for Sections 2 & 8
         clean_search_kw = clean_text_expert(search_keyword)
-        clean_issue_nature = clean_text_expert(analysis.get('issue_nature', '기타'))
-        main_kw = clean_text_expert(analysis.get('main_keyword', '기타'))
-        summary = clean_text_expert(analysis.get('brief_summary', '-'))
-        included = [clean_text_expert(k) for k in analysis.get('included_keywords', []) if k]
         
-        now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        # Use KST for 'Analysis Time' if ever used, though analysis is in processor
+        kst_now = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
+        now_str = kst_now.strftime("%Y-%m-%d %H:%M:%S")
         pub_iso = email.utils.parsedate_to_datetime(item['pubDate']).isoformat()
-        pub_sheet = pub_iso[:10] # Date only for sheet clarity or full iso
-
-        # Google Sheet Row (9 Columns)
-        row = [now_str, clean_search_kw, title, link, main_kw, ", ".join(included), pub_iso, clean_issue_nature, summary]
 
         try:
             # Update Supabase (Raw Staging)

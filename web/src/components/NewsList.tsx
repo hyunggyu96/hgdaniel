@@ -105,7 +105,7 @@ function MarketBadge({ main_keywords, sub_keywords, sector }: { main_keywords: s
 export default async function NewsList({ selectedCategory, currentPage = 1, searchQuery, showCollections }: NewsListProps & { searchQuery?: string, showCollections?: boolean }) {
     const allNews = await getNews();
     const newsByCategory = groupNewsByCategory(allNews);
-    const itemsPerPage = 20;
+    const itemsPerPage = 20; // Reverted to 20 per user request
 
     // Filter news by category first
     let filteredNews: any[] = [];
@@ -158,25 +158,28 @@ export default async function NewsList({ selectedCategory, currentPage = 1, sear
                     </div>
                     <div className="text-[9px] font-bold text-white/30 uppercase tracking-widest mt-2">
                         Last Updated: {(() => {
+                            if (allNews.length === 0) return 'N/A';
+
+                            // Find the most recent published_at across all news
+                            // Dates are ISO strings (e.g., 2025-12-25T09:16:00)
                             const latestArticle = allNews.reduce((latest, article) => {
-                                const articleDate = article.published_at ? new Date(article.published_at) : new Date(0);
-                                const latestDate = latest.published_at ? new Date(latest.published_at) : new Date(0);
-                                return articleDate > latestDate ? article : latest;
-                            }, allNews[0] || {});
+                                if (!article.published_at) return latest;
+                                if (!latest.published_at) return article;
+                                return new Date(article.published_at).getTime() > new Date(latest.published_at).getTime() ? article : latest;
+                            }, allNews[0]);
 
-                            const timestamp = latestArticle.published_at
-                                ? new Date(latestArticle.published_at).toLocaleString('ko-KR', {
-                                    timeZone: 'Asia/Seoul',
-                                    year: 'numeric',
-                                    month: '2-digit',
-                                    day: '2-digit',
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                    hour12: false
-                                }).replace(/\. /g, '.').replace(/\.$/, '').replace(', ', ' ')
-                                : 'N/A';
+                            if (!latestArticle?.published_at) return 'N/A';
 
-                            return timestamp;
+                            // Format as user-friendly string
+                            return new Date(latestArticle.published_at).toLocaleString('ko-KR', {
+                                timeZone: 'Asia/Seoul',
+                                year: 'numeric',
+                                month: '2-digit',
+                                day: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: false
+                            }).replace(/\. /g, '.').replace(/\.$/, '').replace(', ', ' ');
                         })()}
                     </div>
                 </div>

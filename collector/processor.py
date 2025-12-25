@@ -106,6 +106,34 @@ async def analyze_article_expert_async(title, description, search_keyword):
             return {**data, "model": "Claude-3.5"}
         except: pass
 
+    # Try Ollama (Local AI) - Final AI Fallback
+    try:
+        url = "http://localhost:11434/api/generate"
+        payload = {
+            "model": "llama3", # User confirmed pulling llama3
+            "prompt": f"{system_prompt}\n\n{user_prompt}\n\nRespond in JSON format only.",
+            "stream": False,
+            "format": "json"
+        }
+        async with aiohttp.ClientSession() as http_sess:
+            # 60s Timeout for Local AI
+            async with http_sess.post(url, json=payload, timeout=60) as resp:
+                if resp.status == 200:
+                    res_json = await resp.json()
+                    res_content = res_json.get("response", "{}")
+                    data = json.loads(res_content)
+                    return {
+                        "main_keyword": data.get("main_keyword", "기타"),
+                        "included_keywords": data.get("included_keywords", []),
+                        "issue_nature": data.get("issue_nature", "기타"),
+                        "brief_summary": data.get("brief_summary", title[:70]),
+                        "model": "Ollama-Llama3"
+                    }
+                else:
+                    print(f"  ⚠️ Ollama Status {resp.status}...")
+    except Exception as e:
+        print(f"  ⚠️ Ollama Error: {str(e)[:50]}...")
+
     # Basic Fallback
     return None
 
@@ -145,11 +173,26 @@ async def process_item(item, worksheet):
     try:
         supabase.table("articles").insert(prod_data).execute()
         
-        # 2. Update Google Sheets
-        if worksheet:
-            now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            row = [now_str, keyword, title, link, main_kw, ", ".join(included_kws), pub_date, issue_nature, summary]
-            worksheet.append_row(row)
+            # 2. Update Google Sheets
+            if worksheet:
+                kst_now = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
+                now_str = kst_now.strftime("%Y-%m-%d %H:%M:%S")
+                
+                # Convert pub_date to KST
+                pub_kst_str = pub_date
+                try:
+                    if 'T' in pub_date:
+                        pd_utc = datetime.datetime.fromisoformat(pub_date.replace('Z', '+00:00'))
+                    else:
+                        pd_utc = datetime.datetime.strptime(pub_date, "%Y-%m-%d %H:%M:%S+00:00")
+                    pd_kst = pd_utc + datetime.timedelta(hours=9)
+                    pub_kst_str = pd_kst.strftime("%Y-%m-%d %H:%M:%S")
+                except:
+                    pass
+
+                row = [now_str, keyword, title, link, main_kw, ", ".join(included_kws), pub_kst_str, issue_nature, summary]
+                # Insert at Row 2 (Top) to maintain "Newest First" order
+                worksheet.insert_row(row, 2)
             
         # 3. Update Raw status
         supabase.table("raw_news").update({"status": "processed"}).eq("id", raw_id).execute()
