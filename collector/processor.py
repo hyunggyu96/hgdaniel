@@ -16,25 +16,10 @@ from typing import List, Dict
 
 from dotenv import load_dotenv
 from supabase import create_client
-import firebase_admin
-from firebase_admin import credentials, firestore
-from alert_manager import send_slack_alert, send_discord_alert
-
-# Firebase Setup
-try:
-    if not firebase_admin._apps:
-        cred_json = os.environ.get("FIREBASE_SERVICE_ACCOUNT")
-        if cred_json:
-            cred = credentials.Certificate(json.loads(cred_json))
-            firebase_admin.initialize_app(cred)
-        else:
-            firebase_admin.initialize_app()
-    db = firestore.client()
-except Exception as e:
-    print(f"⚠️ Firebase Init Warning: {e}")
-    db = None
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+from openai import AsyncOpenAI  # Re-adding this because it was used but import was missing or implicit
+
 
 # [1] 터미널 한글 깨짐 방지
 if sys.platform == 'win32':
@@ -171,8 +156,11 @@ async def process_item(item, worksheet):
         print(f"  ❌ AI Analysis failed for {raw_id}")
         return False
 
-    # Data transformation
-    main_id = f"[{main_kw} | {issue_nature} | {summary}]"
+    # Extract clean fields
+    main_kw = analysis.get("main_keyword", "기타")
+    included_kws = analysis.get("included_keywords", [])
+    issue_nature = analysis.get("issue_nature", "기타")
+    summary = analysis.get("brief_summary", title[:70])
     impact = analysis.get("impact_level", 3)
     
     # 1. Update Production DB (Supabase)
@@ -183,40 +171,12 @@ async def process_item(item, worksheet):
         "published_at": pub_date,
         "source": "Naver",
         "keyword": keyword,
-        "main_keywords": [main_id] + included_kws
+        "main_keywords": [analysis.get("main_keyword", "기타")] + analysis.get("included_keywords", [])
     }
     
     try:
         supabase.table("articles").insert(prod_data).execute()
         
-        # 2. Update Firestore (New Central DB)
-        if db:
-            kst_now = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
-            doc_ref = db.collection("articles").document()
-            firestore_data = {
-                **prod_data,
-                "impact_level": impact,
-                "analyzed_at": kst_now.isoformat(),
-                "summary": summary,
-                "issue_nature": issue_nature
-            }
-            doc_ref.set(firestore_data)
-            
-            # CRITICAL ALERT LOGIC
-            if impact >= 4:
-                db.collection("critical_alerts").add({
-                    "article_id": doc_ref.id,
-                    "title": title,
-                    "impact_level": impact,
-                    "timestamp": kst_now.isoformat(),
-                    "link": link
-                })
-                print(f" 🔥 [CRITICAL] High impact news detected (Level {impact})!")
-                
-                # SEND PROACTIVE MOBILE ALERTS
-                send_slack_alert(title, impact, link, summary)
-                send_discord_alert(title, impact, link, summary)
-
         # 3. Update Google Sheets
         if worksheet:
                 kst_now = datetime.datetime.utcnow() + datetime.timedelta(hours=9)

@@ -23,12 +23,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Create Service Account JSON
-      env:
-        GCP_SERVICE_ACCOUNT_JSON: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
-      run: |
-        echo "$GCP_SERVICE_ACCOUNT_JSON" > collector/service_account.json
-
     - name: Run News Collector
       env:
         SINGLE_RUN: "true"
@@ -42,9 +36,6 @@ jobs:
         GOOGLE_SHEET_URL: ${{ secrets.GOOGLE_SHEET_URL }}
         GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         GROQ_API_KEY_2: ${{ secrets.GROQ_API_KEY_2 }}
-        FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
       run: |
         python collector/async_collector.py
         python collector/processor.py
