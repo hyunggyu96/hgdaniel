@@ -228,5 +228,15 @@ async def main():
         await process_item(item, worksheet)
         await asyncio.sleep(1) # Small delay to be nice to APIs
 
+    # Create timestamp for Vercel trigger in root directory
+    try:
+        root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        update_path = os.path.join(root_dir, "last_update.json")
+        with open(update_path, "w", encoding='utf-8') as f:
+            json.dump({"last_run": datetime.datetime.now().isoformat(), "status": "success"}, f)
+        print(f"📍 Update timestamp created at {update_path}")
+    except Exception as e:
+        print(f"⚠️ Failed to create update timestamp: {e}")
+
 if __name__ == "__main__":
     asyncio.run(main())

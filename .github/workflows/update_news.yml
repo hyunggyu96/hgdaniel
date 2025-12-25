@@ -7,8 +7,9 @@ on: # Workflow update trigger
 
 jobs:
   update-news:
-    runs-on: ubuntu-latest
-    
+    permissions:
+      contents: write
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -29,7 +30,7 @@ jobs:
       run: |
         echo "$GCP_SERVICE_ACCOUNT_JSON" > collector/service_account.json
 
-    - name: Run News Collector
+    - name: Run News Collector & Processor
       env:
         SINGLE_RUN: "true"
         KEYWORDS: ${{ secrets.KEYWORDS }}
@@ -45,3 +46,15 @@ jobs:
       run: |
         python collector/async_collector.py
         python collector/processor.py
+
+    - name: Organize Google Sheet
+      run: |
+        python collector/organize_sheet.py
+
+    - name: Commit and Push changes (Trigger Vercel)
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add last_update.json
+        git commit -m "chore: auto-update news and trigger deploy [$(date)]" || exit 0
+        git push
