@@ -12,8 +12,8 @@
         }
     ],
     "functions": {
-        "api/**": {
-            "region": "asia-northeast3"
+        "web/src/pages/api/**/*.ts": {
+            "maxDuration": 60
         }
     }
 }
