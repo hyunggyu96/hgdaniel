@@ -192,7 +192,31 @@ async def analyze_article_expert_async(title, description, search_keyword):
         "model": "Fallback-Local"
     }
 
-async def process_item(item, worksheet):
+# [4] Semantic Deduplication (Point 3)
+def is_semantically_duplicate(new_title, recent_articles):
+    """Checks if a title is too similar to recent articles (Jaccard Similarity)."""
+    def get_words(text):
+        # Remove special chars and split into words
+        clean = "".join(c for c in text if c.isalnum() or c.isspace())
+        return set(clean.lower().split())
+
+    new_words = get_words(new_title)
+    if len(new_words) < 3: return None # Too short to judge
+
+    for art in recent_articles:
+        ref_words = get_words(art['title'])
+        if not ref_words: continue
+        
+        intersection = new_words.intersection(ref_words)
+        union = new_words.union(ref_words)
+        similarity = len(intersection) / len(union) if union else 0
+        
+        # If words are 70% identical, it's likely the same news from a different agency
+        if similarity > 0.7:
+            return art['title']
+    return None
+
+async def process_item(item, worksheet, recent_articles):
     raw_id = item['id']
     title = item['title']
     desc = item['description']
@@ -219,15 +243,21 @@ async def process_item(item, worksheet):
         else:
             print("  ✅ AI rescued as Medical news!")
 
-    # [2] Double check if already in production
+    # [2] Double check if already in production (Unique Link)
     try:
         check = supabase.table("articles").select("id").eq("link", link).execute()
         if check.data:
-            print(f"  ⏩ Skipping (Already in DB): {title[:30]}...")
+            print(f"  ⏩ Skipping (Link exist): {title[:30]}...")
             supabase.table("raw_news").update({"status": "skipped"}).eq("id", raw_id).execute()
             return True
-    except Exception as e:
-        print(f"  ⚠️ Duplicate check error: {e}")
+    except: pass
+
+    # [3] Semantic Duplicate Check (Similar Title)
+    dup_title = is_semantically_duplicate(title, recent_articles)
+    if dup_title:
+        print(f"  ⏩ Skipping (Semantic Duplicate of: {dup_title[:20]}...): {title[:20]}...")
+        supabase.table("raw_news").update({"status": "duplicate"}).eq("id", raw_id).execute()
+        return True
 
     print(f"🤖 Processing: {title[:40]}...")
     
@@ -322,8 +352,16 @@ async def main():
     print(f"🔎 Found {len(pending_items)} pending items.")
     worksheet = get_google_sheet()
     
+    # Fetch recent context for semantic deduplication (articles from last 24 hours)
+    # Using 100 recent articles as a window
+    res_recent = supabase.table("articles").select("title").order("published_at", desc=True).limit(100).execute()
+    recent_articles = res_recent.data
+    
     for item in pending_items:
-        await process_item(item, worksheet)
+        success = await process_item(item, worksheet, recent_articles)
+        if success:
+            # Add to local context to prevent duplicates within the same run
+            recent_articles.append({"title": item['title']})
         await asyncio.sleep(1) # Small delay to be nice to APIs
 
     # Create timestamp for Vercel trigger in root directory
