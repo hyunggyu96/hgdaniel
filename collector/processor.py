@@ -61,16 +61,27 @@ def get_google_sheet():
         print(f"⚠️ Google Sheet Warning: {e}")
         return None
 
+# [3] Negative Keywords for Car News Filtering (Avoiding false positives with PLA필러)
+CAR_FILTER_KEYWORDS = [
+    "자동차", "중고차", "전기차", "수소차", "현대차", "기아차",
+    "시승기", "리콜", "국토교통부", "도로공사", "내비게이션", "블랙박스",
+    "A-필러", "B-필러", "C-필러", " A필러", " B필러", " C필러"
+]
+
 # AI Analysis Function (copied from collector for self-containment/modularity)
 async def analyze_article_expert_async(title, description, search_keyword):
     keyword_pool = ", ".join(EXPERT_ANALYSIS_KEYWORDS)
     system_prompt = (
         f"You are a [Medical Aesthetic Market Analyst].\n"
-        f"Your task is to identify ALL relevant Keywords and Companies from the Pool below that are mentioned in the news.\n\n"
+        f"Your task is to identify ALL relevant Medical/Aesthetic Keywords and Companies from the Pool below.\n\n"
+        f"### CRITICAL CONTEXT:\n"
+        f"- We ONLY care about the Medical/Aesthetic industry (Fillers, Botox, Biopharma).\n"
+        f"- Ignore all references to 'Automotive' or 'Car components' (e.g., A-pillar/B-pillar parts).\n"
+        f"- If the news is about a car part named 'Pillar', classify main_keyword as '기타'.\n\n"
         f"### Expert Keyword Pool:\n{keyword_pool}\n\n"
         f"### Extraction Rules (STRICT JSON ONLY):\n"
-        f"1. main_keyword: Pick the single most important word from the Pool. Headline keywords have 10x priority. If none from pool, '기타'.\n"
-        f"2. included_keywords: Array of EVERY word from the Pool that appears in the headline or body. Be exhaustive.\n"
+        f"1. main_keyword: Pick the single most important Medical/Aesthetic word from the Pool. Headline priority.\n"
+        f"2. included_keywords: Array of EVERY relevant word from the Pool. Be exhaustive.\n"
         f"3. issue_nature: ONE of: 제품 출시/허가, 임상/연구데이터, 실적/수출/경영, 법적분쟁/규제, 투자/M&A, 학회/마케팅, 거시경제/정책, 기타.\n"
         f"4. brief_summary: A professional 1-line Korean summary (~70 chars).\n"
         f"5. impact_level: Integer 1-5.\n"
@@ -163,7 +174,14 @@ async def process_item(item, worksheet):
     pub_date = item['pub_date']
     keyword = item['search_keyword']
 
-    # [Strict Rule] Double check if already in production articles to prevent duplicates
+    # [1] Car News Filtering (Point 1)
+    full_text = f"{title} {desc}"
+    if any(car_kw in full_text for car_kw in CAR_FILTER_KEYWORDS):
+        print(f"  🚗 Skipping Car-related news: {title[:30]}...")
+        supabase.table("raw_news").update({"status": "skipped"}).eq("id", raw_id).execute()
+        return True
+
+    # [2] Double check if already in production
     try:
         check = supabase.table("articles").select("id").eq("link", link).execute()
         if check.data:
