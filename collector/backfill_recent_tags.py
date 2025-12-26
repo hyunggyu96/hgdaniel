@@ -30,47 +30,36 @@ supabase = create_client(url, key)
 def backfill():
     print("Fetching recent articles to check for missing tags...")
     # Fetch last 30 articles
-    response = supabase.table("articles").select("*").order("published_at", desc=True).limit(30).execute()
+    response = supabase.table("articles").select("*").order("published_at", desc=True).limit(200).execute()
     
     count = 0
     for art in response.data:
-        # Check if main_keywords is just ['기타'] or empty or null
-        main_kws = art.get('main_keywords')
-        current_sub = art.get('keywords') # Check legacy too
+        title = art.get('title', '')
+        desc = art.get('description', '') or ''
+        current_kws = art.get('main_keywords') or []
         
-        is_bad = False
-        if not main_kws: # Null or empty
-            is_bad = True
-        elif len(main_kws) == 1 and main_kws[0] == '기타':
-            is_bad = True
-        elif len(main_kws) == 0:
-            is_bad = True
-            
-        if is_bad:
-            print(f"Updating: {art['title']}")
-            title = art.get('title', '')
-            desc = art.get('description', '') or ''
-            
-            # Use local extractor
-            local_main = extract_main_keyword(desc, title=title)
-            local_sub = extract_keywords(f"{title} {desc}")
-            
-            # Deduplicate
-            if local_main in local_sub:
-                local_sub.remove(local_main)
-            
-            # Construct main_keywords array: [Main, Sub1, Sub2...]
-            new_main_kws = [local_main] + local_sub
+        # Always re-calculate to ensure we didn't miss anything that's in the pool
+        local_main = extract_main_keyword(desc, title=title)
+        local_all = extract_keywords(f"{title} {desc}", top_n=10)
+        
+        new_kws = list(set([local_main] + local_all))
+        new_kws = [k for k in new_kws if k and k != '기타']
+        
+        # Only update if the set of keywords has changed or grown
+        if set(new_kws) != set(current_kws):
+            print(f"Updating: {title[:40]}...")
+            print(f"  Old: {current_kws}")
+            print(f"  New: {new_kws}")
             
             # Update DB
             # Update both main_keywords (new schema) and keywords (legacy/backup)
             try:
                 supabase.table("articles").update({
-                    "main_keywords": new_main_kws,
-                    "keyword": local_main, # Also update the search 'keyword' column if logic dictates, but safe to leave or set to main
-                    "keywords": local_sub 
+                    "main_keywords": new_kws,
+                    "keyword": local_main,
+                    "keywords": local_all 
                 }).eq("id", art['id']).execute()
-                print(f"  -> Set to: {new_main_kws}")
+                print(f"  -> Set to: {new_kws}")
                 count += 1
             except Exception as e:
                 print(f"  Error updating: {e}")

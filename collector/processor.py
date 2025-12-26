@@ -66,14 +66,14 @@ async def analyze_article_expert_async(title, description, search_keyword):
     keyword_pool = ", ".join(EXPERT_ANALYSIS_KEYWORDS)
     system_prompt = (
         f"You are a [Medical Aesthetic Market Analyst].\n"
-        f"Analyze this news based on the Expert Keyword Pool below.\n\n"
+        f"Your task is to identify ALL relevant Keywords and Companies from the Pool below that are mentioned in the news.\n\n"
         f"### Expert Keyword Pool:\n{keyword_pool}\n\n"
-        f"### Extraction Rules (JSON ONLY):\n"
-        f"1. main_keyword: Pick exactly ONE word from the Pool. Headline priority > Body frequency. If none, '기타'.\n"
-        f"2. included_keywords: Array of all words from the Pool found in text.\n"
-        f"3. issue_nature: Categorize the news into ONE of: 제품 출시/허가, 임상/연구데이터, 실적/수출/경영, 법적분쟁/규제, 투자/M&A, 학회/마케팅, 거시경제/정책, 기타.\n"
-        f"4. brief_summary: A professional 1-line Korean summary. Be informative (~70 chars).\n"
-        f"5. impact_level: Integer 1-5. (1: Minor news, 5: Critical market-shifting info).\n"
+        f"### Extraction Rules (STRICT JSON ONLY):\n"
+        f"1. main_keyword: Pick the single most important word from the Pool. Headline keywords have 10x priority. If none from pool, '기타'.\n"
+        f"2. included_keywords: Array of EVERY word from the Pool that appears in the headline or body. Be exhaustive.\n"
+        f"3. issue_nature: ONE of: 제품 출시/허가, 임상/연구데이터, 실적/수출/경영, 법적분쟁/규제, 투자/M&A, 학회/마케팅, 거시경제/정책, 기타.\n"
+        f"4. brief_summary: A professional 1-line Korean summary (~70 chars).\n"
+        f"5. impact_level: Integer 1-5.\n"
     )
     user_prompt = f"Crawl Keyword: {search_keyword}\nHeadline: {title}\nBody: {description}"
 
@@ -175,28 +175,35 @@ async def process_item(item, worksheet):
 
     print(f"🤖 Processing: {title[:40]}...")
     
+    # [New Strategy] ALWAYS merge AI results with local keyword extraction
+    # 1. Start with Local extraction (Reliable baseline)
+    local_main = extract_main_keyword(desc, title=title)
+    local_all = extract_keywords(f"{title} {desc}", top_n=10)
+    
+    # 2. Get AI Analysis (Intelligent classification/summary)
     analysis = await analyze_article_expert_async(title, desc, keyword)
-    if not analysis:
-        print(f"  ❌ AI Analysis failed for {raw_id}")
-        return False
-
-    # Extract clean fields
-    main_kw = analysis.get("main_keyword", "기타")
-    included_kws = analysis.get("included_keywords", [])
+    
+    # Extract AI fields
+    ai_main = analysis.get("main_keyword", "기타")
+    ai_included = analysis.get("included_keywords", [])
     issue_nature = analysis.get("issue_nature", "기타")
     summary = analysis.get("brief_summary", title[:70])
     impact = analysis.get("impact_level", 3)
     
-    # Logic: If main_keyword is '기타', fallback to search_keyword
-    if main_kw == "기타" or not main_kw:
-        main_kw = keyword
-
-    # Logic: Clean up included_keywords
-    # 1. Remove '기타'
-    # 2. Remove duplicates
-    # 3. Remove main_kw if present
-    included_kws = [k for k in included_kws if k != "기타" and k != main_kw]
-    included_kws = list(set(included_kws))
+    # 3. MERGE LOGIC (Union of AI and Local)
+    # Prefer AI for 'main' if it's not '기타', otherwise use Local
+    final_main = ai_main if (ai_main and ai_main != "기타") else local_main
+    
+    # Union of all keywords
+    final_all_kws = list(set([final_main] + ai_included + local_all))
+    
+    # Clean up
+    final_all_kws = [k for k in final_all_kws if k and k != "기타" and k != "-" and k != "|"]
+    
+    # Guarantee search keyword is included if it was found in text (or at least used as search)
+    # But only if it's actually in our expert pool
+    if keyword and keyword in EXPERT_ANALYSIS_KEYWORDS and keyword not in final_all_kws:
+        final_all_kws.append(keyword)
 
     # 1. Update Production DB (Supabase)
     prod_data = {
@@ -206,7 +213,7 @@ async def process_item(item, worksheet):
         "published_at": pub_date,
         "source": "Naver",
         "keyword": keyword,
-        "main_keywords": [main_kw] + included_kws
+        "main_keywords": final_all_kws
     }
     
     try:
@@ -229,7 +236,7 @@ async def process_item(item, worksheet):
                 except:
                     pass
 
-                row = [now_str, keyword, title, link, main_kw, ", ".join(included_kws), pub_kst_str, issue_nature, summary]
+                row = [now_str, keyword, title, link, final_main, ", ".join(final_all_kws), pub_kst_str, issue_nature, summary]
                 # Insert at Row 2 (Top) to maintain "Newest First" order
                 worksheet.insert_row(row, 2)
             
