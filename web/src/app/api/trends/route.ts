@@ -23,7 +23,8 @@ export async function GET() {
             .from('articles')
             .select('keyword, published_at')
             .gte('published_at', thirtyDaysAgoStr)
-            .order('published_at', { ascending: true });
+            .order('published_at', { ascending: true })
+            .limit(5000); // 1000개 제한 해제 (최대 5000개까지 확장)
 
         if (error) throw error;
 
@@ -31,13 +32,13 @@ export async function GET() {
         const keywordsSet = new Set<string>();
 
         articles?.forEach((item) => {
-            // 날짜/시간 조정 (KST: UTC+9)
+            // KST 날짜 변환 (YYYY-MM-DD 형식 추출)
             const d = new Date(item.published_at);
             d.setHours(d.getHours() + 9);
             const date = d.toISOString().split('T')[0];
 
-            const keyword = item.keyword || '기타';
-            keywordsSet.add(keyword);
+            const keyword = (item.keyword || '기타').trim();
+            if (keyword) keywordsSet.add(keyword);
 
             if (!trendMap[date]) {
                 trendMap[date] = { date };
@@ -49,13 +50,16 @@ export async function GET() {
             trendMap[date][keyword] += 1;
         });
 
-        // 30일치 날짜를 모두 생성하여 빈 데이터(0) 채우기 (Live 느낌을 주려면 오늘까지 포함)
+        // 30일치 날짜를 모두 생성하여 빈 데이터(0) 채우기
         const trendData: any[] = [];
         const allKeywords = Array.from(keywordsSet);
 
+        // 오늘 날짜(KST) 구하기
+        const nowKst = new Date();
+        nowKst.setHours(nowKst.getHours() + 9);
+
         for (let i = 29; i >= 0; i--) {
-            const d = new Date();
-            d.setHours(d.getHours() + 9); // KST
+            const d = new Date(nowKst);
             d.setDate(d.getDate() - i);
             const dateStr = d.toISOString().split('T')[0];
 
