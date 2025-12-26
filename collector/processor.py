@@ -94,16 +94,15 @@ async def is_medical_news_ai(title, description):
         except: continue
     return True # Default to True to avoid missing news
 
-# AI Analysis Function (copied from collector for self-containment/modularity)
-async def analyze_article_expert_async(title, description, search_keyword):
+# AI Analysis Function
+async def analyze_article_expert_async(title, description, search_keyword, force_ollama=False):
     keyword_pool = ", ".join(EXPERT_ANALYSIS_KEYWORDS)
     system_prompt = (
         f"You are a [Medical Aesthetic Market Analyst].\n"
         f"Your task is to identify ALL relevant Medical/Aesthetic Keywords and Companies from the Pool below.\n\n"
         f"### CRITICAL CONTEXT:\n"
-        f"- We ONLY care about the Medical/Aesthetic industry (Fillers, Botox, Biopharma).\n"
-        f"- Ignore all references to 'Automotive' or 'Car components' (e.g., A-pillar/B-pillar parts).\n"
-        f"- If the news is about a car part named 'Pillar', classify main_keyword as '기타'.\n\n"
+        f"- We ONLY care about the Medical/Aesthetic industry.\n"
+        f"- Ignore all references to 'Automotive' or 'Car components' (e.g., A-pillar/C-pillar).\n\n"
         f"### Expert Keyword Pool:\n{keyword_pool}\n\n"
         f"### Extraction Rules (STRICT JSON ONLY):\n"
         f"1. main_keyword: Pick the single most important Medical/Aesthetic word from the Pool. Headline priority.\n"
@@ -114,8 +113,8 @@ async def analyze_article_expert_async(title, description, search_keyword):
     )
     user_prompt = f"Crawl Keyword: {search_keyword}\nHeadline: {title}\nBody: {description}"
 
-    # AI rotation (Same as collector logic)
-    for i, g_key in enumerate(GEMINI_KEYS):
+    # If force_ollama is true (likely related news), skip online models
+    if not force_ollama:
         try:
             url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={g_key}"
             payload = {
@@ -147,6 +146,8 @@ async def analyze_article_expert_async(title, description, search_keyword):
             return {**data, "model": "Groq-Llama3.3"}
         except Exception as e:
             print(f"  ⚠️ Groq Error: {e}")
+    else:
+        print(f"  ℹ️ [OPTIMIZATION] Related news detected. Using local Ollama for processing.")
 
     # Try Ollama (Local AI) - Final AI Fallback
     try:
@@ -233,15 +234,21 @@ async def process_item(item, worksheet, recent_articles):
     has_strong_med = any(med_kw in full_text for med_kw in STRONG_MED_KEYWORDS)
     
     if has_car_noise and not has_strong_med:
-        # Ambiguous or likely car - Stage 2: AI Verification
-        print(f"  🔍 Ambiguous news detected ({title[:20]}...). Stage 2 AI Verifying...")
-        is_medical = await is_medical_news_ai(title, desc)
-        if not is_medical:
-            print(f"  🚗 AI confirmed Car-related news. Skipping.")
+        # ONLY double check with AI if search keyword is "필러"
+        if keyword == "필러":
+            print(f"  🔍 Ambiguous news detected ({title[:20]}...). Stage 2 AI Verifying...")
+            is_medical = await is_medical_news_ai(title, desc)
+            if not is_medical:
+                print(f"  🚗 AI confirmed Car-related news. Skipping.")
+                supabase.table("raw_news").update({"status": "skipped"}).eq("id", raw_id).execute()
+                return True
+            else:
+                print("  ✅ AI rescued as Medical news!")
+        else:
+            # For other keywords, if car noise exists without strong med context, just skip to save AI
+            print(f"  🚗 Heuristic Skip (Non-filler car noise): {title[:20]}...")
             supabase.table("raw_news").update({"status": "skipped"}).eq("id", raw_id).execute()
             return True
-        else:
-            print("  ✅ AI rescued as Medical news!")
 
     # [2] Double check if already in production (Unique Link)
     try:
@@ -254,10 +261,11 @@ async def process_item(item, worksheet, recent_articles):
 
     # [3] Semantic Duplicate Check (Similar Title)
     dup_title = is_semantically_duplicate(title, recent_articles)
+    force_ollama = False
     if dup_title:
-        print(f"  ⏩ Skipping (Semantic Duplicate of: {dup_title[:20]}...): {title[:20]}...")
-        supabase.table("raw_news").update({"status": "duplicate"}).eq("id", raw_id).execute()
-        return True
+        # Rule: If related news, use Ollama to save cost
+        print(f"  ♻️ Related news found (similar to: {dup_title[:20]}...). Will use local Ollama.")
+        force_ollama = True
 
     print(f"🤖 Processing: {title[:40]}...")
     
@@ -266,8 +274,8 @@ async def process_item(item, worksheet, recent_articles):
     local_main = extract_main_keyword(desc, title=title)
     local_all = extract_keywords(f"{title} {desc}", top_n=10)
     
-    # 2. Get AI Analysis (Intelligent classification/summary)
-    analysis = await analyze_article_expert_async(title, desc, keyword)
+    # 2. Get AI Analysis (Online for New, Ollama for Related)
+    analysis = await analyze_article_expert_async(title, desc, keyword, force_ollama=force_ollama)
     
     # Extract AI fields
     ai_main = analysis.get("main_keyword", "기타")
