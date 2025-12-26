@@ -63,20 +63,25 @@ def get_google_sheet():
 
 import re
 
-# [3] Filtering Configuration
-CAR_FILTER_KEYWORDS = [
-    "중고차", "전기차", "수소차", "현대차", "기아차", "르노코리아", "르노삼성", "쌍용차", "KG모빌리티", 
-    "쉐보레", "폭스바겐", "메르세데스", "시승기", "리콜", "국토교통부", "도로공사", "내비게이션", "블랙박스"
+# [3] Filtering Configuration (Confirmed by User)
+CAR_BRANDS = [
+    "르노코리아", "르노삼성", "현대차", "기아차", "쌍용차", "KG모빌리티", "쉐보레", 
+    "폭스바겐", "메르세데스", "벤츠", "BMW", "아르카나", "토레스", "그랜저"
 ]
 
-# Robust Regex for Automotive Pillars (handles "A필러", "A 필러", "A-필러", etc.)
-PILLAR_REGEX = re.compile(r"[A-C]\s*(-|—)?\s*필러", re.IGNORECASE)
+CAR_NOISE_KEYWORDS = [
+    "시승기", "자동차 리콜", "타이어 교체", "내비게이션 업데이트", "중고차", "전기차", "수소차",
+    "도로공사", "블랙박스", "당구(PBA)", "프로농구", "프로배구"
+]
 
-# Keywords that are 100% Medical Aesthetic - NO broad terms like '제약' or '바이오' here
-# These must be specific enough to skip AI verification safely.
+# Keywords that are 100% Medical Aesthetic (Safe to skip AI check)
 STRONG_MED_KEYWORDS = [
-    "피부과", "성형외과", "의료기기", "품목허가", "휴젤", "메디톡스", "파마리서치", "제테마", "클래시스", "바이오플러스", "바임"
+    "HA필러", "CaHA필러", "PLLA필러", "HA-필러", "리쥬란", "톡신", "보톡스", "스킨부스터", "엑소좀", 
+    "PN", "PDRN", "피부과", "성형외과", "품목허가", "휴젤", "메디톡스", "파마리서치", "제테마", "클래시스", "바이오플러스", "바임"
 ]
+
+# Robust Regex for Automotive Pillars (A/B/C-Pillar)
+PILLAR_REGEX = re.compile(r"[A-C]\s*(-|—)?\s*필러", re.IGNORECASE)
 
 async def is_medical_news_ai(title, description):
     """Stage 2: AI verification for ambiguous cases"""
@@ -234,26 +239,38 @@ async def process_item(item, worksheet, recent_articles):
     # [1] News Filtering (2-Stage Approach)
     full_text = f"{title} {desc}"
     
-    # Check if it has car/irrelevant noise
-    has_noise = any(noise_kw in full_text for noise_kw in CAR_FILTER_KEYWORDS)
-    has_pillar_noise = bool(PILLAR_REGEX.search(full_text))
-    
-    # Check if it has strong medical context (High-confidence pass)
-    has_strong_med = any(med_kw in full_text for med_kw in STRONG_MED_KEYWORDS)
-    
-    # If it is HIGH CONFIDENCE Medical (Has strong KW AND no Pillar noise), pass immediately
-    if has_strong_med and not has_pillar_noise:
+    # Priority 1: Clear Car/Noise News -> Skip immediately
+    if any(car_brand in full_text for car_brand in CAR_BRANDS) or \
+       any(noise in full_text for noise in CAR_NOISE_KEYWORDS):
+        print(f"  🚗 Car/Noise detected. Skipping: {title[:20]}...")
+        supabase.table("raw_news").update({"status": "skipped"}).eq("id", raw_id).execute()
+        return True
+
+    # Priority 2: 100% Medical Aesthetic News -> Pass immediately
+    if any(med_kw in full_text for med_kw in STRONG_MED_KEYWORDS):
+        print(f"  🩺 Strong Medical Keywords found. Passing: {title[:20]}...")
         pass 
     else:
-        # For everything else (Noise detected or no strong medical KW), let AI decide
-        print(f"  🔍 Verifying relevance for ambiguous news ({title[:20]}...)...")
-        is_relevant = await is_medical_news_ai(title, desc)
-        if not is_relevant:
-            print(f"  🚫 AI filtered as irrelevant. Skipping.")
-            supabase.table("raw_news").update({"status": "skipped"}).eq("id", raw_id).execute()
-            return True
+        # Priority 3: Ambiguous cases (Pillar mention or just "Filler" without strong context)
+        # Let AI read and decide
+        has_pillar_pattern = bool(PILLAR_REGEX.search(full_text))
+        
+        if has_pillar_pattern or keyword == "필러":
+            print(f"  🔍 Ambiguous pillar/filler news ({title[:20]}...). AI Verifying...")
+            is_relevant = await is_medical_news_ai(title, desc)
+            if not is_relevant:
+                print(f"  🚫 AI confirmed as Irrelevant. Skipping.")
+                supabase.table("raw_news").update({"status": "skipped"}).eq("id", raw_id).execute()
+                return True
+            else:
+                print("  ✅ AI rescued as relevant news!")
         else:
-            print("  ✅ AI confirmed as relevant Medical/Aesthetic news!")
+            # For other keywords without strong context, still do a quick AI check to be safe
+            is_relevant = await is_medical_news_ai(title, desc)
+            if not is_relevant:
+                print(f"  🚫 AI filtered (No context). Skipping.")
+                supabase.table("raw_news").update({"status": "skipped"}).eq("id", raw_id).execute()
+                return True
 
     # [2] Double check if already in production (Unique Link)
     try:
