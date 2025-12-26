@@ -3,11 +3,14 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { CATEGORIES } from '@/lib/constants';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, MessageSquarePlus } from 'lucide-react';
 import CollectionCount from './CollectionCount';
+import KeywordSuggestionModal from './KeywordSuggestionModal';
+import { useState } from 'react';
 
 export default function SideBar() {
     const searchParams = useSearchParams();
+    const [isSuggestOpen, setIsSuggestOpen] = useState(false);
     const selectedCategory = searchParams?.get('category'); // null for Overview
     const isCollections = searchParams?.get('collections') === 'true';
     const searchQuery = searchParams?.get('search');
@@ -62,6 +65,23 @@ export default function SideBar() {
                     </Link>
                 </div>
 
+                {/* Keyword Suggestion Section */}
+                <div className="pt-6 border-t border-white/5 space-y-3">
+                    <h3 className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mb-2 px-4">
+                        Feedback
+                    </h3>
+                    <button
+                        onClick={() => setIsSuggestOpen(true)}
+                        className="w-full py-3 px-4 bg-white/5 hover:bg-white/10 rounded-xl flex items-center justify-between group transition-all border border-white/5"
+                    >
+                        <div className="flex items-center gap-3">
+                            <MessageSquarePlus className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
+                            <span className="text-sm font-bold text-white/70 uppercase tracking-tight">키워드 제안</span>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-white/20 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                </div>
+
                 <div className="pt-8 border-t border-white/5">
                     <div className="p-4 rounded-2xl bg-blue-500/5 border border-blue-500/10">
                         <div className="flex items-center gap-2 mb-2">
@@ -79,6 +99,11 @@ export default function SideBar() {
                     </div>
                 </div>
             </div>
+
+            <KeywordSuggestionModal
+                isOpen={isSuggestOpen}
+                onClose={() => setIsSuggestOpen(false)}
+            />
         </aside>
     );
 }
