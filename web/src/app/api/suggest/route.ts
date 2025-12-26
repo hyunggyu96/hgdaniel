@@ -3,7 +3,7 @@ import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { JWT } from 'google-auth-library';
 import { NextResponse } from 'next/server';
 
-const DEPLOY_VERSION = '2025-12-26-T1922';
+const DEPLOY_VERSION = '2025-12-26-T1926';
 
 export async function POST(req: Request) {
     try {
@@ -13,60 +13,53 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Keyword is required' }, { status: 400 });
         }
 
-        // 1. Initialize Auth
-        console.log(`--- Suggestion API Start [v${DEPLOY_VERSION}] ---`);
-        const sheetId = (process.env.GOOGLE_SHEET_ID || '').trim().replace(/\s/g, '');
+        console.log(`--- [v${DEPLOY_VERSION}] Keyword Suggestion Start ---`);
 
-        let rawKey = (process.env.GOOGLE_SERVICE_ACCOUNT_KEY || '').trim();
+        // 1. Spreadsheet ID (Strict)
+        const sheetId = '1IDFVtmhu5EtxSacRqlklZo6V_x9aB0WVZIzkIx5Wkic';
 
-        // Remove surrounding quotes if they exist (common Vercel/Env issue)
-        if (rawKey.startsWith('"') && rawKey.endsWith('"')) {
-            rawKey = rawKey.substring(1, rawKey.length - 1);
-        } else if (rawKey.startsWith("'") && rawKey.endsWith("'")) {
-            rawKey = rawKey.substring(1, rawKey.length - 1);
-        }
+        // 2. Recursive/Bulletproof Service Account Key Parser
+        let rawKeyEnv = process.env.GOOGLE_SERVICE_ACCOUNT_KEY || '';
 
-        const tryParse = (jsonString: string) => {
-            // Log first 30 chars for debugging (safe, as it's usually {"type":"service_account")
-            console.log('Parsing Key Start:', jsonString.substring(0, 30));
+        const bulletproofParse = (input: string): any => {
+            let current = input.trim();
 
-            try {
-                // Attempt 1: Standard Parse
-                return JSON.parse(jsonString);
-            } catch (e1: any) {
-                console.log(`Attempt 1 failed: ${e1.message}`);
+            // Step 1: Handle wrapping quotes
+            if ((current.startsWith('"') && current.endsWith('"')) || (current.startsWith("'") && current.endsWith("'"))) {
+                current = current.substring(1, current.length - 1);
+            }
 
+            // Step 2: Recursive Parse (Handles double-serialized strings)
+            let result = current;
+            let attempts = 0;
+            while (typeof result === 'string' && attempts < 5) {
                 try {
-                    // Attempt 2: Sanitize control characters (Literal Newlines, etc.)
-                    // This fixes "Bad control character in string literal"
-                    const sanitized = jsonString.replace(/[\u0000-\u001F\u007F-\u009F]/g, (match) => {
-                        if (match === '\n') return '\\n';
-                        if (match === '\r') return '\\r';
-                        if (match === '\t') return '\\t';
-                        return ''; // Strip other control chars
-                    });
-                    return JSON.parse(sanitized);
-                } catch (e2: any) {
-                    console.log(`Attempt 2 failed: ${e2.message}`);
-
+                    // Try to parse as-is
+                    result = JSON.parse(result);
+                } catch (e) {
+                    // If parse fails, try basic sanitization for control characters and retry once
                     try {
-                        // Attempt 3: If it's double-escaped (common in some env setups)
-                        const unescaped = jsonString
+                        const sanitized = result
                             .replace(/\\n/g, '\n')
                             .replace(/\\"/g, '"')
-                            .replace(/\\\\/g, '\\');
-                        // Then re-sanitize for control characters
-                        const finalSanitized = unescaped.replace(/[\u0000-\u001F]/g, (m) => m === '\n' ? '\\n' : '');
-                        return JSON.parse(finalSanitized);
-                    } catch (e3: any) {
-                        console.error('Final Parser Exhausted');
-                        throw new Error(`Auth JSON Error: ${e3.message} (Version: ${DEPLOY_VERSION})`);
+                            .replace(/[\u0000-\u001F]/g, (match) => match === '\n' ? '\\n' : '');
+                        result = JSON.parse(sanitized);
+                    } catch (innerE) {
+                        // If everything fails, break and let the outer catch handle it
+                        break;
                     }
                 }
+                attempts++;
             }
+
+            if (typeof result !== 'object' || result === null) {
+                throw new Error(`Failed to parse Service Account Key into an object. Type: ${typeof result}`);
+            }
+            return result;
         };
 
-        const creds = tryParse(rawKey);
+        const creds = bulletproofParse(rawKeyEnv);
+        console.log('Credentials object identified successfully');
 
         const serviceAccountAuth = new JWT({
             email: creds.client_email,
@@ -74,31 +67,37 @@ export async function POST(req: Request) {
             scopes: ['https://www.googleapis.com/auth/spreadsheets'],
         });
 
-        // 2. Initialize Doc
+        // 3. Initialize Doc
         const doc = new GoogleSpreadsheet(sheetId, serviceAccountAuth);
         await doc.loadInfo();
+        console.log(`Connected to Sheet: ${doc.title}`);
 
-        // 3. Get or Create "키워드제안" Sheet
+        // 4. Get/Create "키워드제안" Sheet
         let sheet = doc.sheetsByTitle['키워드제안'];
         if (!sheet) {
+            console.log('Creating "키워드제안" sheet');
             sheet = await doc.addSheet({
                 title: '키워드제안',
                 headerValues: ['제안일시', '제안 키워드', '카테고리', '제안 사유', '누적 제안 횟수', '상태']
             });
         }
 
-        // 4. Check for duplicates and update count or append new
+        // 5. Deduplication & Incremental Counter
         const rows = await sheet.getRows();
-        const existingRow = rows.find(r => r.get('제안 키워드') === keyword);
+        const existingRow = rows.find(r => r.get('제안 키워드')?.toString().trim() === keyword.trim());
+
+        const now = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
 
         if (existingRow) {
+            console.log(`Updating existing keyword: ${keyword}`);
             const currentCount = parseInt(existingRow.get('누적 제안 횟수') || '1', 10);
             existingRow.set('누적 제안 횟수', currentCount + 1);
-            existingRow.set('제안일시', new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }));
+            existingRow.set('제안일시', now);
             await existingRow.save();
         } else {
+            console.log(`Adding new keyword: ${keyword}`);
             await sheet.addRow({
-                '제안일시': new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
+                '제안일시': now,
                 '제안 키워드': keyword,
                 '카테고리': category || '미지정',
                 '제안 사유': reason || '-',
@@ -107,10 +106,11 @@ export async function POST(req: Request) {
             });
         }
 
+        console.log('--- Suggestion Process Completed Successfully ---');
         return NextResponse.json({ success: true });
 
     } catch (error: any) {
-        console.error('Final Error Handler:', error);
+        console.error('CRITICAL Suggestion Error:', error);
         return NextResponse.json({
             error: error.message,
             version: DEPLOY_VERSION
