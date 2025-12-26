@@ -40,82 +40,82 @@ export default function KeywordSuggestionModal({ isOpen, onClose }: { isOpen: bo
     return (
         <AnimatePresence>
             {isOpen && (
-                <>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none">
                     {/* Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+                        className="absolute inset-0 bg-black/70 backdrop-blur-md pointer-events-auto"
                     />
 
                     {/* Modal */}
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                        initial={{ opacity: 0, scale: 0.95, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-md bg-[#1e1e20] border border-white/10 rounded-2xl shadow-2xl z-[101] overflow-hidden max-h-[90vh] flex flex-col"
+                        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                        className="relative w-full max-w-sm bg-[#1e1e20] border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden max-h-[95vh] pointer-events-auto"
                     >
                         {/* Header: Fixed */}
-                        <div className="p-5 border-b border-white/5 flex justify-between items-center bg-[#1e1e20] z-10">
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                                    <MessageSquarePlus className="w-4 h-4 text-blue-500" />
+                        <div className="px-5 py-4 border-b border-white/5 flex justify-between items-center bg-[#1e1e20] shrink-0">
+                            <div className="flex items-center gap-2.5">
+                                <div className="w-7 h-7 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
+                                    <MessageSquarePlus className="w-3.5 h-3.5 text-blue-500" />
                                 </div>
                                 <div>
-                                    <h3 className="text-base font-bold text-white">Keyword 추천/제안</h3>
-                                    <p className="text-[10px] text-white/40 mt-0.5">새로운 수집 대상을 제안해주세요.</p>
+                                    <h3 className="text-sm font-bold text-white leading-none">Keyword 추천/제안</h3>
+                                    <p className="text-[9px] text-white/30 mt-1 leading-none">새로운 대상을 제안해 주세요.</p>
                                 </div>
                             </div>
                             <button
                                 onClick={onClose}
-                                className="p-2 hover:bg-white/5 rounded-full transition-colors"
+                                className="p-1.5 hover:bg-white/5 rounded-full transition-colors text-white/30 hover:text-white"
                                 aria-label="Close"
                             >
-                                <X className="w-4 h-4 text-white/40" />
+                                <X className="w-4 h-4" />
                             </button>
                         </div>
 
                         {/* Body: Scrollable */}
-                        <div className="flex-1 overflow-y-auto p-6 scrollbar-hide">
+                        <div className="overflow-y-auto px-5 py-5 custom-scrollbar bg-[#1c1c1e]">
                             {status === 'success' ? (
-                                <div className="py-12 flex flex-col items-center justify-center text-center">
+                                <div className="py-10 flex flex-col items-center justify-center text-center">
                                     <motion.div
                                         initial={{ scale: 0 }}
                                         animate={{ scale: 1 }}
-                                        className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-4"
+                                        className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mb-4"
                                     >
-                                        <CheckCircle2 className="w-8 h-8 text-green-500" />
+                                        <CheckCircle2 className="w-6 h-6 text-green-500" />
                                     </motion.div>
-                                    <h4 className="text-xl font-bold text-white">감사합니다!</h4>
-                                    <p className="text-sm text-white/50 mt-2">제안하신 키워드가 구글 시트에 기록되었습니다.</p>
+                                    <h4 className="text-lg font-bold text-white">제안 완료!</h4>
+                                    <p className="text-xs text-white/40 mt-1.5 leading-relaxed">기록이 구글 시트에 반영되었습니다.</p>
                                 </div>
                             ) : (
-                                <form id="suggest-form" onSubmit={handleSubmit} className="space-y-5">
+                                <form id="suggest-form" onSubmit={handleSubmit} className="space-y-4">
                                     <div>
-                                        <label className="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2">키워드 이름</label>
+                                        <label className="block text-[9px] font-bold text-white/30 uppercase tracking-[0.1em] mb-1.5 ml-1">키워드 이름</label>
                                         <input
                                             required
                                             type="text"
                                             value={keyword}
                                             onChange={(e) => setKeyword(e.target.value)}
-                                            placeholder="예: 제테마, HA필러 등"
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-blue-500/50 transition-colors"
+                                            placeholder="예: 제테마, 쥬베룩 등"
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-white/10 focus:outline-none focus:border-blue-500/50 transition-colors"
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2">카테고리</label>
-                                        <div className="grid grid-cols-3 gap-2">
+                                        <label className="block text-[9px] font-bold text-white/30 uppercase tracking-[0.1em] mb-1.5 ml-1">카테고리</label>
+                                        <div className="grid grid-cols-3 gap-1.5">
                                             {['기업', '성분', '기타'].map((cat) => (
                                                 <button
                                                     key={cat}
                                                     type="button"
                                                     onClick={() => setCategory(cat)}
-                                                    className={`py-2 rounded-lg text-[10px] font-bold transition-all ${category === cat
-                                                        ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20'
-                                                        : 'bg-white/5 text-white/40 hover:bg-white/10'
+                                                    className={`py-2 rounded-lg text-[10px] font-bold transition-all border ${category === cat
+                                                            ? 'bg-blue-500/20 text-blue-400 border-blue-500/50'
+                                                            : 'bg-white/5 text-white/30 border-transparent hover:bg-white/10'
                                                         }`}
                                                 >
                                                     {cat}
@@ -125,13 +125,13 @@ export default function KeywordSuggestionModal({ isOpen, onClose }: { isOpen: bo
                                     </div>
 
                                     <div>
-                                        <label className="block text-[10px] font-bold text-white/40 uppercase tracking-wider mb-2">제안 사유 (선택)</label>
+                                        <label className="block text-[9px] font-bold text-white/30 uppercase tracking-[0.1em] mb-1.5 ml-1">제안 사유 (선택)</label>
                                         <textarea
                                             value={reason}
                                             onChange={(e) => setReason(e.target.value)}
-                                            placeholder="이 키워드를 추천하시는 이유를 적어주세요."
-                                            rows={3}
-                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-blue-500/50 transition-colors resize-none"
+                                            placeholder="메모를 입력해 주세요."
+                                            rows={2}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-white/10 focus:outline-none focus:border-blue-500/50 transition-colors resize-none"
                                         />
                                     </div>
                                 </form>
@@ -140,18 +140,18 @@ export default function KeywordSuggestionModal({ isOpen, onClose }: { isOpen: bo
 
                         {/* Footer: Fixed */}
                         {status !== 'success' && (
-                            <div className="p-5 border-t border-white/5 bg-[#1e1e20]">
+                            <div className="px-5 py-4 border-t border-white/5 bg-[#1e1e20] shrink-0">
                                 <button
                                     form="suggest-form"
                                     disabled={status === 'loading'}
                                     type="submit"
-                                    className="w-full bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white font-bold py-3.5 rounded-xl shadow-xl shadow-blue-500/20 transition-all flex items-center justify-center gap-2"
+                                    className="w-full bg-[#3182f6] hover:bg-[#1b64da] disabled:opacity-50 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-500/10 transition-all flex items-center justify-center gap-2 text-xs"
                                 >
                                     {status === 'loading' ? (
-                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                                     ) : (
                                         <>
-                                            <Send className="w-4 h-4" />
+                                            <Send className="w-3.5 h-3.5" />
                                             제안 제출하기
                                         </>
                                     )}
@@ -159,7 +159,7 @@ export default function KeywordSuggestionModal({ isOpen, onClose }: { isOpen: bo
                             </div>
                         )}
                     </motion.div>
-                </>
+                </div>
             )}
         </AnimatePresence>
     );
