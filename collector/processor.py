@@ -225,30 +225,24 @@ async def process_item(item, worksheet, recent_articles):
     pub_date = item['pub_date']
     keyword = item['search_keyword']
 
-    # [1] Car News Filtering (2-Stage Approach)
+    # [1] News Filtering (2-Stage Approach)
     full_text = f"{title} {desc}"
     
-    # Check if it has car noise
-    has_car_noise = any(car_kw in full_text for car_kw in CAR_FILTER_KEYWORDS)
-    # Check if it has strong medical context
+    # Check if it has car/irrelevant noise
+    has_noise = any(noise_kw in full_text for noise_kw in CAR_FILTER_KEYWORDS)
+    # Check if it has strong medical context (High-confidence pass)
     has_strong_med = any(med_kw in full_text for med_kw in STRONG_MED_KEYWORDS)
     
-    if has_car_noise and not has_strong_med:
-        # ONLY double check with AI if search keyword is "필러"
-        if keyword == "필러":
-            print(f"  🔍 Ambiguous news detected ({title[:20]}...). Stage 2 AI Verifying...")
-            is_medical = await is_medical_news_ai(title, desc)
-            if not is_medical:
-                print(f"  🚗 AI confirmed Car-related news. Skipping.")
-                supabase.table("raw_news").update({"status": "skipped"}).eq("id", raw_id).execute()
-                return True
-            else:
-                print("  ✅ AI rescued as Medical news!")
-        else:
-            # For other keywords, if car noise exists without strong med context, just skip to save AI
-            print(f"  🚗 Heuristic Skip (Non-filler car noise): {title[:20]}...")
+    # If it's NOT a strong medical news, let AI decide if it's relevant
+    if not has_strong_med:
+        print(f"  🔍 Verifying relevance for ambiguous news ({title[:20]}...)...")
+        is_relevant = await is_medical_news_ai(title, desc)
+        if not is_relevant:
+            print(f"  🚫 AI filtered as irrelevant. Skipping.")
             supabase.table("raw_news").update({"status": "skipped"}).eq("id", raw_id).execute()
             return True
+        else:
+            print("  ✅ AI confirmed as relevant Medical/Aesthetic news!")
 
     # [2] Double check if already in production (Unique Link)
     try:
