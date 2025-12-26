@@ -187,6 +187,17 @@ async def process_item(item, worksheet):
     summary = analysis.get("brief_summary", title[:70])
     impact = analysis.get("impact_level", 3)
     
+    # Logic: If main_keyword is '기타', fallback to search_keyword
+    if main_kw == "기타" or not main_kw:
+        main_kw = keyword
+
+    # Logic: Clean up included_keywords
+    # 1. Remove '기타'
+    # 2. Remove duplicates
+    # 3. Remove main_kw if present
+    included_kws = [k for k in included_kws if k != "기타" and k != main_kw]
+    included_kws = list(set(included_kws))
+
     # 1. Update Production DB (Supabase)
     prod_data = {
         "title": title,
@@ -195,7 +206,7 @@ async def process_item(item, worksheet):
         "published_at": pub_date,
         "source": "Naver",
         "keyword": keyword,
-        "main_keywords": [analysis.get("main_keyword", "기타")] + analysis.get("included_keywords", [])
+        "main_keywords": [main_kw] + included_kws
     }
     
     try:

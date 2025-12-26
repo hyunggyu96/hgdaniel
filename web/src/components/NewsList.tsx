@@ -255,7 +255,6 @@ export default async function NewsList({ selectedCategory, currentPage = 1, sear
     );
 }
 
-// 🚀 Ultra Compact Card for Dashboard
 const NewsCard = React.memo(function NewsCard({ article, today }: { article: any, today: string }) {
     const analysis = getTags(article);
     const pubDate = article.published_at ? new Date(article.published_at) : null;
@@ -264,14 +263,25 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
 
     // Fallback logic for summary
     let summaryText = analysis.summary && analysis.summary !== '-' ? analysis.summary : article.description;
-    // Clean up unwanted prefix like "- | - | " caused by parsing errors
     if (summaryText) {
         summaryText = summaryText.replace(/^[\s\-\|]+/, '').replace(/^[\s\-\|]+/, '').trim();
     }
 
+    // Consolidated Keywords Logic
+    let allKeywords = [...analysis.main, ...analysis.sub];
+    // Filter out invalid/generic keywords
+    allKeywords = allKeywords.filter(k => k && k !== '기타' && k !== '-' && k !== '|' && k.trim() !== '');
+
+    // If empty, use search keyword
+    if (allKeywords.length === 0 && article.keyword) {
+        allKeywords = [article.keyword];
+    }
+
+    // Deduplicate
+    const uniqueKeywords = Array.from(new Set(allKeywords));
+
     return (
         <div className="group/article flex flex-col gap-0 w-full pb-2 border-b border-dashed border-white/5 last:border-0 last:pb-0 relative pl-3">
-            {/* Left accent line */}
             {isToday && (
                 <div className="mb-1">
                     <span className="text-[8px] font-bold text-white bg-red-600 px-1 py-0.5 rounded shadow-sm uppercase tracking-tighter">TODAY</span>
@@ -295,21 +305,18 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
                 </div>
             </div>
 
-            {/* Keywords & Star */}
+            {/* Unified Keywords (Blue Only) */}
             <div className="flex items-center justify-between mt-1">
                 <div className="flex flex-wrap items-center gap-1">
-                    {/* Main Keywords */}
-                    {analysis.main.length > 0 && analysis.main.map((k, i) => (
-                        <span key={`main-${i}`} className="text-[9px] text-blue-100 bg-blue-500/20 px-1.5 py-0.5 rounded border border-blue-500/20 whitespace-nowrap font-bold">
-                            {k}
-                        </span>
-                    ))}
-                    {/* Sub Keywords */}
-                    {analysis.sub.length > 0 && analysis.sub.slice(0, 3).map((k, i) => (
-                        <span key={`sub-${i}`} className="text-[8px] text-white/60 bg-white/5 px-1.5 py-0.5 rounded border border-white/5 whitespace-nowrap">
-                            {k}
-                        </span>
-                    ))}
+                    {uniqueKeywords.length > 0 ? (
+                        uniqueKeywords.slice(0, 4).map((k, i) => (
+                            <span key={`kw-${i}`} className="text-[9px] text-blue-100 bg-blue-500/20 px-1.5 py-0.5 rounded border border-blue-500/20 whitespace-nowrap font-bold">
+                                {k}
+                            </span>
+                        ))
+                    ) : (
+                        <span className="text-[8px] text-white/20">-</span>
+                    )}
                 </div>
                 <div className="shrink-0 w-[52px] flex justify-end items-center">
                     <CollectionButton newsLink={article.link} newsTitle={article.title} size={20} />
@@ -335,17 +342,28 @@ const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, 
 
     // Fallback logic for summary
     let summaryText = analysis.summary && analysis.summary !== '-' ? analysis.summary : article.description;
-    // Clean up unwanted prefix like "- | - | " caused by parsing errors
     if (summaryText) {
         summaryText = summaryText.replace(/^[\s\-\|]+/, '').replace(/^[\s\-\|]+/, '').trim();
     }
+
+    // Consolidated Keywords Logic
+    let allKeywords = [...analysis.main, ...analysis.sub];
+    // Filter out invalid/generic keywords
+    allKeywords = allKeywords.filter(k => k && k !== '기타' && k !== '-' && k !== '|' && k.trim() !== '');
+
+    // If empty, use search keyword
+    if (allKeywords.length === 0 && article.keyword) {
+        allKeywords = [article.keyword];
+    }
+
+    // Deduplicate
+    const uniqueKeywords = Array.from(new Set(allKeywords));
 
     return (
         <article className={`group py-1.5 px-3 hover:bg-white/[0.03] transition-colors border-b border-white/5 flex flex-col gap-1 relative ${isToday ? 'bg-blue-900/5' : ''}`}>
 
             {/* Top Row: Meta */}
             <div className="flex items-center gap-2 text-[9px] h-4">
-                {/* Col 7: Publishing Time */}
                 <span className={`font-mono font-bold tracking-tight text-[10px] ${isToday ? 'text-blue-400' : 'text-white/50'}`}>
                     {dateStr} <span className="text-[9px] font-medium opacity-80 ml-0.5">{timeStr}</span>
                 </span>
@@ -361,7 +379,6 @@ const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, 
                     <CollectionButton newsLink={article.link} newsTitle={article.title} size={14} />
                 </div>
                 <div className="flex-1 min-w-0 flex flex-col md:flex-row gap-2 md:items-start md:justify-between">
-                    {/* Col 3: Headline */}
                     <div className="flex-1 min-w-0">
                         <a
                             href={article.link}
@@ -374,7 +391,6 @@ const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, 
                             </h3>
                         </a>
 
-                        {/* Col 9: AI One-line Summary (Fallback to Description if parsing fails) */}
                         <p className="mt-0.5 text-[11px] text-white/50 leading-snug font-medium line-clamp-1">
                             {summaryText}
                         </p>
@@ -382,27 +398,19 @@ const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, 
                 </div>
             </div>
 
-            {/* Bottom Row: Included Keywords & Star */}
+            {/* Bottom Row: Unified Keywords */}
             <div className="flex items-center justify-between opacity-60 group-hover:opacity-100 transition-opacity mt-1.5 pl-7">
                 <div className="flex flex-wrap items-center gap-1.5">
-                    {(analysis.main.length > 0 || analysis.sub.length > 0) ? (
-                        <>
-                            {analysis.main.map((k, i) => (
-                                <span key={`main-${i}`} className="text-[9px] text-blue-100 bg-blue-500/20 px-1.5 py-0.5 rounded border border-blue-500/20 font-bold uppercase tracking-tight">
-                                    {k}
-                                </span>
-                            ))}
-                            {analysis.sub.map((k, i) => (
-                                <span key={`sub-${i}`} className="text-[9px] text-white/60 bg-white/5 px-1.5 py-0.5 rounded border border-white/5 font-bold uppercase tracking-tight">
-                                    {k}
-                                </span>
-                            ))}
-                        </>
+                    {uniqueKeywords.length > 0 ? (
+                        uniqueKeywords.map((k, i) => (
+                            <span key={`kw-${i}`} className="text-[9px] text-blue-100 bg-blue-500/20 px-1.5 py-0.5 rounded border border-blue-500/20 font-bold uppercase tracking-tight">
+                                {k}
+                            </span>
+                        ))
                     ) : (
                         <span className="text-[8px] text-white/20">-</span>
                     )}
                 </div>
-
             </div>
         </article>
     );
