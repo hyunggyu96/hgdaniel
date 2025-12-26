@@ -3,7 +3,8 @@ import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { JWT } from 'google-auth-library';
 import { NextResponse } from 'next/server';
 
-const DEPLOY_VERSION = '2025-12-26-T1926';
+const DEPLOY_VERSION = '2025-12-26-T1933';
+const SHEET_ID = '1IDFVtmhu5EtxSacRqlklZo6V_x9aB0WVZIzkIx5Wkic'; // "시장조사 뉴스" 시트 ID
 
 export async function POST(req: Request) {
     try {
@@ -13,66 +14,30 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Keyword is required' }, { status: 400 });
         }
 
-        console.log(`--- [v${DEPLOY_VERSION}] Keyword Suggestion Start ---`);
+        console.log(`--- [v${DEPLOY_VERSION}] Suggestion API Start ---`);
 
-        // 1. Spreadsheet ID (Strict)
-        const sheetId = '1IDFVtmhu5EtxSacRqlklZo6V_x9aB0WVZIzkIx5Wkic';
+        // 1. Service Account Key - Working Logic from login-logs
+        const rawKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY || '';
+        if (!rawKey) throw new Error('GOOGLE_SERVICE_ACCOUNT_KEY is missing');
 
-        // 2. Recursive/Bulletproof Service Account Key Parser
-        let rawKeyEnv = process.env.GOOGLE_SERVICE_ACCOUNT_KEY || '';
-
-        const bulletproofParse = (input: string): any => {
-            let current = input.trim();
-
-            // Step 1: Handle wrapping quotes
-            if ((current.startsWith('"') && current.endsWith('"')) || (current.startsWith("'") && current.endsWith("'"))) {
-                current = current.substring(1, current.length - 1);
-            }
-
-            // Step 2: Recursive Parse (Handles double-serialized strings)
-            let result = current;
-            let attempts = 0;
-            while (typeof result === 'string' && attempts < 5) {
-                try {
-                    // Try to parse as-is
-                    result = JSON.parse(result);
-                } catch (e) {
-                    // If parse fails, try basic sanitization for control characters and retry once
-                    try {
-                        const sanitized = result
-                            .replace(/\\n/g, '\n')
-                            .replace(/\\"/g, '"')
-                            .replace(/[\u0000-\u001F]/g, (match) => match === '\n' ? '\\n' : '');
-                        result = JSON.parse(sanitized);
-                    } catch (innerE) {
-                        // If everything fails, break and let the outer catch handle it
-                        break;
-                    }
-                }
-                attempts++;
-            }
-
-            if (typeof result !== 'object' || result === null) {
-                throw new Error(`Failed to parse Service Account Key into an object. Type: ${typeof result}`);
-            }
-            return result;
-        };
-
-        const creds = bulletproofParse(rawKeyEnv);
-        console.log('Credentials object identified successfully');
+        // Proven cleaning logic from collections/route.ts
+        const cleanKey = rawKey.trim().replace(/^['"]|['"]$/g, '');
+        const creds = JSON.parse(cleanKey);
 
         const serviceAccountAuth = new JWT({
             email: creds.client_email,
-            key: (creds.private_key || '').replace(/\\n/g, '\n'),
-            scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+            key: creds.private_key,
+            scopes: [
+                'https://www.googleapis.com/auth/spreadsheets',
+                'https://www.googleapis.com/auth/drive.file',
+            ],
         });
 
-        // 3. Initialize Doc
-        const doc = new GoogleSpreadsheet(sheetId, serviceAccountAuth);
+        // 2. Initialize Doc & Sheet
+        const doc = new GoogleSpreadsheet(SHEET_ID, serviceAccountAuth);
         await doc.loadInfo();
-        console.log(`Connected to Sheet: ${doc.title}`);
+        console.log(`Connected to Spreadsheet: ${doc.title}`);
 
-        // 4. Get/Create "키워드제안" Sheet
         let sheet = doc.sheetsByTitle['키워드제안'];
         if (!sheet) {
             console.log('Creating "키워드제안" sheet');
@@ -82,31 +47,31 @@ export async function POST(req: Request) {
             });
         }
 
-        // 5. Deduplication & Incremental Counter
+        // 3. Deduplication Logic
         const rows = await sheet.getRows();
-        const existingRow = rows.find(r => r.get('제안 키워드')?.toString().trim() === keyword.trim());
+        const keywordToMatch = keyword.trim();
+        const existingRow = rows.find(r => r.get('제안 키워드')?.toString().trim() === keywordToMatch);
 
         const now = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
 
         if (existingRow) {
-            console.log(`Updating existing keyword: ${keyword}`);
+            console.log(`Incrementing counter for: ${keywordToMatch}`);
             const currentCount = parseInt(existingRow.get('누적 제안 횟수') || '1', 10);
-            existingRow.set('누적 제안 횟수', currentCount + 1);
+            existingRow.set('누적 제안 횟수', (currentCount + 1).toString());
             existingRow.set('제안일시', now);
             await existingRow.save();
         } else {
-            console.log(`Adding new keyword: ${keyword}`);
+            console.log(`Adding new row for: ${keywordToMatch}`);
             await sheet.addRow({
                 '제안일시': now,
-                '제안 키워드': keyword,
+                '제안 키워드': keywordToMatch,
                 '카테고리': category || '미지정',
                 '제안 사유': reason || '-',
-                '누적 제안 횟수': 1,
+                '누적 제안 횟수': '1',
                 '상태': '대기중'
             });
         }
 
-        console.log('--- Suggestion Process Completed Successfully ---');
         return NextResponse.json({ success: true });
 
     } catch (error: any) {
