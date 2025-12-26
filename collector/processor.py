@@ -61,15 +61,21 @@ def get_google_sheet():
         print(f"⚠️ Google Sheet Warning: {e}")
         return None
 
+import re
+
 # [3] Filtering Configuration
 CAR_FILTER_KEYWORDS = [
-    "중고차", "전기차", "수소차", "현대차", "기아차", "시승기", "리콜", "국토교통부", 
-    "도로공사", "내비게이션", "블랙박스", "A-필러", "B-필러", "C-필러", " A필러", " B필러", " C필러"
+    "중고차", "전기차", "수소차", "현대차", "기아차", "르노코리아", "르노삼성", "쌍용차", "KG모빌리티", 
+    "쉐보레", "폭스바겐", "메르세데스", "시승기", "리콜", "국토교통부", "도로공사", "내비게이션", "블랙박스"
 ]
 
-# Keywords that are 100% Medical - if these exist, we skip noise filtering
+# Robust Regex for Automotive Pillars (handles "A필러", "A 필러", "A-필러", etc.)
+PILLAR_REGEX = re.compile(r"[A-C]\s*(-|—)?\s*필러", re.IGNORECASE)
+
+# Keywords that are 100% Medical Aesthetic - NO broad terms like '제약' or '바이오' here
+# These must be specific enough to skip AI verification safely.
 STRONG_MED_KEYWORDS = [
-    "피부과", "성형외과", "의료기기", "임상", "품목허가", "휴젤", "메디톡스", "파마리서치", "대웅제약", "식약처", "PLA필러"
+    "피부과", "성형외과", "의료기기", "품목허가", "휴젤", "메디톡스", "파마리서치", "제테마", "클래시스", "바이오플러스", "바임"
 ]
 
 async def is_medical_news_ai(title, description):
@@ -230,11 +236,16 @@ async def process_item(item, worksheet, recent_articles):
     
     # Check if it has car/irrelevant noise
     has_noise = any(noise_kw in full_text for noise_kw in CAR_FILTER_KEYWORDS)
+    has_pillar_noise = bool(PILLAR_REGEX.search(full_text))
+    
     # Check if it has strong medical context (High-confidence pass)
     has_strong_med = any(med_kw in full_text for med_kw in STRONG_MED_KEYWORDS)
     
-    # If it's NOT a strong medical news, let AI decide if it's relevant
-    if not has_strong_med:
+    # If it is HIGH CONFIDENCE Medical (Has strong KW AND no Pillar noise), pass immediately
+    if has_strong_med and not has_pillar_noise:
+        pass 
+    else:
+        # For everything else (Noise detected or no strong medical KW), let AI decide
         print(f"  🔍 Verifying relevance for ambiguous news ({title[:20]}...)...")
         is_relevant = await is_medical_news_ai(title, desc)
         if not is_relevant:
