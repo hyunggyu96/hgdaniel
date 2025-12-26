@@ -14,17 +14,18 @@ const supabase = createClient(
 
 export async function GET() {
     try {
-        // 최근 30일 이내의 데이터만 가져오기
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        const thirtyDaysAgoStr = thirtyDaysAgo.toISOString();
+        // 최근 7일 이내의 데이터만 가져오기 (과부하 방지)
+        const rangeDays = 7;
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - rangeDays);
+        const startDateStr = startDate.toISOString();
 
         const { data: articles, error } = await supabase
             .from('articles')
             .select('keyword, published_at')
-            .gte('published_at', thirtyDaysAgoStr)
+            .gte('published_at', startDateStr)
             .order('published_at', { ascending: true })
-            .limit(5000); // 1000개 제한 해제 (최대 5000개까지 확장)
+            .limit(3000);
 
         if (error) throw error;
 
@@ -50,7 +51,7 @@ export async function GET() {
             trendMap[date][keyword] += 1;
         });
 
-        // 30일치 날짜를 모두 생성하여 빈 데이터(0) 채우기
+        // 7일치 날짜를 모두 생성하여 빈 데이터(0) 채우기
         const trendData: any[] = [];
         const allKeywords = Array.from(keywordsSet);
 
@@ -58,7 +59,7 @@ export async function GET() {
         const nowKst = new Date();
         nowKst.setHours(nowKst.getHours() + 9);
 
-        for (let i = 29; i >= 0; i--) {
+        for (let i = rangeDays - 1; i >= 0; i--) {
             const d = new Date(nowKst);
             d.setDate(d.getDate() - i);
             const dateStr = d.toISOString().split('T')[0];

@@ -41,7 +41,7 @@ export default function TrendChartInner() {
     return (
         <Card className="mt-4 bg-[#1e1e20] border-white/5 shadow-2xl">
             <Title className="text-xl font-black text-white tracking-tight">키워드 뉴스 트렌드</Title>
-            <Text className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mt-1">Real-time Keyword Mentions (Last 30 Days)</Text>
+            <Text className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mt-1">Real-time Keyword Mentions (Last 7 Days)</Text>
 
             <div className="h-72 w-full mt-8">
                 <ResponsiveContainer width="100%" height="100%">
