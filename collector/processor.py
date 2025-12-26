@@ -61,12 +61,38 @@ def get_google_sheet():
         print(f"⚠️ Google Sheet Warning: {e}")
         return None
 
-# [3] Negative Keywords for Car News Filtering (Avoiding false positives with PLA필러)
+# [3] Filtering Configuration
 CAR_FILTER_KEYWORDS = [
-    "자동차", "중고차", "전기차", "수소차", "현대차", "기아차",
-    "시승기", "리콜", "국토교통부", "도로공사", "내비게이션", "블랙박스",
-    "A-필러", "B-필러", "C-필러", " A필러", " B필러", " C필러"
+    "중고차", "전기차", "수소차", "현대차", "기아차", "시승기", "리콜", "국토교통부", 
+    "도로공사", "내비게이션", "블랙박스", "A-필러", "B-필러", "C-필러", " A필러", " B필러", " C필러"
 ]
+
+# Keywords that are 100% Medical - if these exist, we skip noise filtering
+STRONG_MED_KEYWORDS = [
+    "피부과", "성형외과", "의료기기", "임상", "품목허가", "휴젤", "메디톡스", "파마리서치", "대웅제약", "식약처", "PLA필러"
+]
+
+async def is_medical_news_ai(title, description):
+    """Stage 2: AI verification for ambiguous cases"""
+    prompt = (
+        "Analyze if this news is related to Medical Aesthetics, Biopharma, or Skincare industry. "
+        "Strictly ignore Automotive news even if keywords like 'Pillar' appear.\n"
+        "Respond ONLY with 'TRUE' if it is Medical/Biopharma, and 'FALSE' otherwise.\n\n"
+        f"Title: {title}\n"
+        f"Content: {description}"
+    )
+    for g_key in GEMINI_KEYS:
+        try:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={g_key}"
+            payload = {"contents": [{"parts": [{"text": prompt}]}]}
+            async with aiohttp.ClientSession() as http_sess:
+                async with http_sess.post(url, json=payload, timeout=10) as resp:
+                    if resp.status == 200:
+                        result = await resp.json()
+                        answer = result['candidates'][0]['content']['parts'][0]['text'].strip().upper()
+                        return "TRUE" in answer
+        except: continue
+    return True # Default to True to avoid missing news
 
 # AI Analysis Function (copied from collector for self-containment/modularity)
 async def analyze_article_expert_async(title, description, search_keyword):
@@ -174,12 +200,24 @@ async def process_item(item, worksheet):
     pub_date = item['pub_date']
     keyword = item['search_keyword']
 
-    # [1] Car News Filtering (Point 1)
+    # [1] Car News Filtering (2-Stage Approach)
     full_text = f"{title} {desc}"
-    if any(car_kw in full_text for car_kw in CAR_FILTER_KEYWORDS):
-        print(f"  🚗 Skipping Car-related news: {title[:30]}...")
-        supabase.table("raw_news").update({"status": "skipped"}).eq("id", raw_id).execute()
-        return True
+    
+    # Check if it has car noise
+    has_car_noise = any(car_kw in full_text for car_kw in CAR_FILTER_KEYWORDS)
+    # Check if it has strong medical context
+    has_strong_med = any(med_kw in full_text for med_kw in STRONG_MED_KEYWORDS)
+    
+    if has_car_noise and not has_strong_med:
+        # Ambiguous or likely car - Stage 2: AI Verification
+        print(f"  🔍 Ambiguous news detected ({title[:20]}...). Stage 2 AI Verifying...")
+        is_medical = await is_medical_news_ai(title, desc)
+        if not is_medical:
+            print(f"  🚗 AI confirmed Car-related news. Skipping.")
+            supabase.table("raw_news").update({"status": "skipped"}).eq("id", raw_id).execute()
+            return True
+        else:
+            print("  ✅ AI rescued as Medical news!")
 
     # [2] Double check if already in production
     try:
