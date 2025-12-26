@@ -30,7 +30,6 @@ export async function GET() {
         if (error) throw error;
 
         const trendMap: Record<string, any> = {};
-        const keywordsSet = new Set<string>();
 
         articles?.forEach((item) => {
             // KST 날짜 변환 (YYYY-MM-DD 형식 추출)
@@ -39,7 +38,6 @@ export async function GET() {
             const date = d.toISOString().split('T')[0];
 
             const keyword = (item.keyword || '기타').trim();
-            if (keyword) keywordsSet.add(keyword);
 
             if (!trendMap[date]) {
                 trendMap[date] = { date };
@@ -51,9 +49,17 @@ export async function GET() {
             trendMap[date][keyword] += 1;
         });
 
+        // 카테고리별 전체 언급 횟수 계산 및 정렬 (가장 많이 언급된 순서로)
+        const keywordCounts: Record<string, number> = {};
+        articles?.forEach(item => {
+            const k = (item.keyword || '기타').trim();
+            keywordCounts[k] = (keywordCounts[k] || 0) + 1;
+        });
+
+        const allKeywords = Object.keys(keywordCounts).sort((a, b) => keywordCounts[b] - keywordCounts[a]);
+
         // 7일치 날짜를 모두 생성하여 빈 데이터(0) 채우기
         const trendData: any[] = [];
-        const allKeywords = Array.from(keywordsSet);
 
         // 오늘 날짜(KST) 구하기
         const nowKst = new Date();

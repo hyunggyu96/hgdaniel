@@ -43,7 +43,17 @@ export default function TrendChartInner() {
             <Title className="text-xl font-black text-white tracking-tight">키워드 뉴스 트렌드</Title>
             <Text className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mt-1">Real-time Keyword Mentions (Last 7 Days)</Text>
 
-            <div className="h-72 w-full mt-8">
+            <div className="flex flex-wrap gap-x-4 gap-y-2 mt-4 ml-1">
+                {categories.slice(0, 8).map((c, i) => (
+                    <div key={c} className="flex items-center gap-1.5">
+                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: colors[i % colors.length] }} />
+                        <span className="text-[10px] font-bold text-white/50">{c}</span>
+                    </div>
+                ))}
+                {categories.length > 8 && <span className="text-[10px] font-bold text-white/20">+{categories.length - 8} 더보기</span>}
+            </div>
+
+            <div className="h-72 w-full mt-6">
                 <ResponsiveContainer width="100%" height="100%">
                     <RAreaChart data={data} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
                         <defs>
@@ -71,20 +81,25 @@ export default function TrendChartInner() {
                             contentStyle={{ backgroundColor: '#101012', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', boxShadow: '0 20px 40px rgba(0,0,0,0.4)' }}
                             itemStyle={{ fontSize: '11px', fontWeight: 800, padding: '2px 0' }}
                             labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: '10px', marginBottom: '4px', fontWeight: 700 }}
+                            itemSorter={(item: any) => -item.value} // 항상 높은 값이 위에 보이게
                         />
-                        {categories.map((c, i) => (
-                            <Area
-                                key={c}
-                                type="monotone"
-                                dataKey={c}
-                                stroke={colors[i % colors.length]}
-                                fillOpacity={1}
-                                fill={`url(#color-${c})`}
-                                strokeWidth={2.5}
-                                stackId="1"
-                                animationDuration={1500}
-                            />
-                        ))}
+                        {[...categories].reverse().map((c, i) => {
+                            // 색상 인덱스는 원래 categories 기준 유지
+                            const originalIdx = categories.indexOf(c);
+                            return (
+                                <Area
+                                    key={c}
+                                    type="monotone"
+                                    dataKey={c}
+                                    stroke={colors[originalIdx % colors.length]}
+                                    fillOpacity={1}
+                                    fill={`url(#color-${c})`}
+                                    strokeWidth={2.5}
+                                    stackId="1"
+                                    animationDuration={1500}
+                                />
+                            );
+                        })}
                     </RAreaChart>
                 </ResponsiveContainer>
             </div>
