@@ -262,10 +262,16 @@ async def process_item(item, worksheet, recent_articles):
     # [3] Semantic Duplicate Check (Similar Title)
     dup_title = is_semantically_duplicate(title, recent_articles)
     force_ollama = False
+    
     if dup_title:
-        # Rule: If related news, use Ollama to save cost
-        print(f"  ♻️ Related news found (similar to: {dup_title[:20]}...). Will use local Ollama.")
-        force_ollama = True
+        # Optimization: Use Ollama for related news to save cost
+        # CRITICAL: For '필러' (Filler), we ALWAYS use Online AI due to its high variability
+        if keyword == "필러":
+            print(f"  ♻️ Related news found, but keyword is '필러'. Using Online AI for accuracy.")
+            force_ollama = False
+        else:
+            print(f"  ♻️ Related news found (similar to: {dup_title[:20]}...). Using local Ollama.")
+            force_ollama = True
 
     print(f"🤖 Processing: {title[:40]}...")
     
