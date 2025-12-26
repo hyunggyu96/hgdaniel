@@ -3,6 +3,8 @@ import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { JWT } from 'google-auth-library';
 import { NextResponse } from 'next/server';
 
+const DEPLOY_VERSION = '2025-12-26-T1922';
+
 export async function POST(req: Request) {
     try {
         const { keyword, category, reason } = await req.json();
@@ -12,51 +14,63 @@ export async function POST(req: Request) {
         }
 
         // 1. Initialize Auth
-        console.log('--- Suggestion API Start ---');
-        const sheetId = (process.env.GOOGLE_SHEET_ID || '').replace(/\s/g, '');
+        console.log(`--- Suggestion API Start [v${DEPLOY_VERSION}] ---`);
+        const sheetId = (process.env.GOOGLE_SHEET_ID || '').trim().replace(/\s/g, '');
 
-        let rawKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY || '{}';
+        let rawKey = (process.env.GOOGLE_SERVICE_ACCOUNT_KEY || '').trim();
 
-        // Resilient JSON Parsing
-        let processedKey = rawKey.trim();
-
-        // Remove surrounding quotes if they exist
-        if (processedKey.startsWith('"') && processedKey.endsWith('"')) {
-            processedKey = processedKey.substring(1, processedKey.length - 1);
-        } else if (processedKey.startsWith("'") && processedKey.endsWith("'")) {
-            processedKey = processedKey.substring(1, processedKey.length - 1);
+        // Remove surrounding quotes if they exist (common Vercel/Env issue)
+        if (rawKey.startsWith('"') && rawKey.endsWith('"')) {
+            rawKey = rawKey.substring(1, rawKey.length - 1);
+        } else if (rawKey.startsWith("'") && rawKey.endsWith("'")) {
+            rawKey = rawKey.substring(1, rawKey.length - 1);
         }
 
         const tryParse = (jsonString: string) => {
+            // Log first 30 chars for debugging (safe, as it's usually {"type":"service_account")
+            console.log('Parsing Key Start:', jsonString.substring(0, 30));
+
             try {
-                // First try direct parse
+                // Attempt 1: Standard Parse
                 return JSON.parse(jsonString);
-            } catch (e1) {
-                console.log('Direct parse failed, trying sanitize fallback...');
+            } catch (e1: any) {
+                console.log(`Attempt 1 failed: ${e1.message}`);
+
                 try {
-                    // "Bad control character" fix: Replace literal newlines and tabs
-                    const sanitized = jsonString
-                        .replace(/\n/g, '\\n')
-                        .replace(/\r/g, '\\r')
-                        .replace(/\t/g, '\\t');
+                    // Attempt 2: Sanitize control characters (Literal Newlines, etc.)
+                    // This fixes "Bad control character in string literal"
+                    const sanitized = jsonString.replace(/[\u0000-\u001F\u007F-\u009F]/g, (match) => {
+                        if (match === '\n') return '\\n';
+                        if (match === '\r') return '\\r';
+                        if (match === '\t') return '\\t';
+                        return ''; // Strip other control chars
+                    });
                     return JSON.parse(sanitized);
-                } catch (e2) {
-                    console.log('Sanitize fallback failed, trying unescape fallback...');
-                    // Double-escaped quotes fix
-                    const unescaped = jsonString
-                        .replace(/\\"/g, '"')
-                        .replace(/\\\\/g, '\\')
-                        .replace(/\\n/g, '\n');
-                    return JSON.parse(unescaped);
+                } catch (e2: any) {
+                    console.log(`Attempt 2 failed: ${e2.message}`);
+
+                    try {
+                        // Attempt 3: If it's double-escaped (common in some env setups)
+                        const unescaped = jsonString
+                            .replace(/\\n/g, '\n')
+                            .replace(/\\"/g, '"')
+                            .replace(/\\\\/g, '\\');
+                        // Then re-sanitize for control characters
+                        const finalSanitized = unescaped.replace(/[\u0000-\u001F]/g, (m) => m === '\n' ? '\\n' : '');
+                        return JSON.parse(finalSanitized);
+                    } catch (e3: any) {
+                        console.error('Final Parser Exhausted');
+                        throw new Error(`Auth JSON Error: ${e3.message} (Version: ${DEPLOY_VERSION})`);
+                    }
                 }
             }
         };
 
-        const creds = tryParse(processedKey);
+        const creds = tryParse(rawKey);
 
         const serviceAccountAuth = new JWT({
             email: creds.client_email,
-            key: creds.private_key.replace(/\\n/g, '\n'),
+            key: (creds.private_key || '').replace(/\\n/g, '\n'),
             scopes: ['https://www.googleapis.com/auth/spreadsheets'],
         });
 
@@ -96,9 +110,10 @@ export async function POST(req: Request) {
         return NextResponse.json({ success: true });
 
     } catch (error: any) {
-        console.error('Suggestion Overall Error:', error);
+        console.error('Final Error Handler:', error);
         return NextResponse.json({
             error: error.message,
+            version: DEPLOY_VERSION
         }, { status: 500 });
     }
 }
