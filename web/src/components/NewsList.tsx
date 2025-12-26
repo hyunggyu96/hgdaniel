@@ -298,6 +298,13 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
             {/* Keywords & Star */}
             <div className="flex items-center justify-between mt-1">
                 <div className="flex flex-wrap items-center gap-1">
+                    {/* Main Keywords */}
+                    {analysis.main.length > 0 && analysis.main.map((k, i) => (
+                        <span key={`main-${i}`} className="text-[9px] text-blue-100 bg-blue-500/20 px-1.5 py-0.5 rounded border border-blue-500/20 whitespace-nowrap font-bold">
+                            {k}
+                        </span>
+                    ))}
+                    {/* Sub Keywords */}
                     {analysis.sub.length > 0 && analysis.sub.slice(0, 3).map((k, i) => (
                         <span key={`sub-${i}`} className="text-[8px] text-white/60 bg-white/5 px-1.5 py-0.5 rounded border border-white/5 whitespace-nowrap">
                             {k}
@@ -378,12 +385,19 @@ const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, 
             {/* Bottom Row: Included Keywords & Star */}
             <div className="flex items-center justify-between opacity-60 group-hover:opacity-100 transition-opacity mt-1.5 pl-7">
                 <div className="flex flex-wrap items-center gap-1.5">
-                    {analysis.sub.length > 0 ? (
-                        analysis.sub.map((k, i) => (
-                            <span key={i} className="text-[9px] text-white/60 bg-white/5 px-1.5 py-0.5 rounded border border-white/5 font-bold uppercase tracking-tight">
-                                {k}
-                            </span>
-                        ))
+                    {(analysis.main.length > 0 || analysis.sub.length > 0) ? (
+                        <>
+                            {analysis.main.map((k, i) => (
+                                <span key={`main-${i}`} className="text-[9px] text-blue-100 bg-blue-500/20 px-1.5 py-0.5 rounded border border-blue-500/20 font-bold uppercase tracking-tight">
+                                    {k}
+                                </span>
+                            ))}
+                            {analysis.sub.map((k, i) => (
+                                <span key={`sub-${i}`} className="text-[9px] text-white/60 bg-white/5 px-1.5 py-0.5 rounded border border-white/5 font-bold uppercase tracking-tight">
+                                    {k}
+                                </span>
+                            ))}
+                        </>
                     ) : (
                         <span className="text-[8px] text-white/20">-</span>
                     )}

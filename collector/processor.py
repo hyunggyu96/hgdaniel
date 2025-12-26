@@ -137,14 +137,22 @@ async def analyze_article_expert_async(title, description, search_keyword):
         pass
 
     # Fallback if all AI models fail
-    print(f"⚠️ [FALLBACK] All AI models failed. Using raw content.")
+    print(f"⚠️ [FALLBACK] All AI models failed. Using local keyword extractor.")
+    
+    # Use local logic to rescue tags
+    local_main = extract_main_keyword(description, title=title)
+    local_sub = extract_keywords(f"{title} {description}")
+    # Remove main keyword from sub list if present
+    if local_main in local_sub:
+        local_sub.remove(local_main)
+
     return {
-        "main_keyword": "기타",
-        "included_keywords": [],
+        "main_keyword": local_main,
+        "included_keywords": local_sub,
         "issue_nature": "기타",
         "brief_summary": title[:99],
         "impact_level": 1,
-        "model": "Fallback-NoAI"
+        "model": "Fallback-Local"
     }
 
 async def process_item(item, worksheet):
