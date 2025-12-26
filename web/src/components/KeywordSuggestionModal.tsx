@@ -9,6 +9,7 @@ export default function KeywordSuggestionModal({ isOpen, onClose }: { isOpen: bo
     const [category, setCategory] = useState('기업');
     const [reason, setReason] = useState('');
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,9 +31,12 @@ export default function KeywordSuggestionModal({ isOpen, onClose }: { isOpen: bo
                     setStatus('idle');
                 }, 2000);
             } else {
+                const data = await res.json();
+                setErrorMessage(data.error || '제안 제출에 실패했습니다.');
                 setStatus('error');
             }
-        } catch (err) {
+        } catch (err: any) {
+            setErrorMessage(err.message || '네트워크 오류가 발생했습니다.');
             setStatus('error');
         }
     };
@@ -91,6 +95,20 @@ export default function KeywordSuggestionModal({ isOpen, onClose }: { isOpen: bo
                                     <h4 className="text-lg font-bold text-white">제안 완료!</h4>
                                     <p className="text-xs text-white/40 mt-1.5 leading-relaxed">기록이 구글 시트에 반영되었습니다.</p>
                                 </div>
+                            ) : status === 'error' ? (
+                                <div className="py-10 flex flex-col items-center justify-center text-center">
+                                    <div className="w-12 h-12 bg-red-500/20 rounded-full flex items-center justify-center mb-4">
+                                        <X className="w-6 h-6 text-red-500" />
+                                    </div>
+                                    <h4 className="text-lg font-bold text-white">제출 실패</h4>
+                                    <p className="text-xs text-red-400/70 mt-1.5 leading-relaxed px-4">{errorMessage}</p>
+                                    <button
+                                        onClick={() => setStatus('idle')}
+                                        className="mt-6 text-[10px] font-bold text-blue-400 uppercase tracking-widest hover:text-blue-300 transition-colors"
+                                    >
+                                        다시 시도하기
+                                    </button>
+                                </div>
                             ) : (
                                 <form id="suggest-form" onSubmit={handleSubmit} className="space-y-4">
                                     <div>
@@ -114,8 +132,8 @@ export default function KeywordSuggestionModal({ isOpen, onClose }: { isOpen: bo
                                                     type="button"
                                                     onClick={() => setCategory(cat)}
                                                     className={`py-2 rounded-lg text-[10px] font-bold transition-all border ${category === cat
-                                                            ? 'bg-blue-500/20 text-blue-400 border-blue-500/50'
-                                                            : 'bg-white/5 text-white/30 border-transparent hover:bg-white/10'
+                                                        ? 'bg-blue-500/20 text-blue-400 border-blue-500/50'
+                                                        : 'bg-white/5 text-white/30 border-transparent hover:bg-white/10'
                                                         }`}
                                                 >
                                                     {cat}
