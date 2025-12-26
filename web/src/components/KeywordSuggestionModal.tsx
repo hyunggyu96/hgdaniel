@@ -56,16 +56,16 @@ export default function KeywordSuggestionModal({ isOpen, onClose }: { isOpen: bo
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-[#1e1e20] border border-white/10 rounded-2xl shadow-2xl z-[101] overflow-hidden"
+                        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-md bg-[#1e1e20] border border-white/10 rounded-2xl shadow-2xl z-[101] overflow-hidden max-h-[90vh] flex flex-col"
                     >
-                        <div className="p-6">
+                        <div className="p-6 overflow-y-auto">
                             <div className="flex justify-between items-center mb-6">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
                                         <MessageSquarePlus className="w-5 h-5 text-blue-500" />
                                     </div>
                                     <div>
-                                        <h3 className="text-lg font-bold text-white">키워드 제안</h3>
+                                        <h3 className="text-lg font-bold text-white">Keyword 추천/제안</h3>
                                         <p className="text-xs text-white/40 mt-0.5">새로운 수집 대상을 제안해주세요.</p>
                                     </div>
                                 </div>

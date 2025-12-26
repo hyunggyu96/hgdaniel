@@ -76,7 +76,7 @@ export default function SideBar() {
                     >
                         <div className="flex items-center gap-3">
                             <MessageSquarePlus className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
-                            <span className="text-sm font-bold text-white/70 uppercase tracking-tight">키워드 제안</span>
+                            <span className="text-sm font-bold text-white/70 uppercase tracking-tight">Keyword 추천/제안</span>
                         </div>
                         <ChevronRight className="w-4 h-4 text-white/20 group-hover:translate-x-1 transition-transform" />
                     </button>
