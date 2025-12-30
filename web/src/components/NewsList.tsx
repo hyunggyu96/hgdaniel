@@ -72,25 +72,61 @@ export default async function NewsList({ selectedCategory, currentPage = 1, sear
     const totalPages = Math.ceil(filteredNews.length / itemsPerPage);
     const paginatedNews = filteredNews.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
+    const isLandingPage = !selectedCategory && !searchQuery && !showCollections;
 
     return (
         <div className="flex-1 space-y-4">
-            <div className="pt-6 md:pt-8 px-4 md:px-6 lg:px-12">
-                <div className="flex flex-col gap-2 mb-2">
-                    <h1 className="text-xl md:text-2xl lg:text-4xl font-bold tracking-tighter text-white leading-tight">
-                        {showCollections ? 'Collections' : selectedCategory ? selectedCategory : 'Market Intelligence'}
-                    </h1>
-                    <div className="flex items-center gap-2">
-                        <span className="relative flex h-1.5 w-1.5 shrink-0">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#3182f6]"></span>
-                        </span>
-                        <div className="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em]">
-                            {selectedCategory ? `Active Tracking` : `Real-time Analysis`}
+            {/* 3D SPLINE HERO SECTION (Landing Page Only) */}
+            {isLandingPage ? (
+                <div className="relative w-full h-[50vh] min-h-[450px] mb-8 overflow-hidden">
+                    <div className="absolute inset-0 z-0">
+                        <iframe
+                            src='https://my.spline.design/robotfollowcursorforlandingpage-oM8UzZvqX8Ffl9hWUXSXeBwO/'
+                            frameBorder='0'
+                            width='100%'
+                            height='100%'
+                            className="w-full h-full"
+                            title="3D Robot Interaction"
+                        />
+                    </div>
+                    {/* Gradient Overlay for seamless blending */}
+                    <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-[#101012] via-[#101012]/80 to-transparent pointer-events-none z-10" />
+
+                    {/* Hero Content Overlay */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20 px-4 mt-[-40px]">
+                        <div className="flex items-center gap-2 mb-4 bg-white/5 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 shadow-2xl">
+                            <span className="relative flex h-2 w-2 shrink-0">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                            </span>
+                            <span className="text-[10px] font-bold text-cyan-100/90 uppercase tracking-[0.3em]">
+                                AI-Powered Analysis
+                            </span>
+                        </div>
+                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-white leading-tight drop-shadow-2xl text-center bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">
+                            MARKET INTELLIGENCE
+                        </h1>
+                    </div>
+                </div>
+            ) : (
+                /* Compact Header for Sub-pages */
+                <div className="pt-6 md:pt-8 px-4 md:px-6 lg:px-12">
+                    <div className="flex flex-col gap-2 mb-2">
+                        <h1 className="text-xl md:text-2xl lg:text-4xl font-bold tracking-tighter text-white leading-tight">
+                            {showCollections ? 'Collections' : selectedCategory ? selectedCategory : 'Market Intelligence'}
+                        </h1>
+                        <div className="flex items-center gap-2">
+                            <span className="relative flex h-1.5 w-1.5 shrink-0">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#3182f6]"></span>
+                            </span>
+                            <div className="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em]">
+                                {selectedCategory ? `Active Tracking` : `Real-time Analysis`}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             <div className="px-4 md:px-6 lg:px-12 pb-24">
                 {showCollections ? (
@@ -102,9 +138,9 @@ export default async function NewsList({ selectedCategory, currentPage = 1, sear
                         ))}
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 relative z-30">
                         {Object.keys(newsByCategory).map((category) => (
-                            <div key={category} className="group/theme bg-white/[0.03] border border-white/5 rounded-[20px] p-5 relative overflow-hidden transition-all duration-300 hover:border-blue-500/20 flex flex-col gap-4 shadow-xl h-full">
+                            <div key={category} className="group/theme bg-white/[0.03] border border-white/5 rounded-[20px] p-5 relative overflow-hidden transition-all duration-300 hover:border-blue-500/20 flex flex-col gap-4 shadow-xl h-full backdrop-blur-sm">
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/0 group-hover/theme:bg-blue-500/5 blur-[60px] rounded-full transition-all duration-700" />
 
                                 <div className="relative z-10 w-full text-center border-b border-white/5 pb-3">
