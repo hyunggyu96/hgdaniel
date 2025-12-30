@@ -2,6 +2,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { JWT } from 'google-auth-library';
+import fs from 'fs';
+import path from 'path';
 
 const SHEET_ID = '1IDFVtmhu5EtxSacRqlklZo6V_x9aB0WVZIzkIx5Wkic'; // Market Analysis (시장조사 뉴스)
 const SERVICE_ACCOUNT_KEY = process.env.GOOGLE_SERVICE_ACCOUNT_KEY || '';
@@ -19,21 +21,40 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         if (!SERVICE_ACCOUNT_KEY) throw new Error('GOOGLE_SERVICE_ACCOUNT_KEY is missing');
 
-        // Working Creds Initialization from log-login.ts
-        // Proven implementation from log-login.ts
+        // Ultra-Robust implementation
         let creds;
+        const rawKey = SERVICE_ACCOUNT_KEY.trim();
+
         try {
-            const cleanKey = SERVICE_ACCOUNT_KEY.trim().replace(/^['"]|['"]$/g, '');
+            // Stage 1: Standard parse
+            const cleanKey = rawKey.replace(/^['"]|['"]$/g, '');
             creds = JSON.parse(cleanKey);
-        } catch (err) {
-            // Fallback for double-serialized strings (common in Vercel env vars)
+        } catch (e) {
             try {
-                const cleanKey = SERVICE_ACCOUNT_KEY.trim().replace(/^['"]|['"]$/g, '');
-                creds = JSON.parse(JSON.parse(cleanKey));
-            } catch (err2) {
-                console.error('Auth JSON Final Parse Error:', err2);
-                throw new Error(`Auth JSON Error: ${err2.message}`);
+                // Stage 2: Handle escaped \n by turning them to spaces (safe for RSA)
+                const cleanKey = rawKey.replace(/^['"]|['"]$/g, '');
+                creds = JSON.parse(cleanKey.replace(/\\n/g, ' '));
+            } catch (e2) {
+                try {
+                    // Stage 3: Double-serialized fallback
+                    const cleanKey = rawKey.replace(/^['"]|['"]$/g, '');
+                    creds = JSON.parse(JSON.parse(cleanKey));
+                } catch (e3) {
+                    // Stage 4: Local file fallback for development
+                    try {
+                        const localPath = path.resolve(process.cwd(), 'collector', 'service_account.json');
+                        if (fs.existsSync(localPath)) {
+                            creds = JSON.parse(fs.readFileSync(localPath, 'utf8'));
+                            console.log('--- Using local service_account.json fallback ---');
+                        }
+                    } catch (e4) { }
+                }
             }
+        }
+
+        if (!creds) {
+            const preview = rawKey.substring(0, 50).replace(/\n/g, '\\n');
+            throw new Error(`Auth JSON Error: Failed to parse credentials. Key starts with: [${preview}]`);
         }
 
         const auth = new JWT({
