@@ -18,7 +18,16 @@ from dotenv import load_dotenv
 from supabase import create_client
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-from openai import AsyncOpenAI  # Re-adding this because it was used but import was missing or implicit
+from openai import AsyncOpenAI
+from inference_engine import InferenceEngine
+from font_setup import setup_korean_font
+
+# Initialize Engines
+inference_manager = InferenceEngine()
+setup_korean_font()
+
+# Global Stats for Self-Diagnosis
+STATS = {"local": 0, "cloud": 0, "fallback": 0, "total": 0, "latencies": []}
 
 
 # [1] 터미널 한글 깨짐 방지
@@ -106,7 +115,8 @@ async def is_medical_news_ai(title, description):
     return True # Default to True to avoid missing news
 
 # AI Analysis Function
-async def analyze_article_expert_async(title, description, search_keyword, force_ollama=False):
+async def analyze_article_expert_async(title, description, search_keyword):
+    """Refactored to use central InferenceEngine."""
     keyword_pool = ", ".join(EXPERT_ANALYSIS_KEYWORDS)
     system_prompt = (
         f"You are a [Medical Aesthetic Market Analyst].\n"
@@ -124,85 +134,24 @@ async def analyze_article_expert_async(title, description, search_keyword, force
     )
     user_prompt = f"Crawl Keyword: {search_keyword}\nHeadline: {title}\nBody: {description}"
 
-    # If force_ollama is true (likely related news), skip online models
-    if not force_ollama:
-        try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={g_key}"
-            payload = {
-                "contents": [{"parts": [{"text": f"{system_prompt}\n\n{user_prompt}"}]}],
-                "generationConfig": {"response_mime_type": "application/json"}
-            }
-            async with aiohttp.ClientSession() as http_sess:
-                async with http_sess.post(url, json=payload, timeout=15) as resp:
-                    if resp.status == 429 or resp.status == 503:
-                         print(f"  ⚠️ Gemini-{i+1} Quota/Busy ({resp.status}). Switching...")
-                         continue
-                    if resp.status == 200:
-                        result = await resp.json()
-                        text = result['candidates'][0]['content']['parts'][0]['text']
-                        data = json.loads(text)
-                        return {**data, "model": f"Gemini-2.0-{i+1}"}
-
-        except: continue
-
-    # Try Groq (Free Tier, Llama-3.3)
-    if groq_client:
-        try:
-            response = await groq_client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
-                response_format={"type": "json_object"}
-            )
-            data = json.loads(response.choices[0].message.content)
-            return {**data, "model": "Groq-Llama3.3"}
-        except Exception as e:
-            print(f"  ⚠️ Groq Error: {e}")
-    else:
-        print(f"  ℹ️ [OPTIMIZATION] Related news detected. Using local Ollama for processing.")
-
-    # Try Ollama (Local AI) - Final AI Fallback
-    try:
-        url = "http://localhost:11434/api/generate"
-        payload = {
-            "model": "llama3",
-            "prompt": f"{system_prompt}\n\n{user_prompt}\n\nRespond in JSON format only.",
-            "stream": False,
-            "format": "json"
-        }
-        async with aiohttp.ClientSession() as http_sess:
-            async with http_sess.post(url, json=payload, timeout=60) as resp:
-                if resp.status == 200:
-                    res_json = await resp.json()
-                    res_content = res_json.get("response", "{}")
-                    data = json.loads(res_content)
-                    return {
-                        "main_keyword": data.get("main_keyword", "기타"),
-                        "included_keywords": data.get("included_keywords", []),
-                        "issue_nature": data.get("issue_nature", "기타"),
-                        "brief_summary": data.get("brief_summary", title[:70]),
-                        "model": "Ollama-Llama3"
-                    }
-    except:
-        pass
-
-    # Fallback if all AI models fail
-    print(f"⚠️ [FALLBACK] All AI models failed. Using local keyword extractor.")
+    analysis = await inference_manager.get_analysis_hybrid(system_prompt, user_prompt)
     
-    # Use local logic to rescue tags
-    local_main = extract_main_keyword(description, title=title)
-    local_sub = extract_keywords(f"{title} {description}")
-    # Remove main keyword from sub list if present
-    if local_main in local_sub:
-        local_sub.remove(local_main)
-
-    return {
-        "main_keyword": local_main,
-        "included_keywords": local_sub,
-        "issue_nature": "기타",
-        "brief_summary": title[:99],
-        "impact_level": 1,
-        "model": "Fallback-Local"
-    }
+    if "error" in analysis:
+        # Fallback to local logic if all AI models fail
+        print(f"⚠️ [FALLBACK] All AI models failed. Using local keyword extractor.")
+        local_main = extract_main_keyword(description, title=title)
+        local_sub = extract_keywords(f"{title} {description}")
+        if local_main in local_sub: local_sub.remove(local_main)
+        
+        return {
+            "main_keyword": local_main,
+            "included_keywords": local_sub,
+            "issue_nature": "기타",
+            "brief_summary": title[:99],
+            "impact_level": 1,
+            "model": "Fallback-Local"
+        }
+    return analysis
 
 # [4] Semantic Deduplication (Point 3)
 def is_semantically_duplicate(new_title, recent_articles):
@@ -223,8 +172,8 @@ def is_semantically_duplicate(new_title, recent_articles):
         union = new_words.union(ref_words)
         similarity = len(intersection) / len(union) if union else 0
         
-        # If words are 70% identical, it's likely the same news from a different agency
-        if similarity > 0.7:
+        # If words are 80% identical, it's likely the same news from a different agency
+        if similarity > 0.8:
             return art['title']
     return None
 
@@ -302,8 +251,8 @@ async def process_item(item, worksheet, recent_articles):
     local_main = extract_main_keyword(desc, title=title)
     local_all = extract_keywords(f"{title} {desc}", top_n=10)
     
-    # 2. Get AI Analysis (Online for New, Ollama for Related)
-    analysis = await analyze_article_expert_async(title, desc, keyword, force_ollama=force_ollama)
+    # 2. Get AI Analysis (Hybrid: Local First)
+    analysis = await analyze_article_expert_async(title, desc, keyword)
     
     # Extract AI fields
     ai_main = analysis.get("main_keyword", "기타")
@@ -313,7 +262,12 @@ async def process_item(item, worksheet, recent_articles):
     impact = analysis.get("impact_level", 3)
     
     # 3. MERGE LOGIC (Union of AI and Local)
-    # Prefer AI for 'main' if it's not '기타', otherwise use Local
+    # Update Stats
+    STATS["total"] += 1
+    provider = analysis.get("provider", "fallback")
+    STATS[provider] += 1
+    if "latency" in analysis:
+        STATS["latencies"].append(analysis["latency"])
     final_main = ai_main if (ai_main and ai_main != "기타") else local_main
     
     # Union of all keywords
@@ -399,6 +353,16 @@ async def main():
             # Add to local context to prevent duplicates within the same run
             recent_articles.append({"title": item['title']})
         await asyncio.sleep(1) # Small delay to be nice to APIs
+
+    # Print Self-Diagnosis Report
+    if STATS["total"] > 0:
+        avg_latency = sum(STATS["latencies"]) / len(STATS["latencies"]) if STATS["latencies"] else 0
+        print(f"\n📊 [Self-Diagnosis Report]")
+        print(f"   - Total Processed: {STATS['total']}")
+        print(f"   - Local (Ollama): {STATS['local']} ({(STATS['local']/STATS['total'])*100:.1f}%)")
+        print(f"   - Cloud (Gemini): {STATS['cloud']} ({(STATS['cloud']/STATS['total'])*100:.1f}%)")
+        print(f"   - Fallback (Regex): {STATS['fallback']} ({(STATS['fallback']/STATS['total'])*100:.1f}%)")
+        print(f"   - Average AI Latency: {avg_latency:.2f}s")
 
     # Create timestamp for Vercel trigger in root directory
     try:
