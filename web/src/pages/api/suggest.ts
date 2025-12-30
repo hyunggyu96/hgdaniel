@@ -26,14 +26,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const cleanKey = SERVICE_ACCOUNT_KEY.trim();
             // Handle if the key is wrapped in extra quotes by the shell/env
             const unquotedKey = cleanKey.replace(/^['"]|['"]$/g, '');
-            // Handle escaped newlines properly
-            const fixedKey = unquotedKey.replace(/\\n/g, '\n');
 
             try {
-                creds = JSON.parse(fixedKey);
+                // Try parsing directly (works if \n are represented as string "\n")
+                creds = JSON.parse(unquotedKey);
             } catch (innerError) {
-                // If it's still failing, it might be double-serialized
-                creds = JSON.parse(JSON.parse(fixedKey));
+                // Try double parsing for double-serialized values
+                try {
+                    creds = JSON.parse(JSON.parse(unquotedKey));
+                } catch (doubleError) {
+                    // Failover: If there are literal newlines, escape them first
+                    const escapedKey = unquotedKey.replace(/\n/g, "\\n");
+                    creds = JSON.parse(escapedKey);
+                }
             }
         } catch (e) {
             console.error('Auth JSON Error:', e);
