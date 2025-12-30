@@ -13,7 +13,14 @@ async function getUserSheet(userId: string) {
     if (SERVICE_ACCOUNT_KEY) {
         try {
             const cleanKey = SERVICE_ACCOUNT_KEY.trim().replace(/^['"]|['"]$/g, '');
-            creds = JSON.parse(cleanKey);
+            try {
+                creds = JSON.parse(cleanKey);
+            } catch {
+                creds = JSON.parse(JSON.parse(cleanKey));
+            }
+            if (creds && creds.private_key) {
+                creds.private_key = creds.private_key.replace(/\\n/g, '\n');
+            }
         } catch (err) {
             console.error('Failed to parse GOOGLE_SERVICE_ACCOUNT_KEY');
             throw err;

@@ -12,11 +12,17 @@ async function getVisitsSheet() {
     let creds;
     if (SERVICE_ACCOUNT_KEY) {
         try {
-            // Remove any potential surrounding quotes if accidentally added via CLI
             const cleanKey = SERVICE_ACCOUNT_KEY.trim().replace(/^['"]|['"]$/g, '');
-            creds = JSON.parse(cleanKey);
+            try {
+                creds = JSON.parse(cleanKey);
+            } catch {
+                creds = JSON.parse(JSON.parse(cleanKey));
+            }
+            if (creds && creds.private_key) {
+                creds.private_key = creds.private_key.replace(/\\n/g, '\n');
+            }
         } catch (err) {
-            console.error('Failed to parse GOOGLE_SERVICE_ACCOUNT_KEY. Ensure it is a valid JSON string.');
+            console.error('Failed to parse GOOGLE_SERVICE_ACCOUNT_KEY');
             throw err;
         }
     } else if (SERVICE_ACCOUNT_FILE) {
@@ -24,10 +30,10 @@ async function getVisitsSheet() {
         if (fs.existsSync(credPath)) {
             creds = JSON.parse(fs.readFileSync(credPath, 'utf8'));
         } else {
-            throw new Error(`Service account file not found at ${credPath}`);
+            throw new Error(`Service account file not found`);
         }
     } else {
-        throw new Error('No Google credentials provided (neither key nor file)');
+        throw new Error('No Google credentials provided');
     }
 
     const serviceAccountAuth = new JWT({
@@ -50,7 +56,6 @@ async function getVisitsSheet() {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    // Prevent caching
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
@@ -64,24 +69,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const kstDateString = now.toLocaleDateString('ko-KR', {
             timeZone: 'Asia/Seoul',
             year: 'numeric', month: '2-digit', day: '2-digit'
-        }); // "2024. 12. 25."
+        });
 
         const timestampStr = now.toLocaleString('ko-KR', {
             timeZone: 'Asia/Seoul',
             year: 'numeric', month: '2-digit', day: '2-digit',
             hour: '2-digit', minute: '2-digit', second: '2-digit',
-        }); // "2024. 12. 25. 오후 10:00:00"
+        });
 
-        // 1. Add current visit
         await sheet.addRow({ timestamp: timestampStr, ip, country });
 
-        // 2. Count today's visits
         const rows = await sheet.getRows();
-
-        // Filter rows by today's date prefix
         const todayVisits = rows.filter(row => {
             const ts = row.get('timestamp') as string;
-            // Check if it starts with "2024. 12. 25."
             return ts && ts.startsWith(kstDateString);
         });
 
