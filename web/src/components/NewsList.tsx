@@ -147,30 +147,18 @@ export default async function NewsList({ selectedCategory, currentPage = 1, sear
                                 <div className="relative z-10 w-full text-center border-b border-white/5 pb-4">
                                     <Link
                                         href={`/?category=${encodeURIComponent(category)}`}
-                                        className="group/link flex flex-col items-center justify-center gap-2 p-2 -mx-2 rounded-xl transition-all duration-300 hover:bg-white/[0.03]"
+                                        className="group/link flex flex-col items-center justify-center gap-1 p-2 rounded-xl transition-all duration-300 hover:bg-white/[0.03]"
                                     >
-                                        <div className="flex items-center gap-2 transition-transform duration-300 group-hover/link:translate-x-1">
-                                            <h2 className="text-lg md:text-xl font-bold text-white tracking-tight uppercase transition-colors group-hover/link:text-[#3182f6]">
-                                                {category}
-                                            </h2>
-                                            <ChevronRight className="w-5 h-5 text-[#3182f6] opacity-0 -ml-4 group-hover/link:opacity-100 group-hover/link:ml-0 transition-all duration-300" />
-                                        </div>
+                                        <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight uppercase transition-colors group-hover/link:text-[#3182f6]">
+                                            {category}
+                                        </h2>
 
-                                        <div className="h-0.5 w-8 bg-blue-600 rounded-full transition-all duration-300 group-hover/link:w-16 group-hover/link:bg-[#3182f6]" />
+                                        <div className="h-0.5 w-8 bg-blue-600 rounded-full transition-all duration-300 group-hover/link:w-12 group-hover/link:bg-[#3182f6]" />
 
-                                        <div className="h-4 relative overflow-hidden w-full flex justify-center">
-                                            {/* Default State: Keywords */}
-                                            <div className="absolute transition-all duration-300 opacity-100 group-hover/link:opacity-0 group-hover/link:-translate-y-full">
-                                                <span className="text-[8px] font-medium text-white/20 uppercase tracking-[0.15em] whitespace-nowrap">
-                                                    {CATEGORIES_CONFIG.find(c => c.label === category)?.keywords.slice(0, 4).join(' · ')}
-                                                </span>
-                                            </div>
-
-                                            {/* Hover State: View Channel Hint */}
-                                            <div className="absolute transition-all duration-300 opacity-0 translate-y-full group-hover/link:opacity-100 group-hover/link:translate-y-0 flex items-center gap-1.5">
-                                                <span className="text-[9px] font-bold text-[#3182f6] uppercase tracking-[0.2em]">View Channel</span>
-                                                <ExternalLink className="w-3 h-3 text-[#3182f6]" />
-                                            </div>
+                                        <div className="mt-2 h-4 relative overflow-hidden w-full flex justify-center opacity-0 group-hover/link:opacity-100 transition-all duration-500 transform translate-y-2 group-hover/link:translate-y-0">
+                                            <span className="text-[9px] font-medium text-blue-400/80 uppercase tracking-[0.15em] whitespace-nowrap">
+                                                {CATEGORIES_CONFIG.find(c => c.label === category)?.keywords.slice(0, 4).join(' · ')}
+                                            </span>
                                         </div>
                                     </Link>
                                 </div>
