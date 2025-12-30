@@ -1,6 +1,8 @@
 import { supabaseAdmin } from './supabaseAdmin';
+import { unstable_noStore as noStore } from 'next/cache';
 
 export async function getNews() {
+    noStore(); // Opt out of static generation for this data fetch
     console.log('[API] getNews called');
     try {
         const { data, error } = await supabaseAdmin
