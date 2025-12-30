@@ -26,35 +26,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const rawKey = SERVICE_ACCOUNT_KEY.trim();
 
         try {
-            // Stage 1: Standard parse
             const cleanKey = rawKey.replace(/^['"]|['"]$/g, '');
-            creds = JSON.parse(cleanKey);
-        } catch (e) {
             try {
-                // Stage 2: Handle escaped \n by turning them to spaces (safe for RSA)
-                const cleanKey = rawKey.replace(/^['"]|['"]$/g, '');
-                creds = JSON.parse(cleanKey.replace(/\\n/g, ' '));
-            } catch (e2) {
-                try {
-                    // Stage 3: Double-serialized fallback
-                    const cleanKey = rawKey.replace(/^['"]|['"]$/g, '');
-                    creds = JSON.parse(JSON.parse(cleanKey));
-                } catch (e3) {
-                    // Stage 4: Local file fallback for development
-                    try {
-                        const localPath = path.resolve(process.cwd(), 'collector', 'service_account.json');
-                        if (fs.existsSync(localPath)) {
-                            creds = JSON.parse(fs.readFileSync(localPath, 'utf8'));
-                            console.log('--- Using local service_account.json fallback ---');
-                        }
-                    } catch (e4) { }
-                }
+                creds = JSON.parse(cleanKey);
+            } catch {
+                creds = JSON.parse(JSON.parse(cleanKey));
             }
+
+            // CRITICAL: Google Auth requires literal newlines in private_key
+            if (creds && creds.private_key) {
+                creds.private_key = creds.private_key.replace(/\\n/g, '\n');
+            }
+        } catch (e) {
+            // Local file fallback
+            try {
+                const localPath = path.resolve(process.cwd(), 'collector', 'service_account.json');
+                if (fs.existsSync(localPath)) {
+                    creds = JSON.parse(fs.readFileSync(localPath, 'utf8'));
+                }
+            } catch { }
         }
 
-        if (!creds) {
-            const preview = rawKey.substring(0, 50).replace(/\n/g, '\\n');
-            throw new Error(`Auth JSON Error: Failed to parse credentials. Key starts with: [${preview}]`);
+        if (!creds || !creds.private_key) {
+            throw new Error(`Auth JSON Error: Failed to load valid credentials.`);
         }
 
         const auth = new JWT({
