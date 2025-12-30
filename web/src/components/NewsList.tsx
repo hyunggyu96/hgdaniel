@@ -143,18 +143,33 @@ export default async function NewsList({ selectedCategory, currentPage = 1, sear
                             <div key={category} className="group/theme bg-white/[0.03] border border-white/5 rounded-[20px] p-5 relative overflow-hidden transition-all duration-300 hover:border-blue-500/20 flex flex-col gap-4 shadow-xl h-full backdrop-blur-sm">
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/0 group-hover/theme:bg-blue-500/5 blur-[60px] rounded-full transition-all duration-700" />
 
-                                <div className="relative z-10 w-full text-center border-b border-white/5 pb-3">
-                                    <Link href={`/?category=${encodeURIComponent(category)}`} className="group/link flex flex-col items-center gap-1">
-                                        <h2 className="text-lg md:text-xl font-bold text-white tracking-tight uppercase transition-colors group-hover/link:text-[#3182f6]">
-                                            {category}
-                                        </h2>
-                                        <div className="h-0.5 w-8 bg-blue-600 rounded-full" />
+                                {/* ENHANCED CATEGORY NAVIGATOR */}
+                                <div className="relative z-10 w-full text-center border-b border-white/5 pb-4">
+                                    <Link
+                                        href={`/?category=${encodeURIComponent(category)}`}
+                                        className="group/link flex flex-col items-center justify-center gap-2 p-2 -mx-2 rounded-xl transition-all duration-300 hover:bg-white/[0.03]"
+                                    >
+                                        <div className="flex items-center gap-2 transition-transform duration-300 group-hover/link:translate-x-1">
+                                            <h2 className="text-lg md:text-xl font-bold text-white tracking-tight uppercase transition-colors group-hover/link:text-[#3182f6]">
+                                                {category}
+                                            </h2>
+                                            <ChevronRight className="w-5 h-5 text-[#3182f6] opacity-0 -ml-4 group-hover/link:opacity-100 group-hover/link:ml-0 transition-all duration-300" />
+                                        </div>
 
-                                        <div className="opacity-0 group-hover/theme:opacity-100 transition-all duration-300 transform translate-y-1 group-hover/theme:translate-y-0 mt-1 h-2.5">
-                                            <div className="flex items-center justify-center gap-1.5">
+                                        <div className="h-0.5 w-8 bg-blue-600 rounded-full transition-all duration-300 group-hover/link:w-16 group-hover/link:bg-[#3182f6]" />
+
+                                        <div className="h-4 relative overflow-hidden w-full flex justify-center">
+                                            {/* Default State: Keywords */}
+                                            <div className="absolute transition-all duration-300 opacity-100 group-hover/link:opacity-0 group-hover/link:-translate-y-full">
                                                 <span className="text-[8px] font-medium text-white/20 uppercase tracking-[0.15em] whitespace-nowrap">
-                                                    {CATEGORIES_CONFIG.find(c => c.label === category)?.keywords.slice(0, 4).join(', ')}
+                                                    {CATEGORIES_CONFIG.find(c => c.label === category)?.keywords.slice(0, 4).join(' · ')}
                                                 </span>
+                                            </div>
+
+                                            {/* Hover State: View Channel Hint */}
+                                            <div className="absolute transition-all duration-300 opacity-0 translate-y-full group-hover/link:opacity-100 group-hover/link:translate-y-0 flex items-center gap-1.5">
+                                                <span className="text-[9px] font-bold text-[#3182f6] uppercase tracking-[0.2em]">View Channel</span>
+                                                <ExternalLink className="w-3 h-3 text-[#3182f6]" />
                                             </div>
                                         </div>
                                     </Link>
