@@ -93,8 +93,11 @@ export default async function NewsList({ selectedCategory, currentPage = 1, sear
                     <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-[#101012] via-[#101012]/80 to-transparent pointer-events-none z-10" />
 
                     {/* Hero Content Overlay */}
-                    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20 px-4 mt-[-40px]">
-                        <div className="flex items-center gap-2 mb-4 bg-white/5 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 shadow-2xl">
+                    <div className="absolute inset-0 flex flex-col items-center justify-end pb-12 pointer-events-none z-20 px-4">
+                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-white leading-tight drop-shadow-2xl text-center bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60 mb-6">
+                            MARKET INTELLIGENCE
+                        </h1>
+                        <div className="flex items-center gap-2 bg-white/5 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 shadow-2xl">
                             <span className="relative flex h-2 w-2 shrink-0">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
@@ -103,9 +106,6 @@ export default async function NewsList({ selectedCategory, currentPage = 1, sear
                                 AI-Powered Analysis
                             </span>
                         </div>
-                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-white leading-tight drop-shadow-2xl text-center bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">
-                            MARKET INTELLIGENCE
-                        </h1>
                     </div>
                 </div>
             ) : (
