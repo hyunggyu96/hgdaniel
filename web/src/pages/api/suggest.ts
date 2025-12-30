@@ -20,29 +20,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (!SERVICE_ACCOUNT_KEY) throw new Error('GOOGLE_SERVICE_ACCOUNT_KEY is missing');
 
         // Working Creds Initialization from log-login.ts
-        // Robust Creds Initialization
+        // Proven implementation from log-login.ts
         let creds;
         try {
-            const cleanKey = SERVICE_ACCOUNT_KEY.trim();
-            // Handle if the key is wrapped in extra quotes by the shell/env
-            const unquotedKey = cleanKey.replace(/^['"]|['"]$/g, '');
-
+            const cleanKey = SERVICE_ACCOUNT_KEY.trim().replace(/^['"]|['"]$/g, '');
+            creds = JSON.parse(cleanKey);
+        } catch (err) {
+            // Fallback for double-serialized strings (common in Vercel env vars)
             try {
-                // Try parsing directly (works if \n are represented as string "\n")
-                creds = JSON.parse(unquotedKey);
-            } catch (innerError) {
-                // Try double parsing for double-serialized values
-                try {
-                    creds = JSON.parse(JSON.parse(unquotedKey));
-                } catch (doubleError) {
-                    // Failover: If there are literal newlines, escape them first
-                    const escapedKey = unquotedKey.replace(/\n/g, "\\n");
-                    creds = JSON.parse(escapedKey);
-                }
+                const cleanKey = SERVICE_ACCOUNT_KEY.trim().replace(/^['"]|['"]$/g, '');
+                creds = JSON.parse(JSON.parse(cleanKey));
+            } catch (err2) {
+                console.error('Auth JSON Final Parse Error:', err2);
+                throw new Error(`Auth JSON Error: ${err2.message}`);
             }
-        } catch (e) {
-            console.error('Auth JSON Error:', e);
-            throw new Error(`Auth JSON Error: ${e.message}`);
         }
 
         const auth = new JWT({
