@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
 import React, { Suspense } from 'react';
 import HeaderStatus from '@/components/HeaderStatus';
@@ -10,7 +10,11 @@ import { UserProvider } from '@/components/UserContext';
 import LoginButton from '@/components/LoginButton';
 import MobileNav from '@/components/MobileNav';
 
-const inter = Inter({ subsets: ["latin"] });
+const noto = Noto_Sans_KR({
+  subsets: ["latin"],
+  weight: ['400', '500', '700', '900'],
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: "Aesthetic Intelligence | AI Media Terminal for Medical Market",
@@ -25,7 +29,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={`${inter.className} bg-[#101012] text-white selection:bg-blue-500/30`}>
+      <body className={`${noto.className} bg-[#101012] text-white selection:bg-blue-500/30`}>
         <UserProvider>
           <CollectionProvider>
             {/* Header / Brand (GNB) */}
