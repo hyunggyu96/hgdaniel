@@ -170,12 +170,17 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
     const uniqueKeywords = Array.from(new Set([...analysis.main, ...analysis.sub].filter(k => k && k !== '기타' && k !== '-' && k !== '|' && k.trim() !== '')));
 
     return (
-        <div className="group/card flex flex-col gap-1.5 pb-3 border-b border-white/[0.03] last:border-0 last:pb-0">
+        <div className="group/card flex flex-col gap-1.5 pb-3 border-b border-white/[0.03] last:border-0 last:pb-0 relative">
+            {isToday && (
+                <div className="mb-0.5">
+                    <span className="text-[8px] font-black text-white bg-red-600 px-1 py-0.5 rounded shadow-sm uppercase tracking-tighter">TODAY</span>
+                </div>
+            )}
             <div className="flex items-start justify-between gap-3">
                 <a href={article.link} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-white/80 group-hover/card:text-[#3182f6] transition-colors leading-tight line-clamp-2">
                     {article.title}
                 </a>
-                <div className={`shrink-0 text-[9px] font-mono font-bold text-right ${isToday ? 'text-blue-400' : 'text-white/20'}`}>{dateStr}</div>
+                <div className={`shrink-0 text-[10px] font-mono font-black text-right ${isToday ? 'text-blue-400' : 'text-white/30'}`}>{dateStr}</div>
             </div>
             <div className="flex items-center justify-between">
                 <div className="flex flex-wrap gap-1">
