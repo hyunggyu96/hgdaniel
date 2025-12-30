@@ -102,19 +102,21 @@ export default async function NewsList({ selectedCategory, currentPage = 1, sear
                         ))}
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-10 gap-y-16">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-12">
                         {Object.keys(newsByCategory).map((category) => (
-                            <div key={category} className="space-y-6 flex flex-col items-center w-full">
-                                {/* CENTERED HEADER with HOVER EFFECT */}
-                                <div className="w-full text-center border-b border-white/10 pb-6 mb-2">
+                            <div key={category} className="group/section flex flex-col gap-6 bg-white/[0.03] p-6 rounded-[24px] border border-white/5 hover:border-[#3182f6]/30 hover:bg-white/[0.05] transition-all duration-500 relative overflow-hidden h-full shadow-lg">
+                                {/* ✨ Premium Glow Effect Re-restored */}
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/0 group-hover/section:bg-blue-500/10 blur-[80px] rounded-full transition-all duration-1000" />
+
+                                <div className="w-full text-center border-b border-white/10 pb-6 relative z-10 min-h-[80px] flex flex-col justify-center">
                                     <Link
                                         href={`/?category=${encodeURIComponent(category)}`}
-                                        className="flex flex-col items-center justify-center gap-2 group/header hover:opacity-80 transition-all w-full"
+                                        className="flex flex-col items-center justify-center gap-2 group/header transition-all w-full"
                                     >
-                                        <h3 className="text-2xl font-black uppercase tracking-widest text-white group-hover/header:text-[#3182f6] transition-colors leading-none">
+                                        <h3 className="text-xl md:text-2xl font-black uppercase tracking-widest text-white group-hover/header:text-[#3182f6] transition-colors leading-none">
                                             {category}
                                         </h3>
-                                        <div className="flex items-center justify-center gap-2 opacity-0 group-hover/header:opacity-100 transition-opacity w-full mt-1.5 h-3">
+                                        <div className="flex items-center justify-center gap-2 opacity-0 group-hover/header:opacity-100 transition-opacity w-full mt-2 h-3 overflow-hidden">
                                             <span className="relative flex h-1.5 w-1.5 shrink-0">
                                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                                                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#3182f6]"></span>
@@ -125,12 +127,12 @@ export default async function NewsList({ selectedCategory, currentPage = 1, sear
                                         </div>
                                     </Link>
                                 </div>
-                                <div className="w-full flex flex-col gap-5">
+                                <div className="w-full flex flex-col gap-5 relative z-10 transition-all">
                                     {newsByCategory[category].slice(0, 10).map((article: any) => (
                                         <NewsCard key={article.id} article={article} today={today} />
                                     ))}
                                     {(!newsByCategory[category] || newsByCategory[category].length === 0) && (
-                                        <div className="py-20 text-center text-white/10 text-[10px] uppercase font-bold tracking-widest italic">Awaiting Market Updates...</div>
+                                        <div className="py-12 text-center text-white/5 text-[10px] uppercase font-bold tracking-widest">Collecting Data...</div>
                                     )}
                                 </div>
                             </div>
@@ -166,21 +168,21 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
     const uniqueKeywords = Array.from(new Set([...analysis.main, ...analysis.sub].filter(k => k && k !== '기타' && k !== '-' && k !== '|' && k.trim() !== '')));
 
     return (
-        <div className="group/card flex flex-col gap-0.5 pb-4 border-b border-dashed border-white/5 last:border-0 last:pb-0 relative pl-4">
+        <div className="group/card flex flex-col gap-1 pb-4 border-b border-white/[0.04] last:border-0 last:pb-0 relative">
             {isToday && (
                 <div className="mb-1 pointer-events-none">
                     <span className="text-[8px] font-black text-white bg-red-600 px-1 py-0.5 rounded shadow-sm tracking-tighter uppercase inline-block leading-none">TODAY</span>
                 </div>
             )}
             <div className="flex items-start justify-between gap-3">
-                <a href={article.link} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-white/90 group-hover/card:text-[#3182f6] transition-colors leading-tight line-clamp-2">
+                <a href={article.link} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-white/80 group-hover/card:text-[#3182f6] transition-colors leading-tight line-clamp-2">
                     {article.title}
                 </a>
-                <div className={`shrink-0 text-[10px] font-mono font-black text-right min-w-[50px] ${isToday ? 'text-blue-400' : 'text-white/20'}`}>
+                <div className={`shrink-0 text-[10px] font-mono font-black text-right ${isToday ? 'text-blue-400' : 'text-white/20'}`}>
                     {dateStr}
                 </div>
             </div>
-            <div className="flex items-center justify-between mt-1 mb-1">
+            <div className="flex items-center justify-between mt-1">
                 <div className="flex flex-wrap gap-1">
                     {uniqueKeywords.slice(0, 3).map((k, i) => (
                         <span key={i} className="text-[9px] font-bold text-blue-400 bg-blue-400/10 px-1.5 py-0.5 rounded border border-blue-400/10 uppercase tracking-tighter">
@@ -190,7 +192,6 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
                 </div>
                 <CollectionButton newsLink={article.link} newsTitle={article.title} size={18} />
             </div>
-            {summaryText && <p className="text-[11px] text-white/30 truncate leading-relaxed">{summaryText}</p>}
         </div>
     );
 });
