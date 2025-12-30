@@ -77,16 +77,16 @@ export default async function NewsList({ selectedCategory, currentPage = 1, sear
         <div className="flex-1 space-y-12">
             <div className="pt-8 md:pt-12 px-4 md:px-6 lg:px-12">
                 <div className="flex flex-col gap-4 mb-4">
-                    <h1 className="text-3xl md:text-5xl lg:text-6xl font-black uppercase tracking-tighter text-white leading-tight">
+                    <h1 className="text-3xl md:text-5xl lg:text-7xl font-black uppercase tracking-tighter text-white leading-tight drop-shadow-2xl">
                         {showCollections ? 'Collections' : selectedCategory ? selectedCategory : 'Market Intelligence'}
                     </h1>
                     <div className="flex items-start gap-2">
-                        <span className="relative flex h-2 w-2 mt-1 shrink-0">
+                        <span className="relative flex h-2.5 w-2.5 mt-1 shrink-0">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#3182f6]"></span>
+                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#3182f6]"></span>
                         </span>
-                        <div className="text-[10px] font-bold text-white/40 uppercase leading-relaxed font-mono">
-                            <span className="tracking-[0.4em] mr-2">{selectedCategory ? `Active Tracking:` : `Real-time Analysis`}</span>
+                        <div className="text-[11px] font-bold text-white/40 uppercase leading-relaxed font-mono tracking-[0.4em]">
+                            {selectedCategory ? `Active Tracking:` : `Real-time Analysis`}
                         </div>
                     </div>
                 </div>
@@ -102,37 +102,43 @@ export default async function NewsList({ selectedCategory, currentPage = 1, sear
                         ))}
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-12">
+                    /* 🍱 THE ULTIMATE STRATEGIC GRID */
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                         {Object.keys(newsByCategory).map((category) => (
-                            <div key={category} className="group/section flex flex-col gap-6 bg-white/[0.03] p-6 rounded-[24px] border border-white/5 hover:border-[#3182f6]/30 hover:bg-white/[0.05] transition-all duration-500 relative overflow-hidden h-full shadow-lg">
-                                {/* ✨ Premium Glow Effect Re-restored */}
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/0 group-hover/section:bg-blue-500/10 blur-[80px] rounded-full transition-all duration-1000" />
+                            <div key={category} className="group/theme bg-gradient-to-br from-white/[0.05] to-transparent border border-white/10 rounded-[32px] p-8 relative overflow-hidden transition-all duration-500 hover:border-blue-500/30 flex flex-col gap-6 shadow-2xl h-full">
+                                {/* ✨ Powerful Corner Glow */}
+                                <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/0 group-hover/theme:bg-blue-500/10 blur-[100px] rounded-full transition-all duration-1000" />
 
-                                <div className="w-full text-center border-b border-white/10 pb-6 relative z-10 min-h-[80px] flex flex-col justify-center">
-                                    <Link
-                                        href={`/?category=${encodeURIComponent(category)}`}
-                                        className="flex flex-col items-center justify-center gap-2 group/header transition-all w-full"
-                                    >
-                                        <h3 className="text-xl md:text-2xl font-black uppercase tracking-widest text-white group-hover/header:text-[#3182f6] transition-colors leading-none">
-                                            {category}
-                                        </h3>
-                                        <div className="flex items-center justify-center gap-2 opacity-0 group-hover/header:opacity-100 transition-opacity w-full mt-2 h-3 overflow-hidden">
-                                            <span className="relative flex h-1.5 w-1.5 shrink-0">
-                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#3182f6]"></span>
-                                            </span>
-                                            <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest leading-none truncate max-w-[80%]">
-                                                {CATEGORIES_CONFIG.find(c => c.label === category)?.keywords.join(', ')}
-                                            </span>
+                                {/* 🏷️ CENTERED STRATEGIC HEADER */}
+                                <div className="relative z-10 w-full text-center min-h-[140px] flex flex-col items-center justify-center border-b border-white/10 pb-4">
+                                    <Link href={`/?category=${encodeURIComponent(category)}`} className="group/link flex flex-col items-center gap-2">
+                                        <h2 className="text-3xl md:text-4xl font-black text-white tracking-tighter uppercase italic drop-shadow-2xl transition-colors group-hover/link:text-[#3182f6]">
+                                            {category === 'PDRN/PN' ? 'PDRN / PN' : category}
+                                        </h2>
+                                        <div className="h-1 w-14 bg-blue-600 rounded-full shadow-[0_0_15px_rgba(37,99,246,0.5)]" />
+
+                                        {/* HOVER KEYWORDS (RESTORED) */}
+                                        <div className="opacity-0 group-hover/theme:opacity-100 transition-all duration-500 transform translate-y-1 group-hover/theme:translate-y-0 mt-3 h-4">
+                                            <div className="flex items-center justify-center gap-2">
+                                                <span className="relative flex h-1.5 w-1.5">
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#3182f6]"></span>
+                                                </span>
+                                                <span className="text-[10px] font-black text-white/40 uppercase tracking-widest whitespace-nowrap">
+                                                    {CATEGORIES_CONFIG.find(c => c.label === category)?.keywords.slice(0, 4).join(', ')}
+                                                </span>
+                                            </div>
                                         </div>
                                     </Link>
                                 </div>
-                                <div className="w-full flex flex-col gap-5 relative z-10 transition-all">
-                                    {newsByCategory[category].slice(0, 10).map((article: any) => (
+
+                                {/* 📰 NEWS LIST (CARDS) */}
+                                <div className="relative z-10 flex flex-col gap-5">
+                                    {newsByCategory[category].slice(0, 5).map((article: any) => (
                                         <NewsCard key={article.id} article={article} today={today} />
                                     ))}
                                     {(!newsByCategory[category] || newsByCategory[category].length === 0) && (
-                                        <div className="py-12 text-center text-white/5 text-[10px] uppercase font-bold tracking-widest">Collecting Data...</div>
+                                        <div className="py-20 text-center text-white/5 text-[10px] uppercase font-bold tracking-widest italic">Monitoring Market...</div>
                                     )}
                                 </div>
                             </div>
@@ -168,29 +174,29 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
     const uniqueKeywords = Array.from(new Set([...analysis.main, ...analysis.sub].filter(k => k && k !== '기타' && k !== '-' && k !== '|' && k.trim() !== '')));
 
     return (
-        <div className="group/card flex flex-col gap-1 pb-4 border-b border-white/[0.04] last:border-0 last:pb-0 relative">
+        <div className="group/card flex flex-col gap-1.5 pb-4 border-b border-white/[0.05] last:border-0 last:pb-0 relative">
             {isToday && (
-                <div className="mb-1 pointer-events-none">
-                    <span className="text-[8px] font-black text-white bg-red-600 px-1 py-0.5 rounded shadow-sm tracking-tighter uppercase inline-block leading-none">TODAY</span>
+                <div className="mb-1">
+                    <span className="text-[8px] font-black text-white bg-red-600 px-1.5 py-0.5 rounded shadow-[0_2px_10px_rgba(220,38,38,0.4)] tracking-tighter uppercase inline-block leading-none">TODAY</span>
                 </div>
             )}
             <div className="flex items-start justify-between gap-3">
-                <a href={article.link} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-white/80 group-hover/card:text-[#3182f6] transition-colors leading-tight line-clamp-2">
+                <a href={article.link} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-white/90 group-hover/card:text-[#3182f6] transition-colors leading-tight line-clamp-2">
                     {article.title}
                 </a>
-                <div className={`shrink-0 text-[10px] font-mono font-black text-right ${isToday ? 'text-blue-400' : 'text-white/20'}`}>
+                <div className={`shrink-0 text-[10px] font-mono font-black text-right min-w-[50px] ${isToday ? 'text-blue-400' : 'text-white/20'}`}>
                     {dateStr}
                 </div>
             </div>
             <div className="flex items-center justify-between mt-1">
                 <div className="flex flex-wrap gap-1">
                     {uniqueKeywords.slice(0, 3).map((k, i) => (
-                        <span key={i} className="text-[9px] font-bold text-blue-400 bg-blue-400/10 px-1.5 py-0.5 rounded border border-blue-400/10 uppercase tracking-tighter">
+                        <span key={i} className="text-[9px] font-bold text-blue-100/60 bg-blue-500/20 px-2 py-0.5 rounded border border-blue-500/20 uppercase tracking-tighter">
                             {k}
                         </span>
                     ))}
                 </div>
-                <CollectionButton newsLink={article.link} newsTitle={article.title} size={18} />
+                <CollectionButton newsLink={article.link} newsTitle={article.title} size={20} />
             </div>
         </div>
     );
