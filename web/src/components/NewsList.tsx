@@ -129,7 +129,7 @@ export default async function NewsList({ selectedCategory, currentPage = 1, sear
                                         <NewsCard key={article.id} article={article} today={today} />
                                     ))}
                                     {(!newsByCategory[category] || newsByCategory[category].length === 0) && (
-                                        <div className="py-12 text-center text-white/5 text-[9px] uppercase font-bold tracking-widest italic">Awaiting Updates...</div>
+                                        <div className="py-12 text-center text-white/5 text-[9px] uppercase font-bold tracking-widest">Awaiting Updates...</div>
                                     )}
                                 </div>
                             </div>
