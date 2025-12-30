@@ -14,12 +14,12 @@ if not SUPABASE_URL or not SUPABASE_KEY:
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def generate_report():
-    print("Generating 4-Hour Activity Report...")
+    print("Generating 2-Hour Activity Report...")
     
-    # 시간 범위 설정 (지난 4시간)
+    # 시간 범위 설정 (지난 2시간)
     now = datetime.datetime.utcnow()
-    four_hours_ago = now - datetime.timedelta(hours=4)
-    time_filter = four_hours_ago.isoformat()
+    two_hours_ago = now - datetime.timedelta(hours=2)
+    time_filter = two_hours_ago.isoformat()
 
     # 1. 수집된 뉴스 (Raw News) 카운트
     # created_at이 4시간 이내인 것
@@ -56,13 +56,13 @@ def generate_report():
     # 5. 보고서 본문 작성 (Markdown/Text)
     kst_now = now + datetime.timedelta(hours=9)
     report_lines = []
-    report_lines.append(f"Subject: [News Dashboard] 4-Hour Operation Report ({kst_now.strftime('%H:%M')})")
+    report_lines.append(f"Subject: [News Dashboard] 2-Hour Operation Report ({kst_now.strftime('%H:%M')})")
     report_lines.append(f"")
     report_lines.append(f"🤖 **System Status Report**")
     report_lines.append(f"Date: {kst_now.strftime('%Y-%m-%d %H:%M:%S')} (KST)")
     report_lines.append(f"----------------------------------------")
     report_lines.append(f"")
-    report_lines.append(f"📊 **Workload Status (Last 4h)**")
+    report_lines.append(f"📊 **Workload Status (Last 2h)**")
     report_lines.append(f"- 📥 **Collected**: {raw_count} items")
     report_lines.append(f"- 🧠 **Analyzed**: {processed_count} items")
     report_lines.append(f"- ⏳ **Pending**: {pending_count} items waiting")

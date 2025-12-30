@@ -283,54 +283,61 @@ async def process_item(item, worksheet, recent_articles):
         return False
 
 async def main():
-    print(f"🚀 Expert News Processor Started at {datetime.datetime.now()}")
+    print(f"🚀 Expert News Processor Started (Continuous Mode) at {datetime.datetime.now()}")
     
-    # Fetch pending items
-    res = supabase.table("raw_news").select("*").eq("status", "pending").limit(200).execute()
-    pending_items = res.data
-    
-    if not pending_items:
-        print("💤 No pending items to process.")
-        return
+    while True:
+        try:
+            # 1. Fetch pending items (Batch of 20 for responsiveness)
+            res = supabase.table("raw_news").select("*").eq("status", "pending").limit(20).execute()
+            pending_items = res.data
+            
+            if not pending_items:
+                # If nothing to do, wait 60 seconds
+                print(f"💤 [{datetime.datetime.now().strftime('%H:%M:%S')}] Queue empty. Waiting 60s...")
+                await asyncio.sleep(60)
+                continue
 
-    # [IMPORTANT] Sort by pub_date ASC so that older items are processed first.
-    # When inserted at Row 2 (Top), the newest items end up at the very top.
-    pending_items.sort(key=lambda x: x.get('pub_date', ''))
-    
-    print(f"🔎 Found {len(pending_items)} pending items.")
-    worksheet = get_google_sheet()
-    
-    # Fetch recent context for semantic deduplication (articles from last 24 hours)
-    # Using 100 recent articles as a window
-    res_recent = supabase.table("articles").select("title").order("published_at", desc=True).limit(100).execute()
-    recent_articles = res_recent.data
-    
-    for item in pending_items:
-        success = await process_item(item, worksheet, recent_articles)
-        if success:
-            # Add to local context to prevent duplicates within the same run
-            recent_articles.append({"title": item['title']})
-        await asyncio.sleep(1) # Small delay to be nice to APIs
+            # 2. Sort by pub_date ASC (Process oldest first)
+            pending_items.sort(key=lambda x: x.get('pub_date', ''))
+            
+            print(f"🔎 Found {len(pending_items)} pending items. Processing batch...")
+            
+            # 3. Refresh Resources (Sheet & Context) per batch
+            worksheet = get_google_sheet()
+            res_recent = supabase.table("articles").select("title").order("published_at", desc=True).limit(100).execute()
+            recent_articles = res_recent.data
+            
+            # 4. Process Batch
+            for item in pending_items:
+                success = await process_item(item, worksheet, recent_articles)
+                if success:
+                    recent_articles.append({"title": item['title']})
+                await asyncio.sleep(1) # Rate limit protection
 
-    # Print Self-Diagnosis Report
-    if STATS["total"] > 0:
-        avg_latency = sum(STATS["latencies"]) / len(STATS["latencies"]) if STATS["latencies"] else 0
-        print(f"\n📊 [Self-Diagnosis Report]")
-        print(f"   - Total Processed: {STATS['total']}")
-        print(f"   - Local (Ollama): {STATS['local']} ({(STATS['local']/STATS['total'])*100:.1f}%)")
-        print(f"   - Cloud (Gemini): {STATS['cloud']} ({(STATS['cloud']/STATS['total'])*100:.1f}%)")
-        print(f"   - Fallback (Regex): {STATS['fallback']} ({(STATS['fallback']/STATS['total'])*100:.1f}%)")
-        print(f"   - Average AI Latency: {avg_latency:.2f}s")
+            # 5. Print Stats periodically
+            if STATS["total"] > 0 and STATS["total"] % 10 == 0:
+                avg_latency = sum(STATS["latencies"]) / len(STATS["latencies"]) if STATS["latencies"] else 0
+                print(f"📊 [Stats] Total: {STATS['total']} | Local: {STATS['local']} | Cloud: {STATS['cloud']} | Avg Latency: {avg_latency:.2f}s")
 
-    # Create timestamp for Vercel trigger in root directory
-    try:
-        root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        update_path = os.path.join(root_dir, "last_update.json")
-        with open(update_path, "w", encoding='utf-8') as f:
-            json.dump({"last_run": datetime.datetime.now().isoformat(), "status": "success"}, f)
-        print(f"📍 Update timestamp created at {update_path}")
-    except Exception as e:
-        print(f"⚠️ Failed to create update timestamp: {e}")
+            # 6. Update Heartbeat
+            try:
+                root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                update_path = os.path.join(root_dir, "last_update.json")
+                with open(update_path, "w", encoding='utf-8') as f:
+                    json.dump({"last_run": datetime.datetime.now().isoformat(), "status": "active"}, f)
+            except Exception as e:
+                print(f"⚠️ Failed to update heartbeat: {e}")
+
+            print("✅ Batch complete. Pausing 5s...")
+            await asyncio.sleep(5)
+
+        except KeyboardInterrupt:
+            print("\n🛑 Execution stopped by user.")
+            break
+        except Exception as e:
+            print(f"❌ Unexpected Error in Main Loop: {e}")
+            print("   -> Retrying in 30 seconds...")
+            await asyncio.sleep(30)
 
 if __name__ == "__main__":
     asyncio.run(main())
