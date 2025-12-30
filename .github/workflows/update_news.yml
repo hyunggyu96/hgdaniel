@@ -2,7 +2,8 @@ name: Update News
 
 on: # Workflow update trigger
   schedule:
-    - cron: '*/30 * * * *' # Run every 30 minutes
+    - cron: '*/30 21-23,0-9 * * *'  # KST 06:00 ~ 18:30 (30 min interval)
+    - cron: '0 10-14 * * *'         # KST 19:00 ~ 23:00 (60 min interval)
   workflow_dispatch: # Allow manual trigger
 
 jobs:
