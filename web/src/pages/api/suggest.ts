@@ -13,18 +13,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const { keyword, category, reason } = req.body;
         if (!keyword) return res.status(400).json({ error: 'Keyword is required' });
 
+        const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
+
         console.log('--- Keyword Suggestion (Pages API) Start ---');
 
         if (!SERVICE_ACCOUNT_KEY) throw new Error('GOOGLE_SERVICE_ACCOUNT_KEY is missing');
 
         // Working Creds Initialization from log-login.ts
-        const cleanKey = SERVICE_ACCOUNT_KEY.trim().replace(/^['"]|['"]$/g, '');
+        // Robust Creds Initialization
         let creds;
         try {
-            creds = JSON.parse(cleanKey);
+            const cleanKey = SERVICE_ACCOUNT_KEY.trim();
+            // Handle if the key is wrapped in extra quotes by the shell/env
+            const unquotedKey = cleanKey.replace(/^['"]|['"]$/g, '');
+            // Handle escaped newlines properly
+            const fixedKey = unquotedKey.replace(/\\n/g, '\n');
+
+            try {
+                creds = JSON.parse(fixedKey);
+            } catch (innerError) {
+                // If it's still failing, it might be double-serialized
+                creds = JSON.parse(JSON.parse(fixedKey));
+            }
         } catch (e) {
-            // Recursive fallback for double-serialized strings
-            creds = JSON.parse(JSON.parse(cleanKey));
+            console.error('Auth JSON Error:', e);
+            throw new Error(`Auth JSON Error: ${e.message}`);
         }
 
         const auth = new JWT({
@@ -43,7 +56,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (!sheet) {
             sheet = await doc.addSheet({
                 title: '키워드제안',
-                headerValues: ['제안일시', '제안 키워드', '카테고리', '제안 사유', '누적 제안 횟수', '상태']
+                headerValues: ['제안일시', '제안 키워드', '카테고리', '제안 사유', '누적 제안 횟수', '상태', 'IP']
             });
         }
 
@@ -56,6 +69,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const count = parseInt(existingRow.get('누적 제안 횟수') || '1', 10);
             existingRow.set('누적 제안 횟수', (count + 1).toString());
             existingRow.set('제안일시', now);
+            existingRow.set('IP', ip);
             await existingRow.save();
         } else {
             await sheet.addRow({
@@ -64,7 +78,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 '카테고리': category || '미지정',
                 '제안 사유': reason || '-',
                 '누적 제안 횟수': '1',
-                '상태': '대기중'
+                '상태': '대기중',
+                'IP': ip
             });
         }
 
