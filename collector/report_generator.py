@@ -39,7 +39,14 @@ def generate_report():
     processed_count = processed_res.count if processed_res.count is not None else len(processed_res.data)
     recent_articles = processed_res.data
 
-    # 3. 보고서 본문 작성 (Markdown/Text)
+    # 3. 대기 중인 뉴스 (Pending) 카운트 (추가 업무)
+    pending_res = supabase.table("raw_news") \
+        .select("id", count="exact") \
+        .eq("status", "pending") \
+        .execute()
+    pending_count = pending_res.count if pending_res.count is not None else len(pending_res.data)
+
+    # 4. 보고서 본문 작성 (Markdown/Text)
     kst_now = now + datetime.timedelta(hours=9)
     report_lines = []
     report_lines.append(f"Subject: [News Dashboard] 4-Hour Operation Report ({kst_now.strftime('%H:%M')})")
@@ -48,12 +55,15 @@ def generate_report():
     report_lines.append(f"Date: {kst_now.strftime('%Y-%m-%d %H:%M:%S')} (KST)")
     report_lines.append(f"----------------------------------------")
     report_lines.append(f"")
-    report_lines.append(f"📊 **Activity Summary (Last 4 Hours)**")
-    report_lines.append(f"- 📥 **Collected (Raw)**: {raw_count} items")
-    report_lines.append(f"- 🧠 **Analyzed (Processed)**: {processed_count} items")
+    report_lines.append(f"📊 **Workload Status**")
+    report_lines.append(f"- 📥 **Collected (Last 4h)**: {raw_count} new items")
+    report_lines.append(f"- 🧠 **Analyzed (Last 4h)**: {processed_count} completed")
+    report_lines.append(f"- ⏳ **Pending Queue**: {pending_count} items waiting")
     
-    status_emoji = "🟢 Healthy" if processed_count > 0 else "🔴 Check System"
-    if processed_count == 0 and raw_count > 0: status_emoji = "⚠️ Processing Lag"
+    status_emoji = "🟢 Healthy"
+    if pending_count > 100: status_emoji = "🟠 Heavy Load (Working Hard)"
+    if pending_count > 500: status_emoji = "🔴 Backlog Critical"
+    if processed_count == 0 and raw_count > 0: status_emoji = "⚠️ Processing Stalled?"
     
     report_lines.append(f"- 🌡️ **System Health**: {status_emoji}")
     report_lines.append(f"")
