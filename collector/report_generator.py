@@ -39,14 +39,21 @@ def generate_report():
     processed_count = processed_res.count if processed_res.count is not None else len(processed_res.data)
     recent_articles = processed_res.data
 
-    # 3. 대기 중인 뉴스 (Pending) 카운트 (추가 업무)
+    # 3. 대기 중인 뉴스 (Pending) 카운트
     pending_res = supabase.table("raw_news") \
         .select("id", count="exact") \
         .eq("status", "pending") \
         .execute()
     pending_count = pending_res.count if pending_res.count is not None else len(pending_res.data)
 
-    # 4. 보고서 본문 작성 (Markdown/Text)
+    # 4. 전체 누적 뉴스 (Total) 카운트 (추가 업무)
+    total_raw_res = supabase.table("raw_news").select("id", count="exact", head=True).execute()
+    total_raw_count = total_raw_res.count if total_raw_res.count is not None else 0
+
+    total_proc_res = supabase.table("articles").select("id", count="exact", head=True).execute()
+    total_proc_count = total_proc_res.count if total_proc_res.count is not None else 0
+
+    # 5. 보고서 본문 작성 (Markdown/Text)
     kst_now = now + datetime.timedelta(hours=9)
     report_lines = []
     report_lines.append(f"Subject: [News Dashboard] 4-Hour Operation Report ({kst_now.strftime('%H:%M')})")
@@ -55,10 +62,14 @@ def generate_report():
     report_lines.append(f"Date: {kst_now.strftime('%Y-%m-%d %H:%M:%S')} (KST)")
     report_lines.append(f"----------------------------------------")
     report_lines.append(f"")
-    report_lines.append(f"📊 **Workload Status**")
-    report_lines.append(f"- 📥 **Collected (Last 4h)**: {raw_count} new items")
-    report_lines.append(f"- 🧠 **Analyzed (Last 4h)**: {processed_count} completed")
-    report_lines.append(f"- ⏳ **Pending Queue**: {pending_count} items waiting")
+    report_lines.append(f"📊 **Workload Status (Last 4h)**")
+    report_lines.append(f"- 📥 **Collected**: {raw_count} items")
+    report_lines.append(f"- 🧠 **Analyzed**: {processed_count} items")
+    report_lines.append(f"- ⏳ **Pending**: {pending_count} items waiting")
+    report_lines.append(f"")
+    report_lines.append(f"📚 **Total Accumulation**")
+    report_lines.append(f"- 📦 **Total Collected**: {total_raw_count} items")
+    report_lines.append(f"- 💎 **Total Analyzed**: {total_proc_count} items")
     
     status_emoji = "🟢 Healthy"
     if pending_count > 100: status_emoji = "🟠 Heavy Load (Working Hard)"
