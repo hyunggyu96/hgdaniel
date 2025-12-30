@@ -119,17 +119,18 @@ async def analyze_article_expert_async(title, description, search_keyword):
     """Refactored to use central InferenceEngine."""
     keyword_pool = ", ".join(EXPERT_ANALYSIS_KEYWORDS)
     system_prompt = (
-        f"You are a [Medical Aesthetic Market Analyst].\n"
+        f"You are a [Medical Aesthetic Business Analyst].\n"
         f"Your task is to identify ALL relevant Medical/Aesthetic Keywords and Companies from the Pool below.\n\n"
         f"### CRITICAL CONTEXT:\n"
-        f"- We ONLY care about the Medical/Aesthetic industry.\n"
-        f"- Ignore all references to 'Automotive' or 'Car components' (e.g., A-pillar/C-pillar).\n\n"
+        f"- We care about BUSINESS issues: Lawsuits, FDA Approvals, Earnings, M&A.\n"
+        f"- DO NOT focus on simple product benefits (e.g., 'wrinkles', 'whitening', 'square jaw', 'young people').\n"
+        f"- Ignore all references to 'Automotive' or 'Car components'.\n\n"
         f"### Expert Keyword Pool:\n{keyword_pool}\n\n"
         f"### Extraction Rules (STRICT JSON ONLY):\n"
-        f"1. main_keyword: Pick the single most important Medical/Aesthetic word from the Pool. Headline priority.\n"
-        f"2. included_keywords: Array of EVERY relevant word from the Pool. Be exhaustive.\n"
+        f"1. main_keyword: Pick the single most important COMPANY or BRAND from the Pool. If Lawsuit, pick the Company.\n"
+        f"2. included_keywords: Array of every relevant word from the Pool. Be exhaustive. DO NOT include generic terms like 'shaving', 'jaw'.\n"
         f"3. issue_nature: ONE of: 제품 출시/허가, 임상/연구데이터, 실적/수출/경영, 법적분쟁/규제, 투자/M&A, 학회/마케팅, 거시경제/정책, 기타.\n"
-        f"4. brief_summary: A professional 1-line Korean summary (~70 chars).\n"
+        f"4. brief_summary: A professional 1-line Korean summary (~70 chars). Focus on the 'News Hook' (e.g., Who sued whom? Who got approved?), not product features.\n"
         f"5. impact_level: Integer 1-5.\n"
     )
     user_prompt = f"Crawl Keyword: {search_keyword}\nHeadline: {title}\nBody: {description}"
@@ -172,8 +173,8 @@ def is_semantically_duplicate(new_title, recent_articles):
         union = new_words.union(ref_words)
         similarity = len(intersection) / len(union) if union else 0
         
-        # If words are 80% identical, it's likely the same news from a different agency
-        if similarity > 0.8:
+        # If words are 85% identical, it's likely the same news from a different agency
+        if similarity > 0.85:
             return art['title']
     return None
 
@@ -185,73 +186,9 @@ async def process_item(item, worksheet, recent_articles):
     pub_date = item['pub_date']
     keyword = item['search_keyword']
 
-    # [1] News Filtering (2-Stage Approach)
-    full_text = f"{title} {desc}"
-    
-    # Priority 1: Clear Car/Noise News -> Skip immediately
-    if any(car_brand in full_text for car_brand in CAR_BRANDS) or \
-       any(noise in full_text for noise in CAR_NOISE_KEYWORDS):
-        print(f"  🚗 Car/Noise detected. Skipping: {title[:20]}...")
-        supabase.table("raw_news").update({"status": "skipped"}).eq("id", raw_id).execute()
-        return True
-
-    # Priority 2: 100% Medical Aesthetic News -> Pass immediately
-    if any(med_kw in full_text for med_kw in STRONG_MED_KEYWORDS):
-        print(f"  🩺 Strong Medical Keywords found. Passing: {title[:20]}...")
-        pass 
-    else:
-        # Priority 3: Ambiguous cases (Pillar mention or just "Filler" without strong context)
-        # Let AI read and decide
-        has_pillar_pattern = bool(PILLAR_REGEX.search(full_text))
-        
-        if has_pillar_pattern or keyword == "필러":
-            print(f"  🔍 Ambiguous pillar/filler news ({title[:20]}...). AI Verifying...")
-            is_relevant = await is_medical_news_ai(title, desc)
-            if not is_relevant:
-                print(f"  🚫 AI confirmed as Irrelevant. Skipping.")
-                supabase.table("raw_news").update({"status": "skipped"}).eq("id", raw_id).execute()
-                return True
-            else:
-                print("  ✅ AI rescued as relevant news!")
-        else:
-            # For other keywords without strong context, still do a quick AI check to be safe
-            is_relevant = await is_medical_news_ai(title, desc)
-            if not is_relevant:
-                print(f"  🚫 AI filtered (No context). Skipping.")
-                supabase.table("raw_news").update({"status": "skipped"}).eq("id", raw_id).execute()
-                return True
-
-    # [2] Double check if already in production (Unique Link)
-    try:
-        check = supabase.table("articles").select("id").eq("link", link).execute()
-        if check.data:
-            print(f"  ⏩ Skipping (Link exist): {title[:30]}...")
-            supabase.table("raw_news").update({"status": "skipped"}).eq("id", raw_id).execute()
-            return True
-    except: pass
-
-    # [3] Semantic Duplicate Check (Similar Title)
-    dup_title = is_semantically_duplicate(title, recent_articles)
-    force_ollama = False
-    
-    if dup_title:
-        # Optimization: Use Ollama for related news to save cost
-        # CRITICAL: For '필러' (Filler), we ALWAYS use Online AI due to its high variability
-        if keyword == "필러":
-            print(f"  ♻️ Related news found, but keyword is '필러'. Using Online AI for accuracy.")
-            force_ollama = False
-        else:
-            print(f"  ♻️ Related news found (similar to: {dup_title[:20]}...). Using local Ollama.")
-            force_ollama = True
-
-    print(f"🤖 Processing: {title[:40]}...")
-    
-    # [New Strategy] ALWAYS merge AI results with local keyword extraction
-    # 1. Start with Local extraction (Reliable baseline)
-    local_main = extract_main_keyword(desc, title=title)
-    local_all = extract_keywords(f"{title} {desc}", top_n=10)
-    
-    # 2. Get AI Analysis (Hybrid: Local First)
+    # [1] AI Analysis (Hybrid: Local First)
+    # We analyze it FIRST to get context
+    print(f"🤖 Analyzing: {title[:40]}...")
     analysis = await analyze_article_expert_async(title, desc, keyword)
     
     # Extract AI fields
@@ -261,60 +198,81 @@ async def process_item(item, worksheet, recent_articles):
     summary = analysis.get("brief_summary", title[:70])
     impact = analysis.get("impact_level", 3)
     
-    # 3. MERGE LOGIC (Union of AI and Local)
-    # Update Stats
-    STATS["total"] += 1
-    provider = analysis.get("provider", "fallback")
-    STATS[provider] += 1
-    if "latency" in analysis:
-        STATS["latencies"].append(analysis["latency"])
+    # [2] Local Extraction for robustness
+    local_main = extract_main_keyword(desc, title=title)
+    local_all = extract_keywords(f"{title} {desc}", top_n=10)
+    
+    # [3] MERGE LOGIC (Union of AI and Local)
     final_main = ai_main if (ai_main and ai_main != "기타") else local_main
-    
-    # Union of all keywords
     final_all_kws = list(set([final_main] + ai_included + local_all))
-    
-    # Clean up
-    final_all_kws = [k for k in final_all_kws if k and k != "기타" and k != "-" and k != "|"]
-    
-    # Guarantee search keyword is included if it was found in text (or at least used as search)
-    # But only if it's actually in our expert pool
+    final_all_kws = [k for k in final_all_kws if k and k not in ["기타", "-", "|"]]
     if keyword and keyword in EXPERT_ANALYSIS_KEYWORDS and keyword not in final_all_kws:
         final_all_kws.append(keyword)
 
-    # 1. Update Production DB (Supabase)
-    prod_data = {
-        "title": title,
-        "description": desc,
-        "link": link,
-        "published_at": pub_date,
-        "source": "Naver",
-        "keyword": keyword,
-        "main_keywords": final_all_kws
-    }
-    
+    # Update Stats
+    provider = analysis.get("provider", "fallback")
+    STATS["total"] += 1
+    STATS[provider] += 1
+
+    # [4] SAVE TO SUPABASE (Always save unless Link exists)
     try:
-        supabase.table("articles").insert(prod_data).execute()
-        
-        # 3. Update Google Sheets
+        check = supabase.table("articles").select("id").eq("link", link).execute()
+        if not check.data:
+            prod_data = {
+                "title": title, "description": desc, "link": link,
+                "published_at": pub_date, "source": "Naver",
+                "keyword": keyword, "main_keywords": final_all_kws
+            }
+            supabase.table("articles").insert(prod_data).execute()
+            print(f"  ✅ Saved to Supabase DB (All-inclusive log)")
+    except Exception as e:
+        print(f"  ⚠️ Supabase DB Error: {e}")
+
+    # [5] FILTERING FOR GOOGLE SHEETS & WEBSITE (The "Clean" Report)
+    is_filtered = False
+    filter_reason = ""
+    
+    # Rule A: Car/Noise
+    full_text = f"{title} {desc}"
+    if any(car_brand in full_text for car_brand in CAR_BRANDS) or \
+       any(noise in full_text for noise in CAR_NOISE_KEYWORDS):
+        is_filtered = True
+        filter_reason = "Car/Noise"
+    
+    # Rule B: Semantic Duplicate (85% similarity)
+    if not is_filtered:
+        dup_title = is_semantically_duplicate(title, recent_articles)
+        if dup_title:
+            is_filtered = True
+            filter_reason = f"Duplicate of: {dup_title[:15]}..."
+
+    # [6] SAVE TO GOOGLE SHEETS (Curated Only)
+    if not is_filtered:
         if worksheet:
+            try:
                 kst_now = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
                 now_str = kst_now.strftime("%Y-%m-%d %H:%M:%S")
-                
-                # Convert pub_date to KST
-                pub_kst_str = pub_date
+                # pub_date conversion to KST...
+                pd_kst_str = pub_date
                 try:
-                    if 'T' in pub_date:
-                        pd_utc = datetime.datetime.fromisoformat(pub_date.replace('Z', '+00:00'))
-                    else:
-                        pd_utc = datetime.datetime.strptime(pub_date, "%Y-%m-%d %H:%M:%S+00:00")
-                    pd_kst = pd_utc + datetime.timedelta(hours=9)
-                    pub_kst_str = pd_kst.strftime("%Y-%m-%d %H:%M:%S")
-                except:
-                    pass
+                    pd_utc = datetime.datetime.fromisoformat(pub_date.replace('Z', '+00:00'))
+                    pd_kst_str = (pd_utc + datetime.timedelta(hours=9)).strftime("%Y-%m-%d %H:%M:%S")
+                except: pass
 
-                row = [now_str, keyword, title, link, final_main, ", ".join(final_all_kws), pub_kst_str, issue_nature, summary]
-                # Insert at Row 2 (Top) to maintain "Newest First" order
+                row = [now_str, keyword, title, link, final_main, ", ".join(final_all_kws), pd_kst_str, issue_nature, summary]
                 worksheet.insert_row(row, 2)
+                print(f"  📑 Saved to Google Sheets (Curated)")
+                
+                # Update history for deduplication
+                recent_articles.append({'title': title, 'link': link})
+            except Exception as e:
+                print(f"  ⚠️ Google Sheet Error: {e}")
+    else:
+        print(f"  🚫 Filtered for Report ({filter_reason}). Check Supabase articles for entry.")
+
+    # [7] Final Status Sync
+    supabase.table("raw_news").update({"status": "processed"}).eq("id", raw_id).execute()
+    return True
             
         # 3. Update Raw status
         supabase.table("raw_news").update({"status": "processed"}).eq("id", raw_id).execute()

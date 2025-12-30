@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { getNews } from '@/lib/api';
 import { groupNewsByCategory, CATEGORIES_CONFIG } from '@/lib/constants';
@@ -9,6 +9,7 @@ import CollectionsView from './CollectionsView';
 interface NewsListProps {
     selectedCategory?: string | null;
     currentPage?: number;
+    searchQuery?: string;
     showCollections?: boolean;
 }
 
@@ -19,22 +20,16 @@ function getTags(article: any) {
     let summary: string | null = null;
     let issue_nature: string | null = null;
 
-    // 1. New Schema (keywords, main_keywords)
     if (article.main_keywords && article.main_keywords.length > 0) {
         const firstTag = article.main_keywords[0];
-        // Check for encoded format: [Main | Issue | Summary]
-        // Allow for loose matching (spaces around pipes)
         const match = firstTag.match(/^\[(.*?)(?:\|(.*?))?(?:\|(.*?))?\]$/);
 
         if (match) {
-            // Extracted from encoded string
             main = [match[1].trim()];
             if (match[2]) issue_nature = match[2].trim();
             if (match[3]) summary = match[3].trim();
-            // Rest of main_keywords are actually included keywords
             sub = article.main_keywords.slice(1);
         } else {
-            // Fallback: If it starts with [ and ends with ], treat it as a raw tag and clean it
             if (firstTag.startsWith('[') && firstTag.endsWith(']')) {
                 const content = firstTag.slice(1, -1);
                 const parts = content.split('|').map(s => s.trim());
@@ -48,27 +43,22 @@ function getTags(article: any) {
         }
     } else if (article.keywords) {
         sub = article.keywords;
-    }
-    // 2. Legacy Schema (Fallback parsing from summary_bullets)
-    else {
+    } else {
         const summaryBullets = article.summary_bullets || [];
         const tagLine = summaryBullets.find((b: string) => b.startsWith("TAGS: ["));
         const keywordLine = summaryBullets.find((b: string) => b.startsWith("KEYWORDS:"));
 
-        // Legacy TAGS format: [Company | Brand | Stock] -> Treat as Main Keywords
         if (tagLine) {
             const match = tagLine.match(/\[(.*?)\]/);
             if (match && match[1]) {
                 main = match[1].split('|').map((p: string) => p.trim()).filter((p: string) => p !== '-' && p !== '');
             }
         }
-        // Legacy KEYWORDS format -> Sub Keywords
         if (keywordLine) {
             sub = keywordLine.replace("KEYWORDS:", "").split(",").map((k: string) => k.trim());
         }
     }
 
-    // Final Sanitation: Remove meaningless characters
     main = main.filter(m => m && m !== '-' && m !== '|' && m.trim() !== '');
     if (!issue_nature || issue_nature === '-' || issue_nature === '|' || issue_nature.trim() === '') issue_nature = null;
     if (!summary || summary === '-' || summary === '|' || summary.trim() === '') summary = null;
@@ -76,38 +66,11 @@ function getTags(article: any) {
     return { main, sub, summary, issue_nature };
 }
 
-function MarketBadge({ main_keywords, sub_keywords, sector }: { main_keywords: string[], sub_keywords: string[], sector: string }) {
-    return (
-        <div className="flex flex-wrap items-center gap-2 mb-4">
-            {/* Sector Badge */}
-            <span className="text-[11px] font-black text-white bg-blue-600 px-3 py-1 rounded-lg uppercase tracking-widest shadow-[0_0_15px_rgba(37,99,235,0.4)] border border-blue-400/30">
-                {sector || 'NEWS'}
-            </span>
-
-            {/* Main Keywords (Top Priority) */}
-            {main_keywords.slice(0, 3).map((k, i) => (
-                <span key={`main-${i}`} className="text-[10px] font-bold text-white bg-white/10 border border-white/20 px-2.5 py-1 rounded-md uppercase tracking-wide">
-                    {k}
-                </span>
-            ))}
-
-            {/* Sub Keywords (Secondary) */}
-            {sub_keywords.slice(0, 2).map((k, i) => (
-                <span key={`sub-${i}`} className="text-[10px] font-bold text-white/50 bg-white/5 border border-white/10 px-2.5 py-1 rounded-md uppercase tracking-wide">
-                    {k}
-                </span>
-            ))}
-        </div>
-    );
-}
-
-
-export default async function NewsList({ selectedCategory, currentPage = 1, searchQuery, showCollections }: NewsListProps & { searchQuery?: string, showCollections?: boolean }) {
+export default async function NewsList({ selectedCategory, currentPage = 1, searchQuery, showCollections }: NewsListProps) {
     const allNews = await getNews();
     const newsByCategory = groupNewsByCategory(allNews);
-    const itemsPerPage = 20; // Reverted to 20 per user request
+    const itemsPerPage = 20;
 
-    // Filter news by category first
     let filteredNews: any[] = [];
     if (selectedCategory) {
         filteredNews = newsByCategory[selectedCategory] || [];
@@ -115,7 +78,6 @@ export default async function NewsList({ selectedCategory, currentPage = 1, sear
         filteredNews = allNews;
     }
 
-    // Apply search filter if query exists
     if (searchQuery && searchQuery.trim()) {
         const query = searchQuery.toLowerCase().trim();
         filteredNews = filteredNews.filter(article =>
@@ -125,20 +87,16 @@ export default async function NewsList({ selectedCategory, currentPage = 1, sear
         );
     }
 
-    // Filter by collections if requested (client-side filtering will be handled by CollectionsView)
-    const isCollectionsView = showCollections;
-
     const totalPages = Math.ceil(filteredNews.length / itemsPerPage);
     const paginatedNews = filteredNews.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
 
     return (
         <div className="flex-1 space-y-12">
-            {/* Header */}
             <div className="pt-8 md:pt-12 px-4 md:px-6 lg:px-12">
                 <div className="flex flex-col gap-4 mb-4">
                     <h1 className="text-2xl md:text-3xl lg:text-5xl font-black uppercase tracking-tighter text-white leading-tight">
-                        {isCollectionsView ? 'Collections' : selectedCategory ? selectedCategory : 'Market Intelligence'}
+                        {showCollections ? 'Collections' : selectedCategory ? selectedCategory : 'Market Intelligence'}
                     </h1>
                     <div className="flex items-start gap-2">
                         <span className="relative flex h-2 w-2 mt-1 shrink-0">
@@ -146,9 +104,7 @@ export default async function NewsList({ selectedCategory, currentPage = 1, sear
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-[#3182f6]"></span>
                         </span>
                         <div className="text-[10px] font-bold text-white/40 uppercase leading-relaxed">
-                            <span className="tracking-[0.4em] mr-2">
-                                {selectedCategory ? `Active Tracking:` : `Real-time Analysis`}
-                            </span>
+                            <span className="tracking-[0.4em] mr-2">{selectedCategory ? `Active Tracking:` : `Real-time Analysis`}</span>
                             {selectedCategory && (
                                 <span className="tracking-tight text-white/50">
                                     {CATEGORIES_CONFIG.find(c => c.label === selectedCategory)?.keywords.join(', ')}
@@ -156,38 +112,11 @@ export default async function NewsList({ selectedCategory, currentPage = 1, sear
                             )}
                         </div>
                     </div>
-                    <div className="text-[9px] font-bold text-white/30 uppercase tracking-widest mt-2">
-                        Last Updated: {(() => {
-                            if (allNews.length === 0) return 'N/A';
-
-                            // Find the most recent published_at across all news
-                            // Dates are ISO strings (e.g., 2025-12-25T09:16:00)
-                            const latestArticle = allNews.reduce((latest, article) => {
-                                if (!article.published_at) return latest;
-                                if (!latest.published_at) return article;
-                                return new Date(article.published_at).getTime() > new Date(latest.published_at).getTime() ? article : latest;
-                            }, allNews[0]);
-
-                            if (!latestArticle?.published_at) return 'N/A';
-
-                            // Format as user-friendly string
-                            return new Date(latestArticle.published_at).toLocaleString('ko-KR', {
-                                timeZone: 'Asia/Seoul',
-                                year: 'numeric',
-                                month: '2-digit',
-                                day: '2-digit',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: false
-                            }).replace(/\. /g, '.').replace(/\.$/, '').replace(', ', ' ');
-                        })()}
-                    </div>
                 </div>
             </div>
 
-            {/* List */}
             <div className="px-4 md:px-6 lg:px-12 pb-24">
-                {isCollectionsView ? (
+                {showCollections ? (
                     <CollectionsView allNews={allNews} today={today} />
                 ) : selectedCategory || searchQuery ? (
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-0 max-w-7xl">
@@ -196,62 +125,69 @@ export default async function NewsList({ selectedCategory, currentPage = 1, sear
                         ))}
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-12">
-                        {Object.keys(newsByCategory).map((category) => (
-                            <div key={category} className="space-y-4 flex flex-col items-center w-full bg-white/[0.02] p-5 rounded-2xl border border-white/5">
-                                <div className="w-full text-center border-b border-white/10 pb-4 mb-2">
-                                    <Link
-                                        href={`/?category=${encodeURIComponent(category)}`}
-                                        className="flex flex-col items-center justify-center gap-2 group/header hover:opacity-80 transition-opacity w-full"
-                                    >
-                                        <h3 className="text-xl font-black uppercase tracking-wider text-white group-hover/header:text-[#3182f6] transition-colors">
-                                            {category}
-                                        </h3>
-                                        <div className="flex items-center justify-center gap-1.5 opacity-0 group-hover/header:opacity-100 transition-opacity w-full px-2">
-                                            <span className="relative flex h-1.5 w-1.5 shrink-0">
-                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#3182f6]"></span>
-                                            </span>
-                                            <span className="text-[9px] font-bold text-white/40 uppercase tracking-tight leading-none truncate max-w-full">
-                                                {CATEGORIES_CONFIG.find(c => c.label === category)?.keywords.join(', ')}
-                                            </span>
+                    <div className="space-y-20">
+                        {/* 🌟 STRATEGIC HIGHLIGHT SECTION */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            {['Exosome', 'PDRN/PN'].map((theme) => (
+                                <div key={theme} className="bg-gradient-to-br from-white/[0.04] to-transparent border border-white/10 rounded-[32px] p-8 relative overflow-hidden group/theme">
+                                    <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 blur-[100px] rounded-full group-hover/theme:bg-blue-500/20 transition-all duration-1000" />
+                                    <div className="relative z-10 flex flex-col gap-6">
+                                        <div className="flex items-end justify-between">
+                                            <div>
+                                                <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase italic drop-shadow-2xl">
+                                                    {theme === 'Exosome' ? 'Exosome' : 'PDRN / PN'}
+                                                </h2>
+                                                <div className="h-1 w-12 bg-blue-600 mt-2 rounded-full" />
+                                            </div>
+                                            <Link href={`/?category=${encodeURIComponent(theme)}`} className="text-[10px] font-bold text-[#3182f6] hover:text-white uppercase tracking-widest border border-[#3182f6]/30 px-4 py-2 rounded-full hover:bg-[#3182f6] transition-all">
+                                                Explore All
+                                            </Link>
                                         </div>
-                                    </Link>
+                                        <div className="grid gap-3">
+                                            {newsByCategory[theme]?.slice(0, 5).map((article: any) => (
+                                                <NewsCard key={article.id} article={article} today={today} />
+                                            ))}
+                                            {(!newsByCategory[theme] || newsByCategory[theme].length === 0) && (
+                                                <div className="py-20 text-center text-white/10 text-[10px] uppercase font-bold tracking-widest">Collecting Data...</div>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="w-full flex flex-col gap-3">
-                                    {newsByCategory[category].slice(0, 10).map((article: any) => (
-                                        <NewsCard key={article.id} article={article} today={today} />
-                                    ))}
+                            ))}
+                        </div>
+
+                        {/* 📂 STANDARD CATEGORY GRID */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-16">
+                            {Object.keys(newsByCategory).filter(c => !['Exosome', 'PDRN/PN'].includes(c)).map((category) => (
+                                <div key={category} className="flex flex-col gap-5 bg-white/[0.02] p-6 rounded-2xl border border-white/5 hover:border-white/10 transition-all">
+                                    <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                                        <h3 className="text-lg font-black uppercase text-white tracking-widest">{category}</h3>
+                                        <Link href={`/?category=${encodeURIComponent(category)}`} className="text-[10px] font-bold text-white/30 hover:text-[#3182f6] uppercase tracking-widest">More</Link>
+                                    </div>
+                                    <div className="flex flex-col gap-4">
+                                        {newsByCategory[category].slice(0, 8).map((article: any) => (
+                                            <NewsCard key={article.id} article={article} today={today} />
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
                 )}
 
-                {/* Pagination - Only show for category/search views, not collections */}
-                {!isCollectionsView && (selectedCategory || searchQuery) && totalPages > 1 && (
+                {!showCollections && (selectedCategory || searchQuery) && totalPages > 1 && (
                     <div className="mt-24 flex items-center justify-center gap-4">
-                        {(currentPage > 1) && (
-                            <Link
-                                href={`/?${selectedCategory ? `category=${encodeURIComponent(selectedCategory)}&` : ''}${searchQuery ? `search=${encodeURIComponent(searchQuery)}&` : ''}page=${currentPage - 1}`}
-                                className="p-3 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-[#3182f6] hover:border-[#3182f6] transition-all"
-                            >
-                                <ChevronLeft className="w-5 h-5" />
-                            </Link>
+                        {currentPage > 1 && (
+                            <Link href={`/?${selectedCategory ? `category=${encodeURIComponent(selectedCategory)}&` : ''}${searchQuery ? `search=${encodeURIComponent(searchQuery)}&` : ''}page=${currentPage - 1}`} className="p-3 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-[#3182f6] transition-all"><ChevronLeft className="w-5 h-5" /></Link>
                         )}
                         <span className="text-white/50 text-sm font-bold">Page {currentPage} of {totalPages}</span>
                         {currentPage < totalPages && (
-                            <Link
-                                href={`/?${selectedCategory ? `category=${encodeURIComponent(selectedCategory)}&` : ''}${searchQuery ? `search=${encodeURIComponent(searchQuery)}&` : ''}page=${currentPage + 1}`}
-                                className="p-3 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-[#3182f6] hover:border-[#3182f6] transition-all"
-                            >
-                                <ChevronRight className="w-5 h-5" />
-                            </Link>
+                            <Link href={`/?${selectedCategory ? `category=${encodeURIComponent(selectedCategory)}&` : ''}${searchQuery ? `search=${encodeURIComponent(searchQuery)}&` : ''}page=${currentPage + 1}`} className="p-3 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-[#3182f6] transition-all"><ChevronRight className="w-5 h-5" /></Link>
                         )}
                     </div>
                 )}
             </div>
-        </div >
+        </div>
     );
 }
 
@@ -261,78 +197,32 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
     const isToday = pubDate?.toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' }) === today;
     const dateStr = pubDate ? pubDate.toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul', month: '2-digit', day: '2-digit' }).replace(/\. /g, '.').replace(/\.$/, '') : '';
 
-    // Fallback logic for summary
     let summaryText = analysis.summary && analysis.summary !== '-' ? analysis.summary : article.description;
-    if (summaryText) {
-        summaryText = summaryText.replace(/^[\s\-\|]+/, '').replace(/^[\s\-\|]+/, '').trim();
-    }
+    if (summaryText) summaryText = summaryText.replace(/^[\s\-\|]+/, '').trim();
 
-    // Consolidated Keywords Logic
-    let allKeywords = [...analysis.main, ...analysis.sub];
-    // Filter out invalid/generic keywords
-    allKeywords = allKeywords.filter(k => k && k !== '기타' && k !== '-' && k !== '|' && k.trim() !== '');
-
-    // If empty, use search keyword
-    if (allKeywords.length === 0 && article.keyword) {
-        allKeywords = [article.keyword];
-    }
-
-    // Deduplicate
-    const uniqueKeywords = Array.from(new Set(allKeywords));
+    const uniqueKeywords = Array.from(new Set([...analysis.main, ...analysis.sub].filter(k => k && k !== '기타' && k !== '-' && k !== '|' && k.trim() !== '')));
 
     return (
-        <div className="group/article flex flex-col gap-0 w-full pb-2 border-b border-dashed border-white/5 last:border-0 last:pb-0 relative pl-3">
-            {isToday && (
-                <div className="mb-1">
-                    <span className="text-[8px] font-bold text-white bg-red-600 px-1 py-0.5 rounded shadow-sm uppercase tracking-tighter">TODAY</span>
-                </div>
-            )}
-
+        <div className="group/card flex flex-col gap-1.5 pb-3 border-b border-white/[0.03] last:border-0 last:pb-0">
             <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                    <a
-                        href={article.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm font-bold text-white/90 group-hover/article:text-[#3182f6] transition-colors leading-tight line-clamp-2"
-                    >
-                        {article.title}
-                    </a>
-                </div>
-                <div className={`shrink-0 flex flex-col items-end text-[10px] font-mono font-bold leading-tight w-[52px] text-right ${isToday ? 'text-blue-400' : 'text-white/40'}`}>
-                    <span>{dateStr}</span>
-                    <span className="text-[9px] font-medium opacity-80">{pubDate ? pubDate.toLocaleTimeString('ko-KR', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', hour12: false }) : ''}</span>
-                </div>
+                <a href={article.link} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-white/90 group-hover/card:text-[#3182f6] transition-colors leading-tight line-clamp-2">
+                    {article.title}
+                </a>
+                <div className={`shrink-0 text-[10px] font-mono font-black text-right ${isToday ? 'text-blue-400' : 'text-white/30'}`}>{dateStr}</div>
             </div>
-
-            {/* Unified Keywords (Blue Only) */}
-            <div className="flex items-center justify-between mt-1">
-                <div className="flex flex-wrap items-center gap-1">
-                    {uniqueKeywords.length > 0 ? (
-                        uniqueKeywords.slice(0, 4).map((k, i) => (
-                            <span key={`kw-${i}`} className="text-[9px] text-blue-100 bg-blue-500/20 px-1.5 py-0.5 rounded border border-blue-500/20 whitespace-nowrap font-bold">
-                                {k}
-                            </span>
-                        ))
-                    ) : (
-                        <span className="text-[8px] text-white/20">-</span>
-                    )}
+            <div className="flex items-center justify-between">
+                <div className="flex flex-wrap gap-1">
+                    {uniqueKeywords.slice(0, 3).map((k, i) => (
+                        <span key={i} className="text-[9px] font-bold text-blue-400 bg-blue-400/10 px-1.5 py-0.5 rounded uppercase tracking-tighter border border-blue-400/10">{k}</span>
+                    ))}
                 </div>
-                <div className="shrink-0 w-[52px] flex justify-end items-center">
-                    <CollectionButton newsLink={article.link} newsTitle={article.title} size={20} />
-                </div>
+                <CollectionButton newsLink={article.link} newsTitle={article.title} size={18} />
             </div>
-
-            {(summaryText) && (
-                <p className="text-[11px] text-white/40 leading-relaxed line-clamp-1 pr-4 mt-1">
-                    {summaryText}
-                </p>
-            )}
+            {summaryText && <p className="text-[11px] text-white/30 truncate">{summaryText}</p>}
         </div>
     );
 });
 
-// 🚀 Dense Layout Row (Expert 9-column style focus)
 const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, today: string }) {
     const analysis = getTags(article);
     const pubDate = article.published_at ? new Date(article.published_at) : null;
@@ -340,77 +230,28 @@ const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, 
     const dateStr = pubDate ? pubDate.toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul', month: '2-digit', day: '2-digit' }).replace(/\. /g, '.').replace(/\.$/, '') : '';
     const timeStr = pubDate ? pubDate.toLocaleTimeString('ko-KR', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', hour12: false }) : '';
 
-    // Fallback logic for summary
     let summaryText = analysis.summary && analysis.summary !== '-' ? analysis.summary : article.description;
-    if (summaryText) {
-        summaryText = summaryText.replace(/^[\s\-\|]+/, '').replace(/^[\s\-\|]+/, '').trim();
-    }
+    if (summaryText) summaryText = summaryText.replace(/^[\s\-\|]+/, '').trim();
 
-    // Consolidated Keywords Logic
-    let allKeywords = [...analysis.main, ...analysis.sub];
-    // Filter out invalid/generic keywords
-    allKeywords = allKeywords.filter(k => k && k !== '기타' && k !== '-' && k !== '|' && k.trim() !== '');
-
-    // If empty, use search keyword
-    if (allKeywords.length === 0 && article.keyword) {
-        allKeywords = [article.keyword];
-    }
-
-    // Deduplicate
-    const uniqueKeywords = Array.from(new Set(allKeywords));
+    const uniqueKeywords = Array.from(new Set([...analysis.main, ...analysis.sub].filter(k => k && k !== '기타' && k !== '-' && k !== '|' && k.trim() !== '')));
 
     return (
-        <article className={`group py-1.5 px-3 hover:bg-white/[0.03] transition-colors border-b border-white/5 flex flex-col gap-1 relative ${isToday ? 'bg-blue-900/5' : ''}`}>
-
-            {/* Top Row: Meta */}
-            <div className="flex items-center gap-2 text-[9px] h-4">
-                <span className={`font-mono font-bold tracking-tight text-[10px] ${isToday ? 'text-blue-400' : 'text-white/50'}`}>
-                    {dateStr} <span className="text-[9px] font-medium opacity-80 ml-0.5">{timeStr}</span>
-                </span>
-
-                {isToday && (
-                    <span className="ml-auto text-[8px] font-bold text-white bg-red-600 px-1 py-0.5 rounded shadow-sm">TODAY</span>
-                )}
+        <article className={`group py-3 px-4 hover:bg-white/[0.03] border-b border-white/5 flex flex-col gap-2 transition-all ${isToday ? 'bg-blue-400/[0.03]' : ''}`}>
+            <div className="flex items-center justify-between text-[10px] font-mono font-black">
+                <span className={isToday ? 'text-blue-400' : 'text-white/30'}>{dateStr} {timeStr}</span>
+                {isToday && <span className="text-[8px] bg-red-600 px-1 py-0.5 rounded text-white">NEW</span>}
             </div>
-
-            {/* Middle Row: Title & Summary */}
-            <div className="flex gap-2 items-start">
-                <div className="pt-0.5">
-                    <CollectionButton newsLink={article.link} newsTitle={article.title} size={14} />
-                </div>
-                <div className="flex-1 min-w-0 flex flex-col md:flex-row gap-2 md:items-start md:justify-between">
-                    <div className="flex-1 min-w-0">
-                        <a
-                            href={article.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="block group/link"
-                        >
-                            <h3 className="text-sm md:text-base font-bold text-white/90 leading-tight group-hover/link:text-[#3182f6] truncate pr-2">
-                                {article.title}
-                            </h3>
-                        </a>
-
-                        <p className="mt-0.5 text-[11px] text-white/50 leading-snug font-medium line-clamp-1">
-                            {summaryText}
-                        </p>
-                    </div>
+            <div className="flex gap-3 items-start">
+                <CollectionButton newsLink={article.link} newsTitle={article.title} size={16} />
+                <div className="flex-1 min-w-0">
+                    <a href={article.link} target="_blank" rel="noopener noreferrer" className="block"><h3 className="text-sm md:text-base font-bold text-white group-hover:text-[#3182f6] truncate transition-colors">{article.title}</h3></a>
+                    <p className="text-[11px] text-white/40 truncate mt-1">{summaryText}</p>
                 </div>
             </div>
-
-            {/* Bottom Row: Unified Keywords */}
-            <div className="flex items-center justify-between opacity-60 group-hover:opacity-100 transition-opacity mt-1.5 pl-7">
-                <div className="flex flex-wrap items-center gap-1.5">
-                    {uniqueKeywords.length > 0 ? (
-                        uniqueKeywords.map((k, i) => (
-                            <span key={`kw-${i}`} className="text-[9px] text-blue-100 bg-blue-500/20 px-1.5 py-0.5 rounded border border-blue-500/20 font-bold uppercase tracking-tight">
-                                {k}
-                            </span>
-                        ))
-                    ) : (
-                        <span className="text-[8px] text-white/20">-</span>
-                    )}
-                </div>
+            <div className="flex flex-wrap gap-1.5 pl-7">
+                {uniqueKeywords.map((k, i) => (
+                    <span key={i} className="text-[9px] font-black text-blue-100/50 bg-white/5 px-2 py-0.5 rounded border border-white/5 group-hover:border-blue-400/30 group-hover:text-blue-400 transition-all uppercase tracking-tighter">{k}</span>
+                ))}
             </div>
         </article>
     );

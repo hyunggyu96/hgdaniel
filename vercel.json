@@ -1,14 +1,10 @@
 {
-    "builds": [
-        {
-            "src": "web/package.json",
-            "use": "@vercel/next"
+    "functions": {
+        "src/pages/api/*.ts": {
+            "includeFiles": "collector/service_account.json"
         }
-    ],
-    "routes": [
-        {
-            "src": "/(.*)",
-            "dest": "web/$1"
-        }
-    ]
+    },
+    "buildCommand": "cd web && npm run build",
+    "installCommand": "cd web && npm install",
+    "outputDirectory": "web/.next"
 }

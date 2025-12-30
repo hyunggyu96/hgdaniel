@@ -67,16 +67,16 @@ class InferenceEngine:
         return None
 
     async def get_analysis_hybrid(self, system_prompt: str, user_prompt: str) -> Dict[str, Any]:
-        # 1. Try Local First
+        # 1. Try Local First (Save Tokens!)
         result = await self.call_ollama(system_prompt, user_prompt)
         if result:
             return result
         
-        # 2. Fallback to Cloud
+        # 2. Fallback to Cloud (Only if Local fails)
         print("  ⚠️ Local engine failed/offline. Falling back to Cloud...")
         result = await self.call_gemini(system_prompt, user_prompt)
         if result:
             return result
             
-        # 3. Last resort: Empty Structure (to be filled by local fallback logic in processor)
+        # 3. Last resort
         return {"error": "All engines failed"}
