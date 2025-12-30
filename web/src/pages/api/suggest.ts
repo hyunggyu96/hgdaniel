@@ -21,23 +21,47 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         if (!SERVICE_ACCOUNT_KEY) throw new Error('GOOGLE_SERVICE_ACCOUNT_KEY is missing');
 
-        // Ultra-Robust implementation
-        let creds;
-        const rawKey = SERVICE_ACCOUNT_KEY.trim();
+        // Failsafe implementation
+        let creds: any = null;
+        let s = SERVICE_ACCOUNT_KEY.trim();
 
         try {
-            const cleanKey = rawKey.replace(/^['"]|['"]$/g, '');
-            try {
-                creds = JSON.parse(cleanKey);
-            } catch {
-                creds = JSON.parse(JSON.parse(cleanKey));
+            // 1. Double check for surrounding quotes and unescape them
+            if (s.startsWith('"') && s.endsWith('"')) {
+                s = s.substring(1, s.length - 1);
             }
 
-            // CRITICAL: Google Auth requires literal newlines in private_key
+            // 2. Try parsing directly
+            try {
+                creds = JSON.parse(s);
+            } catch {
+                // 3. Try unescaping common problematic characters
+                const unescaped = s.replace(/\\n/g, '\n').replace(/\\"/g, '"');
+                try {
+                    creds = JSON.parse(unescaped);
+                } catch {
+                    // 4. Double-serialized case
+                    try {
+                        creds = JSON.parse(JSON.parse(s));
+                    } catch {
+                        // 5. Hardcore cleanup: If it's a raw string starting with {
+                        // but failed to parse, it might have literal newlines
+                        const normalized = s.replace(/[\n\r\t]/g, ' ');
+                        creds = JSON.parse(normalized);
+                    }
+                }
+            }
+
+            // Fix RSA Key
             if (creds && creds.private_key) {
                 creds.private_key = creds.private_key.replace(/\\n/g, '\n');
+                if (!creds.private_key.includes('---')) {
+                    // Recover header/footer if lost
+                    creds.private_key = `-----BEGIN PRIVATE KEY-----\n${creds.private_key}\n-----END PRIVATE KEY-----`;
+                }
             }
         } catch (e) {
+            console.warn('Primary parsing failed, trying local file...');
             // Local file fallback
             try {
                 const localPath = path.resolve(process.cwd(), 'collector', 'service_account.json');
@@ -47,8 +71,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             } catch { }
         }
 
-        if (!creds || !creds.private_key) {
-            throw new Error(`Auth JSON Error: Failed to load valid credentials.`);
+        if (!creds || !creds.private_key || !creds.client_email) {
+            throw new Error(`Auth JSON Error: Failed after all attempts. Length: ${s.length}, Starts: ${s.substring(0, 10)}`);
         }
 
         const auth = new JWT({
