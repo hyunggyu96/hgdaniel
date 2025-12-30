@@ -110,18 +110,23 @@ export default async function NewsList({ selectedCategory, currentPage = 1, sear
                     /* � UNIFIED CATEGORY GRID WITH PREMIUM EFFECTS */
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-12">
                         {Object.keys(newsByCategory).map((category) => (
-                            <div key={category} className="group/section flex flex-col gap-5 bg-white/[0.03] p-6 rounded-[24px] border border-white/5 hover:border-[#3182f6]/30 hover:bg-white/[0.05] transition-all duration-500 relative overflow-hidden">
+                            <div key={category} className="group/section flex flex-col gap-6 bg-white/[0.03] p-6 rounded-[24px] border border-white/5 hover:border-[#3182f6]/30 hover:bg-white/[0.05] transition-all duration-500 relative overflow-hidden h-full">
                                 {/* Subtle Glow Effect for EVERY category */}
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/0 group-hover/section:bg-blue-500/10 blur-[60px] rounded-full transition-all duration-700" />
 
-                                <div className="flex items-end justify-between border-b border-white/10 pb-4 relative z-10">
-                                    <div className="space-y-1">
-                                        <h3 className="text-xl font-black uppercase text-white tracking-widest group-hover/section:text-[#3182f6] transition-colors">{category}</h3>
+                                {/* HEADER: Fixed minimum height leads to perfect alignment */}
+                                <div className="flex items-start justify-between min-h-[85px] border-b border-white/10 pb-4 relative z-10">
+                                    <div className="space-y-1.5 flex-1 pr-4">
+                                        <h3 className="text-xl md:text-2xl font-black uppercase text-white tracking-widest leading-[1.1] group-hover/section:text-[#3182f6] transition-colors break-words">
+                                            {category}
+                                        </h3>
                                         <p className="text-[8px] font-bold text-white/20 uppercase tracking-[0.2em]">Strategic Sector</p>
                                     </div>
-                                    <Link href={`/?category=${encodeURIComponent(category)}`} className="text-[9px] font-black text-[#3182f6] opacity-40 group-hover/section:opacity-100 hover:bg-[#3182f6] hover:text-white px-3 py-1.5 rounded-full border border-[#3182f6]/30 transition-all uppercase tracking-widest leading-none">
-                                        Explore All
-                                    </Link>
+                                    <div className="shrink-0 pt-1">
+                                        <Link href={`/?category=${encodeURIComponent(category)}`} className="text-[9px] font-black text-[#3182f6] opacity-40 group-hover/section:opacity-100 hover:bg-[#3182f6] hover:text-white px-3 py-1.5 rounded-full border border-[#3182f6]/30 transition-all uppercase tracking-widest leading-none">
+                                            Explore
+                                        </Link>
+                                    </div>
                                 </div>
 
                                 <div className="flex flex-col gap-4 relative z-10">
