@@ -9,7 +9,7 @@ const SERVICE_ACCOUNT_KEY = process.env.GOOGLE_SERVICE_ACCOUNT_KEY || '';
 const SERVICE_ACCOUNT_FILE = process.env.SERVICE_ACCOUNT_FILE || '';
 
 async function getAuth() {
-    let creds;
+    let creds: any = null;
     if (SERVICE_ACCOUNT_KEY) {
         try {
             const cleanKey = SERVICE_ACCOUNT_KEY.trim().replace(/^['"]|['"]$/g, '');
@@ -32,7 +32,9 @@ async function getAuth() {
         }
     }
 
-    if (!creds) throw new Error('No Google credentials provided');
+    if (!creds || !creds.client_email || !creds.private_key) {
+        throw new Error('No valid Google credentials found');
+    }
 
     return new JWT({
         email: creds.client_email,
@@ -53,8 +55,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
 
-        const auth = await getAuth();
-        const doc = new GoogleSpreadsheet(SHEET_ID, auth);
+        const serviceAccountAuth = await getAuth();
+        const doc = new GoogleSpreadsheet(SHEET_ID, serviceAccountAuth);
         await doc.loadInfo();
 
         let sheet = doc.sheetsByTitle['키워드제안'];
