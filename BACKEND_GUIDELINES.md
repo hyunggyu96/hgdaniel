@@ -216,29 +216,50 @@ Legion Y700의 성능을 유지하고 기기 수명을 보호하기 위한 규�
 
 ---
 
-## 🛠️ 10. CLI 툴킷 및 연결 상태 (CLI Toolkit)
+## 🛠️ 10. CLI 툴킷 및 서비스 연결 상태 (Tool Connectivity)
 
-프로젝트 관리를 위해 사용되는 주요 CLI 도구들과 그 연결 상태를 정의합니다.
+프로젝트 관리에 사용되는 CLI 도구 및 AI, 외부 서비스 연결 방식을 정의합니다.
 
-### 1. Vercel CLI
+### ✅ Active CLI (설치됨 & 사용 중)
 
-- **용도**: 프론트엔드(`web`) 배포, 로그 확인 및 환경변수 동기화.
-- **연결**: `web` 디렉토리가 `hgdaniels-projects/aesthetics-intelligence` 프로젝트에 링크됨.
-- **주요 명령**:
-  - `vercel link`: 프로젝트 재연결.
-  - `vercel env pull .env.local`: 최신 환경변수 다운로드.
-  - `vercel --prod`: 로컬 변경사항을 프로덕션에 강제 배포.
+#### 1. Vercel CLI
 
-### 2. Firebase CLI
+- **상태**: `web` 디렉토리가 `hgdaniels-projects/aesthetics-intelligence`에 링크됨.
+- **용도**: 프론트엔드 배포(`vercel --prod`) 및 환경변수 동기화(`vercel env pull`).
+- **인증**: 하드코딩된 Base64 키 사용으로 환경변수 의존성을 낮춤.
 
-- **용도**: Firestore 데이터베이스 규칙(`firestore.rules`) 및 인덱스 배포.
-- **상태**: 루트 디렉토리에 `firebase.json` 존재하여 설정 관리 중. (실제 데이터 조작은 MCP 및 Python SDK 사용)
+#### 2. GitHub CLI (`gh`)
 
-### 3. Tablet Remote (SSH)
+- **상태**: 로그인 완료 (`gh auth status` 확인).
+- **용도**: PR 생성, 이슈 관리, **Secrets 보안 업로드**(`gh secret set`).
+- **권장**: 민감한 키 파일은 로컬에만 두고, GitHub Secrets를 통해 관리.
 
-- **용도**: 태블릿(`192.168.219.102`) 터미널 원격 제어.
-- **연결**: `ssh -p 8022 u0_a43@192.168.219.102` (기본 암호: `aisapiens`)
-- **자동화**: `tablet_remote_control.py` 스크립트를 통해 패치 검증 및 프로세스 재시작 자동화.
+#### 3. Tablet Remote (SSH)
+
+- **상태**: `192.168.219.102:8022` 접속 가능.
+- **용도**: 태블릿 터미널 직접 제어, `logcat` 확인, 패치 검증.
+- **명령**: `ssh -p 8022 u0_a43@192.168.219.102`
+
+---
+
+### ☁️ Managed by AI & SDK (AI 직접 제어)
+
+#### 4. Supabase
+
+- **연결 방식**: Python/JS `supabase` 라이브러리 및 Direct SQL 실행.
+- **이력**: Antigravity가 `setup_raw_news.sql` 등을 통해 테이블 및 스키마 직접 관리.
+- **참고**: 전역 CLI(`supabase`)는 없으나, AI가 코드로 DB를 직접 조작하므로 기능상 제약 없음.
+
+#### 5. Google Cloud (GCP)
+
+- **연결 방식**: `service_account.json` (Service Account Key) 기반 인증.
+- **용도**: Google Sheets API (대시보드), Gmail API.
+- **관리**: 대시보드 할당량 및 권한 설정은 [GCP Console](https://console.cloud.google.com/) 이용.
+
+#### 6. Firebase
+
+- **연결 방식**: `firebase-admin` (Python SDK) 및 MCP.
+- **상태**: 루트에 `firebase.json` 설정 파일 존재. Firestore 데이터는 AI가 스크립트로 직접 읽고 씀.
 
 ---
 
