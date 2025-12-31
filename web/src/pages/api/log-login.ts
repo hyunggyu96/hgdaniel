@@ -50,9 +50,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const type = body.provider ? 'LOGIN' : (body.title ? 'CLICK' : 'UNKNOWN');
         const meta = body.provider || body.link || body.title || '';
 
-        // v4 default is append. Prepend requires complex batch update. 
-        // Ensuring build success first by using addRow.
-        await sheet.addRow({ 'Time': now, 'UserID': userId, 'Type': type, 'Meta': meta, 'IP': ip });
+        // Low-level API for Prepend (Insert at Row 2, push others down)
+        // @ts-ignore
+        await doc.saveRequests([
+            {
+                insertDimension: {
+                    range: {
+                        sheetId: sheet.sheetId,
+                        dimension: 'ROWS',
+                        startIndex: 1,
+                        endIndex: 2,
+                    },
+                    inheritFromBefore: false,
+                },
+            },
+        ]);
+
+        // Fill the inserted row with values
+        await sheet.loadCells('A2:E2');
+        const values = [now, userId, type, meta, ip];
+        for (let i = 0; i < values.length; i++) {
+            const cell = sheet.getCell(1, i);
+            cell.value = values[i];
+        }
+        await sheet.saveUpdatedCells();
 
         return res.status(200).json({ success: true });
     } catch (e: any) {

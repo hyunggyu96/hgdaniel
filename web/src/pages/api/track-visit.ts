@@ -63,8 +63,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             sheet = await doc.addSheet({ title: 'Visits_v2', headerValues: ['Time', 'IP', 'Country', 'UserAgent'] });
         }
 
-        // v4 default is append. Ensuring build success.
-        await sheet.addRow({ 'Time': nowStr, 'IP': ip, 'Country': country, 'UserAgent': ua });
+        // Prepend: Insert one row at index 1 (under header)
+        // @ts-ignore
+        await doc.saveRequests([
+            {
+                insertDimension: {
+                    range: {
+                        sheetId: sheet.sheetId,
+                        dimension: 'ROWS',
+                        startIndex: 1,
+                        endIndex: 2,
+                    },
+                    inheritFromBefore: false,
+                },
+            },
+        ]);
+
+        // Fill cells
+        await sheet.loadCells('A2:D2');
+        const visitValues = [nowStr, ip, country, ua];
+        for (let i = 0; i < visitValues.length; i++) {
+            const cell = sheet.getCell(1, i);
+            cell.value = visitValues[i];
+        }
+        await sheet.saveUpdatedCells();
 
         // 2. Daily Stats (NEW SHEET: DailyStats_v2)
         let statsSheet = doc.sheetsByTitle['DailyStats_v2'];

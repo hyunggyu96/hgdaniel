@@ -72,15 +72,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             existingRow.set('IP', ip);
             await existingRow.save();
         } else {
-            await sheet.addRow({
-                '제안일시': now,
-                '제안 키워드': keywordToMatch,
-                '카테고리': category || '미지정',
-                '제안 사유': reason || '-',
-                '누적 제안 횟수': '1',
-                '상태': '대기중',
-                'IP': ip
-            });
+            // Low-level Prepend: Insert one row at index 1
+            // @ts-ignore
+            await doc.saveRequests([
+                {
+                    insertDimension: {
+                        range: {
+                            sheetId: sheet.sheetId,
+                            dimension: 'ROWS',
+                            startIndex: 1,
+                            endIndex: 2,
+                        },
+                        inheritFromBefore: false,
+                    },
+                },
+            ]);
+
+            // Fill cells (A2:G2)
+            await sheet.loadCells('A2:G2');
+            const suggestValues = [now, keywordToMatch, category || '미지정', reason || '-', '1', '대기중', ip];
+            for (let i = 0; i < suggestValues.length; i++) {
+                const cell = sheet.getCell(1, i);
+                cell.value = suggestValues[i];
+            }
+            await sheet.saveUpdatedCells();
         }
 
         return res.status(200).json({ success: true });
