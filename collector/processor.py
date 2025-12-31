@@ -260,29 +260,29 @@ async def process_item(item, worksheet, recent_articles):
         k = corrections.get(k, k)
         return k.strip()
 
-    # White-list Filtering (Ensure only pool keywords are saved)
-    pool_set = set(EXPERT_ANALYSIS_KEYWORDS)
-    if final_main not in pool_set and final_main != "기타":
-        final_main = "기타"
+    # White-list Filtering (Strict mapping to Pool)
+    pool_set = set([k.strip() for k in EXPERT_ANALYSIS_KEYWORDS])
     
+    # AI/Local 결과물 중 Pool에 있는 것만 선별
+    final_main = final_main if final_main in pool_set else "기타"
     ai_included = [k for k in ai_included if k in pool_set]
     local_all = [k for k in local_all if k in pool_set]
     
-    # 5. Summary Post-processing (Remove trailing dots and broken words)
+    # 5. Summary Post-processing (Power Clean)
     summary = summary.strip()
-    summary = re.sub(r'[.\s]+$', '', summary) # Remove trailing dots/whitespace
-    # Simple heuristic: if ends with a broken particle, trim it
-    broken_particles = ["에", "의", "를", "을", "과", "와", "현", "하", "는"] 
-    if any(summary.endswith(p) for p in broken_particles):
-        summary = re.sub(r'\s+\S+$', '', summary) # Remove the last orphan word
+    # 패턴: 완성형 어미(.다, .함, .음) 다음에 바로 숫자나 조사가 붙는 경우 그 이후 삭제
+    # 예: "전달한다6.95% 하락했다.." -> "전달한다"
+    summary = re.sub(r'([다함음]\.|[다함음])[\d\s%가-힣]+(하락|상승|입했다|출처|기자).*$', r'\1', summary)
+    summary = re.sub(r'[.\s]+$', '', summary) # 문장 끝 점/공백 정리
     
-    # Final summary length check
-    if len(summary) > 100:
-        summary = summary[:97] + "..."
+    # 추가: 문장 중간에 갑자기 "하락", "%" 등이 붙는 꼬리표 제거
+    if " 하락" in summary or " 상승" in summary:
+        summary = re.split(r'\d*\.?\d*%', summary)[0].strip()
 
     final_all_kws = list(set([final_main] + ai_included + local_all))
-    final_all_kws = [k for k in final_all_kws if k and k not in ["기타", "-", "|", "None"]]
-    if keyword and keyword in EXPERT_ANALYSIS_KEYWORDS and keyword not in final_all_kws:
+    final_all_kws = [k for k in final_all_kws if k and k in pool_set and k not in ["기타", "-", "|", "None"]]
+    
+    if keyword and keyword in pool_set and keyword not in final_all_kws:
         final_all_kws.append(keyword)
 
     # Update Stats
