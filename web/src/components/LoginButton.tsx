@@ -10,12 +10,24 @@ export default function LoginButton() {
     const [showInput, setShowInput] = useState(false);
     const [inputValue, setInputValue] = useState('');
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (inputValue.trim()) {
-            login(inputValue.trim());
+        const id = inputValue.trim();
+        if (id) {
+            login(id);
             setShowInput(false);
             setInputValue('');
+
+            // Log Login
+            try {
+                await fetch('/api/log-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: id, provider: 'manual' })
+                });
+            } catch (err) {
+                console.error('Login log failed', err);
+            }
         }
     };
 
