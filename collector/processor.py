@@ -130,12 +130,13 @@ async def analyze_article_expert_async(title, description, search_keyword):
         f"### STRICT RULES:\n"
         f"1. **Language**: summary and issue_nature MUST be in Korean (Hangul) ONLY. NO Japanese, NO Hanja.\n"
         f"2. **Main Keyword**: Pick a single most relevant name from the Pool. Use the EXACT Korean name if available in Pool.\n"
-        f"3. **No Halucination**: If a company name is Hugel, use '휴젤'. Do not mix English and Korean like '휴zel'. Avoid Japanese characters even if the source is related to Japan.\n"
-        f"4. **JSON Only**: Do not include any explanation or markdown. Return only the JSON object.\n\n"
+        f"3. **Included Keywords**: Pick ONLY 2-4 keywords that are CRITICAL to the news content from the Pool. Do not pick irrelevant or generic ones like '허가' if it's not the main topic.\n"
+        f"4. **No Halucination**: If a company name is Hugel, use '휴젤'. Do not mix English and Korean like '휴zel'. Avoid Japanese characters even if the source is related to Japan.\n"
+        f"5. **JSON Only**: Do not include any explanation or markdown. Return only the JSON object.\n\n"
         f"### Expert Keyword Pool:\n{keyword_pool}\n\n"
         f"### Schema (Required fields):\n"
         f"- main_keyword: (String) Selected from Pool or clean Company name.\n"
-        f"- included_keywords: (Array of Strings) Relevant keywords from Pool.\n"
+        f"- included_keywords: (Array of Strings) 2-4 highly relevant keywords from Pool.\n"
         f"- issue_nature: (String) One of: [제품 출시/허가, 임상/연구데이터, 실적/수출/경영, 법적분쟁/규제, 투자/M&A, 학회/마케팅, 거시경제/정책, 기타].\n"
         f"- brief_summary: (String) Professional 1-line Korean summary (~70 chars). MUST BE PURE KOREAN.\n"
         f"- impact_level: (Integer) 1 to 5.\n"
@@ -221,7 +222,7 @@ async def process_item(item, worksheet, recent_articles):
     
     # [2] Local Extraction for robustness
     local_main = extract_main_keyword(desc, title=title)
-    local_all = extract_keywords(f"{title} {desc}", top_n=10)
+    local_all = extract_keywords(f"{title} {desc}", top_n=5)
     
     # [3] MERGE LOGIC (Union of AI and Local)
     final_main = ai_main if (ai_main and ai_main != "기타") else local_main
