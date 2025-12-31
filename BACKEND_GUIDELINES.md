@@ -73,12 +73,11 @@
 #### 2. 사용자 활동 (Activity Logs)
 
 - **`LoginHistory_v2`**: [Time, UserID, Type, Meta, IP] - 로그인 및 주요 클릭 로그.
-- **`UserCollections`**: [UserID, Title, URL, Date, AddedAt] - 즐겨찾기 통합 관리.
+- **`UserCollections_v2`**: [UserID, IP, Title, URL, Date, AddedAt] - 즐겨찾기 통합 관리.
   - **전략**: 사용자별 시트 생성(Tab per User)은 지양하고, **단일 시트 + UserID 필터링** 방식을 사용하여 유지보수성을 극대화합니다.
 
 #### 3. 인증 및 연결
 
-- **ID**: `Login Logs` 등의 시트 ID는 코드 내 상수로 하드코딩하여 관리.
 - **인증**: Base64 인코딩된 서비스 계정 키 사용.
 
 ### 🚀 배포 및 보안 (Deployment & Security)
