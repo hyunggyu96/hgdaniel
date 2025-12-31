@@ -57,20 +57,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         const doc = await getDoc();
         
-        // 1. Visits Log
-        let sheet = doc.sheetsByTitle['Visits'];
+        // 1. Visits Log (NEW SHEET: Visits_v2)
+        let sheet = doc.sheetsByTitle['Visits_v2'];
         if (!sheet) {
-            sheet = await doc.addSheet({ title: 'Visits', headerValues: ['Time', 'IP', 'Country', 'UserAgent'] });
+            sheet = await doc.addSheet({ title: 'Visits_v2', headerValues: ['Time', 'IP', 'Country', 'UserAgent'] });
         }
 
         // Attempt Prepend (@ts-ignore to suppress type errors)
         // @ts-ignore
         await sheet.addRow({ 'Time': nowStr, 'IP': ip, 'Country': country, 'UserAgent': ua }, { insert: true });
 
-        // 2. Daily Stats
-        let statsSheet = doc.sheetsByTitle['DailyStats'];
+        // 2. Daily Stats (NEW SHEET: DailyStats_v2)
+        let statsSheet = doc.sheetsByTitle['DailyStats_v2'];
         if (!statsSheet) {
-            statsSheet = await doc.addSheet({ title: 'DailyStats', headerValues: ['Date', 'TotalVisitors'] });
+            statsSheet = await doc.addSheet({ title: 'DailyStats_v2', headerValues: ['Date', 'TotalVisitors'] });
         }
 
         const dateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
