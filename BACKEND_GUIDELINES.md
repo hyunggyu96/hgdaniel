@@ -61,6 +61,18 @@
 - **인증**: `collector/service_account.json`은 절대 노출 금지 및 위치 고수.
 - **할당량 (Quota)**: Google Sheets API는 쓰기 제한이 엄격합니다. `processor.py` 내의 `asyncio.sleep(1)`은 이를 방지하기 위한 최소한의 안전장치이므로 제거하지 마세요.
 
+### 📊 방문자 로깅 (Visitor Tracking)
+
+- **아키텍처**: `Frontend(HeaderStatus.tsx)` → `GET /api/track-visit` → `Google Sheet(Visits)`
+- **특이사항**: 프론트엔드가 `GET` 요청으로 호출하므로, API는 `GET` 메서드에서도 **쓰기(Log Append)** 작업을 수행해야 합니다. (REST 원칙 예외 적용)
+- **시트 ID**: `Login Logs` 시트(`1wA1...`)를 사용하며, Vercel 환경변수 누락 방지를 위해 코드 내에 **ID 하드코딩**이 적용되어 있습니다. (Key는 환경변수 사용)
+- **정렬 정책**: API는 성능을 위해 `Append`(맨 아래 추가) 방식을 사용합니다. 시트를 **최신순(Newest First)**으로 보고 싶다면 `organize_visitor_sheet.py`를 실행하세요.
+
+### 🚀 배포 및 보안 (Deployment & Security)
+
+- **Vercel 환경변수**: 로컬(`.env.local`)과 배포환경(Vercel Dashboard)의 변수 동기화 필수. `GOOGLE_SERVICE_ACCOUNT_KEY`가 없으면 방문자 트래킹 등 핵심 기능이 침묵(Silent Fail)합니다.
+- **GitHub Push Protection**: `service_account.json` 등 시크릿 파일이 커밋에 포함되면 Push가 차단됩니다. 차단 시 `git reset`으로 파일만 빼는 것이 아니라, **오염된 커밋 자체를 삭제(`git reset --hard`)**해야 해결됩니다.
+
 ---
 
 ### 🔑 API Keys 및 환경 변수
