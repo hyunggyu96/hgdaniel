@@ -56,52 +56,9 @@ async function getDoc() {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    // GET: Return total count (Headless API for HeaderStatus)
-    if (req.method === 'GET') {
-        try {
-            const doc = await getDoc();
-            const sheet = doc.sheetsByTitle['Visits'];
-            if (!sheet) return res.status(200).json({ count: 0 });
+    // Combine GET/POST logic: Always log visit, then return count.
+    // HeaderStatus uses GET, so executing logging here is required.
 
-            // Simple count based on row count (minus header)
-            // Or count today's visits if needed. For now, total count as requested by UI.
-            // UI says "today visitors", so we might need to filter.
-
-            const rows = await sheet.getRows({ limit: 1000 }); // Get recent 1000
-            const today = new Date().toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul' });
-
-            // Count rows matching today's date string prefix
-            // Row format: '2025. 12. 31. 오후 ...'
-            // We need robust matching.
-
-            // Let's stick to simple total rows for now if filtering is expensive, 
-            // OR do a quick check on the first N rows because it's sorted descending!
-
-            let todayCount = 0;
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = now.getMonth() + 1;
-            const day = now.getDate();
-            const datePrefix = `${year}. ${month}. ${day}.`; // "2025. 12. 31."
-
-            for (const row of rows) {
-                const timeStr = row.get('Time') || '';
-                if (timeStr.includes(datePrefix)) {
-                    todayCount++;
-                } else {
-                    // Optimized: Since it's sorted descending, once we miss today, we stop.
-                    // But we just sorted it, so this assumption holds!
-                    if (todayCount > 0) break;
-                }
-            }
-
-            return res.status(200).json({ count: todayCount });
-
-        } catch (e) {
-            console.error('Track visit error:', e);
-            return res.status(500).json({ count: 0 });
-        }
-    }
 
     // POST: Log visit (Wait, HeaderStatus calls GET usually? Let's check HeaderStatus code)
     // HeaderStatus calls: fetch(`/api/track-visit?_t=${Date.now()}`); which is GET.
