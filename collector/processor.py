@@ -166,24 +166,26 @@ async def analyze_article_expert_async(title, description, search_keyword):
 def is_semantically_duplicate(new_title, recent_articles):
     """Checks if a title is too similar to recent articles (Jaccard Similarity)."""
     def get_words(text):
-        # Remove special chars and split into words
-        clean = "".join(c for c in text if c.isalnum() or c.isspace())
+        if not text: return set()
+        # Remove ALL special characters including various quotes and brackets
+        clean = re.sub(r'[^가-힣a-zA-Z0-9\s]', ' ', text)
         return set(clean.lower().split())
 
     new_words = get_words(new_title)
-    if len(new_words) < 3: return None # Too short to judge
+    if len(new_words) < 3: return None
 
     for art in recent_articles:
-        ref_words = get_words(art['title'])
+        ref_title = art.get('title', '')
+        ref_words = get_words(ref_title)
         if not ref_words: continue
         
         intersection = new_words.intersection(ref_words)
         union = new_words.union(ref_words)
         similarity = len(intersection) / len(union) if union else 0
         
-        # If words are 85% identical, it's likely the same news from a different agency
-        if similarity > 0.85:
-            return art['title']
+        # Lowered threshold to 0.7 to catch slightly modified titles from different agencies
+        if similarity > 0.7:
+            return ref_title
     return None
 
 async def process_item(item, worksheet, recent_articles):

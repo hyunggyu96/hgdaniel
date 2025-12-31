@@ -147,14 +147,39 @@ async def main():
                 start_date = datetime.datetime(2025, 12, 19)
                 print(f"📅 Final fallback start_date: {start_date}")
 
-            # Load existing links (last 2000 for deduplication speed)
+            # Load existing links and titles (last 1000 for deduplication speed)
             existing_links = set()
+            existing_titles = []
             try:
-                rows = supabase.table("raw_news").select("link").order("created_at", desc=True).limit(2000).execute().data
-                existing_links = {r['link'] for r in rows}
-                print(f"📚 Loaded {len(existing_links)} recent raw links for deduplication.")
+                # 1. From raw_news
+                res_raw = supabase.table("raw_news").select("link, title").order("created_at", desc=True).limit(1000).execute().data
+                for r in res_raw:
+                    existing_links.add(r['link'])
+                    existing_titles.append(clean_text_expert(r['title']))
+                
+                # 2. From articles (final results)
+                res_art = supabase.table("articles").select("link, title").order("created_at", desc=True).limit(500).execute().data
+                for r in res_art:
+                    existing_links.add(r['link'])
+                    existing_titles.append(clean_text_expert(r['title']))
+                
+                print(f"📚 Loaded {len(existing_links)} links and {len(existing_titles)} titles for deduplication.")
             except Exception as e:
-                print(f"⚠️ Link Load Error: {e}")
+                print(f"⚠️ Link/Title Load Error: {e}")
+
+            # Define Simple semantic check for collector
+            def is_dup_title(new_title, title_list):
+                if not new_title: return False
+                def get_w(t): return set(re.sub(r'[^가-힣a-zA-Z0-9]', ' ', t).split())
+                nw = get_w(new_title)
+                if len(nw) < 3: return False
+                for t in title_list[-300:]: # Check last 300 for speed
+                    rw = get_w(t)
+                    if not rw: continue
+                    intersect = nw.intersection(rw)
+                    union = nw.union(rw)
+                    if union and (len(intersect) / len(union) > 0.75): return True
+                return False
 
             async with aiohttp.ClientSession() as session:
                 total_added = 0
@@ -164,7 +189,12 @@ async def main():
                     
                     added_for_kw = 0
                     for item in items:
+                        t_clean = clean_text_expert(item['title'])
+                        if item['link'] in existing_links or is_dup_title(t_clean, existing_titles):
+                            continue
+                            
                         added_for_kw += await process_news_item_expert(item, keyword, existing_links)
+                        existing_titles.append(t_clean)
                     
                     print(f"   > Added {added_for_kw} new articles.")
                     total_added += added_for_kw
