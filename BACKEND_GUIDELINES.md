@@ -61,14 +61,25 @@
 - **인증**: `collector/service_account.json`은 절대 노출 금지 및 위치 고수.
 - **할당량 (Quota)**: Google Sheets API는 쓰기 제한이 엄격합니다. `processor.py` 내의 `asyncio.sleep(1)`은 이를 방지하기 위한 최소한의 안전장치이므로 제거하지 마세요.
 
-### 📊 방문자 로깅 (Visitor Tracking)
+### 📊 구글 시트 스키마 (Google Sheets Schema)
 
-- **아키텍처**: `Frontend` → `GET /api/track-visit` → `Google Sheet(Visits & DailyStats)`
-- **특이사항**: `GET` 요청 시에도 방문 기록을 남기며, 최신 데이터가 상단에 오도록 **Prepend** 방식을 사용합니다 (`{ insert: true }`).
-- **시트 구조**:
-  - `Visits`: 개별 방문 로그 (최신순).
-  - `DailyStats`: [날짜 | 총 방문자 수] 형태의 일별 집계 시트 (자동 생성 및 갱신).
-- **시트 ID**: `Login Logs` 시트(`1wA1...`) 사용. (ID 하드코딩 적용)
+데이터 무결성과 관리 용이성을 위해 다음 스키마를 엄수합니다.
+
+#### 1. 방문자 및 통계
+
+- **`Visits_v2`**: [Time, IP, Country, UserAgent] - 최신순 정렬(Prepend).
+- **`DailyStats_v2`**: [Date, TotalVisitors] - 일별 자동 집계.
+
+#### 2. 사용자 활동 (Activity Logs)
+
+- **`LoginHistory_v2`**: [Time, UserID, Type, Meta, IP] - 로그인 및 주요 클릭 로그.
+- **`UserCollections`**: [UserID, Title, URL, Date, AddedAt] - 즐겨찾기 통합 관리.
+  - **전략**: 사용자별 시트 생성(Tab per User)은 지양하고, **단일 시트 + UserID 필터링** 방식을 사용하여 유지보수성을 극대화합니다.
+
+#### 3. 인증 및 연결
+
+- **ID**: `Login Logs` 등의 시트 ID는 코드 내 상수로 하드코딩하여 관리.
+- **인증**: Base64 인코딩된 서비스 계정 키 사용.
 
 ### 🚀 배포 및 보안 (Deployment & Security)
 
