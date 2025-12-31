@@ -288,3 +288,30 @@ Legion Y700의 성능을 유지하고 기기 수명을 보호하기 위한 규�
   3. `Visits` 시트 접근 문제 해결을 위해 **`Visits_v2` 및 `DailyStats_v2`로 타겟 시트 변경**.
   4. IP 추출 로직 강화 (`x-real-ip` 및 `x-forwarded-for` 다중 체크) 및 에러 발생 시 디버그 정보 반환하도록 수정.
 - **교훈**: Vercel 환경변수는 로컬과 다를 수 있으므로, 확실한 인증이 필요할 땐 암호화된 키를 코드에 심는 것이 가장 강력한 해결책이다. 또한 기존 시트가 오염되었을 땐 **빠르게 V2로 이주**하는 것이 시간 절약에 좋다.
+
+---
+
+##  12. 유지보수 및 확장 가이드 (Developer's Note)
+
+이 프로젝트를 이어받을 AI 또는 개발자를 위한 핵심 구현 원리와 노하우입니다.
+
+###  1. Base64 하드코딩 인증 (The 'Silver Bullet' for Auth)
+- **배경**: Vercel 환경변수(\n 처리 문제)와 GitHub Push Protection(JSON 파일 차단)의 이중고를 해결하기 위해 도입했습니다.
+- **원리**: service_account.json -> Compact JSON String -> Base64 Encode -> Code Constant
+- **키 교체 방법**:
+  1. 로컬에 새 1service_account.json을 준비합니다.
+  2. 파이썬 스크립트(ix_auth_apis.py 참조)를 작성하여, JSON을 읽어 Base64로 변환합니다.
+  3. API 파일(	rack-visit.ts, log-login.ts 등)의 SERVICE_ACCOUNT_KEY_B64 상수를 교체합니다.
+  4. **주의**: .env나 Vercel Env에 의존하지 마십시오. 코드가 곧 설정입니다.
+
+###  2. App Router vs Pages Router 충돌 방지
+- **현황**: 메인 웹은 Next.js App Router(pp/)를 쓰지만, 백엔드 API는 호환성과개발 속도를 위해 **Pages Router (pages/api/)**를 사용 중입니다.
+- **주의**: web/src/app/api/... 경로에 동일한 이름의 폴더가 생기면 빌드 충돌이 발생합니다. API는 무조건 web/src/pages/api/에만 만드십시오.
+
+###  3. 구글 시트 데이터 전략 (Unified & V2)
+- **V2 이주**: 시트가 원인 불명으로 꼬이거나 쓰기가 거부될 땐, 디버깅보다 **새 탭(_v2) 생성**이 훨씬 빠르고 경제적입니다.
+- **통합 시트(UserCollections)**: 사용자마다 시트를 만들면(Tab per User), 시트 탭 한계(200개)와 관리 복잡도에 직면합니다.
+- **해법**: 모든 사용자의 즐겨찾기를 하나의 시트에 넣고, UserID 컬럼으로 구분하십시오. 읽을 때는 ilter()로 가져오면 됩니다.
+
+> **Note**: 시스템이 멈추거나 이상하면 이 가이드라인의 '트러블슈팅 히스토리'와 이 섹션을 먼저 읽어보세요. 답은 이미 여기에 있습니다.
+
