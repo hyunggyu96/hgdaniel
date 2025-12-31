@@ -26,32 +26,48 @@ async function getDoc() {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-    const { email, name, provider } = req.body;
-    if (!email) return res.status(400).json({ error: 'Missing email' });
+    const { email, action, article } = req.body;
+    if (!email || !action) return res.status(400).json({ error: 'Missing fields' });
 
     try {
         const doc = await getDoc();
 
-        // Use a user-specific sheet or a global login log?
-        // Analyzing typical usage: usually specific users get their own sheet OR a master log.
-        // User asked for "Login Logs". Let's stick to the 'Login Logs' sheet but maybe V2?
-        // Actually, previous context implies user specific sheets for collections, but login logs might be global.
-        // Let's create/use 'LoginHistory_v2' to be safe and reset.
+        // 1. Sanitize Email for Sheet Title (e.g. "user_gmail_com")
+        // User requested "Reset", so we will use a new naming convention to avoid old conflicts.
+        // Let's modify the sanitizer or just delete old sheet if needed?
+        // Safer: Just use standard sanitization. If user said "refresh", maybe delete content?
+        // Let's keep it simple: Ensure sheet exists.
         
-        let sheet = doc.sheetsByTitle['LoginHistory_v2'];
+        const safeTitle = email.replace(/[@.]/g, '_').substring(0, 90); // Sheet title limit 100 chars
+        
+        let sheet = doc.sheetsByTitle[safeTitle];
         if (!sheet) {
-            sheet = await doc.addSheet({ title: 'LoginHistory_v2', headerValues: ['Time', 'Email', 'Name', 'Provider', 'IP'] });
+            sheet = await doc.addSheet({ title: safeTitle, headerValues: ['Title', 'URL', 'Date', 'Summary', 'AddedAt'] });
         }
 
-        const now = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
-        const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
-
-        // @ts-ignore
-        await sheet.addRow({ 'Time': now, 'Email': email, 'Name': name, 'Provider': provider, 'IP': ip }, { insert: true });
+        if (action === 'add' && article) {
+            // Add (Prepend for newest)
+            const now = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+            // @ts-ignore
+            await sheet.addRow({
+                'Title': article.title,
+                'URL': article.url,
+                'Date': article.published_at || '',
+                'Summary': article.summary || '',
+                'AddedAt': now
+            }, { insert: true });
+        } else if (action === 'remove' && article) {
+            // Remove by URL match
+            const rows = await sheet.getRows();
+            const rowToDelete = rows.find(r => r.get('URL') === article.url);
+            if (rowToDelete) {
+                await rowToDelete.delete();
+            }
+        }
 
         return res.status(200).json({ success: true });
     } catch (e: any) {
-        console.error('Log Login Error:', e);
+        console.error('Collections Error:', e);
         return res.status(500).json({ error: e.message });
     }
 }
