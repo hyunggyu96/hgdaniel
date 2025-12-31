@@ -5,7 +5,7 @@ import path from 'path';
 import fs from 'fs';
 
 // Environment Variables
-const SHEET_ID = process.env.GOOGLE_SHEET_ID_LOGINS || '';
+const SHEET_ID = process.env.GOOGLE_SHEET_ID_LOGINS || '1wA1YzPatil0qnhZk1EkS4r4Roc-Mx1I-iBSlmtyJNm8';
 const SERVICE_ACCOUNT_KEY = process.env.GOOGLE_SERVICE_ACCOUNT_KEY || '';
 
 async function getDoc() {
