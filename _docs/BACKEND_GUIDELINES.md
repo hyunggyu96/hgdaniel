@@ -1,7 +1,7 @@
 # 📄 뉴스 대시보드 백엔드 가이드라인 (Unified Backend Guidelines)
 
-**Version**: 2.4 (2025-12-31 Updated)
-**Status**: Stable / Production Ready
+**Version**: 2.5 (2026-01-01 New Year Update)
+**Status**: Stable / Monitoring Active
 
 이 문서는 뉴스 대시보드 프로젝트의 백엔드 아키텍처, 데이터 파이프라인, 태블릿 운영 수칙, 트러블슈팅을 집대성한 공식 매뉴얼입니다.
 
@@ -58,7 +58,9 @@
 
 ### 🚨 에러 모니터링
 
-- **Sentry**: 백엔드 API 및 태블릿 분석 프로세스의 모든 런타임 에러는 Sentry 대시보드로 전송되어 실시간 추적합니다.
+- **Sentry (Web)**: Next.js 프론트엔드 및 Vercel API 에러를 실시간 추적합니다. (`NEXT_PUBLIC_SENTRY_DSN` - 끝자리 3872)
+- **Sentry (Tablet)**: 태블릿의 수집/분석 프로세스 에러를 추적합니다. (`SENTRY_DSN` - 끝자리 1408)
+- **자율 주행**: 에러 발생 시 Sentry 보고 후 시스템은 중지되지 않고 30~60초 후 자동 재시도합니다.
 
 ---
 
@@ -107,6 +109,8 @@
 - **DDL 권한 제한**: Supabase API Key는 보안상 `CREATE INDEX` 같은 구조 변경 명령이 거부될 수 있습니다. 중요한 DB 구조 변경은 반드시 **Supabase Dashboard의 SQL Editor**에서 실행하십시오.
 - **환경변수 파싱**: `.env.local` 파일 내에 JSON 문자열이 포함된 경우, `python-dotenv` 등에서 경고가 발생할 수 있습니다. 이는 무시해도 좋으나 연결 실패 시 가장 먼저 확인하십시오.
 - **좀비 프로세스**: `pkill python`으로 프로세스를 죽여도 태블릿에서 살아있는 경우가 있으니 `ps -ef`로 반드시 확인하십시오.
+- **서버 시차 (UTC vs KST)**: Vercel 서버는 UTC 기준이므로, 구글 시트 날짜 키(`DateKey`) 생성 시 반드시 `Intl.DateTimeFormat` 등을 사용해 `Asia/Seoul` 타임존을 명시적으로 선언해야 합니다. (자정 업데이트 지연 방지)
+- **Sentry DSN 분리**: 웹과 태블릿은 서로 다른 프로젝트 DSN을 사용하므로, 환경 변수(`.env.local` vs `collector/.env`) 설정 시 섞이지 않도록 주의하십시오.
 
 ---
 

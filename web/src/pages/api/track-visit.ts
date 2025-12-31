@@ -32,31 +32,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
         // Robust IP Extraction (Fixed Types)
         let ip = ((req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim()) || '';
-        
+
         if (!ip) {
             const realIp = req.headers['x-real-ip'];
             if (typeof realIp === 'string') ip = realIp;
         }
-        
+
         if (!ip && req.socket?.remoteAddress) {
             ip = req.socket.remoteAddress;
         }
-        
+
         if (!ip) ip = 'unknown-ip';
 
         // Vercel Geolocation
-        const country = (req.headers['x-vercel-ip-country'] as string) || 'KR'; 
+        const country = (req.headers['x-vercel-ip-country'] as string) || 'KR';
         const ua = (req.headers['user-agent'] as string) || 'unknown-ua';
-        
+
         const now = new Date();
         const nowStr = now.toLocaleString('ko-KR', {
             timeZone: 'Asia/Seoul',
             year: 'numeric', month: 'numeric', day: 'numeric',
             hour: '2-digit', minute: '2-digit', second: '2-digit',
-        }); 
+        });
 
         const doc = await getDoc();
-        
+
         // 1. Visits Log (NEW SHEET: Visits_v2)
         let sheet = doc.sheetsByTitle['Visits_v2'];
         if (!sheet) {
@@ -73,7 +73,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             statsSheet = await doc.addSheet({ title: 'DailyStats_v2', headerValues: ['Date', 'TotalVisitors'] });
         }
 
-        const dateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        const kstDate = new Intl.DateTimeFormat('ko-KR', {
+            timeZone: 'Asia/Seoul',
+            year: 'numeric', month: '2-digit', day: '2-digit'
+        }).format(now).replace(/\. /g, '-').replace('.', '');
+
+        const dateKey = kstDate; // "YYYY-MM-DD" format
         const statsRows = await statsSheet.getRows();
         const todayRow = statsRows.find(r => r.get('Date') === dateKey);
         let todayCount = 1;
@@ -87,7 +92,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             // @ts-ignore
             await statsSheet.addRow({ 'Date': dateKey, 'TotalVisitors': '1' }, { insert: true });
         }
-        
+
         return res.status(200).json({ count: todayCount, success: true });
 
     } catch (e: any) {
