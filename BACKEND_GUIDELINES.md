@@ -63,10 +63,12 @@
 
 ### 📊 방문자 로깅 (Visitor Tracking)
 
-- **아키텍처**: `Frontend(HeaderStatus.tsx)` → `GET /api/track-visit` → `Google Sheet(Visits)`
-- **특이사항**: 프론트엔드가 `GET` 요청으로 호출하므로, API는 `GET` 메서드에서도 **쓰기(Log Append)** 작업을 수행해야 합니다. (REST 원칙 예외 적용)
-- **시트 ID**: `Login Logs` 시트(`1wA1...`)를 사용하며, Vercel 환경변수 누락 방지를 위해 코드 내에 **ID 하드코딩**이 적용되어 있습니다. (Key는 환경변수 사용)
-- **정렬 정책**: API는 성능을 위해 `Append`(맨 아래 추가) 방식을 사용합니다. 시트를 **최신순(Newest First)**으로 보고 싶다면 `organize_visitor_sheet.py`를 실행하세요.
+- **아키텍처**: `Frontend` → `GET /api/track-visit` → `Google Sheet(Visits & DailyStats)`
+- **특이사항**: `GET` 요청 시에도 방문 기록을 남기며, 최신 데이터가 상단에 오도록 **Prepend** 방식을 사용합니다 (`{ insert: true }`).
+- **시트 구조**:
+  - `Visits`: 개별 방문 로그 (최신순).
+  - `DailyStats`: [날짜 | 총 방문자 수] 형태의 일별 집계 시트 (자동 생성 및 갱신).
+- **시트 ID**: `Login Logs` 시트(`1wA1...`) 사용. (ID 하드코딩 적용)
 
 ### 🚀 배포 및 보안 (Deployment & Security)
 
