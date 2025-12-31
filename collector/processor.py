@@ -129,16 +129,20 @@ async def analyze_article_expert_async(title, description, search_keyword):
         f"Your task: Identify relevant Medical/Aesthetic Keywords and Companies from the Pool.\n\n"
         f"### STRICT RULES:\n"
         f"1. **Language**: summary and issue_nature MUST be in Korean (Hangul) ONLY. NO Japanese, NO Hanja.\n"
-        f"2. **Main Keyword**: Pick a single name from the Pool that is EXPLICITLY mentioned or the core subject. Use the EXACT Korean name.\n"
-        f"3. **Included Keywords**: Pick ONLY 2-4 keywords from the Pool that are ACTUALLY MENTIONED or strictly central to the text. DO NOT include keywords that are NOT in the text or just broadly related.\n"
-        f"4. **No Hallucination**: Do not add information or keywords that are not supported by the headline or body. If no pool keyword matches well, leave it empty or use '기타'.\n"
-        f"5. **JSON Only**: Do not include any explanation or markdown. Return only the JSON object.\n\n"
+        f"2. **Main Keyword**: Pick a single name from the Pool that is EXPLICITLY mentioned. Use the EXACT Korean name.\n"
+        f"3. **Included Keywords**: Pick ONLY 2-4 keywords from the Pool that are ACTUALLY in the text. DO NOT invent new words.\n"
+        f"4. **No Hallucination**: Do not add information not in the text. If no pool keyword matches, use '기타'.\n"
+        f"5. **JSON Only**: Return only the JSON object.\n\n"
+        f"### Extraction Example:\n"
+        f"Input: [KLPGA, 태국서 ‘리쥬란 챔피언십’ 연다]\n"
+        f"Good: {{\"main_keyword\": \"리쥬란\", \"included_keywords\": [\"파마리서치\", \"학회\"], \"issue_nature\": \"학회/마케팅\", \"brief_summary\": \"파마리서치가 태국에서 리쥬란 챔피언십 골프 대회를 개최하며 글로벌 마케팅을 강화한다.\"}}\n"
+        f"Bad: {{\"main_keyword\": \"태국바이오\", \"included_keywords\": [\"성과\", \"조직문화\"], ...}} (Reason: Not in Pool, irrelevant)\n\n"
         f"### Expert Keyword Pool:\n{keyword_pool}\n\n"
         f"### Schema (Required fields):\n"
-        f"- main_keyword: (String) Core company/subject from Pool.\n"
-        f"- included_keywords: (Array of Strings) 2-4 keywords strictly from text and Pool.\n"
+        f"- main_keyword: (String) subject from Pool.\n"
+        f"- included_keywords: (Array of Strings) 2-4 keywords STRICTLY from Pool.\n"
         f"- issue_nature: (String) One of: [제품 출시/허가, 임상/연구데이터, 실적/수출/경영, 법적분쟁/규제, 투자/M&A, 학회/마케팅, 거시경제/정책, 기타].\n"
-        f"- brief_summary: (String) Professional 1-line Korean summary (~70 chars) based ONLY on provided text.\n"
+        f"- brief_summary: (String) 1-line Korean summary (~70 chars). No trailing dots or broken words.\n"
         f"- impact_level: (Integer) 1 to 5.\n"
     )
     user_prompt = f"Crawl Keyword: {search_keyword}\nHeadline: {title}\nBody: {description}"
@@ -256,11 +260,21 @@ async def process_item(item, worksheet, recent_articles):
         k = corrections.get(k, k)
         return k.strip()
 
-    final_main = clean_kw(final_main) or "기타"
-    ai_included = [clean_kw(k) for k in ai_included if clean_kw(k)]
-    issue_nature = clean_kw(issue_nature) or "기타"
-    summary = clean_kw(summary) or title[:70]
-    local_all = [clean_kw(k) for k in local_all]
+    # White-list Filtering (Ensure only pool keywords are saved)
+    pool_set = set(EXPERT_ANALYSIS_KEYWORDS)
+    if final_main not in pool_set and final_main != "기타":
+        final_main = "기타"
+    
+    ai_included = [k for k in ai_included if k in pool_set]
+    local_all = [k for k in local_all if k in pool_set]
+    
+    # 5. Summary Post-processing (Remove trailing dots and broken words)
+    summary = summary.strip()
+    summary = re.sub(r'[.\s]+$', '', summary) # Remove trailing dots/whitespace
+    # Simple heuristic: if ends with a broken particle, trim it
+    broken_particles = ["에", "의", "를", "을", "과", "와", "현", "하", "는"] 
+    if any(summary.endswith(p) for p in broken_particles):
+        summary = re.sub(r'\s+\S+$', '', summary) # Remove the last orphan word
     
     # Final summary length check
     if len(summary) > 100:
