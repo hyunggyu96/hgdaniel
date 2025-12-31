@@ -29,11 +29,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Frontend (LoginButton) will send: { userId, provider }
     // Or LoginTracker sends { userId, title, link } for clicks.
     // We should handle both or at least the Login one effectively.
-    
+
     // Let's support generic logging.
     const body = req.body;
-    const userId = body.userId || body.email; 
-    
+    const userId = body.userId || body.email;
+
     if (!userId) return res.status(400).json({ error: 'Missing userId' });
 
     try {
@@ -45,7 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         const now = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
         const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
-        
+
         // Determine log type
         const type = body.provider ? 'LOGIN' : (body.title ? 'CLICK' : 'UNKNOWN');
         const meta = body.provider || body.link || body.title || '';

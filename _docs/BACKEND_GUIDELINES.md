@@ -64,9 +64,16 @@
 
 ---
 
-## 📊 5. 구글 시트 스키마 (v2.2)
+## 📊 5. 구글 시트 스키마 (Distributed Multi-Sheet System)
 
-사용자 활동과 데이터 무결성을 위해 다음 탭 구조를 유지합니다.
+**핵심 규칙**: 모든 시트의 데이터는 **최신 항목이 상단(Row 2)**에 오도록 기록해야 합니다. (Prepend/Insert Row)
+
+데이터 보안과 관리 효율을 위해 두 개의 독립적인 구글 시트를 운영합니다.
+
+### 📗 1. 사용자 분석 및 로그 시트 (User Operations)
+
+- **ID**: `1wA1YzPatil0qnhZk1EkS4r4Roc-Mx1I-iBSlmtyJNm8` (Logins & Analytics)
+- **주요 탭**:
 
 #### 1. 방문자 및 통계
 
@@ -77,6 +84,12 @@
 
 - **`LoginHistory_v2`**: [Time, UserID, Type, Meta, IP] - 로그인 및 클릭 로그.
 - **`UserCollections_v2`**: [UserID, IP, Title, URL, Date, AddedAt] - 즐겨찾기 통합 관리.
+
+### 📘 2. 시장 분석 시트 (Market Analysis)
+
+- **ID**: `1IDFVtmhu5EtxSacRqlklZo6V_x9aB0WVZIzkIx5Wkic` (Collector Results)
+- **주요 탭**:
+- **`Sheet1`**: 태블릿에서 전송된 큐레이션 완료 뉴스 (Analysis Results).
 - **`키워드제안`**: 사용자가 입력한 새로운 시장 키워드 제안서.
 
 ---
