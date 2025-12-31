@@ -1,6 +1,57 @@
-# 🏗️ News Dashboard System Architecture (2025-12-31)
+# 🏗️ News Dashboard System Architecture
 
-이 문서는 현재 구축된 뉴스 대시보드 시스템의 **역할 분담**과 **데이터 흐름**을 정의합니다.
+이 문서는 **Legion Y700 태블릿(Local AI)**과 **Next.js(Vercel)**가 결합된 하이브리드 뉴스 시스템의 구조를 설명합니다.
+
+## 🗺️ 시스템 전체 흐름도 (Visual Overview)
+
+```mermaid
+graph TD
+    %% Nodes
+    subgraph Sources[🌐 뉴스 소스]
+        Naver[네이버 뉴스 RSS]
+        Search[검색 API]
+    end
+
+    subgraph Tablet[📱 태블릿 (Legion Y700)]
+        direction TB
+        Collector(수집기: async_collector.py)
+        Processor(분석기: processor.py)
+        Ollama[🧠 Local AI: Ollama 3.2 3B]
+        
+        Collector -->|1. 키워드 수집| Sources
+        Processor <-->|3. 요약 및 정제| Ollama
+    end
+
+    subgraph DataStore[💾 데이터 저장소]
+        Supabase[(Supabase: 원본 저장)]
+        GSheets[(Google Sheets: 서비스 DB)]
+        Visits[방문자/로그 v2]
+    end
+
+    subgraph Frontend[🖥️ 서비스 (Vercel)]
+        Web[Next.js Dashboard]
+        User((사용자))
+    end
+
+    %% Data Flow
+    Collector -->|2. Raw 데이터 저장| Supabase
+    Processor -->|3. Raw 데이터 로드| Supabase
+    Processor -->|4. 분석 데이터 동기화| GSheets
+    
+    Web <-->|5. 뉴스 조회| GSheets
+    User -->|6. 접속/로그인| Web
+    Web -->|7. 로그 기록 (Prepend)| Visits
+    
+    %% Styling
+    style Tablet fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    style Ollama fill:#fff9c4,stroke:#fbc02d,stroke-width:2px
+    style GSheets fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+```
+
+---
+
+## 🏛️ 핵심 설계 철학 (Core Philosophy)
+
 시스템은 **PC 독립적**이며, 태블릿과 클라우드 서비스만으로 24시간 자동 운영됩니다.
 
 **🌐 공식 서비스 주소**: [https://aesthetics-intelligence.vercel.app/](https://aesthetics-intelligence.vercel.app/)
