@@ -72,21 +72,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             existingRow.set('IP', ip);
             await existingRow.save();
         } else {
-            // Low-level Prepend: Insert one row at index 1
+            // Prepend new row at index 1 (under header)
             // @ts-ignore
-            await doc.saveRequests([
-                {
-                    insertDimension: {
-                        range: {
-                            sheetId: sheet.sheetId,
-                            dimension: 'ROWS',
-                            startIndex: 1,
-                            endIndex: 2,
-                        },
-                        inheritFromBefore: false,
-                    },
-                },
-            ]);
+            await sheet.insertDimension('ROWS', { startIndex: 1, endIndex: 2 });
 
             // Fill cells (A2:G2)
             await sheet.loadCells('A2:G2');

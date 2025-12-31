@@ -65,19 +65,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         // Prepend: Insert one row at index 1 (under header)
         // @ts-ignore
-        await doc.saveRequests([
-            {
-                insertDimension: {
-                    range: {
-                        sheetId: sheet.sheetId,
-                        dimension: 'ROWS',
-                        startIndex: 1,
-                        endIndex: 2,
-                    },
-                    inheritFromBefore: false,
-                },
-            },
-        ]);
+        await sheet.insertDimension('ROWS', { startIndex: 1, endIndex: 2 });
 
         // Fill cells
         await sheet.loadCells('A2:D2');

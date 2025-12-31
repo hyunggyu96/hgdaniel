@@ -50,21 +50,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const type = body.provider ? 'LOGIN' : (body.title ? 'CLICK' : 'UNKNOWN');
         const meta = body.provider || body.link || body.title || '';
 
-        // Low-level API for Prepend (Insert at Row 2, push others down)
+        // Prepend: Insert one row at index 1 (under header)
         // @ts-ignore
-        await doc.saveRequests([
-            {
-                insertDimension: {
-                    range: {
-                        sheetId: sheet.sheetId,
-                        dimension: 'ROWS',
-                        startIndex: 1,
-                        endIndex: 2,
-                    },
-                    inheritFromBefore: false,
-                },
-            },
-        ]);
+        await sheet.insertDimension('ROWS', { startIndex: 1, endIndex: 2 });
 
         // Fill the inserted row with values
         await sheet.loadCells('A2:E2');
