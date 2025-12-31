@@ -1,12 +1,20 @@
-# -*- coding: utf-8 -*-
-"""Expert News Collector V4.0:
-- Pure news collection role.
-- Saves raw data to Supabase 'raw_news' table.
-- AI Analysis is handled separately by processor.py.
-"""
-
 import sys
 import os
+
+# Sentry SDK Integration
+try:
+    import sentry_sdk
+    sentry_sdk.init(
+        dsn=os.getenv("SENTRY_DSN"),
+        traces_sample_rate=1.0,
+        profiles_sample_rate=1.0,
+    )
+    print("Sentry initialized successfully.")
+except ImportError:
+    print("sentry-sdk not found. Error tracking disabled.")
+except Exception as e:
+    print(f"Sentry init failed: {e}")
+
 import asyncio
 import aiohttp
 import json
@@ -209,6 +217,10 @@ async def main():
 
         except Exception as e:
             print(f"❌ Error in Main Loop: {e}")
+            try:
+                import sentry_sdk
+                sentry_sdk.capture_exception(e)
+            except: pass
             await asyncio.sleep(60)
         except KeyboardInterrupt:
             break

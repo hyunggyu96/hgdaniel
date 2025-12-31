@@ -1,6 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
+import * as Sentry from "@sentry/nextjs";
 import { CATEGORIES_CONFIG } from '@/lib/constants';
+
+// Trends API도 1시간 캐싱 (자주 변하지 않음)
+export const revalidate = 3600;
 
 // supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -77,8 +81,6 @@ export async function GET() {
             }
         });
 
-        // 카테고리 순서: 빈도순 정렬 대신 설정 파일의 고정 순서 사용 (사용자 요청 반영)
-        // const allKeywords = Object.keys(keywordCounts).sort((a, b) => keywordCounts[b] - keywordCounts[a]); 
         const allKeywords = CATEGORIES_CONFIG.map(c => c.label);
 
         // 3. 차트용 데이터 포맷으로 변환
@@ -87,9 +89,14 @@ export async function GET() {
             ...trendMap[date]
         }));
 
-        return NextResponse.json({ data: trendData, categories: allKeywords });
+        return NextResponse.json({ data: trendData, categories: allKeywords }, {
+            headers: {
+                'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200'
+            }
+        });
     } catch (e: any) {
         console.error("Trend API Error:", e);
+        Sentry.captureException(e);
         return NextResponse.json({ error: e.message }, { status: 500 });
     }
 }

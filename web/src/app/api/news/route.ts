@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getNews } from '@/lib/api';
+import * as Sentry from "@sentry/nextjs";
 
 // API도 60초 캐싱 (프론트엔드와 동일)
 export const revalidate = 60;
@@ -18,6 +19,7 @@ export async function GET() {
         });
     } catch (error) {
         console.error('[API /api/news] Error:', error);
+        Sentry.captureException(error);
         return NextResponse.json(
             { error: 'Failed to fetch news', timestamp: new Date().toISOString() },
             { status: 500 }

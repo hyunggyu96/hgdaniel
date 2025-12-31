@@ -1,13 +1,19 @@
-# -*- coding: utf-8 -*-
-"""
-Expert News Processor V1.0:
-- Fetches pending items from raw_news.
-- Analyzes with AI.
-- Saves to articles (Production) & Google Sheets.
-"""
-
 import sys
 import os
+
+# Sentry SDK Integration
+try:
+    import sentry_sdk
+    sentry_sdk.init(
+        dsn=os.getenv("SENTRY_DSN"),
+        traces_sample_rate=1.0,
+        profiles_sample_rate=1.0,
+    )
+    print("Sentry initialized successfully.")
+except ImportError:
+    print("sentry-sdk not found. Error tracking disabled.")
+except Exception as e:
+    print(f"Sentry init failed: {e}")
 
 # Disable stdout buffering for nohup
 sys.stdout.reconfigure(line_buffering=True)
@@ -429,6 +435,10 @@ async def main():
         except Exception as e:
             import traceback
             print(f"❌ Unexpected Error in Main Loop: {e}")
+            try:
+                import sentry_sdk
+                sentry_sdk.capture_exception(e)
+            except: pass
             traceback.print_exc()
             print("   -> Retrying in 30 seconds...")
             await asyncio.sleep(30)
