@@ -52,14 +52,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         // Prepend: Insert one row at index 1 (under header)
         // @ts-ignore
-        await sheet.insertDimension('ROWS', { startIndex: 1, endIndex: 2 });
+        await sheet.insertDimension('ROWS', { startIndex: 1, endIndex: 2 }, false); // false = don't inherit from previous row
 
-        // Fill the inserted row with values
+        // Fill the inserted row with values and FORCE WHITE BACKGROUND
         await sheet.loadCells('A2:E2');
         const values = [now, userId, type, meta, ip];
         for (let i = 0; i < values.length; i++) {
             const cell = sheet.getCell(1, i);
             cell.value = values[i];
+            // @ts-ignore
+            cell.backgroundColor = { red: 1, green: 1, blue: 1 }; // Force White
         }
         await sheet.saveUpdatedCells();
 

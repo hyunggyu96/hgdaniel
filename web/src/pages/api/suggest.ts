@@ -74,14 +74,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         } else {
             // Prepend new row at index 1 (under header)
             // @ts-ignore
-            await sheet.insertDimension('ROWS', { startIndex: 1, endIndex: 2 });
+            await sheet.insertDimension('ROWS', { startIndex: 1, endIndex: 2 }, false);
 
-            // Fill cells (A2:G2)
+            // Fill cells (A2:G2) and Force White Background
             await sheet.loadCells('A2:G2');
             const suggestValues = [now, keywordToMatch, category || '미지정', reason || '-', '1', '대기중', ip];
             for (let i = 0; i < suggestValues.length; i++) {
                 const cell = sheet.getCell(1, i);
                 cell.value = suggestValues[i];
+                // @ts-ignore
+                cell.backgroundColor = { red: 1, green: 1, blue: 1 };
             }
             await sheet.saveUpdatedCells();
         }

@@ -65,14 +65,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         // Prepend: Insert one row at index 1 (under header)
         // @ts-ignore
-        await sheet.insertDimension('ROWS', { startIndex: 1, endIndex: 2 });
+        await sheet.insertDimension('ROWS', { startIndex: 1, endIndex: 2 }, false); // Do not inherit yellow!
 
-        // Fill cells
+        // Fill cells and Force White Background
         await sheet.loadCells('A2:D2');
         const visitValues = [nowStr, ip, country, ua];
         for (let i = 0; i < visitValues.length; i++) {
             const cell = sheet.getCell(1, i);
             cell.value = visitValues[i];
+            // @ts-ignore
+            cell.backgroundColor = { red: 1, green: 1, blue: 1 };
         }
         await sheet.saveUpdatedCells();
 
