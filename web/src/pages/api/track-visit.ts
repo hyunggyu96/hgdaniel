@@ -63,9 +63,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             sheet = await doc.addSheet({ title: 'Visits_v2', headerValues: ['Time', 'IP', 'Country', 'UserAgent'] });
         }
 
-        // Attempt Prepend (@ts-ignore to suppress type errors)
+        // Prepend: Insert one row at index 1 (under header)
         // @ts-ignore
-        await sheet.addRow({ 'Time': nowStr, 'IP': ip, 'Country': country, 'UserAgent': ua }, { insert: true });
+        await sheet.insertRows(1, [{ 'Time': nowStr, 'IP': ip, 'Country': country, 'UserAgent': ua }]);
 
         // 2. Daily Stats (NEW SHEET: DailyStats_v2)
         let statsSheet = doc.sheetsByTitle['DailyStats_v2'];

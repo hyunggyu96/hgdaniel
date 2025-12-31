@@ -50,8 +50,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const type = body.provider ? 'LOGIN' : (body.title ? 'CLICK' : 'UNKNOWN');
         const meta = body.provider || body.link || body.title || '';
 
-        // @ts-ignore
-        await sheet.addRow({ 'Time': now, 'UserID': userId, 'Type': type, 'Meta': meta, 'IP': ip }, { insert: true });
+        // Prepend: Insert at Row 2 (index 1)
+        await sheet.insertRows(1, [{ 'Time': now, 'UserID': userId, 'Type': type, 'Meta': meta, 'IP': ip }]);
 
         return res.status(200).json({ success: true });
     } catch (e: any) {
