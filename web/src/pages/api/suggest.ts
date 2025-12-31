@@ -9,7 +9,6 @@ const SHEET_ID = '1IDFVtmhu5EtxSacRqlklZo6V_x9aB0WVZIzkIx5Wkic'; // Market Analy
 async function getAuth() {
     const possiblePaths = [
         path.join(process.cwd(), 'collector', 'service_account.json'),
-        path.join(process.cwd(), '..', 'collector', 'service_account.json'),
         '/var/task/collector/service_account.json'
     ];
 
@@ -17,11 +16,8 @@ async function getAuth() {
     for (const p of possiblePaths) {
         if (fs.existsSync(p)) {
             try {
-                const config = JSON.parse(fs.readFileSync(p, 'utf8'));
-                if (config.private_key && config.client_email) {
-                    creds = config;
-                    break;
-                }
+                creds = JSON.parse(fs.readFileSync(p, 'utf8'));
+                break;
             } catch (e) { }
         }
     }
@@ -39,10 +35,7 @@ async function getAuth() {
     return new JWT({
         email: creds.client_email,
         key: creds.private_key,
-        scopes: [
-            'https://www.googleapis.com/auth/spreadsheets',
-            'https://www.googleapis.com/auth/drive.file',
-        ],
+        scopes: ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive.file'],
     });
 }
 
@@ -53,7 +46,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const { keyword, category, reason } = req.body;
         if (!keyword) return res.status(400).json({ error: 'Keyword is required' });
 
-        const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
+        const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
 
         const auth = await getAuth();
         const doc = new GoogleSpreadsheet(SHEET_ID, auth);
@@ -79,9 +72,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             existingRow.set('IP', ip);
             await existingRow.save();
         } else {
-            // Prepend new row at index 1 (just below headers)
-            // @ts-ignore
-            await sheet.insertRows(1, [{
+            await sheet.addRow({
                 '제안일시': now,
                 '제안 키워드': keywordToMatch,
                 '카테고리': category || '미지정',
@@ -89,13 +80,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 '누적 제안 횟수': '1',
                 '상태': '대기중',
                 'IP': ip
-            }]);
+            });
         }
 
         return res.status(200).json({ success: true });
 
     } catch (e: any) {
         console.error('Suggest API Error:', e.message);
-        return res.status(500).json({ error: `Auth/Sheet Error: ${e.message}` });
+        return res.status(500).json({ error: e.message });
     }
 }
