@@ -1,0 +1,27 @@
+
+const CATEGORIES_CONFIG = [
+    { label: "Filler", keywords: ["필러", "레볼락스", "더채움", "쥬비덤", "주비덤", "레스틸레인", "벨로테로", "순수필", "엘라스티", "뉴라미스", "로리앙", "클레비엘", "이브아르", "테오시알", "스타일에이지", "리덴시티", "에스테팜", "아크로스", "중헌제약"] },
+    { label: "Botulinum Toxin", keywords: ["톡신", "보톡스", "나보타", "제오민", "레티보", "코어톡스", "하이톡스", "비에녹스", "이노톡스", "메디톡신", "디스포트", "리즈톡스", "보툴렉스", "이노톡스"] },
+    { label: "PDRN/PN", keywords: ["PN", "PDRN", "리쥬란", "파마리서치", "연어주사", "비타란"] },
+    { label: "Exosome", keywords: ["엑소좀", "엑소코바이오", "브이타이드", "엑소좀주사", "ASCE", "엑소코"] },
+    { label: "Collagen Stimulator", keywords: ["PLLA", "PDLLA", "PLA", "쥬베룩", "레니스나", "스컬트라", "리프팅실", "실리프팅", "PDO", "에스테필", "바임", "리젠바이오텍", "올리디아", "에버클"] },
+    { label: "Skinboosters/Threads", keywords: ["스킨부스터", "hADM", "인체조직", "힐로웨이브", "스킨바이브", "프로파일로", "동종진피", "리투오", "리바이브", "엔파인더스", "한스바이오베드", "제이월드", "네오닥터"] },
+    { label: "Machines (EBD)", keywords: ["HIFU", "RF", "고주파", "레이저", "울쎄라", "써마지", "슈링크", "인모드", "올리지오", "텐써마", "브이로", "더블로", "울트라포머", "리프테라", "포텐자", "시크릿", "실펌", "온다리프팅", "큐어젯", "노보젯", "원텍", "클래시스", "제이시스"] },
+    { label: "Corporate News", keywords: ["제테마", "휴젤", "종근당", "종근당바이오", "휴온스", "휴메딕스", "메디톡스", "바이오플러스", "대웅제약", "갈더마", "멀츠", "앨러간", "시지바이오", "비엔씨", "비엠아이", "MDR", "학회", "최소침습", "미용성형", "화장품", "허가"] }
+];
+
+const allKeywords = new Set();
+const duplicates = [];
+
+CATEGORIES_CONFIG.forEach(cat => {
+    cat.keywords.forEach(k => {
+        if (allKeywords.has(k)) {
+            duplicates.push({ keyword: k, category: cat.label });
+        } else {
+            allKeywords.add(k);
+        }
+    });
+});
+
+console.log("Total Keywords:", allKeywords.size);
+console.log("Duplicates found:", duplicates);

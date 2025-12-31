@@ -217,10 +217,12 @@ async def process_item(item, worksheet, recent_articles):
         issue_nature = issue_nature.get("name", "기타") if "name" in issue_nature else "기타"
     issue_nature = str(issue_nature) if issue_nature else "기타"
     
-    summary = analysis.get("brief_summary", title[:70])
-    if isinstance(summary, dict):
-        summary = str(summary)
-    summary = str(summary)[:100] if summary else title[:70]
+    summary = str(analysis.get("brief_summary", title[:70]))
+    # [Nuclear Option] Cleanup and 70-char hard truncate for frontend safety
+    summary = re.sub(r'[\u4e00-\u9fff]', '', summary) # Remove Hanja
+    summary = re.sub(r'[\u3040-\u30ff]', '', summary) # Remove Japanese
+    if len(summary) > 70:
+        summary = summary[:67] + "..."
     
     impact = analysis.get("impact_level", 3)
     if isinstance(impact, dict):

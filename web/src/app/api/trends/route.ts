@@ -1,9 +1,8 @@
-
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
+import { CATEGORIES_CONFIG } from '@/lib/constants';
 
-// supabase client (server-side)
-// supabase client (server-side)
+// supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
@@ -14,71 +13,83 @@ const supabase = createClient(
 
 export async function GET() {
     try {
-        // 최근 7일 이내의 데이터만 가져오기 (과부하 방지)
         const rangeDays = 7;
-        const startDate = new Date();
-        startDate.setDate(startDate.getDate() - rangeDays);
+        const now = new Date();
+        const startDate = new Date(now);
+        startDate.setDate(now.getDate() - rangeDays);
         const startDateStr = startDate.toISOString();
 
         const { data: articles, error } = await supabase
             .from('articles')
-            .select('keyword, published_at')
+            .select('keyword, main_keywords, title, description, published_at')
             .gte('published_at', startDateStr)
             .order('published_at', { ascending: true })
-            .limit(3000);
+            .limit(5000);
 
         if (error) throw error;
 
-        const trendMap: Record<string, any> = {};
+        // 1. 날짜별/카테고리별 초기 데이터 구조 생성
+        const trendMap: Record<string, Record<string, number>> = {};
 
-        articles?.forEach((item) => {
-            // KST 날짜 변환 (YYYY-MM-DD 형식 추출)
-            const d = new Date(item.published_at);
-            d.setHours(d.getHours() + 9);
-            const date = d.toISOString().split('T')[0];
-
-            const keyword = (item.keyword || '기타').trim();
-
-            if (!trendMap[date]) {
-                trendMap[date] = { date };
-            }
-
-            if (!trendMap[date][keyword]) {
-                trendMap[date][keyword] = 0;
-            }
-            trendMap[date][keyword] += 1;
-        });
-
-        // 카테고리별 전체 언급 횟수 계산 및 정렬 (가장 많이 언급된 순서로)
-        const keywordCounts: Record<string, number> = {};
-        articles?.forEach(item => {
-            const k = (item.keyword || '기타').trim();
-            keywordCounts[k] = (keywordCounts[k] || 0) + 1;
-        });
-
-        const allKeywords = Object.keys(keywordCounts).sort((a, b) => keywordCounts[b] - keywordCounts[a]);
-
-        // 7일치 날짜를 모두 생성하여 빈 데이터(0) 채우기
-        const trendData: any[] = [];
-
-        // 오늘 날짜(KST) 구하기
-        const nowKst = new Date();
-        nowKst.setHours(nowKst.getHours() + 9);
-
+        // 날짜 배열 생성 (KST 기준)
+        const dateLabels: string[] = [];
         for (let i = rangeDays - 1; i >= 0; i--) {
-            const d = new Date(nowKst);
+            const d = new Date();
             d.setDate(d.getDate() - i);
-            const dateStr = d.toISOString().split('T')[0];
+            const dateStr = d.toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
+            dateLabels.push(dateStr);
+            trendMap[dateStr] = {};
 
-            const dayData = trendMap[dateStr] || { date: dateStr };
-            allKeywords.forEach(k => {
-                if (!dayData[k]) dayData[k] = 0;
+            // 모든 카테고리 0으로 초기화
+            CATEGORIES_CONFIG.forEach(cat => {
+                trendMap[dateStr][cat.label] = 0;
             });
-            trendData.push(dayData);
         }
+
+        // 2. 기사별로 카테고리 판별 및 카운팅
+        articles?.forEach((article) => {
+            const pubDate = new Date(article.published_at);
+            const dateKey = pubDate.toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
+
+            if (!trendMap[dateKey]) return; // 범위 밖 날짜 무시
+
+            // 카테고리 스코어링 로직 (NewsList와 동일하게 적용)
+            let bestCategory: string | null = null;
+            let highestScore = 0;
+
+            CATEGORIES_CONFIG.forEach(config => {
+                let score = 0;
+
+                // Keyword Match
+                const mainKeyword = article.keyword; // DB의 keyword 필드 사용
+                if (mainKeyword && config.keywords.some(k => mainKeyword === k)) score += 100;
+                if (article.title && config.keywords.some(k => article.title.startsWith(k))) score += 50;
+                if (article.title && config.keywords.some(k => article.title.includes(k))) score += 20;
+
+                if (score > highestScore) {
+                    highestScore = score;
+                    bestCategory = config.label;
+                }
+            });
+
+            if (bestCategory) {
+                trendMap[dateKey][bestCategory] += 1;
+            }
+        });
+
+        // 카테고리 순서: 빈도순 정렬 대신 설정 파일의 고정 순서 사용 (사용자 요청 반영)
+        // const allKeywords = Object.keys(keywordCounts).sort((a, b) => keywordCounts[b] - keywordCounts[a]); 
+        const allKeywords = CATEGORIES_CONFIG.map(c => c.label);
+
+        // 3. 차트용 데이터 포맷으로 변환
+        const trendData = dateLabels.map(date => ({
+            date: date.substring(5), // MM-DD 형식으로 축약
+            ...trendMap[date]
+        }));
 
         return NextResponse.json({ data: trendData, categories: allKeywords });
     } catch (e: any) {
+        console.error("Trend API Error:", e);
         return NextResponse.json({ error: e.message }, { status: 500 });
     }
 }

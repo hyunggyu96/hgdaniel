@@ -26,7 +26,8 @@ export default function SideBar() {
                     <div className="space-y-1">
                         <Link
                             href="/"
-                            prefetch={false}
+                            scroll={false}
+                            prefetch={true}
                             className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 group flex items-center justify-between ${isOverview ? 'bg-[#3182f6] text-white' : 'text-white/50 hover:bg-white/5 hover:text-white'}`}
                         >
                             <span className="text-sm font-bold uppercase tracking-tight">Overview</span>
@@ -38,6 +39,8 @@ export default function SideBar() {
                             <Link
                                 key={category}
                                 href={`/?category=${encodeURIComponent(category)}`}
+                                scroll={false}
+                                prefetch={true}
                                 className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 group flex items-center justify-between ${selectedCategory === category ? 'bg-[#3182f6] text-white' : 'text-white/50 hover:bg-white/5 hover:text-white'}`}
                             >
                                 <span className="text-sm font-bold uppercase tracking-tight">{category}</span>
@@ -53,6 +56,8 @@ export default function SideBar() {
                 <div className="pt-6 border-t border-white/5">
                     <Link
                         href="/?collections=true"
+                        scroll={false}
+                        prefetch={true}
                         className={`flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition-all group/collections ${isCollections ? 'bg-[#3182f6] text-white' : 'hover:bg-white/5'}`}
                     >
                         <div className="flex items-center gap-3">
@@ -94,7 +99,7 @@ export default function SideBar() {
                             </p>
                         </div>
                         <p className="text-xs text-white/60 leading-relaxed font-medium">
-                            Tracking 102 medical aesthetic sectors with AI-powered real-time analysis.
+                            Tracking 114 medical aesthetic sectors with AI-powered real-time analysis.
                         </p>
                     </div>
                 </div>

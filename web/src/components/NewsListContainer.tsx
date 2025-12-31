@@ -76,6 +76,13 @@ export default function NewsListContainer({
                                 {selectedCategory ? `Active Tracking` : `Real-time Analysis`}
                             </div>
                         </div>
+                        {selectedCategory && (
+                            <div className="flex flex-wrap gap-1 mt-2 opacity-50">
+                                {CATEGORIES_CONFIG.find(c => c.label === selectedCategory)?.keywords.map((k, i) => (
+                                    <span key={i} className="text-[9px] text-white/40 border border-white/10 px-1.5 py-0.5 rounded-full uppercase tracking-tight">{k}</span>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
@@ -95,47 +102,56 @@ export default function NewsListContainer({
                     </motion.div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5 relative z-30">
-                        {Object.keys(newsByCategory).map((category, idx) => (
-                            <motion.div
-                                key={category}
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5, delay: idx * 0.05 }}
-                                className="group/theme glass-card rounded-[24px] p-5 relative overflow-hidden flex flex-col gap-4 h-full"
-                            >
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/0 group-hover/theme:bg-blue-600/10 blur-[80px] rounded-full transition-all duration-700" />
+                        {CATEGORIES_CONFIG.map((config, idx) => {
+                            const category = config.label;
+                            // Corporate News는 메인 대시보드에서 제외하거나 맨 뒤로, 또는 설정에 따름. 현재는 모두 표시.
+                            // 해당 카테고리에 뉴스가 없어도 카드를 보여줄지 여부는 기획에 따르지만, 빈 카드라도 순서 유지를 위해 렌더링.
+                            const articles = newsByCategory[category] || [];
 
-                                <div className="relative z-10 w-full text-center border-b border-white/5 pb-4">
-                                    <Link
-                                        href={`/?category=${encodeURIComponent(category)}`}
-                                        className="group/link flex flex-col items-center justify-center gap-1.5 p-2 rounded-xl transition-all duration-300 hover:bg-white/[0.03]"
-                                    >
-                                        <h2 className="text-xl font-black text-white tracking-tighter uppercase transition-colors group-hover/link:text-blue-400">
-                                            {category}
-                                        </h2>
-                                        <div className="h-1 w-6 bg-blue-600 rounded-full transition-all duration-500 group-hover/link:w-16 group-hover/link:bg-blue-400" />
-                                    </Link>
-                                </div>
+                            return (
+                                <motion.div
+                                    key={category}
+                                    initial={{ opacity: 0, y: 30 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.5, delay: idx * 0.05 }}
+                                    className="group/theme glass-card rounded-[24px] p-5 relative overflow-hidden flex flex-col gap-4 h-full"
+                                >
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/0 group-hover/theme:bg-blue-600/10 blur-[80px] rounded-full transition-all duration-700" />
 
-                                <div className="relative z-10 flex flex-col gap-3.5">
-                                    <AnimatePresence mode="popLayout">
-                                        {newsByCategory[category].slice(0, 8).map((article: any, i: number) => (
-                                            <motion.div
-                                                key={article.id}
-                                                initial={{ opacity: 0, x: -10 }}
-                                                animate={{ opacity: 1, x: 0 }}
-                                                transition={{ delay: (idx * 0.05) + (i * 0.02) }}
-                                            >
-                                                <NewsCard article={article} today={today} />
-                                            </motion.div>
-                                        ))}
-                                    </AnimatePresence>
-                                    {(!newsByCategory[category] || newsByCategory[category].length === 0) && (
-                                        <div className="py-12 text-center text-white/10 text-[9px] uppercase font-bold tracking-[0.3em]">Awaiting Insight</div>
-                                    )}
-                                </div>
-                            </motion.div>
-                        ))}
+                                    <div className="relative z-10 w-full text-center border-b border-white/5 pb-4">
+                                        <Link
+                                            href={`/?category=${encodeURIComponent(category)}`}
+                                            scroll={false}
+                                            prefetch={true}
+                                            className="group/link flex flex-col items-center justify-center gap-1.5 p-2 rounded-xl transition-all duration-300 hover:bg-white/[0.03]"
+                                        >
+                                            <h2 className="text-xl font-black text-white tracking-tighter uppercase transition-colors group-hover/link:text-blue-400">
+                                                {category}
+                                            </h2>
+                                            <div className="h-1 w-6 bg-blue-600 rounded-full transition-all duration-500 group-hover/link:w-16 group-hover/link:bg-blue-400" />
+                                        </Link>
+                                    </div>
+
+                                    <div className="relative z-10 flex flex-col gap-3.5">
+                                        <AnimatePresence mode="popLayout">
+                                            {articles.slice(0, 8).map((article: any, i: number) => (
+                                                <motion.div
+                                                    key={article.id}
+                                                    initial={{ opacity: 0, x: -10 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ delay: (idx * 0.05) + (i * 0.02) }}
+                                                >
+                                                    <NewsCard article={article} today={today} />
+                                                </motion.div>
+                                            ))}
+                                        </AnimatePresence>
+                                        {(articles.length === 0) && (
+                                            <div className="py-12 text-center text-white/10 text-[9px] uppercase font-bold tracking-[0.3em]">Awaiting Insight</div>
+                                        )}
+                                    </div>
+                                </motion.div>
+                            );
+                        })}
                     </div>
                 )}
 
@@ -205,33 +221,33 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
     return (
         <motion.div
             whileHover={{ x: 2 }}
-            className="group/card flex flex-col gap-1.5 pb-2.5 border-b border-white/[0.04] last:border-0 last:pb-0 relative transition-all duration-300 cursor-pointer"
+            className="group/card flex flex-col gap-1 pb-2 border-b border-white/[0.04] last:border-0 last:pb-0 relative transition-all duration-300 cursor-pointer"
         >
-            <div className="flex items-start justify-between gap-2.5">
+            <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-1.5 mb-0.5">
                         {isToday && (
                             <span className="text-[8px] font-black text-white bg-red-500 px-1.5 py-0.5 rounded shadow-[0_0_12px_rgba(239,68,68,0.6)] tracking-tighter uppercase inline-block leading-none shrink-0 border border-red-400/50 animate-pulse">NEW</span>
                         )}
-                        <a href={article.link} target="_blank" rel="noopener noreferrer" className="text-[13px] font-semibold text-white/70 group-hover/card:text-blue-400 transition-colors leading-snug line-clamp-2 block tracking-tight">
+                        <a href={article.link} target="_blank" rel="noopener noreferrer" className="text-[14px] font-bold text-gray-100 group-hover/card:text-blue-400 transition-colors leading-tight line-clamp-2 block tracking-tight">
                             {article.title}
                         </a>
                     </div>
                     {summaryText && (
-                        <p className="text-[11px] text-white/40 line-clamp-1 leading-normal mb-1.5 font-light group-hover/card:text-white/60 transition-colors">{summaryText}</p>
+                        <p className="text-[11px] text-white/40 line-clamp-1 leading-tight mb-1 font-normal group-hover/card:text-white/60 transition-colors">{summaryText}</p>
                     )}
                 </div>
             </div>
             <div className="flex items-center justify-between mt-0.5">
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-1">
                     {uniqueKeywords.slice(0, 2).map((k, i) => (
-                        <span key={i} className="text-[8px] font-bold text-blue-400/50 bg-blue-500/5 px-2 py-0.5 rounded-full border border-blue-500/10 uppercase tracking-tight group-hover/card:border-blue-500/30 group-hover/card:text-blue-400 transition-all">
+                        <span key={i} className="text-[7px] font-bold text-blue-400/60 bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-500/10 uppercase tracking-tight group-hover/card:border-blue-500/30 group-hover/card:text-blue-400 transition-all">
                             {k}
                         </span>
                     ))}
                 </div>
-                <div className="flex items-center gap-3">
-                    <span className={`text-[9px] font-mono font-bold ${isToday ? 'text-red-400/80' : 'text-white/10'}`}>
+                <div className="flex items-center gap-2">
+                    <span className={`text-[9px] font-mono font-bold ${isToday ? 'text-red-400' : 'text-white/20'}`}>
                         {dateStr}
                     </span>
                     <CollectionButton newsLink={article.link} newsTitle={article.title} size={14} />
@@ -254,23 +270,27 @@ const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, 
     const uniqueKeywords = Array.from(new Set([...analysis.main, ...analysis.sub].filter(k => k && k !== '기타' && k !== '-' && k !== '|' && k.trim() !== '')));
 
     return (
-        <article className={`group py-3 px-5 hover:bg-white/[0.03] border-b border-white/5 flex flex-col gap-1 transition-all ${isToday ? 'bg-blue-400/[0.03]' : ''}`}>
+        <article className={`group py-2 px-4 hover:bg-white/[0.03] border-b border-white/5 flex flex-col gap-0.5 transition-all ${isToday ? 'bg-blue-400/[0.03]' : ''}`}>
             <div className="flex items-center justify-between text-[9px] font-mono font-medium">
-                <span className={isToday ? 'text-blue-400' : 'text-white/20'}>{dateStr} {timeStr}</span>
-                {isToday && <span className="text-[7px] bg-[#3182f6] px-1 py-0.5 rounded text-white font-bold uppercase">TODAY</span>}
+                <span className={isToday ? 'text-red-400' : 'text-white/30'}>{dateStr} {timeStr}</span>
             </div>
-            <div className="flex gap-3 items-start">
+            <div className="flex gap-2.5 items-start">
                 <div className="pt-0.5">
-                    <CollectionButton newsLink={article.link} newsTitle={article.title} size={15} />
+                    <CollectionButton newsLink={article.link} newsTitle={article.title} size={14} />
                 </div>
                 <div className="flex-1 min-w-0">
-                    <a href={article.link} target="_blank" rel="noopener noreferrer" className="block"><h3 className="text-[13px] md:text-sm font-medium text-white group-hover:text-[#3182f6] transition-colors line-clamp-1">{article.title}</h3></a>
-                    <p className="text-[10px] text-white/25 truncate mt-0.5 leading-snug">{summaryText}</p>
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                        {isToday && (
+                            <span className="text-[8px] font-black text-white bg-red-500 px-1.5 py-0.5 rounded shadow-[0_0_12px_rgba(239,68,68,0.6)] tracking-tighter uppercase inline-block leading-none shrink-0 border border-red-400/50 animate-pulse">NEW</span>
+                        )}
+                        <a href={article.link} target="_blank" rel="noopener noreferrer" className="block"><h3 className="text-[14px] font-bold text-gray-100 group-hover:text-[#3182f6] transition-colors line-clamp-1 leading-tight">{article.title}</h3></a>
+                    </div>
+                    <p className="text-[11px] text-white/35 truncate leading-tight font-normal">{summaryText}</p>
                 </div>
             </div>
-            <div className="flex flex-wrap gap-1 pl-7">
+            <div className="flex flex-wrap gap-1 pl-5">
                 {uniqueKeywords.slice(0, 4).map((k, i) => (
-                    <span key={i} className="text-[8px] font-medium text-white/15 bg-white/5 px-1.5 py-0.5 rounded border border-white/5 group-hover:border-blue-400/20 group-hover:text-blue-400 transition-all uppercase tracking-tighter">{k}</span>
+                    <span key={i} className="text-[7px] font-medium text-white/15 bg-white/5 px-1.5 py-0.5 rounded border border-white/5 group-hover:border-blue-400/20 group-hover:text-blue-400 transition-all uppercase tracking-tighter">{k}</span>
                 ))}
             </div>
         </article>

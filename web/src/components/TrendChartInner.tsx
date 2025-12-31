@@ -36,7 +36,20 @@ export default function TrendChartInner() {
         return <div className="h-80 w-full animate-pulse bg-white/5 rounded-lg flex items-center justify-center text-gray-400">데이터를 불러오는 중...</div>;
     }
 
-    const colors = ['#3182f6', '#00d084', '#ff6900', '#abb8c3', '#eb144c', '#f78da7'];
+    const CATEGORY_COLORS: Record<string, string> = {
+        'Filler': '#3182f6', // Premium Blue
+        'Botulinum Toxin': '#00d084', // Mint Green
+        'Collagen Stimulator': '#ff6900', // Orange
+        'Exosome': '#abb8c3', // Gray
+        'PDRN/PN': '#eb144c', // Red/Pink
+        'Skinboosters/Threads': '#f78da7', // Soft Pink
+        'Machines (EBD)': '#9900ef', // Purple
+        'Corporate News': '#0693e3' // Cyan
+    };
+
+    const getColor = (category: string, index: number) => {
+        return CATEGORY_COLORS[category] || ['#3182f6', '#00d084', '#ff6900', '#abb8c3', '#eb144c', '#f78da7'][index % 6];
+    };
 
     return (
         <Card className="mt-4 bg-[#1e1e20] border-white/5 shadow-2xl">
@@ -44,13 +57,12 @@ export default function TrendChartInner() {
             <Text className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mt-1">Real-time Keyword Mentions (Last 7 Days)</Text>
 
             <div className="flex flex-wrap gap-x-4 gap-y-2 mt-4 ml-1">
-                {categories.slice(0, 8).map((c, i) => (
+                {categories.map((c, i) => (
                     <div key={c} className="flex items-center gap-1.5">
-                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: colors[i % colors.length] }} />
+                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: getColor(c, i) }} />
                         <span className="text-[10px] font-bold text-white/50">{c}</span>
                     </div>
                 ))}
-                {categories.length > 8 && <span className="text-[10px] font-bold text-white/20">+{categories.length - 8} 더보기</span>}
             </div>
 
             <div className="h-72 w-full mt-6">
@@ -59,8 +71,8 @@ export default function TrendChartInner() {
                         <defs>
                             {categories.map((c, i) => (
                                 <linearGradient key={`gradient-${c}`} id={`color-${c}`} x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor={colors[i % colors.length]} stopOpacity={0.4} />
-                                    <stop offset="95%" stopColor={colors[i % colors.length]} stopOpacity={0} />
+                                    <stop offset="5%" stopColor={getColor(c, i)} stopOpacity={0.4} />
+                                    <stop offset="95%" stopColor={getColor(c, i)} stopOpacity={0} />
                                 </linearGradient>
                             ))}
                         </defs>
@@ -81,25 +93,21 @@ export default function TrendChartInner() {
                             contentStyle={{ backgroundColor: '#101012', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', boxShadow: '0 20px 40px rgba(0,0,0,0.4)' }}
                             itemStyle={{ fontSize: '11px', fontWeight: 800, padding: '2px 0' }}
                             labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: '10px', marginBottom: '4px', fontWeight: 700 }}
-                            itemSorter={(item: any) => -item.value} // 항상 높은 값이 위에 보이게
+                            itemSorter={(item: any) => -item.value}
                         />
-                        {[...categories].reverse().map((c, i) => {
-                            // 색상 인덱스는 원래 categories 기준 유지
-                            const originalIdx = categories.indexOf(c);
-                            return (
-                                <Area
-                                    key={c}
-                                    type="monotone"
-                                    dataKey={c}
-                                    stroke={colors[originalIdx % colors.length]}
-                                    fillOpacity={1}
-                                    fill={`url(#color-${c})`}
-                                    strokeWidth={2.5}
-                                    stackId="1"
-                                    animationDuration={1500}
-                                />
-                            );
-                        })}
+                        {categories.map((c, i) => (
+                            <Area
+                                key={c}
+                                type="monotone"
+                                dataKey={c}
+                                stroke={getColor(c, i)}
+                                fill={`url(#color-${c})`}
+                                strokeWidth={2}
+                                stackId={undefined}
+                                animationDuration={1000}
+                                fillOpacity={0.15}
+                            />
+                        ))}
                     </RAreaChart>
                 </ResponsiveContainer>
             </div>
