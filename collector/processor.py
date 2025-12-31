@@ -260,24 +260,46 @@ async def process_item(item, worksheet, recent_articles):
         k = corrections.get(k, k)
         return k.strip()
 
-    # White-list Filtering (Strict mapping to Pool)
+    # Whitelist & Language Filtering (Strict)
     pool_set = set([k.strip() for k in EXPERT_ANALYSIS_KEYWORDS])
     
-    # AI/Local 결과물 중 Pool에 있는 것만 선별
-    final_main = final_main if final_main in pool_set else "기타"
-    ai_included = [k for k in ai_included if k in pool_set]
-    local_all = [k for k in local_all if k in pool_set]
+    def is_valid_korean_kw(k):
+        # 1. Must be in Pool
+        if k not in pool_set: return False
+        # 2. Must contain Hangul (Double check to avoid pure English noise)
+        if not re.search(r'[가-힣]', k): return False
+        return True
+
+    final_main = final_main if is_valid_korean_kw(final_main) else "기타"
+    ai_included = [k for k in ai_included if is_valid_korean_kw(k)]
+    local_all = [k for k in local_all if is_valid_korean_kw(k)]
     
-    # 5. Summary Post-processing (Power Clean)
+    # 5. Summary Post-processing (Smart Clean V3)
     summary = summary.strip()
-    # 패턴: 완성형 어미(.다, .함, .음) 다음에 바로 숫자나 조사가 붙는 경우 그 이후 삭제
-    # 예: "전달한다6.95% 하락했다.." -> "전달한다"
-    summary = re.sub(r'([다함음]\.|[다함음])[\d\s%가-힣]+(하락|상승|입했다|출처|기자).*$', r'\1', summary)
-    summary = re.sub(r'[.\s]+$', '', summary) # 문장 끝 점/공백 정리
     
-    # 추가: 문장 중간에 갑자기 "하락", "%" 등이 붙는 꼬리표 제거
-    if " 하락" in summary or " 상승" in summary:
-        summary = re.split(r'\d*\.?\d*%', summary)[0].strip()
+    # 1. Remove repetitive dots first
+    summary = re.sub(r'\.{2,}', '.', summary) 
+    
+    # 2. Smart Cut: Remove garbage after the LAST valid sentence ending
+    # Capture the last occurrence of ".다" or ".함" etc.
+    # Preserve subsequent sentences if they look like proper Korean sentences, 
+    # but cut if they are just numbers, symbols, or broken words.
+    
+    # Find the last valid sentence end index
+    matches = list(re.finditer(r'([다함음]\.|[다함음])', summary))
+    if matches:
+        last_match = matches[-1]
+        end_idx = last_match.end()
+        remainder = summary[end_idx:]
+        
+        # If remainder is just noise (digits, %, whitespace, punctuation, short garbage)
+        # We cut it. Allow remainder only if it's a long string of Hangul (another sentence).
+        if not re.search(r'[가-힣]{2,}', remainder):
+            summary = summary[:end_idx]
+            
+    # 3. Final safety trim for loose garbage at ends
+    summary = re.sub(r'\s+[\d.%]+\s*$', '', summary) # Remove trailing "6.95%"
+    summary = summary.strip()
 
     final_all_kws = list(set([final_main] + ai_included + local_all))
     final_all_kws = [k for k in final_all_kws if k and k in pool_set and k not in ["기타", "-", "|", "None"]]
