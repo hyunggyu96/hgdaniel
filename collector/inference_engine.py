@@ -15,6 +15,7 @@ class InferenceEngine:
         
     async def call_ollama(self, system_prompt: str, user_prompt: str) -> Optional[Dict[str, Any]]:
         url = f"{self.local_host}/api/generate"
+        print(f"  [Ollama Debug] Connecting to: {url}")
         payload = {
             "model": self.model,
             "prompt": f"{system_prompt}\n\n{user_prompt}\n\nRespond in JSON format only.",
@@ -26,7 +27,7 @@ class InferenceEngine:
         try:
             async with self.semaphore:
                 async with aiohttp.ClientSession() as session:
-                    async with session.post(url, json=payload, timeout=30) as resp:
+                    async with session.post(url, json=payload, timeout=120) as resp:
                         if resp.status == 200:
                             res_json = await resp.json()
                             latency = time.time() - start_time

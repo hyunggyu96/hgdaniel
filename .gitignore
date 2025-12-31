@@ -44,3 +44,5 @@ pnpm-debug.log
 Thumbs.db
 .env*.local
 .vercel
+
+screenshots/

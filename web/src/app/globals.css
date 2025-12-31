@@ -4,8 +4,8 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%; /* Very light grey/white */
-    --foreground: 222 47% 11%; /* Deep navy/slate */
+    --background: 210 20% 98%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
@@ -13,7 +13,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 221 83% 45%; /* Premium Blue */
+    --primary: 221 83% 45%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
@@ -32,7 +32,29 @@
     --input: 214 32% 91%;
     --ring: 221 83% 45%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
   }
 }
 
@@ -42,27 +64,52 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 }
 
-
-
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  .glass-panel {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0, 0, 0, 0.3)];
   }
 
-  /* GQAI Style: Clean, Solid Blue aesthetics */
+  .glass-card {
+    @apply bg-white/[0.03] backdrop-blur-md border border-white/[0.08] hover:border-white/20 transition-all duration-500 shadow-xl;
+  }
+
   .blue-gradient-header {
-    @apply bg-gradient-to-r from-blue-900 to-blue-800 text-white shadow-md;
+    @apply bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white shadow-xl;
   }
 
   .card-premium {
-    @apply bg-white dark:bg-slate-800 rounded-xl shadow-[0_2px_12px_-4px_rgba(59,130,246,0.15)] border border-blue-100 dark:border-slate-700;
+    @apply bg-white dark:bg-[#1c1c1e] rounded-2xl shadow-[0_4px_20px_-4px_rgba(0, 0, 0, 0.1)] border border-gray-100 dark:border-white/5 hover:shadow-[0_8px_30px_rgb(0, 0, 0, 0.12)] transition-all duration-500;
   }
 
-  .gradient-text-blue {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-600 dark:from-blue-400 dark:to-indigo-400;
+  .gradient-text-premium {
+    @apply bg-clip-text text-transparent bg-gradient-to-br from-white via-white to-white/40;
+  }
+
+  .text-glow-blue {
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+  }
+
+  /* Custom Scrollbar for Premium Feel */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
+  }
+
+  /* Selection Color */
+  ::selection {
+    @apply bg-blue-500/30 text-white;
   }
 }

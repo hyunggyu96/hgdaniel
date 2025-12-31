@@ -8,43 +8,49 @@ Expert News Processor V1.0:
 
 import sys
 import os
+
+# Disable stdout buffering for nohup
+sys.stdout.reconfigure(line_buffering=True)
+sys.stderr.reconfigure(line_buffering=True)
+
+# [1] 환경 변수 먼저 로드 (InferenceEngine보다 먼저!)
+from dotenv import load_dotenv
+env_path = os.path.join(os.path.dirname(__file__), '.env')
+load_dotenv(env_path)
+
 import json
 import asyncio
 import aiohttp
 import datetime
 from typing import List, Dict
 
-from dotenv import load_dotenv
 from supabase import create_client
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from openai import AsyncOpenAI
 from inference_engine import InferenceEngine
-from font_setup import setup_korean_font
 
-# Initialize Engines
+# Initialize Engines (이제 .env가 로드된 상태)
 inference_manager = InferenceEngine()
-setup_korean_font()
 
 # Global Stats for Self-Diagnosis
 STATS = {"local": 0, "cloud": 0, "fallback": 0, "total": 0, "latencies": []}
 
 
-# [1] 터미널 한글 깨짐 방지
+# [2] 터미널 한글 깨짐 방지
 if sys.platform == 'win32':
     sys.stdout.reconfigure(encoding='utf-8')
     sys.stderr.reconfigure(encoding='utf-8')
-
-# [2] 환경 변수 및 경로 설정
-env_path = os.path.join(os.path.dirname(__file__), '.env')
-load_dotenv(env_path)
 
 # Import local expert logic
 sys.path.append(os.path.dirname(__file__))
 try:
     from local_keyword_extractor import extract_keywords, extract_main_keyword, EXPERT_ANALYSIS_KEYWORDS
 except ImportError:
-    EXPERT_ANALYSIS_KEYWORDS = ["필러", "톡신", "휴젤", "종근당", "리쥬란"]
+    EXPERT_ANALYSIS_KEYWORDS = [
+    "휴젤", "메디톡스", "파마리서치", "대웅제약", "종근당", "제테마", "휴온스", "휴메딕스", "바이오플러스", "바임",
+    "필러", "보톡스", "톡신", "리쥬란", "스킨부스터", "엑소좀", "PN", "PDRN", "품목허가", "임상시험", "기술수출", "M&A"
+]
 
 # Setup Clients
 SUPABASE_URL = os.getenv("SUPABASE_URL")
@@ -119,19 +125,20 @@ async def analyze_article_expert_async(title, description, search_keyword):
     """Refactored to use central InferenceEngine."""
     keyword_pool = ", ".join(EXPERT_ANALYSIS_KEYWORDS)
     system_prompt = (
-        f"You are a [Medical Aesthetic Business Analyst].\n"
-        f"Your task is to identify ALL relevant Medical/Aesthetic Keywords and Companies from the Pool below.\n\n"
-        f"### CRITICAL CONTEXT:\n"
-        f"- We care about BUSINESS issues: Lawsuits, FDA Approvals, Earnings, M&A.\n"
-        f"- DO NOT focus on simple product benefits (e.g., 'wrinkles', 'whitening', 'square jaw', 'young people').\n"
-        f"- Ignore all references to 'Automotive' or 'Car components'.\n\n"
+        f"You are a [Medical Aesthetic Business Analyst]. Output MUST be strict JSON.\n"
+        f"Your task: Identify relevant Medical/Aesthetic Keywords and Companies from the Pool.\n\n"
+        f"### STRICT RULES:\n"
+        f"1. **Language**: summary and issue_nature MUST be in Korean (Hangul) ONLY. NO Japanese, NO Hanja.\n"
+        f"2. **Main Keyword**: Pick a single most relevant name from the Pool. Use the EXACT Korean name if available in Pool.\n"
+        f"3. **No Halucination**: If a company name is Hugel, use '휴젤'. Do not mix English and Korean like '휴zel'. Avoid Japanese characters even if the source is related to Japan.\n"
+        f"4. **JSON Only**: Do not include any explanation or markdown. Return only the JSON object.\n\n"
         f"### Expert Keyword Pool:\n{keyword_pool}\n\n"
-        f"### Extraction Rules (STRICT JSON ONLY):\n"
-        f"1. main_keyword: Pick the single most important COMPANY or BRAND from the Pool. If Lawsuit, pick the Company.\n"
-        f"2. included_keywords: Array of every relevant word from the Pool. Be exhaustive. DO NOT include generic terms like 'shaving', 'jaw'.\n"
-        f"3. issue_nature: ONE of: 제품 출시/허가, 임상/연구데이터, 실적/수출/경영, 법적분쟁/규제, 투자/M&A, 학회/마케팅, 거시경제/정책, 기타.\n"
-        f"4. brief_summary: A professional 1-line Korean summary (~70 chars). Focus on the 'News Hook' (e.g., Who sued whom? Who got approved?), not product features.\n"
-        f"5. impact_level: Integer 1-5.\n"
+        f"### Schema (Required fields):\n"
+        f"- main_keyword: (String) Selected from Pool or clean Company name.\n"
+        f"- included_keywords: (Array of Strings) Relevant keywords from Pool.\n"
+        f"- issue_nature: (String) One of: [제품 출시/허가, 임상/연구데이터, 실적/수출/경영, 법적분쟁/규제, 투자/M&A, 학회/마케팅, 거시경제/정책, 기타].\n"
+        f"- brief_summary: (String) Professional 1-line Korean summary (~70 chars). MUST BE PURE KOREAN.\n"
+        f"- impact_level: (Integer) 1 to 5.\n"
     )
     user_prompt = f"Crawl Keyword: {search_keyword}\nHeadline: {title}\nBody: {description}"
 
@@ -191,12 +198,26 @@ async def process_item(item, worksheet, recent_articles):
     print(f"🤖 Analyzing: {title[:40]}...")
     analysis = await analyze_article_expert_async(title, desc, keyword)
     
-    # Extract AI fields
+    # Extract AI fields (safely handle dict values)
     ai_main = analysis.get("main_keyword", "기타")
+    if isinstance(ai_main, dict):
+        ai_main = ai_main.get("name", str(ai_main)) if "name" in ai_main else "기타"
+    ai_main = str(ai_main) if ai_main else "기타"
+    
     ai_included = analysis.get("included_keywords", [])
     issue_nature = analysis.get("issue_nature", "기타")
+    if isinstance(issue_nature, dict):
+        issue_nature = issue_nature.get("name", "기타") if "name" in issue_nature else "기타"
+    issue_nature = str(issue_nature) if issue_nature else "기타"
+    
     summary = analysis.get("brief_summary", title[:70])
+    if isinstance(summary, dict):
+        summary = str(summary)
+    summary = str(summary)[:100] if summary else title[:70]
+    
     impact = analysis.get("impact_level", 3)
+    if isinstance(impact, dict):
+        impact = 3
     
     # [2] Local Extraction for robustness
     local_main = extract_main_keyword(desc, title=title)
@@ -204,8 +225,46 @@ async def process_item(item, worksheet, recent_articles):
     
     # [3] MERGE LOGIC (Union of AI and Local)
     final_main = ai_main if (ai_main and ai_main != "기타") else local_main
+    if isinstance(final_main, dict):
+        final_main = final_main.get("name", "기타") if "name" in final_main else "기타"
+    final_main = str(final_main) if final_main else "기타"
+    
+    # [4] CLEANUP & FINAL FORMATTING (Nuclear Option)
+    def clean_kw(k):
+        if not k: return ""
+        k = str(k).strip()
+        # 1. Replace common Hanja
+        k = k.replace("社", "사").replace("外", "외").replace("內", "내").replace("美", "미").replace("中", "중").replace("日", "일").replace("韓", "한")
+        
+        # 2. Remove all Hanja (4E00-9FFF)
+        k = re.sub(r'[\u4e00-\u9fff]', '', k)
+        
+        # 3. Remove all Japanese (Hiragana: 3040-309F, Katakana: 30A0-30FF)
+        k = re.sub(r'[\u3040-\u30ff]', '', k)
+        
+        # 4. Remove strange symbols/control chars but keep basic punct
+        k = re.sub(r'[^\w\s\d.,!?"\'\[\]()%&-]', '', k)
+        
+        corrections = {
+            "휴zel": "휴젤", "Hugel": "휴젤", "휴젤사": "휴젤",
+            "파마리서치바이오": "파마리서치", "리쥬란힐러": "리쥬란",
+            "파마리서치사": "파마리서치", "메디톡스사": "메디톡스"
+        }
+        k = corrections.get(k, k)
+        return k.strip()
+
+    final_main = clean_kw(final_main) or "기타"
+    ai_included = [clean_kw(k) for k in ai_included if clean_kw(k)]
+    issue_nature = clean_kw(issue_nature) or "기타"
+    summary = clean_kw(summary) or title[:70]
+    local_all = [clean_kw(k) for k in local_all]
+    
+    # Final summary length check
+    if len(summary) > 100:
+        summary = summary[:97] + "..."
+
     final_all_kws = list(set([final_main] + ai_included + local_all))
-    final_all_kws = [k for k in final_all_kws if k and k not in ["기타", "-", "|"]]
+    final_all_kws = [k for k in final_all_kws if k and k not in ["기타", "-", "|", "None"]]
     if keyword and keyword in EXPERT_ANALYSIS_KEYWORDS and keyword not in final_all_kws:
         final_all_kws.append(keyword)
 
@@ -273,14 +332,6 @@ async def process_item(item, worksheet, recent_articles):
     # [7] Final Status Sync
     supabase.table("raw_news").update({"status": "processed"}).eq("id", raw_id).execute()
     return True
-            
-        # 3. Update Raw status
-        supabase.table("raw_news").update({"status": "processed"}).eq("id", raw_id).execute()
-        print(f"  ✅ Done: {analysis['model']}")
-        return True
-    except Exception as e:
-        print(f"  ❌ Error saving processed item: {e}")
-        return False
 
 async def main():
     print(f"🚀 Expert News Processor Started (Continuous Mode) at {datetime.datetime.now()}")
@@ -335,7 +386,9 @@ async def main():
             print("\n🛑 Execution stopped by user.")
             break
         except Exception as e:
+            import traceback
             print(f"❌ Unexpected Error in Main Loop: {e}")
+            traceback.print_exc()
             print("   -> Retrying in 30 seconds...")
             await asyncio.sleep(30)
 
