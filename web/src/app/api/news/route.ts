@@ -3,7 +3,9 @@ import { getNews } from '@/lib/api';
 import * as Sentry from "@sentry/nextjs";
 
 // API도 60초 캐싱 (프론트엔드와 동일)
-export const revalidate = 60;
+// 캐싱 완전 제거 (실시간성 보장)
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function GET() {
     try {
@@ -11,10 +13,12 @@ export async function GET() {
         return NextResponse.json({
             data: news,
             timestamp: new Date().toISOString(),
-            cached: true
+            cached: false
         }, {
             headers: {
-                'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120'
+                'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
             }
         });
     } catch (error) {
