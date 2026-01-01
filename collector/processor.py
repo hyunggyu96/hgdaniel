@@ -77,7 +77,7 @@ def get_google_sheet():
         creds = ServiceAccountCredentials.from_json_keyfile_name(SERVICE_ACCOUNT_FILE, scope)
         client = gspread.authorize(creds)
         sheet = client.open_by_url(GOOGLE_SHEET_URL)
-        return sheet.get_worksheet(0)
+        return sheet.worksheet("Synced_Articles")  # V3.2: 새 동기화 시트 사용
     except Exception as e:
         print(f"⚠️ Google Sheet Warning: {e}")
         return None
