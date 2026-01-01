@@ -84,6 +84,30 @@ export async function GET() {
                 }
             });
 
+            // Rule Refinement (Frontend와 100% 동일하게): 
+            // Corporate News로 분류됐어도, 제품 키워드 점수가 있으면 제품 카테고리 우선!
+            if (bestCategory === 'Corporate News') {
+                let bestProductCategory: string | null = null;
+                let maxProductScore = 0;
+
+                CATEGORIES_CONFIG.forEach(config => {
+                    if (config.label !== 'Corporate News') {
+                        // 여기서도 점수 다시 계산 필요하지만, 위에서 저장해둔 score map이 없으므로 간이 계산
+                        // (하지만 위 루프에서 categoryScores 맵을 만드는 게 정석임)
+                        // 성능상 간단히: 제품 키워드가 1개라도 있으면 제품으로 변경
+                        const kws = config.keywords || [];
+                        const hasProductKeyword = kws.some(k =>
+                            (article.keyword && article.keyword.includes(k)) ||
+                            (article.title && article.title.includes(k))
+                        );
+
+                        if (hasProductKeyword) {
+                            bestCategory = config.label; // 덮어쓰기
+                        }
+                    }
+                });
+            }
+
             if (bestCategory) {
                 trendMap[dateKey][bestCategory] += 1;
             }
