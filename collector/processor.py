@@ -499,11 +499,11 @@ async def main():
             
             # 3. Refresh Resources (Sheet & Context) per batch
             worksheet = get_google_sheet()
-            # [V5.1] Get title and summary (which is our stored description/excerpt)
-            res_recent = supabase.table("articles").select("title, summary").order("published_at", desc=True).limit(300).execute()
+            # [V5.1.1] Use 'description' column (summary doesn't exist in Supabase articles table)
+            res_recent = supabase.table("articles").select("title, description").order("published_at", desc=True).limit(300).execute()
             recent_articles = []
             for r in res_recent.data:
-                recent_articles.append({"title": r['title'], "description": r['summary']})
+                recent_articles.append({"title": r['title'], "description": r['description']})
             
             # 4. Process Batch
             for item in pending_items:
