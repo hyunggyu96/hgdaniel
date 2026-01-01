@@ -64,15 +64,12 @@ export function groupNewsByCategory(news: any[]) {
             }
         });
 
-        // Rule 2 Refinement: 브랜드 + 회사이름 -> 제품 카테고리 우선
-        // 만약 Corporate 점수와 제품 카테고리 점수가 경합할 때, 제품 키워드가 명확하면 제품으로 보냄.
-        // 하지만 위에서 제품 키워드 점수(Title Match 50)가 누적되므로 자연스럽게 해결될 가능성 높음.
-        // 예외 처리: 만약 Corporate가 1등인데, 다른 제품 카테고리 점수도 상당하다면(예: 50점 이상)?
-        // -> 사용자는 "브랜드+회사이름 = 다른 성분 키워드(제품)"를 원함.
-        // 따라서 제품 카테고리 점수가 0이 아니라면 Corporate보다 우선순위를 줄 필요가 있음.
+        // Rule 2 Refinement: 회사이름 + 카테고리 키워드 -> 제품 카테고리 우선
+        // 예: "메디톡스 vs 대웅제약 보톡스 전쟁" -> 회사 2개지만 "보톡스"가 있으므로 Toxin으로 분류
+        // 핵심: 제목에 카테고리 키워드가 있으면 회사 개수와 상관없이 제품 카테고리 우선!
 
-        if (bestCategory === "Corporate News" && !isMultiCompany) {
-            // 단일 회사가 언급되었는데, 제품 키워드도 같이 있는 경우 -> 제품 카테고리로 변경 시도
+        if (bestCategory === "Corporate News") {
+            // Corporate로 분류됐지만, 제품 카테고리 키워드도 있는 경우 -> 제품 카테고리로 변경 시도
             let bestProductCategory: string | null = null;
             let maxProductScore = 0;
 
@@ -83,8 +80,8 @@ export function groupNewsByCategory(news: any[]) {
                 }
             });
 
-            // 제품 점수가 유의미하게 존재하면(예: 제목에 제품명 있음) 제품 카테고리로 뺏어오기
-            if (bestProductCategory && maxProductScore >= 40) {
+            // 제목에 카테고리 키워드가 있으면(50점 이상) 제품 카테고리로 뺏어오기
+            if (bestProductCategory && maxProductScore >= 50) {
                 bestCategory = bestProductCategory;
             }
         }
