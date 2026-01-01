@@ -67,6 +67,15 @@ except Exception as e:
         "필러", "보톡스", "톡신", "리쥬란", "스킨부스터", "엑소좀", "PN", "PDRN"
     ]
 
+# Import local expert logic (Must be AFTER keyword loading or passed explicitly)
+sys.path.append(os.path.dirname(__file__))
+try:
+    from local_keyword_extractor import extract_keywords, extract_main_keyword
+except ImportError:
+    print("⚠️ local_keyword_extractor not found. Local fallback will fail.")
+    def extract_main_keyword(text, title=""): return "기타"
+    def extract_keywords(text, top_n=5): return []
+
 # Setup Clients
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
