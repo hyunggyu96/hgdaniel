@@ -122,113 +122,71 @@ async def main():
         try:
             print(f"\n⏰ Cycle Start: {datetime.datetime.now()}")
             
-            # ---- Determine start_date ----
+            # ---- [V5.0] Determine start_date (Keyword-Specific) ----
             import json, pathlib
             last_update_path = pathlib.Path(__file__).parents[1] / "last_update.json"
-            cycle_start_time = datetime.datetime.now() # Capture this for later saving
-
+            cycle_start_time = datetime.datetime.now()
+            
+            # Load existing time data
+            time_registry = {}
             if last_update_path.exists():
                 try:
-                    data = json.loads(last_update_path.read_text(encoding="utf-8"))
-                    # [V4.6] Use 'last_collected_at' to avoid interference with processor heartbeat
-                    last_col_str = data.get("last_collected_at") or data.get("last_run") # Compatibility
-                    if last_col_str:
-                        start_date = datetime.datetime.fromisoformat(last_col_str.replace('Z', '+00:00')).replace(tzinfo=None)
-                        print(f"📅 start_date from last_update.json: {start_date}")
-                    else:
-                        raise ValueError("last_collected_at missing")
+                    time_registry = json.loads(last_update_path.read_text(encoding="utf-8"))
                 except Exception as e:
-                    print(f"⚠️ Failed to parse last_update.json ({e}), falling back to DB")
-                    start_date = None
-            else:
-                start_date = None
+                    print(f"⚠️ Failed to parse last_update.json: {e}")
 
-            # Fallback: get latest published_at from articles table if needed
-            if not start_date:
+            # Prepare keyword-specific times if not present
+            kw_times = time_registry.get("keyword_last_collected_at", {})
+            global_fallback = time_registry.get("last_collected_at") or time_registry.get("last_run") or "2025-12-19T00:00:00"
+
+            # Prepare list to track updates
+            keyword_items_to_process = []
+            for kw in KEYWORDS:
+                kw_start_str = kw_times.get(kw, global_fallback)
                 try:
-                    latest_res = supabase.table("articles").select("published_at").order("published_at", desc=True).limit(1).execute()
-                    if latest_res.data:
-                        latest_iso = latest_res.data[0]["published_at"]
-                        if "T" in latest_iso:
-                            start_date = datetime.datetime.fromisoformat(latest_iso.replace('Z', '+00:00')).replace(tzinfo=None)
-                        else:
-                            start_date = datetime.datetime.strptime(latest_iso, "%Y-%m-%d %H:%M:%S+00:00").replace(tzinfo=None)
-                        print(f"📅 start_date from DB: {start_date}")
-                    else:
-                        start_date = datetime.datetime(2025, 12, 19)
-                        print(f"📅 No articles in DB, using default: {start_date}")
-                except Exception as e:
-                    start_date = datetime.datetime(2025, 12, 19)
-                    print(f"⚠️ DB start_date error ({e}), using default: {start_date}")
-            # Ensure start_date is set
-            if not start_date:
-                start_date = datetime.datetime(2025, 12, 19)
-                print(f"📅 Final fallback start_date: {start_date}")
+                    kw_start_date = datetime.datetime.fromisoformat(kw_start_str.replace('Z', '+00:00')).replace(tzinfo=None)
+                except:
+                    kw_start_date = datetime.datetime(2025, 12, 19)
+                keyword_items_to_process.append((kw, kw_start_date))
 
-            # Load existing links and titles (last 1000 for deduplication speed)
+            # Load existing links once for the cycle (Last 1500 for speed)
             existing_links = set()
-            existing_titles = []
             try:
-                # 1. From raw_news
-                res_raw = supabase.table("raw_news").select("link, title").order("created_at", desc=True).limit(1000).execute().data
-                for r in res_raw:
-                    existing_links.add(r['link'])
-                    existing_titles.append(clean_text_expert(r['title']))
-                
-                # 2. From articles (final results)
-                res_art = supabase.table("articles").select("link, title").order("created_at", desc=True).limit(500).execute().data
-                for r in res_art:
-                    existing_links.add(r['link'])
-                    existing_titles.append(clean_text_expert(r['title']))
-                
-                print(f"📚 Loaded {len(existing_links)} links and {len(existing_titles)} titles for deduplication.")
+                res_raw = supabase.table("raw_news").select("link").order("created_at", desc=True).limit(1000).execute().data
+                for r in res_raw: existing_links.add(r['link'])
+                res_art = supabase.table("articles").select("link").order("created_at", desc=True).limit(500).execute().data
+                for r in res_art: existing_links.add(r['link'])
+                print(f"📚 Loaded {len(existing_links)} unique links for deduplication.")
             except Exception as e:
-                print(f"⚠️ Link/Title Load Error: {e}")
-
-            # Define Simple semantic check for collector
-            def is_dup_title(new_title, title_list):
-                if not new_title: return False
-                def get_w(t): return set(re.sub(r'[^가-힣a-zA-Z0-9]', ' ', t).split())
-                nw = get_w(new_title)
-                if len(nw) < 3: return False
-                for t in title_list[-300:]: # Check last 300 for speed
-                    rw = get_w(t)
-                    if not rw: continue
-                    intersect = nw.intersection(rw)
-                    union = nw.union(rw)
-                    if union and (len(intersect) / len(union) > 0.75): return True
-                return False
+                print(f"⚠️ Link Load Error: {e}")
 
             async with aiohttp.ClientSession() as session:
                 total_added = 0
-                for keyword in KEYWORDS:
-                    print(f"🔍 Searching: [{keyword}]")
+                for keyword, start_date in keyword_items_to_process:
+                    print(f"🔍 Searching: [{keyword}] since {start_date}")
                     items = await fetch_naver_news_expert(session, keyword, start_date)
                     
                     added_for_kw = 0
                     for item in items:
-                        # V3.1: 링크 중복만 체크 (제목 유사도는 Processor에서 처리)
-                        if item['link'] in existing_links:
-                            continue
-                            
+                        if item['link'] in existing_links: continue
                         added_for_kw += await process_news_item_expert(item, keyword, existing_links)
                     
                     print(f"   > Added {added_for_kw} new articles.")
                     total_added += added_for_kw
+                    # Update specific keyword time in our local registry after each keyword is done
+                    kw_times[keyword] = cycle_start_time.isoformat()
 
                 print(f"🎉 Cycle Complete. Total Added: {total_added}")
 
-                # [V4.6] Update ONLY the collection timestamp
+                # [V5.0] Atomic Save of all keyword times
                 try:
-                    current_data = {}
-                    if last_update_path.exists():
-                        current_data = json.loads(last_update_path.read_text(encoding="utf-8"))
-                    
-                    current_data["last_collected_at"] = cycle_start_time.isoformat()
-                    current_data["collector_status"] = "active"
-                    last_update_path.write_text(json.dumps(current_data, indent=2), encoding="utf-8")
+                    time_registry["keyword_last_collected_at"] = kw_times
+                    current_global_time = cycle_start_time.isoformat()
+                    time_registry["last_collected_at"] = current_global_time 
+                    time_registry["collector_status"] = "active"
+                    last_update_path.write_text(json.dumps(time_registry, indent=2), encoding="utf-8")
                 except Exception as e:
-                    print(f"⚠️ Failed to update collection timestamp: {e}")
+                    print(f"⚠️ Failed to update time registry: {e}")
                 break
                 
             print("💤 Sleeping for 30 minutes...")
