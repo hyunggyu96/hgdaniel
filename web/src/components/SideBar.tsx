@@ -99,7 +99,7 @@ export default function SideBar() {
                             </p>
                         </div>
                         <p className="text-xs text-white/60 leading-relaxed font-medium">
-                            Tracking 176 medical aesthetic sectors with AI-powered real-time analysis.
+                            Tracking 173 medical aesthetic sectors with AI-powered real-time analysis.
                         </p>
                     </div>
                 </div>
