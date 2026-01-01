@@ -442,9 +442,29 @@ async def main():
             pending_items = res.data
             
             if not pending_items:
-                # If nothing to do, wait 60 seconds
-                print(f"💤 [{datetime.datetime.now().strftime('%H:%M:%S')}] Queue empty. Waiting 60s...")
-                await asyncio.sleep(60)
+                # [Smart Scheduling] KST Timezone Logic
+                kst_now = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
+                current_hour = kst_now.hour
+                current_minute = kst_now.minute
+                
+                sleep_seconds = 60
+                mode = "Default"
+
+                # 1. 00:00 ~ 06:00 (Night: 2 hours)
+                if 0 <= current_hour < 6:
+                    sleep_seconds = 7200
+                    mode = "Night (2h)"
+                # 2. 06:00 ~ 18:30 (Day: 5 min) 
+                elif 6 <= current_hour < 18 or (current_hour == 18 and current_minute < 30):
+                    sleep_seconds = 300
+                    mode = "Day (5m)"
+                # 3. 18:30 ~ 00:00 (Evening: 10 min)
+                else:
+                    sleep_seconds = 600
+                    mode = "Evening (10m)"
+
+                print(f"💤 [{kst_now.strftime('%H:%M:%S')}] Queue empty. Sleeping {sleep_seconds}s ({mode})...")
+                await asyncio.sleep(sleep_seconds)
                 continue
 
             # 2. Sort by pub_date ASC (Process oldest first)
