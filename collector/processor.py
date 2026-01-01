@@ -346,13 +346,19 @@ async def process_item(item, worksheet, recent_articles):
     if not is_duplicate:
         try:
             prod_data = {
-                "title": title, "description": desc, "link": link,
-                "published_at": pub_date, "source": "Naver",
-                "keyword": keyword, "main_keywords": final_all_kws
+                "title": title, 
+                "description": desc,  # 원본 보관 (웹/시트 표시용)
+                "link": link,
+                "published_at": pub_date, 
+                "source": "Naver",
+                "keyword": keyword, 
+                "main_keywords": final_all_kws,
+                "ai_summary": summary, # AI 데이터는 백업용으로만 저장
+                "issue_nature": issue_nature
             }
             supabase.table("articles").insert(prod_data).execute()
             supabase_saved = True
-            print(f"  ✅ Saved to Supabase DB")
+            print(f"  ✅ Saved to Supabase DB (Description First)")
         except Exception as e:
             print(f"  ⚠️ Supabase DB Error: {e}")
     else:
