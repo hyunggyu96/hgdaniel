@@ -72,7 +72,7 @@ export default function NewsListContainer({
                                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#3182f6]"></span>
                             </span>
                             <div className="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em]">
-                                {selectedCategory ? `Active Tracking` : `Real-time Analysis`}
+                                {selectedCategory ? `ACTIVE TRACKING: ${CATEGORIES_CONFIG.find(c => c.label === selectedCategory)?.keywords.length || 0}` : `Real-time Analysis`}
                             </div>
                         </div>
                         {selectedCategory && (
