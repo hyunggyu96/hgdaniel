@@ -321,6 +321,8 @@ async def process_item(item, worksheet, recent_articles):
     STATS[provider] += 1
 
     # [4] SAVE TO SUPABASE (Always save unless Link exists)
+    # V3.0: 완벽 동기화 - Supabase 저장 성공 시에만 구글시트에도 저장
+    supabase_saved = False
     try:
         check = supabase.table("articles").select("id").eq("link", link).execute()
         if not check.data:
@@ -330,30 +332,15 @@ async def process_item(item, worksheet, recent_articles):
                 "keyword": keyword, "main_keywords": final_all_kws
             }
             supabase.table("articles").insert(prod_data).execute()
-            print(f"  ✅ Saved to Supabase DB (All-inclusive log)")
+            supabase_saved = True
+            print(f"  ✅ Saved to Supabase DB")
+        else:
+            print(f"  ⏭️ Skipped Supabase (Duplicate Link)")
     except Exception as e:
         print(f"  ⚠️ Supabase DB Error: {e}")
 
-    # [5] FILTERING FOR GOOGLE SHEETS & WEBSITE (The "Clean" Report)
-    is_filtered = False
-    filter_reason = ""
-    
-    # Rule A: Car/Noise
-    full_text = f"{title} {desc}"
-    if any(car_brand in full_text for car_brand in CAR_BRANDS) or \
-       any(noise in full_text for noise in CAR_NOISE_KEYWORDS):
-        is_filtered = True
-        filter_reason = "Car/Noise"
-    
-    # Rule B: Semantic Duplicate (85% similarity)
-    if not is_filtered:
-        dup_title = is_semantically_duplicate(title, recent_articles)
-        if dup_title:
-            is_filtered = True
-            filter_reason = f"Duplicate of: {dup_title[:15]}..."
-
-    # [6] SAVE TO GOOGLE SHEETS (Curated Only)
-    if not is_filtered:
+    # [5] SAVE TO GOOGLE SHEETS (Only if Supabase saved - Perfect Sync V3.0)
+    if supabase_saved:
         if worksheet:
             try:
                 kst_now = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
@@ -367,16 +354,14 @@ async def process_item(item, worksheet, recent_articles):
 
                 row = [now_str, keyword, title, link, final_main, ", ".join(final_all_kws), pd_kst_str, issue_nature, summary]
                 worksheet.insert_row(row, 2)
-                print(f"  📑 Saved to Google Sheets (Curated)")
+                print(f"  📑 Saved to Google Sheets (Synced)")
                 
                 # Update history for deduplication
                 recent_articles.append({'title': title, 'link': link})
             except Exception as e:
                 print(f"  ⚠️ Google Sheet Error: {e}")
-    else:
-        print(f"  🚫 Filtered for Report ({filter_reason}). Check Supabase articles for entry.")
 
-    # [7] Final Status Sync
+    # [6] Final Status Sync
     supabase.table("raw_news").update({"status": "processed"}).eq("id", raw_id).execute()
     return True
 
