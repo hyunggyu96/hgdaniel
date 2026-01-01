@@ -435,7 +435,8 @@ async def process_item(item, worksheet, recent_articles):
     if supabase_saved:
         if worksheet:
             try:
-                kst_now = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
+                # [Smart Scheduling] Use System Local Time (KST)
+                kst_now = datetime.datetime.now()
                 now_str = kst_now.strftime("%Y-%m-%d %H:%M:%S")
                 # pub_date conversion to KST...
                 pd_kst_str = pub_date
@@ -467,8 +468,8 @@ async def main():
             pending_items = res.data
             
             if not pending_items:
-                # [Smart Scheduling] KST Timezone Logic
-                kst_now = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
+                # [Smart Scheduling] Use System Local Time (KST)
+                kst_now = datetime.datetime.now()
                 current_hour = kst_now.hour
                 current_minute = kst_now.minute
                 
