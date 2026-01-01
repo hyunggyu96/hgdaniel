@@ -65,11 +65,18 @@ export async function GET() {
             CATEGORIES_CONFIG.forEach(config => {
                 let score = 0;
 
-                // Keyword Match
-                const mainKeyword = article.keyword; // DB의 keyword 필드 사용
-                if (mainKeyword && config.keywords.some(k => mainKeyword === k)) score += 100;
-                if (article.title && config.keywords.some(k => article.title.startsWith(k))) score += 50;
-                if (article.title && config.keywords.some(k => article.title.includes(k))) score += 20;
+                // Keyword Match (V2.0: 완화된 로직)
+                const mainKeyword = article.keyword || '';
+                // Exact Match가 아니라도, 포함되면 점수 부여
+                if (mainKeyword && config.keywords.some(k => mainKeyword.includes(k))) score += 100;
+
+                // article.title이 null일 수 있음
+                const title = article.title || '';
+                if (config.keywords.some(k => title.includes(k))) score += 50;
+
+                // description 점수도 추가 (데이터가 적을 때 보완)
+                const desc = article.description || '';
+                if (config.keywords.some(k => desc.includes(k))) score += 20;
 
                 if (score > highestScore) {
                     highestScore = score;
