@@ -239,6 +239,19 @@ def is_semantically_duplicate(new_title, recent_articles):
             return ref_title
     return None
 
+def is_semantic_duplicate(text1, text2, threshold=0.8):
+    if not text1 or not text2: return False
+    # Remove special chars and split into words
+    def get_words(t): return set(re.sub(r'[^가-힣a-zA-Z0-9]', ' ', t).split())
+    w1 = get_words(text1)
+    w2 = get_words(text2)
+    if not w1 or not w2: return False
+    
+    intersection = w1.intersection(w2)
+    union = w1.union(w2)
+    similarity = len(intersection) / len(union)
+    return similarity >= threshold
+
 async def process_item(item, worksheet, recent_articles):
     raw_id = item['id']
     title = item['title']
@@ -247,7 +260,18 @@ async def process_item(item, worksheet, recent_articles):
     pub_date = item['pub_date']
     keyword = item['search_keyword']
 
-    # [1] AI Analysis (Hybrid: Local First)
+    # [1] Semantic Duplicate Check (V5.1: 80% threshold for Title OR Desc)
+    for recent in recent_articles[-300:]: # Check last 300 processed items
+        # Title check
+        if is_semantic_duplicate(title, recent.get('title'), threshold=0.8):
+            print(f"⏩ Skipping (Duplicate Title): {title[:30]}...")
+            return None
+        # Description check
+        if is_semantic_duplicate(desc, recent.get('description'), threshold=0.8):
+            print(f"⏩ Skipping (Duplicate Content): {title[:30]}...")
+            return None
+
+    # [2] AI Analysis (Hybrid: Local First)
     # We analyze it FIRST to get context
     print(f"🤖 Analyzing: {title[:40]}...")
     analysis = await analyze_article_expert_async(title, desc, keyword)
@@ -475,14 +499,18 @@ async def main():
             
             # 3. Refresh Resources (Sheet & Context) per batch
             worksheet = get_google_sheet()
-            res_recent = supabase.table("articles").select("title").order("published_at", desc=True).limit(100).execute()
-            recent_articles = res_recent.data
+            # [V5.1] Get title and summary (which is our stored description/excerpt)
+            res_recent = supabase.table("articles").select("title, summary").order("published_at", desc=True).limit(300).execute()
+            recent_articles = []
+            for r in res_recent.data:
+                recent_articles.append({"title": r['title'], "description": r['summary']})
             
             # 4. Process Batch
             for item in pending_items:
                 success = await process_item(item, worksheet, recent_articles)
                 if success:
-                    recent_articles.append({"title": item['title']})
+                    # Capture title and description for next items in this batch
+                    recent_articles.append({"title": item['title'], "description": item['description']})
                 await asyncio.sleep(1) # Rate limit protection
 
             # 5. Print Stats periodically
