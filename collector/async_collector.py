@@ -197,12 +197,11 @@ async def main():
                     
                     added_for_kw = 0
                     for item in items:
-                        t_clean = clean_text_expert(item['title'])
-                        if item['link'] in existing_links or is_dup_title(t_clean, existing_titles):
+                        # V3.1: 링크 중복만 체크 (제목 유사도는 Processor에서 처리)
+                        if item['link'] in existing_links:
                             continue
                             
                         added_for_kw += await process_news_item_expert(item, keyword, existing_links)
-                        existing_titles.append(t_clean)
                     
                     print(f"   > Added {added_for_kw} new articles.")
                     total_added += added_for_kw

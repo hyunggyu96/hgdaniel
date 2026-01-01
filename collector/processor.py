@@ -320,12 +320,31 @@ async def process_item(item, worksheet, recent_articles):
     STATS["total"] += 1
     STATS[provider] += 1
 
-    # [4] SAVE TO SUPABASE (Always save unless Link exists)
-    # V3.0: 완벽 동기화 - Supabase 저장 성공 시에만 구글시트에도 저장
-    supabase_saved = False
+    # [4] FILTERING: 링크 중복 + 제목 유사도 체크 (V3.2)
+    is_duplicate = False
+    dup_reason = ""
+    
+    # Check 1: 링크 중복
     try:
         check = supabase.table("articles").select("id").eq("link", link).execute()
-        if not check.data:
+        if check.data:
+            is_duplicate = True
+            dup_reason = "Duplicate Link"
+    except Exception as e:
+        print(f"  ⚠️ Supabase Link Check Error: {e}")
+    
+    # Check 2: 제목 유사도 (링크 중복 아닐 때만)
+    if not is_duplicate:
+        dup_title = is_semantically_duplicate(title, recent_articles)
+        if dup_title:
+            is_duplicate = True
+            dup_reason = f"Similar to: {dup_title[:20]}..."
+
+    # [5] SAVE TO SUPABASE (중복 아닐 때만)
+    # V3.0: 완벽 동기화 - Supabase 저장 성공 시에만 구글시트에도 저장
+    supabase_saved = False
+    if not is_duplicate:
+        try:
             prod_data = {
                 "title": title, "description": desc, "link": link,
                 "published_at": pub_date, "source": "Naver",
@@ -334,10 +353,10 @@ async def process_item(item, worksheet, recent_articles):
             supabase.table("articles").insert(prod_data).execute()
             supabase_saved = True
             print(f"  ✅ Saved to Supabase DB")
-        else:
-            print(f"  ⏭️ Skipped Supabase (Duplicate Link)")
-    except Exception as e:
-        print(f"  ⚠️ Supabase DB Error: {e}")
+        except Exception as e:
+            print(f"  ⚠️ Supabase DB Error: {e}")
+    else:
+        print(f"  ⏭️ Skipped ({dup_reason})")
 
     # [5] SAVE TO GOOGLE SHEETS (Only if Supabase saved - Perfect Sync V3.0)
     if supabase_saved:
