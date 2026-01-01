@@ -3,8 +3,9 @@ import { NextResponse } from 'next/server';
 import * as Sentry from "@sentry/nextjs";
 import { CATEGORIES_CONFIG } from '@/lib/constants';
 
-// Trends API도 1시간 캐싱 (자주 변하지 않음)
-export const revalidate = 3600;
+// Trends API: 실시간 반영을 위해 캐싱 제거
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 // supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
