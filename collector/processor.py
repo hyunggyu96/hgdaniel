@@ -288,10 +288,12 @@ async def process_item(item, worksheet, recent_articles):
         # Title check
         if is_semantic_duplicate(title, recent.get('title'), threshold=0.8):
             print(f"⏩ Skipping (Duplicate Title): {title[:30]}...")
+            supabase.table("raw_news").update({"status": "duplicate"}).eq("id", raw_id).execute()
             return None
         # Description check
         if is_semantic_duplicate(desc, recent.get('description'), threshold=0.8):
             print(f"⏩ Skipping (Duplicate Content): {title[:30]}...")
+            supabase.table("raw_news").update({"status": "duplicate"}).eq("id", raw_id).execute()
             return None
 
     # [2] AI Analysis (Hybrid: Local First)
