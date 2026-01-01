@@ -127,6 +127,7 @@ async def is_medical_news_ai(title, description):
         "너는 의료/바이오/미용 성형 분야의 전문 뉴스 데스크야.\n"
         "아래 뉴스가 [의료/제약/미용성형/바이오] 산업과 관련이 있는지 판단해줘.\n"
         "특히 '필러'라는 단어가 자동차 부품(A/B/C-Pillar)으로 쓰였거나, '캐시워크/퀴즈' 관련 뉴스라면 무조건 FALSE를 출력해.\n"
+        "중요: 우리가 관리하는 키워드 리스트(keywords.json)에 명시되지 않은 엉뚱한 기업(예: 오스테오닉, 강스템바이오 등)이 메인 주제라면 FALSE를 출력해.\n"
         "오직 'TRUE' 또는 'FALSE'로만 대답해.\n\n"
         f"제목: {title}\n"
         f"내용: {description}"
