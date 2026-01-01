@@ -1,5 +1,11 @@
 # 🏥 Medical Aesthetic News Intelligence System (Structure)
 
+> **⚠️ AI 작업자 필독 (CRITICAL FOR AI AGENTS)**
+> 백엔드(Collector, Processor, DB, Tablet) 관련 작업을 시작하기 전, 반드시 **`_docs/BACKEND_GUIDELINES.md`의 [0. 작업 시작 전 필독 수칙]**을 먼저 정독하고 컨텍스트에 로드하십시오.
+> 이를 지키지 않아 발생하는 DB 스키마 불일치나 SSH 연결 오류는 심각한 토큰 낭비를 초래합니다.
+>
+> **특히, 도구 실행 후 반환되는 Output(명령 답변)을 정독하지 않고 넘어가면 무한 루프에 빠집니다. 모든 로그를 꼼꼼히 확인하십시오.**
+
 이 문서는 시스템의 전반적인 구조와 운영 방식을 정의합니다. 필요에 따라 내용을 수정하여 시스템의 방향성을 변경할 수 있습니다.
 
 ---

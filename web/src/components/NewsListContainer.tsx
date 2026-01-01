@@ -1,18 +1,15 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import CollectionButton from './CollectionButton';
 import CollectionsView from './CollectionsView';
 
 interface Props {
     allNews: any[];
     newsByCategory: Record<string, any[]>;
-    paginatedNews: any[];
-    currentPage: number;
-    totalPages: number;
+    filteredNews: any[];
     selectedCategory: string | null;
     searchQuery: string | null;
     showCollections: boolean;
@@ -22,9 +19,11 @@ interface Props {
 }
 
 export default function NewsListContainer({
-    allNews, newsByCategory, paginatedNews, currentPage, totalPages,
+    allNews, newsByCategory, filteredNews,
     selectedCategory, searchQuery, showCollections, today, isLandingPage, CATEGORIES_CONFIG
 }: Props) {
+    const ITEMS_PER_PAGE = 20;
+    const [displayCount, setDisplayCount] = useState(ITEMS_PER_PAGE);
 
     return (
         <div className="flex-1 space-y-4">
@@ -64,7 +63,7 @@ export default function NewsListContainer({
             ) : (
                 <div className="pt-6 md:pt-8 px-4 md:px-6 lg:px-12">
                     <div className="flex flex-col gap-2 mb-2">
-                        <h1 className="text-xl md:text-2xl lg:text-4xl font-bold tracking-tighter text-white leading-tight">
+                        <h1 className="text-xl md:text-2xl lg:text-4xl font-bold tracking-tighter text-white leading-tight uppercase">
                             {showCollections ? 'Collections' : selectedCategory ? selectedCategory : 'Market Intelligence'}
                         </h1>
                         <div className="flex items-center gap-2">
@@ -91,15 +90,32 @@ export default function NewsListContainer({
                 {showCollections ? (
                     <CollectionsView allNews={allNews} today={today} />
                 ) : selectedCategory || searchQuery ? (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-0 max-w-7xl"
-                    >
-                        {paginatedNews.map((article) => (
-                            <NewsRow key={article.id} article={article} today={today} />
-                        ))}
-                    </motion.div>
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-0 max-w-7xl"
+                        >
+                            {filteredNews.slice(0, displayCount).map((article) => (
+                                <NewsRow key={article.id} article={article} today={today} />
+                            ))}
+                        </motion.div>
+
+                        {/* Load More Button */}
+                        {displayCount < filteredNews.length && (
+                            <div className="mt-12 flex justify-center">
+                                <button
+                                    onClick={() => setDisplayCount(prev => prev + ITEMS_PER_PAGE)}
+                                    className="group relative px-8 py-3 bg-white/5 hover:bg-[#3182f6] border border-white/10 hover:border-[#3182f6] rounded-lg transition-all duration-300 overflow-hidden"
+                                >
+                                    <span className="relative z-10 text-sm font-medium text-white/70 group-hover:text-white transition-colors">
+                                        Load More ({filteredNews.length - displayCount})
+                                    </span>
+                                    <div className="absolute inset-0 bg-gradient-to-r from-[#3182f6]/0 via-[#3182f6]/10 to-[#3182f6]/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                </button>
+                            </div>
+                        )}
+                    </>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5 relative z-30">
                         {CATEGORIES_CONFIG.map((config, idx) => {
@@ -134,7 +150,7 @@ export default function NewsListContainer({
 
                                     <div className="relative z-10 flex flex-col gap-3.5">
                                         <AnimatePresence mode="popLayout">
-                                            {articles.slice(0, 8).map((article: any, i: number) => (
+                                            {articles.slice(0, 5).map((article: any, i: number) => (
                                                 <motion.div
                                                     key={article.id}
                                                     initial={{ opacity: 0, x: -10 }}
@@ -152,18 +168,6 @@ export default function NewsListContainer({
                                 </motion.div>
                             );
                         })}
-                    </div>
-                )}
-
-                {!showCollections && (selectedCategory || searchQuery) && totalPages > 1 && (
-                    <div className="mt-16 flex items-center justify-center gap-4">
-                        {currentPage > 1 && (
-                            <Link href={`/?${selectedCategory ? `category=${encodeURIComponent(selectedCategory)}&` : ''}${searchQuery ? `search=${encodeURIComponent(searchQuery)}&` : ''}page=${currentPage - 1}`} className="p-1.5 rounded-lg bg-white/5 border border-white/10 text-white hover:bg-[#3182f6] transition-all"><ChevronLeft className="w-3.5 h-3.5" /></Link>
-                        )}
-                        <span className="text-white/30 text-[10px] font-medium uppercase tracking-widest">Page {currentPage} / {totalPages}</span>
-                        {currentPage < totalPages && (
-                            <Link href={`/?${selectedCategory ? `category=${encodeURIComponent(selectedCategory)}&` : ''}${searchQuery ? `search=${encodeURIComponent(searchQuery)}&` : ''}page=${currentPage + 1}`} className="p-1.5 rounded-lg bg-white/5 border border-white/10 text-white hover:bg-[#3182f6] transition-all"><ChevronRight className="w-3.5 h-3.5" /></Link>
-                        )}
                     </div>
                 )}
             </div>
@@ -229,19 +233,19 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
                         {isToday && (
                             <span className="text-[8px] font-black text-white bg-red-500 px-1.5 py-0.5 rounded shadow-[0_0_12px_rgba(239,68,68,0.6)] tracking-tighter uppercase inline-block leading-none shrink-0 border border-red-400/50 animate-pulse">NEW</span>
                         )}
-                        <a href={article.link} target="_blank" rel="noopener noreferrer" className="text-[14px] font-bold text-gray-100 group-hover/card:text-blue-400 transition-colors leading-tight line-clamp-2 block tracking-tight">
+                        <a href={article.link} target="_blank" rel="noopener noreferrer" className="text-[14px] font-bold text-white/90 group-hover/card:text-blue-400 transition-colors leading-tight line-clamp-2 block tracking-tight">
                             {article.title}
                         </a>
                     </div>
                     {summaryText && (
-                        <p className="text-[11px] text-white/40 line-clamp-1 leading-tight mb-1 font-normal group-hover/card:text-white/60 transition-colors">{summaryText}</p>
+                        <p className="text-[11px] text-white/55 line-clamp-1 leading-tight mb-1 font-normal group-hover/card:text-white/70 transition-colors">{summaryText}</p>
                     )}
                 </div>
             </div>
             <div className="flex items-center justify-between mt-0.5">
                 <div className="flex flex-wrap gap-1">
                     {uniqueKeywords.slice(0, 2).map((k, i) => (
-                        <span key={i} className="text-[7px] font-bold text-blue-400/60 bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-500/10 uppercase tracking-tight group-hover/card:border-blue-500/30 group-hover/card:text-blue-400 transition-all">
+                        <span key={i} className="text-[11px] font-bold text-blue-400/60 bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-500/10 uppercase tracking-tight group-hover/card:border-blue-500/30 group-hover/card:text-blue-400 transition-all">
                             {k}
                         </span>
                     ))}
@@ -270,7 +274,7 @@ const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, 
     const uniqueKeywords = Array.from(new Set([...analysis.main, ...analysis.sub].filter(k => k && k !== '기타' && k !== '-' && k !== '|' && k.trim() !== '')));
 
     return (
-        <article className={`group py-2 px-4 hover:bg-white/[0.03] border-b border-white/5 flex flex-col gap-0.5 transition-all ${isToday ? 'bg-blue-400/[0.03]' : ''}`}>
+        <article className={`group py-2 px-4 bg-white/[0.02] hover:bg-white/[0.05] hover:scale-[1.01] border-b border-white/5 flex flex-col gap-0.5 transition-all duration-300 ${isToday ? 'bg-blue-400/[0.03]' : ''}`}>
             <div className="flex items-center justify-between text-[9px] font-mono font-medium">
                 <span className={isToday ? 'text-red-400' : 'text-white/30'}>{dateStr} {timeStr}</span>
             </div>
@@ -283,14 +287,14 @@ const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, 
                         {isToday && (
                             <span className="text-[8px] font-black text-white bg-red-500 px-1.5 py-0.5 rounded shadow-[0_0_12px_rgba(239,68,68,0.6)] tracking-tighter uppercase inline-block leading-none shrink-0 border border-red-400/50 animate-pulse">NEW</span>
                         )}
-                        <a href={article.link} target="_blank" rel="noopener noreferrer" className="block"><h3 className="text-[14px] font-bold text-gray-100 group-hover:text-[#3182f6] transition-colors line-clamp-1 leading-tight">{article.title}</h3></a>
+                        <a href={article.link} target="_blank" rel="noopener noreferrer" className="block"><h3 className="text-[14px] font-bold text-white/90 group-hover:text-[#3182f6] transition-colors line-clamp-1 leading-tight">{article.title}</h3></a>
                     </div>
-                    <p className="text-[11px] text-white/35 truncate leading-tight font-normal">{summaryText}</p>
+                    <p className="text-[11px] text-white/55 truncate leading-tight font-normal">{summaryText}</p>
                 </div>
             </div>
             <div className="flex flex-wrap gap-1 pl-5">
                 {uniqueKeywords.slice(0, 4).map((k, i) => (
-                    <span key={i} className="text-[7px] font-medium text-white/15 bg-white/5 px-1.5 py-0.5 rounded border border-white/5 group-hover:border-blue-400/20 group-hover:text-blue-400 transition-all uppercase tracking-tighter">{k}</span>
+                    <span key={i} className="text-[11px] font-medium text-blue-400/60 bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-500/10 group-hover:border-blue-500/30 group-hover:text-blue-400 transition-all uppercase tracking-tighter">{k}</span>
                 ))}
             </div>
         </article>

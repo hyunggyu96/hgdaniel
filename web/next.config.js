@@ -8,6 +8,7 @@ const nextConfig = {
     // Standard Next.js optimizations
     reactStrictMode: true,
 
+
     // Ensuring consistent response headers for caching if needed
     async headers() {
         return [

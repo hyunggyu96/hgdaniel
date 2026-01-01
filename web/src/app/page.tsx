@@ -17,6 +17,7 @@ export default function Page() {
     const currentPage = parseInt(searchParams?.get('page') || '1', 10);
     const searchQuery = searchParams?.get('search') || undefined;
     const showCollections = searchParams?.get('collections') === 'true';
+    const isLandingPage = !selectedCategory && !searchQuery && !showCollections;
 
     return (
         <div className="flex min-h-screen bg-[#101012]">
@@ -31,7 +32,8 @@ export default function Page() {
                     searchQuery={searchQuery}
                     showCollections={showCollections}
                 />
-                {!showCollections && (
+                {/* TrendChart only on Landing Page */}
+                {isLandingPage && (
                     <div className="px-4 md:px-6 lg:px-12 pb-24 text-white">
                         <TrendChart />
                     </div>

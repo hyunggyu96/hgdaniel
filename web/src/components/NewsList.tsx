@@ -43,7 +43,6 @@ export default function NewsList({ selectedCategory, currentPage = 1, searchQuer
     }
 
     const newsByCategory = groupNewsByCategory(allNews);
-    const itemsPerPage = 20;
 
     let filteredNews: any[] = [];
     if (selectedCategory) {
@@ -61,8 +60,6 @@ export default function NewsList({ selectedCategory, currentPage = 1, searchQuer
         );
     }
 
-    const totalPages = Math.ceil(filteredNews.length / itemsPerPage);
-    const paginatedNews = filteredNews.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
     const isLandingPage = !selectedCategory && !searchQuery && !showCollections;
 
@@ -70,9 +67,7 @@ export default function NewsList({ selectedCategory, currentPage = 1, searchQuer
         <NewsListContainer
             allNews={allNews}
             newsByCategory={newsByCategory}
-            paginatedNews={paginatedNews}
-            currentPage={currentPage}
-            totalPages={totalPages}
+            filteredNews={filteredNews}
             selectedCategory={selectedCategory || null}
             searchQuery={searchQuery || null}
             showCollections={showCollections || false}
