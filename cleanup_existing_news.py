@@ -1,7 +1,11 @@
 """기존 articles 테이블을 전수 조사하여 노이즈(자동차, 퀴즈 등) 삭제"""
 import os
+import sys
 import asyncio
 from supabase import create_client
+
+# 경로 추가
+sys.path.append(os.path.join(os.path.dirname(__file__), 'collector'))
 from collector.processor import is_medical_news_ai
 
 SUPABASE_URL = "https://jwkdxygcpfdmavxcbcfe.supabase.co"
