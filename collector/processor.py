@@ -395,8 +395,8 @@ async def process_item(item, worksheet, recent_articles):
                 "source": "Naver",
                 "keyword": keyword, 
                 "main_keywords": final_all_kws,
-                # "ai_summary": summary, # [FIX] DB Column Missing
-                # "issue_nature": issue_nature # [FIX] DB Column Missing
+                # "ai_summary": summary, # [DISABLED] DB Column Missing (Restore later via SQL migration)
+                # "issue_nature": issue_nature # [DISABLED] DB Column Missing
             }
             supabase.table("articles").insert(prod_data).execute()
             supabase_saved = True

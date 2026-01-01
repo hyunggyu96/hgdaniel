@@ -255,6 +255,22 @@ ssh -p 8022 u0_a43@192.168.219.102 "cd ~/news_dashboard && bash start_tablet_sol
 
 **교훈**: 로그만 믿지 말고, **실제 프로세스 개수**와 **구글시트 타임스탬프**를 교차 검증하십시오.
 
+### 💾 2026-01-01 DB 스키마 불일치 사건 (Schema Mismatch)
+
+**증상**: `processor.py`가 V4.2 스펙의 AI 데이터(`ai_summary`, `issue_nature`)를 저장하려다 `Column not found` 에러 발생.
+
+**원인**: Supabase `articles` 테이블에 해당 컬럼을 추가하지 않은 상태에서 코드만 먼저 업데이트됨.
+
+**조치**:
+
+1. `processor.py`에서 해당 필드를 주석 처리하여 에러 임시 해결 (3시간 전 상태 복귀).
+2. 추후 **Supabase Dashboard > SQL Editor**에서 아래 쿼리를 실행해야만 AI 데이터를 온전히 저장 가능함.
+
+```sql
+ALTER TABLE articles ADD COLUMN IF NOT EXISTS ai_summary TEXT;
+ALTER TABLE articles ADD COLUMN IF NOT EXISTS issue_nature TEXT;
+```
+
 ---
 
 > **Note**: 시스템이 멈추거나 이상하면 로그를 확인하기 전에 이 가이드라인을 먼저 읽으십시오. 90%의 정답은 이미 여기에 있습니다.
