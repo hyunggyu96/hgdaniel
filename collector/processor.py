@@ -260,6 +260,29 @@ async def process_item(item, worksheet, recent_articles):
     pub_date = item['pub_date']
     keyword = item['search_keyword']
 
+    # [0] Hard Noise Filter (Sync with Frontend Logic)
+    # 웹사이트와 동일한 필터링 기준 적용 (자동차, 노이즈, 퀴즈 등 무조건 제거)
+    full_text = f"{title} {desc}"
+    
+    # 1. Car Brands Check
+    if any(brand in full_text for brand in CAR_BRANDS):
+        print(f"🚫 Hard Filter: Car Brand detected ({title[:20]}...)")
+        # Mark as processed in raw_news so we don't fetch it again, but DON'T save to articles
+        supabase.table("raw_news").update({"status": "filtered"}).eq("id", raw_id).execute()
+        return False
+
+    # 2. Noise Keywords Check
+    if any(noise in full_text for noise in CAR_NOISE_KEYWORDS):
+        print(f"🚫 Hard Filter: Noise Keyword detected ({title[:20]}...)")
+        supabase.table("raw_news").update({"status": "filtered"}).eq("id", raw_id).execute()
+        return False
+        
+    # 3. Bad Keywords (Quiz, etc)
+    if any(bad in title for bad in BAD_KEYWORDS):
+        print(f"🚫 Hard Filter: Bad Keyword detected ({title[:20]}...)")
+        supabase.table("raw_news").update({"status": "filtered"}).eq("id", raw_id).execute()
+        return False
+
     # [1] Semantic Duplicate Check (V5.1: 80% threshold for Title OR Desc)
     for recent in recent_articles[-300:]: # Check last 300 processed items
         # Title check
