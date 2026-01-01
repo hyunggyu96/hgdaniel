@@ -187,8 +187,10 @@ async def main():
                     last_update_path.write_text(json.dumps(time_registry, indent=2), encoding="utf-8")
                 except Exception as e:
                     print(f"⚠️ Failed to update time registry: {e}")
-                break
-                
+                if single_run:
+                    print("🚀 Single run completed. Exiting.")
+                    break
+
             print("💤 Sleeping for 30 minutes...")
             await asyncio.sleep(1800)
 
