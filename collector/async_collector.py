@@ -63,19 +63,26 @@ async def fetch_naver_news_expert(session, keyword, start_date):
     headers = {"X-Naver-Client-Id": NAVER_CLIENT_ID, "X-Naver-Client-Secret": NAVER_CLIENT_SECRET}
     
     all_items = []
-    # Fetch top 100
-    params = {"query": keyword, "display": 100, "sort": "date"}
-    try:
-        async with session.get(url, headers=headers, params=params) as resp:
-            if resp.status == 200:
-                data = await resp.json()
-                items = data.get('items', [])
-                for item in items:
-                    pub_date = email.utils.parsedate_to_datetime(item['pubDate'])
-                    if pub_date.replace(tzinfo=None) > start_date:
-                        all_items.append(item)
-    except Exception as e:
-        print(f"  ⚠️ Naver API Error for [{keyword}]: {e}")
+    # [V4.6] Fetch 200 items (2 pages) to catch news without keyword in title
+    for start_idx in [1, 101]:
+        params = {"query": keyword, "display": 100, "sort": "date", "start": start_idx}
+        try:
+            async with session.get(url, headers=headers, params=params) as resp:
+                if resp.status == 200:
+                    data = await resp.json()
+                    items = data.get('items', [])
+                    if not items: break
+                    
+                    for item in items:
+                        pub_date = email.utils.parsedate_to_datetime(item['pubDate'])
+                        if pub_date.replace(tzinfo=None) > start_date:
+                            all_items.append(item)
+                        else:
+                            # Since results are sorted by date, we can stop if we hit older news
+                            pass 
+        except Exception as e:
+            print(f"  ⚠️ Naver API Error for [{keyword}] at start={start_idx}: {e}")
+            break
     return all_items
 
 # [5] Process Single Item (Save Raw)
@@ -118,15 +125,18 @@ async def main():
             # ---- Determine start_date ----
             import json, pathlib
             last_update_path = pathlib.Path(__file__).parents[1] / "last_update.json"
+            cycle_start_time = datetime.datetime.now() # Capture this for later saving
+
             if last_update_path.exists():
                 try:
                     data = json.loads(last_update_path.read_text(encoding="utf-8"))
-                    last_run_str = data.get("last_run")
-                    if last_run_str:
-                        start_date = datetime.datetime.fromisoformat(last_run_str.replace('Z', '+00:00')).replace(tzinfo=None)
+                    # [V4.6] Use 'last_collected_at' to avoid interference with processor heartbeat
+                    last_col_str = data.get("last_collected_at") or data.get("last_run") # Compatibility
+                    if last_col_str:
+                        start_date = datetime.datetime.fromisoformat(last_col_str.replace('Z', '+00:00')).replace(tzinfo=None)
                         print(f"📅 start_date from last_update.json: {start_date}")
                     else:
-                        raise ValueError("last_run missing")
+                        raise ValueError("last_collected_at missing")
                 except Exception as e:
                     print(f"⚠️ Failed to parse last_update.json ({e}), falling back to DB")
                     start_date = None
@@ -208,7 +218,17 @@ async def main():
 
                 print(f"🎉 Cycle Complete. Total Added: {total_added}")
 
-            if single_run:
+                # [V4.6] Update ONLY the collection timestamp
+                try:
+                    current_data = {}
+                    if last_update_path.exists():
+                        current_data = json.loads(last_update_path.read_text(encoding="utf-8"))
+                    
+                    current_data["last_collected_at"] = cycle_start_time.isoformat()
+                    current_data["collector_status"] = "active"
+                    last_update_path.write_text(json.dumps(current_data, indent=2), encoding="utf-8")
+                except Exception as e:
+                    print(f"⚠️ Failed to update collection timestamp: {e}")
                 break
                 
             print("💤 Sleeping for 30 minutes...")

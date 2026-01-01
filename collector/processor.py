@@ -490,12 +490,21 @@ async def main():
                 avg_latency = sum(STATS["latencies"]) / len(STATS["latencies"]) if STATS["latencies"] else 0
                 print(f"📊 [Stats] Total: {STATS['total']} | Local: {STATS['local']} | Cloud: {STATS['cloud']} | Avg Latency: {avg_latency:.2f}s")
 
-            # 6. Update Heartbeat
+            # 6. Update Heartbeat (V4.6: Distinct key)
             try:
                 root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
                 update_path = os.path.join(root_dir, "last_update.json")
+                
+                current_data = {}
+                if os.path.exists(update_path):
+                    with open(update_path, "r", encoding='utf-8') as f:
+                        current_data = json.load(f)
+                
+                current_data["processor_heartbeat"] = datetime.datetime.now().isoformat()
+                current_data["processor_status"] = "active"
+                
                 with open(update_path, "w", encoding='utf-8') as f:
-                    json.dump({"last_run": datetime.datetime.now().isoformat(), "status": "active"}, f)
+                    json.dump(current_data, f, indent=2)
             except Exception as e:
                 print(f"⚠️ Failed to update heartbeat: {e}")
 
