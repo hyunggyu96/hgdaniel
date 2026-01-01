@@ -52,6 +52,10 @@ echo "[+] Processor 시작 중..."
 nohup $PYTHON_CMD collector/processor.py >> processor.log 2>&1 &
 PROCESSOR_PID=$!
 
+echo "[+] Auto Sync Bot (감시자) 시작 중..."
+nohup $PYTHON_CMD auto_sync_bot.py >> sync_bot.log 2>&1 &
+BOT_PID=$!
+
 sleep 2
 
 # ============================================
@@ -59,16 +63,18 @@ sleep 2
 # ============================================
 FINAL_COLLECTOR=$(pgrep -f "async_collector.py" | wc -l)
 FINAL_PROCESSOR=$(pgrep -f "processor.py" | wc -l)
+FINAL_BOT=$(pgrep -f "auto_sync_bot.py" | wc -l)
 
 echo ""
 echo "=== 가동 결과 ==="
-echo "  Collector: ${FINAL_COLLECTOR}개 (PID: $COLLECTOR_PID)"
-echo "  Processor: ${FINAL_PROCESSOR}개 (PID: $PROCESSOR_PID)"
+echo "  Collector: ${FINAL_COLLECTOR}개"
+echo "  Processor: ${FINAL_PROCESSOR}개"
+echo "  Sync Bot : ${FINAL_BOT}개"
 
-if [ "$FINAL_COLLECTOR" -eq 1 ] && [ "$FINAL_PROCESSOR" -eq 1 ]; then
-    echo "✅ 정상 가동 완료 (프로세스 각 1개)"
+if [ "$FINAL_COLLECTOR" -ge 1 ] && [ "$FINAL_PROCESSOR" -ge 1 ] && [ "$FINAL_BOT" -ge 1 ]; then
+    echo "✅ 정상 가동 완료 (3대장 실행 중)"
 else
-    echo "🚨 경고: 프로세스 개수 이상! 수동 확인 필요"
+    echo "🚨 경고: 일부 프로세스 미실행! 수동 확인 필요"
     echo "   pgrep -fl python 으로 확인하세요"
 fi
 
