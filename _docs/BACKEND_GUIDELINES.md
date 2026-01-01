@@ -1,7 +1,7 @@
 # 📄 뉴스 대시보드 백엔드 가이드라인 (Unified Backend Guidelines)
 
-**Version**: 2.5 (2026-01-01 New Year Update)
-**Status**: Stable / Monitoring Active
+**Version**: 2.6 (2026-01-01 V4.2 Noise Filter Update)
+**Status**: Stable / AI Filtering Enhanced
 
 이 문서는 뉴스 대시보드 프로젝트의 백엔드 아키텍처, 데이터 파이프라인, 태블릿 운영 수칙, 트러블슈팅을 집대성한 공식 매뉴얼입니다.
 
@@ -97,11 +97,14 @@ graph TD
 - **API 캐싱**: 모든 뉴스 조회 API는 `export const revalidate = 60;`을 적용하여 서버 부하를 최소화합니다.
 - **응답 압축**: `next.config.js`의 `compress: true` 설정을 통해 클라이언트 전송 데이터를 압축합니다.
 
-### 🚨 에러 모니터링
+### 🚨 에러 및 노이즈 모니터링 (V4.2)
 
-- **Sentry (Web)**: Next.js 프론트엔드 및 Vercel API 에러를 실시간 추적합니다. (`NEXT_PUBLIC_SENTRY_DSN` - 끝자리 3872)
-- **Sentry (Tablet)**: 태블릿의 수집/분석 프로세스 에러를 추적합니다. (`SENTRY_DSN` - 끝자리 1408)
-- **자율 주행**: 에러 발생 시 Sentry 보고 후 시스템은 중지되지 않고 30~60초 후 자동 재시도합니다.
+- **Sentry (Web/Tablet)**: 프론트엔드 및 태블릿 분석 에러를 실시간 추적합니다.
+- **자율 주행**: 에러 발생 시 Sentry 보고 후 30~60초 후 자동 재시도합니다.
+- **지능형 노이즈 차단**:
+  - **BAD_KEYWORDS**: 퀴즈(캐시워크, 용돈퀴즈), 자동차(SUV, 신차, B-필러) 관련 키워드 발견 시 AI 분석 전 즉시 폐기합니다.
+  - **Contextual AI Check**: AI가 '필러'라는 단어의 맥락을 읽어 자동차 부품용인지 미용 시술용인지 판별합니다.
+  - **보수적 승인**: AI가 판단하기 모호한 경우, 의료/바이오 관련 키워드가 제목에 포함되지 않으면 폐기하는 것을 원칙으로 합니다.
 
 ---
 
