@@ -48,15 +48,24 @@ if sys.platform == 'win32':
     sys.stdout.reconfigure(encoding='utf-8')
     sys.stderr.reconfigure(encoding='utf-8')
 
-# Import local expert logic
-sys.path.append(os.path.dirname(__file__))
+# [2] Load Keywords from JSON (SSOT)
+shared_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '_shared')
+keywords_path = os.path.join(shared_dir, 'keywords.json')
+EXPERT_ANALYSIS_KEYWORDS = []
+
 try:
-    from local_keyword_extractor import extract_keywords, extract_main_keyword, EXPERT_ANALYSIS_KEYWORDS
-except ImportError:
+    with open(keywords_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+        for cat in data.get('categories', []):
+            EXPERT_ANALYSIS_KEYWORDS.extend(cat.get('keywords', []))
+    print(f"✅ Loaded {len(EXPERT_ANALYSIS_KEYWORDS)} keywords from keywords.json")
+except Exception as e:
+    print(f"⚠️ Failed to load keywords.json: {e}")
+    # Fallback (구형)
     EXPERT_ANALYSIS_KEYWORDS = [
-    "휴젤", "메디톡스", "파마리서치", "대웅제약", "종근당", "제테마", "휴온스", "휴메딕스", "바이오플러스", "바임",
-    "필러", "보톡스", "톡신", "리쥬란", "스킨부스터", "엑소좀", "PN", "PDRN", "품목허가", "임상시험", "기술수출", "M&A"
-]
+        "휴젤", "메디톡스", "파마리서치", "대웅제약", "종근당", "제테마", "휴온스", "휴메딕스", "바이오플러스", "바임",
+        "필러", "보톡스", "톡신", "리쥬란", "스킨부스터", "엑소좀", "PN", "PDRN"
+    ]
 
 # Setup Clients
 SUPABASE_URL = os.getenv("SUPABASE_URL")
@@ -96,10 +105,7 @@ CAR_NOISE_KEYWORDS = [
 ]
 
 # Keywords that are 100% Medical Aesthetic (Safe to skip AI check)
-STRONG_MED_KEYWORDS = [
-    "HA필러", "CaHA필러", "PLLA필러", "HA-필러", "리쥬란", "톡신", "보톡스", "스킨부스터", "엑소좀", 
-    "PN", "PDRN", "피부과", "성형외과", "품목허가", "휴젤", "메디톡스", "파마리서치", "제테마", "클래시스", "바이오플러스", "바임"
-]
+STRONG_MED_KEYWORDS = [k for k in EXPERT_ANALYSIS_KEYWORDS if "필러" in k or "톡신" in k or "리쥬란" in k]
 
 # 🚫 노이즈 차단 키워드 (제목/본문에 있으면 즉시 폐기)
 BAD_KEYWORDS = [
@@ -123,11 +129,17 @@ async def is_medical_news_ai(title, description):
         print(f"  🚫 Noise Filter: Automotive keywords detected in Title")
         return False
 
+    # 화이트리스트 문자열 생성 (Top 50개만 예시로 주입하여 토큰 절약하되, 핵심 기업은 포함)
+    whitelist_sample = ", ".join(EXPERT_ANALYSIS_KEYWORDS[:100]) + "..."
+    
     prompt = (
-        "너는 의료/바이오/미용 성형 분야의 전문 뉴스 데스크야.\n"
+        "너는 의료/바이오/미용 성형 분야의 엄격한 데이터 필터야.\n"
         "아래 뉴스가 [의료/제약/미용성형/바이오] 산업과 관련이 있는지 판단해줘.\n"
-        "특히 '필러'라는 단어가 자동차 부품(A/B/C-Pillar)으로 쓰였거나, '캐시워크/퀴즈' 관련 뉴스라면 무조건 FALSE를 출력해.\n"
-        "중요: 우리가 관리하는 키워드 리스트(keywords.json)에 명시되지 않은 엉뚱한 기업(예: 오스테오닉, 강스템바이오 등)이 메인 주제라면 FALSE를 출력해.\n"
+        "특히 '필러'라는 단어가 자동차 부품(A/B/C-Pillar)으로 쓰였거나, '캐시워크/퀴즈' 관련 뉴스라면 무조건 FALSE.\n\n"
+        "### 매우 중요한 규칙 (STRICT RULE):\n"
+        f"우리는 오직 다음 허용된 키워드 리스트에 있는 기업/제품만 수집한다: [{whitelist_sample}]\n"
+        "만약 기사의 메인 주제가 위 리스트에 없는 엉뚱한 기업(예: 강스템바이오, 오스테오닉 등)이라면, 설령 바이오 뉴스라도 과감히 FALSE를 출력해라.\n"
+        "즉, '허용된 키워드'가 제목이나 본문의 핵심이 아니라면 FALSE다.\n\n"
         "오직 'TRUE' 또는 'FALSE'로만 대답해.\n\n"
         f"제목: {title}\n"
         f"내용: {description}"
