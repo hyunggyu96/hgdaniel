@@ -487,8 +487,10 @@ async def main():
     while True:
         try:
             # 1. Fetch pending items (Batch of 20 for responsiveness)
-            res = supabase.table("raw_news").select("*").eq("status", "pending").limit(20).execute()
+            # 전체 개수 파악을 위해 count='exact' 사용
+            res = supabase.table("raw_news").select("*", count="exact").eq("status", "pending").limit(20).execute()
             pending_items = res.data
+            total_pending = res.count
             
             if not pending_items:
                 # [Smart Scheduling] Use System Local Time (KST)
@@ -519,7 +521,7 @@ async def main():
             # 2. Sort by pub_date ASC (Process oldest first)
             pending_items.sort(key=lambda x: x.get('pub_date', ''))
             
-            print(f"🔎 Found {len(pending_items)} pending items. Processing batch...")
+            print(f"🔎 Found {len(pending_items)} items to process in this batch. (Total Pending: {total_pending})")
             
             # 3. Refresh Resources (Sheet & Context) per batch
             worksheet = get_google_sheet()
