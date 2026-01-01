@@ -190,7 +190,6 @@ async def analyze_article_expert_async(title, description, search_keyword):
         f"- main_keyword: (String) subject from Pool.\n"
         f"- included_keywords: (Array of Strings) 2-4 keywords STRICTLY from Pool.\n"
         f"- issue_nature: (String) One of: [제품 출시/허가, 임상/연구데이터, 실적/수출/경영, 법적분쟁/규제, 투자/M&A, 학회/마케팅, 거시경제/정책, 기타].\n"
-        f"- brief_summary: (String) 1-line Korean summary (~70 chars). No trailing dots or broken words.\n"
         f"- impact_level: (Integer) 1 to 5.\n"
     )
     user_prompt = f"Crawl Keyword: {search_keyword}\nHeadline: {title}\nBody: {description}"
@@ -265,7 +264,9 @@ async def process_item(item, worksheet, recent_articles):
         issue_nature = issue_nature.get("name", "기타") if "name" in issue_nature else "기타"
     issue_nature = str(issue_nature) if issue_nature else "기타"
     
-    summary = str(analysis.get("brief_summary", title[:70]))
+    # [V4.5] AI 요약 대신 원본 발췌문(description) 사용
+    summary = str(desc if desc else title)
+    
     # [Nuclear Option] Cleanup and 70-char hard truncate for frontend safety
     summary = re.sub(r'[\u4e00-\u9fff]', '', summary) # Remove Hanja
     summary = re.sub(r'[\u3040-\u30ff]', '', summary) # Remove Japanese
