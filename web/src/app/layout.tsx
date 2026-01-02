@@ -9,6 +9,7 @@ import { CollectionProvider } from '@/components/CollectionContext';
 import { UserProvider } from '@/components/UserContext';
 import LoginButton from '@/components/LoginButton';
 import MobileNav from '@/components/MobileNav';
+import { GoogleAnalytics } from '@next/third-parties/google';
 
 const noto = Noto_Sans_KR({
   subsets: ["latin"],
@@ -102,6 +103,9 @@ export default function RootLayout({
             </footer>
           </CollectionProvider>
         </UserProvider>
+
+        {/* Google Analytics */}
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ''} />
       </body>
     </html>
   );
