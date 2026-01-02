@@ -216,6 +216,7 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
     const pubDate = article.published_at ? new Date(article.published_at) : null;
     const isToday = pubDate?.toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' }) === today;
     const dateStr = pubDate ? pubDate.toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul', month: '2-digit', day: '2-digit' }).replace(/\. /g, '.').replace(/\.$/, '') : '';
+    const timeStr = pubDate ? pubDate.toLocaleTimeString('ko-KR', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', hour12: false }) : '';
 
     let summaryText = analysis.summary && analysis.summary !== '-' ? analysis.summary : article.description;
     if (summaryText) summaryText = summaryText.replace(/^[\s\-\|]+/, '').trim();
@@ -252,7 +253,7 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
                 </div>
                 <div className="flex items-center gap-2">
                     <span className={`text-[9px] font-mono font-bold ${isToday ? 'text-red-400' : 'text-white/20'}`}>
-                        {dateStr}
+                        {dateStr} {timeStr}
                     </span>
                     <CollectionButton newsLink={article.link} newsTitle={article.title} size={14} />
                 </div>

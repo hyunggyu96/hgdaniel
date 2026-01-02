@@ -78,7 +78,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
         await sheet.saveUpdatedCells();
 
-        // 2. Daily Stats (NEW SHEET: DailyStats_v2)
+        // 2. Daily Stats (NEW SHEET: DailyStats_v2) - IP 기준 고유 방문자 집계
         let statsSheet = doc.sheetsByTitle['DailyStats_v2'];
         if (!statsSheet) {
             statsSheet = await doc.addSheet({ title: 'DailyStats_v2', headerValues: ['Date', 'TotalVisitors'] });
@@ -90,21 +90,35 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }).format(now).replace(/\. /g, '-').replace('.', '');
 
         const dateKey = kstDate; // "YYYY-MM-DD" format
+
+        // Count unique IPs for today from Visits_v2
+        await sheet.loadCells(); // Load all cells from Visits sheet
+        const rows = await sheet.getRows();
+        const todayVisits = rows.filter(r => {
+            const rowDate = r.get('Time');
+            if (!rowDate) return false;
+            // Extract date part from "YYYY. M. D. HH:MM:SS" format
+            const datePart = rowDate.split('.').slice(0, 3).join('.').trim();
+            const normalizedDate = datePart.replace(/\. /g, '-').replace('.', '');
+            return normalizedDate === dateKey;
+        });
+
+        const uniqueIPs = new Set(todayVisits.map(r => r.get('IP')).filter(Boolean));
+        const todayCount = uniqueIPs.size;
+
+        // Update or create stats row
         const statsRows = await statsSheet.getRows();
         const todayRow = statsRows.find(r => r.get('Date') === dateKey);
-        let todayCount = 1;
 
         if (todayRow) {
-            const current = parseInt(todayRow.get('TotalVisitors'), 10) || 0;
-            todayCount = current + 1;
             todayRow.set('TotalVisitors', String(todayCount));
             await todayRow.save();
         } else {
             // @ts-ignore
-            await statsSheet.addRow({ 'Date': dateKey, 'TotalVisitors': '1' }, { insert: true });
+            await statsSheet.addRow({ 'Date': dateKey, 'TotalVisitors': String(todayCount) }, { insert: true });
         }
 
-        return res.status(200).json({ count: todayCount, success: true });
+        return res.status(200).json({ count: todayCount, uniqueIPs: todayCount, success: true });
 
     } catch (e: any) {
         console.error('Track API Error:', e);

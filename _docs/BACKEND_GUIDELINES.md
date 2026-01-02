@@ -121,6 +121,10 @@ graph TD
 1. **양방향 체크**: 새로운 기업을 추가할 때는 `.env`(수집용)와 `keywords.json`(분석용)에 **모두 추가**해야 확실하게 수집됩니다.
 2. **오타 주의**: '한스바이오메드'와 같이 정확한 회사명을 입력해야 합니다.
 3. **제외 처리**: 특정 기업(대웅제약 등)을 빼고 싶다면, **수집 키워드(.env)에서 우선 삭제**하여 원천 차단하는 것이 가장 효율적입니다.
+4. **동음이의어 주의** (2026-01-02 추가):
+   - **"바임"** = 의료기기 회사 (VIME) ✅ vs. 노벨문학상 소설 제목 ❌
+   - 문학/출판 뉴스가 "바임" 키워드로 수집될 수 있음
+   - **해결**: `BAD_KEYWORDS`에 문학 키워드 추가 (작가, 문학, 소설, 출판, 노벨문학상)
 
 ---
 
@@ -165,6 +169,7 @@ graph TD
 - **자율 주행**: 에러 발생 시 Sentry 보고 후 30~60초 후 자동 재시도합니다.
 - **지능형 노이즈 차단**:
   - **BAD_KEYWORDS**: 퀴즈(캐시워크, 용돈퀴즈), 자동차(SUV, 신차, B-필러) 관련 키워드 발견 시 AI 분석 전 즉시 폐기합니다.
+  - **CAR_BRANDS (Sync with Frontend)**: 현대차, 기아, 르노 등 자동차 브랜드 및 노이즈 키워드(시승기, 중고차)가 포함된 기사는 **DB/구글 시트 저장 단계에서 원천 차단**하여 웹사이트와 100% 동일한 필터링 기준을 적용합니다.
   - **Contextual AI Check**: AI가 '필러'라는 단어의 맥락을 읽어 자동차 부품용인지 미용 시술용인지 판별합니다.
   - **보수적 승인**: AI가 판단하기 모호한 경우, 의료/바이오 관련 키워드가 제목에 포함되지 않으면 폐기하는 것을 원칙으로 합니다.
 
@@ -172,7 +177,7 @@ graph TD
 
 ## 📊 5. 구글 시트 스키마 (Distributed Multi-Sheet System)
 
-**핵심 규칙**: 모든 시트의 데이터는 **최신 항목이 상단(Row 2)**에 오도록 기록해야 합니다.
+**핵심 규칙**: 모든 시트의 데이터는 **최신 항목이 상단(Row 2)**에 오도록 기록해야 합니다. (발행일시 기준 내림차순 정렬 필수)
 
 - **Node.js**: `insertDimension` 요청으로 2행을 삽입한 후, `loadCells/getCell`로 데이터를 채우십시오. (v4 고수준 API의 한계 극복)
 - **Python**: `sheet.insert_row(data, 2)`를 사용하여 최신 데이터를 상단에 배치하십시오.
@@ -330,6 +335,75 @@ ssh -p 8022 u0_a43@192.168.219.102 "cd ~/news_dashboard && bash start_tablet_sol
 ALTER TABLE articles ADD COLUMN IF NOT EXISTS ai_summary TEXT;
 ALTER TABLE articles ADD COLUMN IF NOT EXISTS issue_nature TEXT;
 ```
+
+### 🎯 2026-01-02 keyword 필드 분류 오류 사건 (Keyword Misclassification)
+
+**증상**: "원텍, 다음은 제모 레이저" 기사가 **BOTULINUM TOXIN** 카테고리로 잘못 분류됨. 사용자가 웹사이트에서 발견.
+
+**원인 분석**:
+
+1. **본문에 "보톡스" 1회 언급** → 네이버 "보톡스" 검색 결과에 포함됨
+2. `processor.py` 446번 라인에서 **네이버 검색어를 그대로 `keyword` 필드에 저장**:
+
+   ```python
+   "keyword": keyword,  # ← "보톡스" (검색어)
+   ```
+
+3. 프론트엔드 `constants.ts` 43번 라인에서 `keyword` 필드에 **100점 가중치** 부여:
+
+   ```typescript
+   if (article.keyword === k) score += 100;
+   ```
+
+4. 결과: AI가 "레이저"로 분석했음에도 불구하고, keyword 필드의 "보톡스"가 압도적 점수를 받아 Toxin 카테고리로 분류됨
+
+**발견 범위**: 원텍 레이저 관련 기사 **17개** 동일 증상
+
+**임시 조치** (2026-01-02):
+
+PC에서 Supabase DB 직접 수정 스크립트 실행:
+
+```python
+# fix_wontek_keyword.py
+supabase.table('articles')\
+    .update({'keyword': '레이저'})\
+    .ilike('title', '%원텍%레이저%')\
+    .execute()
+```
+
+**근본 해결** (태블릿 작업 필요):
+
+`processor.py` 446번 라인 수정:
+
+```python
+# 수정 전 (검색어 그대로 저장)
+"keyword": keyword,
+
+# 수정 후 (AI 분석 결과 사용)
+"keyword": final_main,
+```
+
+**교훈**:
+
+> **"네이버 검색 키워드 ≠ 기사의 실제 주제"**
+>
+> 본문에 타 키워드가 단 1회만 언급되어도 검색 결과에 포함될 수 있다. 따라서 **검색어(`keyword`)를 그대로 DB에 저장하면 안 되며**, 반드시 **AI 분석 결과(`final_main`)**를 우선해야 한다.
+
+**추가 권장 사항**:
+
+1. **DB 스키마 확장** (검색어 추적이 필요한 경우):
+
+   ```sql
+   ALTER TABLE articles ADD COLUMN IF NOT EXISTS search_keyword TEXT;
+   ```
+
+2. **프론트엔드 로직 조정**: `keyword` 필드 가중치(100점)를 줄이고 `main_keywords` 배열을 더 활용
+
+**작업 기록**:
+
+- 알림 파일: `❗TABLET_WORK_PENDING.md` (작업 완료 후 자동 삭제)
+- 워크플로우: `.agent/workflows/tablet-fix.md` (`/tablet-fix` 명령어)
+- 상세 가이드: `_docs/TABLET_TODO.md`
 
 ---
 

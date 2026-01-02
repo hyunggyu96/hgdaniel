@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, Title, Text } from '@tremor/react';
-import { AreaChart as RAreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart as RAreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip, ResponsiveContainer, Legend } from 'recharts';
 import { useEffect, useState } from 'react';
 
 interface TrendData {
@@ -19,9 +19,18 @@ export default function TrendChartInner() {
             try {
                 const res = await fetch('/api/trends');
                 const json = await res.json();
-                if (json.data) {
-                    setData(json.data);
-                    setCategories(json.categories);
+                if (json.data && json.categories) {
+                    // Corporate News 제외
+                    const filteredCategories = json.categories.filter((c: string) => c !== 'Corporate News');
+
+                    // 데이터에서도 Corporate News 필드 제거
+                    const filteredData = json.data.map((item: any) => {
+                        const { 'Corporate News': removed, ...rest } = item;
+                        return rest;
+                    });
+
+                    setData(filteredData);
+                    setCategories(filteredCategories);
                 }
             } catch (err) {
                 console.error("Failed to fetch trend data", err);
@@ -38,23 +47,22 @@ export default function TrendChartInner() {
 
     const CATEGORY_COLORS: Record<string, string> = {
         'Filler': '#3182f6', // Premium Blue
-        'Botulinum Toxin': '#00d084', // Mint Green
-        'Collagen Stimulator': '#ff6900', // Orange
-        'Exosome': '#abb8c3', // Gray
-        'PDRN/PN': '#eb144c', // Red/Pink
-        'Skinboosters/Threads': '#f78da7', // Soft Pink
-        'Machines (EBD)': '#9900ef', // Purple
-        'Corporate News': '#0693e3' // Cyan
+        'Botulinum Toxin': '#10b981', // Emerald Green
+        'Collagen Stimulator': '#f59e0b', // Amber
+        'Exosome': '#ec4899', // Pink
+        'PDRN/PN': '#8b5cf6', // Purple
+        'Skinboosters/Threads': '#06b6d4', // Cyan
+        'Machines (EBD)': '#f97316', // Orange
     };
 
     const getColor = (category: string, index: number) => {
-        return CATEGORY_COLORS[category] || ['#3182f6', '#00d084', '#ff6900', '#abb8c3', '#eb144c', '#f78da7'][index % 6];
+        return CATEGORY_COLORS[category] || '#3182f6';
     };
 
     return (
         <Card className="mt-4 bg-[#1e1e20] border-white/5 shadow-2xl">
             <Title className="text-xl font-black text-white tracking-tight">키워드 뉴스 트렌드</Title>
-            <Text className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mt-1">Real-time Keyword Mentions (Last 7 Days)</Text>
+            <Text className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mt-1">제품 카테고리별 뉴스 발생 추이 (최근 7일)</Text>
 
             <div className="flex flex-wrap gap-x-4 gap-y-2 mt-4 ml-1">
                 {categories.map((c, i) => (
@@ -65,14 +73,14 @@ export default function TrendChartInner() {
                 ))}
             </div>
 
-            <div className="h-72 w-full mt-6">
+            <div className="h-96 w-full mt-6">
                 <ResponsiveContainer width="100%" height="100%">
-                    <RAreaChart data={data} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                    <RAreaChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                         <defs>
                             {categories.map((c, i) => (
                                 <linearGradient key={`gradient-${c}`} id={`color-${c}`} x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor={getColor(c, i)} stopOpacity={0.4} />
-                                    <stop offset="95%" stopColor={getColor(c, i)} stopOpacity={0} />
+                                    <stop offset="5%" stopColor={getColor(c, i)} stopOpacity={0.6} />
+                                    <stop offset="95%" stopColor={getColor(c, i)} stopOpacity={0.05} />
                                 </linearGradient>
                             ))}
                         </defs>
@@ -81,18 +89,25 @@ export default function TrendChartInner() {
                             dataKey="date"
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: 700 }}
+                            tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: 600 }}
                             dy={10}
                         />
                         <YAxis
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: 700 }}
+                            tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: 600 }}
+                            label={{ value: '뉴스 개수', angle: -90, position: 'insideLeft', fill: 'rgba(255,255,255,0.3)', fontSize: 10 }}
                         />
                         <RTooltip
-                            contentStyle={{ backgroundColor: '#101012', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', boxShadow: '0 20px 40px rgba(0,0,0,0.4)' }}
-                            itemStyle={{ fontSize: '11px', fontWeight: 800, padding: '2px 0' }}
-                            labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: '10px', marginBottom: '4px', fontWeight: 700 }}
+                            contentStyle={{
+                                backgroundColor: '#101012',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '12px',
+                                boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+                                padding: '12px'
+                            }}
+                            itemStyle={{ fontSize: '12px', fontWeight: 700, padding: '4px 0' }}
+                            labelStyle={{ color: 'rgba(255,255,255,0.6)', fontSize: '11px', marginBottom: '8px', fontWeight: 700 }}
                             itemSorter={(item: any) => -item.value}
                         />
                         {categories.map((c, i) => (
@@ -102,10 +117,12 @@ export default function TrendChartInner() {
                                 dataKey={c}
                                 stroke={getColor(c, i)}
                                 fill={`url(#color-${c})`}
-                                strokeWidth={2}
+                                strokeWidth={2.5}
                                 stackId={undefined}
-                                animationDuration={1000}
-                                fillOpacity={0.15}
+                                animationDuration={1200}
+                                fillOpacity={1}
+                                dot={{ r: 3, fill: getColor(c, i), strokeWidth: 0 }}
+                                activeDot={{ r: 5, strokeWidth: 2, stroke: '#fff' }}
                             />
                         ))}
                     </RAreaChart>

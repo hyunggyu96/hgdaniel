@@ -71,6 +71,21 @@ def sync_to_new_sheet():
             keywords_str = str(main_keywords)
             main_kw = ""
         
+        # 필터링 (V5.2 전수 검사)
+        CAR_BRANDS = ["르노코리아", "르노삼성", "현대차", "기아차", "쌍용차", "KG모빌리티", "쉐보레", "폭스바겐", "메르세데스", "벤츠", "BMW", "아르카나", "토레스", "그랜저", "제네시스", "테슬라"]
+        NOISE = ["시승기", "자동차 리콜", "타이어 교체", "중고차", "전기차", "수소차", "도로공사", "블랙박스", "당구(PBA)", "프로농구", "프로배구"]
+        BAD = ["캐시워크", "캐시닥", "용돈퀴즈", "돈버는퀴즈", "정답", "퀴즈", "신차", "SUV", "A-필러", "B-필러", "C-필러", "디지털키"]
+        
+        full_text = f"{article.get('title', '')} {article.get('description', '')}"
+        
+        should_skip = False
+        if any(b in full_text for b in CAR_BRANDS): should_skip = True
+        elif any(n in full_text for n in NOISE): should_skip = True
+        elif any(bd in article.get('title', '') for bd in BAD): should_skip = True
+        
+        if should_skip:
+            continue
+
         row = [
             pub_date_kst,  # 분석시각 (발행일 사용)
             article.get('keyword', ''),
