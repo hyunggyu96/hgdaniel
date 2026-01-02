@@ -84,23 +84,36 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             statsSheet = await doc.addSheet({ title: 'DailyStats_v2', headerValues: ['Date', 'TotalVisitors'] });
         }
 
-        const kstDate = new Intl.DateTimeFormat('ko-KR', {
+        // Get today's date in KST (YYYY-MM-DD format)
+        const kstDate = new Intl.DateTimeFormat('en-CA', {
             timeZone: 'Asia/Seoul',
             year: 'numeric', month: '2-digit', day: '2-digit'
-        }).format(now).replace(/\. /g, '-').replace('.', '');
+        }).format(now); // "YYYY-MM-DD"
 
-        const dateKey = kstDate; // "YYYY-MM-DD" format
+        const dateKey = kstDate;
 
         // Count unique IPs for today from Visits_v2
-        await sheet.loadCells(); // Load all cells from Visits sheet
         const rows = await sheet.getRows();
         const todayVisits = rows.filter(r => {
             const rowDate = r.get('Time');
             if (!rowDate) return false;
-            // Extract date part from "YYYY. M. D. HH:MM:SS" format
-            const datePart = rowDate.split('.').slice(0, 3).join('.').trim();
-            const normalizedDate = datePart.replace(/\. /g, '-').replace('.', '');
-            return normalizedDate === dateKey;
+
+            // Time format: "2026. 1. 2. 16:47:30"
+            // Extract just the date part and normalize
+            try {
+                // Parse the Korean date format
+                const parts = rowDate.split('.');
+                if (parts.length < 3) return false;
+
+                const year = parts[0].trim();
+                const month = parts[1].trim().padStart(2, '0');
+                const day = parts[2].trim().padStart(2, '0');
+                const rowDateKey = `${year}-${month}-${day}`;
+
+                return rowDateKey === dateKey;
+            } catch (e) {
+                return false;
+            }
         });
 
         const uniqueIPs = new Set(todayVisits.map(r => r.get('IP')).filter(Boolean));
@@ -118,7 +131,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             await statsSheet.addRow({ 'Date': dateKey, 'TotalVisitors': String(todayCount) }, { insert: true });
         }
 
-        return res.status(200).json({ count: todayCount, uniqueIPs: todayCount, success: true });
+        return res.status(200).json({ count: todayCount, uniqueIPs: todayCount, date: dateKey, success: true });
 
     } catch (e: any) {
         console.error('Track API Error:', e);
