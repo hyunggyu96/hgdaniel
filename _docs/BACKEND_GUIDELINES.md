@@ -66,6 +66,29 @@ git pull
 - ❌ `ollama serve` (Segmentation Fault)
 - ✅ `llama-server` (Termux llama-cpp)
 
+### 6. 키워드 관리 (SSOT)
+
+**절대 원칙**: `_shared/keywords.json`이 유일한 진실의 원천 (Single Source of Truth)
+
+- ❌ 코드에 하드코딩 금지
+- ✅ JSON 파일 로드하여 사용
+- ⚠️ 키워드 추가 시 **양방향 체크**:
+  - `collector/.env` KEYWORDS (수집용)
+  - `_shared/keywords.json` (AI 분석용)
+
+**현재 총 173개 키워드** (V5.2):
+
+- Filler (29종), Toxin (24종), PDRN/PN (9종)
+- Exosome (6종), Collagen Stimulator (24종)
+- Skinboosters/Threads (22종), Machines/EBD (32종)
+- Corporate/Other (26종)
+
+**주의사항**:
+
+- 동음이의어 확인 (예: "바임" = 의료기기 vs 소설)
+- 새 키워드 추가 → 두 곳 모두 업데이트
+- 삭제 시에도 두 곳 모두 확인
+
 ---
 
 ## ✅ 필수 검증 체크리스트
