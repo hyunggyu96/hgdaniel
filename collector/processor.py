@@ -471,11 +471,16 @@ async def process_item(item, worksheet, recent_articles):
                 except: pass
 
                 row = [now_str, keyword, title, link, final_main, ", ".join(final_all_kws), pd_kst_str, issue_nature, summary]
-                worksheet.insert_row(row, 2)
-                print(f"  📑 Saved to Google Sheets (Synced)")
                 
-                # Update history for deduplication
-                recent_articles.append({'title': title, 'link': link})
+                try:
+                    worksheet.insert_row(row, 2)
+                    print(f"  📑 Saved to Google Sheets (Synced)")
+                    # Update history for deduplication
+                    recent_articles.append({'title': title, 'link': link})
+                except Exception as sheet_err:
+                    # Grid ID errors are non-critical - data is already in Supabase
+                    print(f"  ⚠️ Google Sheet Warning (non-critical): {str(sheet_err)[:100]}")
+                    
             except Exception as e:
                 print(f"  ⚠️ Google Sheet Error: {e}")
 
