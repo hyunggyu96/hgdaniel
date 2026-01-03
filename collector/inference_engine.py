@@ -72,44 +72,12 @@ class InferenceEngine:
         except Exception:
             return None
 
-    async def call_gemini(self, system_prompt: str, user_prompt: str) -> Optional[Dict[str, Any]]:
-        full_prompt = f"{system_prompt}\n\n{user_prompt}"
-        start_time = time.time()
-        
-        for k in self.gemini_keys:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={k}"
-            payload = {
-                "contents": [{"parts": [{"text": full_prompt}]}],
-                "generationConfig": {"response_mime_type": "application/json"}
-            }
-            try:
-                async with aiohttp.ClientSession() as session:
-                    async with session.post(url, json=payload, timeout=15) as resp:
-                        if resp.status == 200:
-                            res_json = await resp.json()
-                            text = res_json['candidates'][0]['content']['parts'][0]['text']
-                            latency = time.time() - start_time
-                            data = json.loads(text)
-                            return {**data, "model": "Gemini-2.0-Flash", "latency": latency, "provider": "cloud"}
-                        elif resp.status == 429:
-                            print(f"  [Gemini] Quota Exceeded (429). Trying next key...")
-                            continue
-            except Exception as e:
-                print(f"  [Gemini] Error: {e}")
-                continue
-        return None
-
     async def get_analysis_hybrid(self, system_prompt: str, user_prompt: str) -> Dict[str, Any]:
-        # 1. Try Local First (Save Tokens!)
+        # [V5.0] 로컬 AI(태블릿) 전용 모드 (외부 API 미사용)
         result = await self.call_local_llm(system_prompt, user_prompt)
         if result:
             return result
         
-        # 2. Fallback to Cloud (Only if Local fails)
-        print("  ⚠️ Local engine failed/offline. Falling back to Cloud...")
-        result = await self.call_gemini(system_prompt, user_prompt)
-        if result:
-            return result
-            
-        # 3. Last resort
-        return {"error": "All engines failed"}
+        # 로컬 AI 실패 시 즉시 에러 반환 (외부 API Fallback 제거)
+        print("  ❌ Local engine failed/offline. (Cloud Fallback Disabled by User)")
+        return {"error": "Local engine failed"}

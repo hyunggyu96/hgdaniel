@@ -251,21 +251,7 @@ async def analyze_article_expert_async(title, description, search_keyword):
 
     analysis = await inference_manager.get_analysis_hybrid(system_prompt, user_prompt)
     
-    if "error" in analysis:
-        # Fallback to local logic if all AI models fail
-        print(f"⚠️ [FALLBACK] All AI models failed. Using local keyword extractor.")
-        local_main = extract_main_keyword(description, title=title)
-        local_sub = extract_keywords(f"{title} {description}")
-        if local_main in local_sub: local_sub.remove(local_main)
-        
-        return {
-            "main_keyword": local_main,
-            "included_keywords": local_sub,
-            "issue_nature": "기타",
-            "brief_summary": title[:99],
-            "impact_level": 1,
-            "model": "Fallback-Local"
-        }
+    # [V5.1] AI 분석 실패 시 Fallback(로컬 추출) 대신 에러를 반환하여 수동 검토 유도
     return analysis
 
 # [4] Semantic Deduplication (Point 3)
@@ -351,10 +337,14 @@ async def process_item(item, worksheet, recent_articles):
             supabase.table("raw_news").update({"status": "duplicate"}).eq("id", raw_id).execute()
             return None
 
-    # [2] AI Analysis (Hybrid: Local First)
-    # We analyze it FIRST to get context
     print(f"🤖 Analyzing: {title[:40]}...")
     analysis = await analyze_article_expert_async(title, desc, keyword)
+    
+    # [V5.1] AI 분석 실패 처리
+    if "error" in analysis:
+        print(f"  ❌ AI Analysis Failed. Moving to 'ai_error' status for manual review.")
+        supabase.table("raw_news").update({"status": "ai_error"}).eq("id", raw_id).execute()
+        return False
     
     # Extract AI fields (safely handle dict values)
     ai_main = analysis.get("main_keyword", "기타")
