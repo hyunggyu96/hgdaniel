@@ -61,11 +61,59 @@ try:
     print(f"✅ Loaded {len(EXPERT_ANALYSIS_KEYWORDS)} keywords from keywords.json")
 except Exception as e:
     print(f"⚠️ Failed to load keywords.json: {e}")
-    # Fallback (구형)
-    EXPERT_ANALYSIS_KEYWORDS = [
-        "휴젤", "메디톡스", "파마리서치", "대웅제약", "종근당", "제테마", "휴온스", "휴메딕스", "바이오플러스", "바임",
-        "필러", "보톡스", "톡신", "리쥬란", "스킨부스터", "엑소좀", "PN", "PDRN"
-    ]
+    EXPERT_ANALYSIS_KEYWORDS = ["휴젤", "메디톡스", "파마리서치", "대웅제약", "필러", "보톡스"]
+
+# [2.5] Category Mapping Logic (Sync with Frontend lib/constants.ts)
+CATEGORIES_CONFIG = []
+try:
+    with open(keywords_path, 'r', encoding='utf-8') as f:
+        CATEGORIES_CONFIG = json.load(f).get('categories', [])
+except: pass
+
+def determine_category(title, description, search_keyword):
+    """Determines news category based on keyword scores (Matches Frontend Logic)"""
+    content = f"{title or ''} {search_keyword or ''} {description or ''}"
+    best_category = "Corporate News"
+    highest_score = 0
+    category_scores = {}
+    
+    # Identify corporate keywords
+    corporate_config = next((c for c in CATEGORIES_CONFIG if c['label'] == "Corporate News"), None)
+    corporate_keywords = corporate_config['keywords'] if corporate_config else []
+    mentioned_companies = [k for k in corporate_keywords if k in content]
+    is_multi_company = len(mentioned_companies) >= 2
+    
+    for config in CATEGORIES_CONFIG:
+        label = config['label']
+        keywords = config['keywords']
+        score = 0
+        is_corporate = (label == "Corporate News")
+        
+        for k in keywords:
+            if search_keyword == k: score += 100
+            if title and k in title: score += 50
+            if description and k in description: score += 10
+            
+        if is_corporate and is_multi_company:
+            score += 150
+            
+        category_scores[label] = score
+        if score > highest_score:
+            highest_score = score
+            best_category = label
+            
+    # Rule: Product category takes priority if title matches
+    if best_category == "Corporate News":
+        best_product_cat = None
+        max_product_score = 0
+        for label, score in category_scores.items():
+            if label != "Corporate News" and score > max_product_score:
+                max_product_score = score
+                best_product_cat = label
+        if best_product_cat and max_product_score >= 50:
+            best_category = best_product_cat
+            
+    return best_category
 
 # Import local expert logic (Must be AFTER keyword loading or passed explicitly)
 sys.path.append(os.path.dirname(__file__))
@@ -433,20 +481,19 @@ async def process_item(item, worksheet, recent_articles):
             dup_reason = f"Similar to: {dup_title[:20]}..."
 
     # [5] SAVE TO SUPABASE (중복 아닐 때만)
-    # V3.0: 완벽 동기화 - Supabase 저장 성공 시에만 구글시트에도 저장
     supabase_saved = False
+    category = determine_category(title, desc, keyword)
     if not is_duplicate:
         try:
             prod_data = {
                 "title": title, 
-                "description": desc,  # 원본 보관 (웹/시트 표시용)
+                "description": desc,
                 "link": link,
                 "published_at": pub_date, 
                 "source": "Naver",
                 "keyword": keyword, 
                 "main_keywords": final_all_kws,
-                # "ai_summary": summary, # [DISABLED] DB Column Missing (Restore later via SQL migration)
-                # "issue_nature": issue_nature # [DISABLED] DB Column Missing
+                "category": category # NEW: Category Storage
             }
             supabase.table("articles").insert(prod_data).execute()
             supabase_saved = True
@@ -470,7 +517,7 @@ async def process_item(item, worksheet, recent_articles):
                     pd_kst_str = (pd_utc + datetime.timedelta(hours=9)).strftime("%Y-%m-%d %H:%M:%S")
                 except: pass
 
-                row = [now_str, keyword, title, link, final_main, ", ".join(final_all_kws), pd_kst_str, issue_nature, summary]
+                row = [now_str, keyword, category, title, link, final_main, ", ".join(final_all_kws), pd_kst_str, issue_nature, summary]
                 
                 try:
                     worksheet.insert_row(row, 2)

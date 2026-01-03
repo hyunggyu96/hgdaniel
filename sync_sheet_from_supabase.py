@@ -43,7 +43,7 @@ def sync_to_new_sheet():
     print(f"   새 시트 '{new_sheet_name}' 생성 완료")
     
     # 5. 헤더 작성
-    headers = ["분석시각", "검색키워드", "제목", "링크", "메인키워드", "전체키워드", "발행일", "이슈성격", "요약"]
+    headers = ["분석시각", "검색키워드", "카테고리", "제목", "링크", "메인키워드", "전체키워드", "발행일", "이슈성격", "요약"]
     new_worksheet.append_row(headers)
     
     # 6. 데이터 변환 및 작성 (배치로)
@@ -86,16 +86,32 @@ def sync_to_new_sheet():
         if should_skip:
             continue
 
+        # [V5.3] 정확한 시간 필드 추출
+        # 분석시각 (DB 기록 시간: created_at)
+        raw_created_at = article.get('created_at')
+        if raw_created_at:
+            try:
+                # ISO 포맷 변환 (Z 또는 +00:00 처리)
+                c_dt = datetime.datetime.fromisoformat(str(raw_created_at).replace('Z', '+00:00'))
+                created_at_kst = (c_dt + datetime.timedelta(hours=9)).strftime("%Y-%m-%d %H:%M:%S")
+            except Exception as e:
+                print(f"  ⚠️ Time conversion error (created_at): {e}")
+                created_at_kst = str(raw_created_at)[:19]
+        else:
+            # created_at이 없으면 최후의 수단으로 현재 시각 사용 (발행일로 덮어쓰지 않음)
+            created_at_kst = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
         row = [
-            pub_date_kst,  # 분석시각 (발행일 사용)
+            created_at_kst, # 1. 분석시각
             article.get('keyword', ''),
+            article.get('category', '기타'), # 3. 카테고리 (NEW)
             article.get('title', ''),
             article.get('link', ''),
             main_kw,
             keywords_str,
-            pub_date_kst,
-            article.get('issue_nature', ''), # 이슈 성격은 유지
-            article.get('description', '')[:100] if article.get('description') else "" # V4.1: 다시 원본 내용 사용
+            pub_date_kst,   # 8. 발행일
+            article.get('issue_nature', ''),
+            article.get('description', '')[:100] if article.get('description') else ""
         ]
         rows_to_add.append(row)
     
