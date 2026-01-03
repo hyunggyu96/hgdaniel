@@ -1,26 +1,48 @@
-"""Supabase articles 테이블 확인"""
-import os
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""태블릿 processor.py 수정 후 검증 스크립트"""
+
 from supabase import create_client
+import os
+from dotenv import load_dotenv
+from datetime import datetime, timedelta
 
-SUPABASE_URL = "https://jwkdxygcpfdmavxcbcfe.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp3a2R4eWdjcGZkbWF2eGNiY2ZlIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NjQ4NDY2NywiZXhwIjoyMDgyMDYwNjY3fQ.wpTvHzqa2yewcmBDWx-XURlMssAgOLQNr5m626R4_vo"
+load_dotenv('collector/.env')
+supabase = create_client(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_KEY'))
 
-client = create_client(SUPABASE_URL, SUPABASE_KEY)
+print("=" * 80)
+print("✅ 태블릿 processor.py 수정 검증")
+print("=" * 80)
 
-print("=" * 60)
-print("📊 Supabase articles 테이블 (웹사이트 표시용)")
-print("=" * 60)
+# 최근 1시간 이내 기사 확인
+one_hour_ago = (datetime.now() - timedelta(hours=1)).isoformat()
 
-# 최신 10개
-result = client.table('articles').select('title, published_at').order('published_at', desc=True).limit(10).execute()
+res = supabase.table('articles')\
+    .select('id, title, keyword, main_keywords, published_at')\
+    .gte('published_at', one_hour_ago)\
+    .order('published_at', desc=True)\
+    .limit(10)\
+    .execute()
 
-print("\n[최신 10개 뉴스]")
-for r in result.data:
-    pub = r['published_at'][:16].replace('T', ' ') if r['published_at'] else "N/A"
-    print(f"  📰 [{pub}] {r['title'][:45]}...")
+articles = res.data
 
-# 1월 1일 데이터 개수
-jan1_result = client.table('articles').select('id', count='exact').gte('published_at', '2026-01-01').execute()
-print(f"\n[2026-01-01 이후 데이터]: {jan1_result.count}개")
+print(f"\n📊 최근 1시간 처리된 기사: {len(articles)}개\n")
 
-print("=" * 60)
+if not articles:
+    print("⚠️ 아직 새로 처리된 기사가 없습니다.")
+    print("💡 5-10분 후 다시 확인해주세요.")
+else:
+    for idx, article in enumerate(articles, 1):
+        print(f"[{idx}] {article['title'][:50]}...")
+        print(f"    keyword: {article['keyword']}")
+        print(f"    main_keywords: {article['main_keywords']}")
+        print(f"    published_at: {article['published_at']}")
+        print()
+
+    print("\n✅ 작동 확인 포인트:")
+    print("1. keyword 필드가 AI 분석 결과를 반영하는지 확인")
+    print("2. '레이저' 기사는 keyword가 '레이저'여야 함")
+    print("3. '필러' 기사는 keyword가 '필러'여야 함")
+    print("4. 문학/출판 뉴스가 필터링되는지 확인")
+
+print("\n" + "=" * 80)

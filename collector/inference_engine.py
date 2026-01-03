@@ -7,20 +7,25 @@ from typing import Dict, Any, Optional
 
 class InferenceEngine:
     def __init__(self):
-        self.semaphore = asyncio.Semaphore(3) # Max 3 concurrent requests to tablet
-        self.local_host = os.getenv("OLLAMA_HOST", "http://192.168.0.15:11434") # Default placeholder
-        self.model = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
+        self.semaphore = asyncio.Semaphore(1) # Reduce concurrency for stability
+        self.local_host = os.getenv("OLLAMA_HOST", "http://127.0.0.1:8080") # Target llama-server
+        self.model = os.getenv("OLLAMA_MODEL", "qwen-3b") # Model alias
         self.gemini_keys = [os.getenv("GEMINI_API_KEY"), os.getenv("GEMINI_API_KEY_2")]
         self.gemini_keys = [k for k in self.gemini_keys if k]
         
-    async def call_ollama(self, system_prompt: str, user_prompt: str) -> Optional[Dict[str, Any]]:
-        url = f"{self.local_host}/api/generate"
-        print(f"  [Ollama Debug] Connecting to: {url}")
+    async def call_local_llm(self, system_prompt: str, user_prompt: str) -> Optional[Dict[str, Any]]:
+        # Try OpenAI compatible endpoint (llama-server)
+        url = f"{self.local_host}/v1/chat/completions"
+        print(f"  [Local LLM] Connecting to: {url}")
+        
         payload = {
-            "model": self.model,
-            "prompt": f"{system_prompt}\n\n{user_prompt}\n\nRespond in JSON format only.",
-            "stream": False,
-            "format": "json"
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            "temperature": 0.1,
+            "max_tokens": 512,
+            "response_format": {"type": "json_object"}
         }
         
         start_time = time.time()
@@ -31,13 +36,40 @@ class InferenceEngine:
                         if resp.status == 200:
                             res_json = await resp.json()
                             latency = time.time() - start_time
-                            data = json.loads(res_json.get("response", "{}"))
+                            # Handle OpenAI format response
+                            content = res_json['choices'][0]['message']['content']
+                            data = json.loads(content)
                             return {**data, "model": f"Local-{self.model}", "latency": latency, "provider": "local"}
                         else:
-                            print(f"  [Ollama] Failed with status {resp.status}")
+                            print(f"  [Local LLM] Failed with status {resp.status}")
+                            text = await resp.text()
+                            print(f"  [Local LLM] Error detail: {text}")
                             return None
         except Exception as e:
-            print(f"  [Ollama] Connection Error: {e}")
+            # Fallback to Ollama native API if /v1/chat/completions fails (e.g. if we switched back to Ollama)
+            if "Connection refused" in str(e) or "404" in str(e):
+                 return await self.call_ollama_fallback(system_prompt, user_prompt)
+            print(f"  [Local LLM] Connection Error: {e}")
+            return None
+
+    async def call_ollama_fallback(self, system_prompt: str, user_prompt: str) -> Optional[Dict[str, Any]]:
+        # Backup: Original Ollama API on port 11434
+        url = "http://127.0.0.1:11434/api/generate"
+        print(f"  [Ollama Fallback] Connecting to: {url}")
+        payload = {
+            "model": "qwen2.5:3b", # Assumes Ollama model name
+            "prompt": f"{system_prompt}\n\n{user_prompt}\n\nRespond in JSON format only.",
+            "stream": False,
+            "format": "json"
+        }
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(url, json=payload, timeout=120) as resp:
+                    if resp.status == 200:
+                        res_json = await resp.json()
+                        data = json.loads(res_json.get("response", "{}"))
+                        return {**data, "model": "Ollama-Fallback", "provider": "local"}
+        except Exception:
             return None
 
     async def call_gemini(self, system_prompt: str, user_prompt: str) -> Optional[Dict[str, Any]]:
@@ -69,7 +101,7 @@ class InferenceEngine:
 
     async def get_analysis_hybrid(self, system_prompt: str, user_prompt: str) -> Dict[str, Any]:
         # 1. Try Local First (Save Tokens!)
-        result = await self.call_ollama(system_prompt, user_prompt)
+        result = await self.call_local_llm(system_prompt, user_prompt)
         if result:
             return result
         

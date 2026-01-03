@@ -25,20 +25,33 @@ if [ "$COLLECTOR_COUNT" -gt 0 ] || [ "$PROCESSOR_COUNT" -gt 0 ]; then
     echo "⚠️  경고: 기존 프로세스 발견! 중복 실행을 방지하기 위해 정리합니다..."
     pkill -f "async_collector.py"
     pkill -f "processor.py"
+    pkill llama-server
     sleep 2
     echo "✅ 기존 프로세스 종료 완료"
 fi
 
 # ============================================
-# Ollama 체크 및 가동
+# Local LLM (llama-server) 체크 및 가동
 # ============================================
-if ! pgrep -x "ollama" > /dev/null; then
-    echo "[+] Ollama 시작 중..."
-    export OLLAMA_HOST=0.0.0.0
-    nohup ollama serve > ollama.log 2>&1 &
-    sleep 5
+if ! pgrep -f "llama-server" > /dev/null; then
+    echo "[+] llama-server (Qwen 7B OpenCL GPU) 시작 중..."
+    # Custom Built OpenCL Binary
+    # Qwen 7B, Hybrid GPU Mode (-ngl 20), 8 threads, 8080 port
+    # LD_LIBRARY_PATH required for libggml-opencl.so
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/llama.cpp/build/bin
+    
+    # Use the custom binary if exists, else fallback to pkg binary
+    if [ -f "./llama-server-opencl" ]; then
+        SERVER_BIN="./llama-server-opencl"
+    else
+        SERVER_BIN="llama-server"
+    fi
+
+    nohup $SERVER_BIN -m models/qwen7b.gguf -ngl 20 -t 8 -c 2048 --port 8080 --host 0.0.0.0 > server.log 2>&1 &
+    echo "    ⏳ 모델 로딩 대기 (10초)..."
+    sleep 10
 else
-    echo "[✓] Ollama 이미 실행 중"
+    echo "[✓] llama-server 이미 실행 중"
 fi
 
 # ============================================
