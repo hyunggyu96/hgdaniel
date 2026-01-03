@@ -474,3 +474,121 @@ supabase.table('articles')\
 > "우리는 오늘(2026-01-03) 수많은 시행착오(크래시, 재부팅) 끝에 이 **'Hybrid -ngl 20'** 설정값을 찾아냈다.
 > 더 나은 드라이버나 루팅 환경이 아니라면, **이 설정을 건드리지 마라.**
 > GPU 욕심을 부리는 순간 태블릿은 꺼진다."
+
+---
+
+## 🔧 9. 트러블슈팅 사례: Qwen 연결 실패 (2026-01-03/04)
+
+**날짜**: 2026-01-03 23:34 ~ 2026-01-04 00:01  
+**증상**: Processor 로그에 `Cannot connect to host 127.0.0.1:11434` 에러 반복. 모든 AI 모델 실패 후 local fallback으로만 작동.
+
+### 🔍 근본 원인 (Root Cause)
+
+llama-server는 **포트 8080**에서 실행 중이었으나, 코드와 환경변수가 **포트 11434** (Ollama 기본 포트)를 참조하고 있었습니다.
+
+**문제 발생 지점 3곳**:
+
+1. **`collector/inference_engine.py` 라인 57**: fallback 함수의 하드코딩된 URL
+
+   ```python
+   # 잘못된 코드
+   url = "http://127.0.0.1:11434/api/generate"
+   ```
+
+2. **`collector/.env` 파일**: 환경변수 OLLAMA_HOST
+
+   ```bash
+   # 잘못된 설정
+   OLLAMA_HOST=http://127.0.0.1:11434
+   ```
+
+3. **코드 우선순위 혼동**: 환경변수가 코드의 기본값(8080)을 오버라이드하고 있었음
+
+### ✅ 해결 방법
+
+#### 1단계: 코드 수정
+
+```python
+# collector/inference_engine.py Line 57
+# 수정 전
+url = "http://127.0.0.1:11434/api/generate"
+
+# 수정 후
+url = "http://127.0.0.1:8080/api/generate"
+```
+
+#### 2단계: 환경변수 수정
+
+```bash
+# collector/.env
+# 수정 전
+OLLAMA_HOST=http://127.0.0.1:11434
+
+# 수정 후
+OLLAMA_HOST=http://127.0.0.1:8080
+```
+
+#### 3단계: 배포 및 재시작
+
+```bash
+# PC에서
+git add collector/inference_engine.py
+git commit -m "Fix: 포트 11434→8080 변경"
+git push origin main
+
+# 태블릿에서
+cd ~/news_dashboard
+git pull origin main
+pkill python
+bash start_tablet_solo.sh
+```
+
+### 📊 검증 방법
+
+**성공 확인 로그**:
+
+```
+🤖 Analyzing: [기사 제목]...
+  [Local LLM] Connecting to: http://127.0.0.1:8080/v1/chat/completions
+  ✅ Saved to Supabase DB (Description First)
+  📑 Saved to Google Sheets (Synced)
+```
+
+**실패 로그 (문제 있음)**:
+
+```
+  [Local LLM] Connection Error: Cannot connect to host 127.0.0.1:11434
+  ⚠️ Local engine failed/offline. Falling back to Cloud...
+  [Gemini] Quota Exceeded (429). Trying next key...
+⚠️ [FALLBACK] All AI models failed. Using local keyword extractor.
+```
+
+### ⚠️ 교훈 및 체크리스트
+
+**진단 시 반드시 확인할 것**:
+
+1. ✅ **llama-server 실행 중 및 포트 확인**:
+
+   ```bash
+   ssh -p 8022 u0_a43@192.168.219.102 "ps aux | grep llama-server"
+   # 출력에서 --port 8080 확인
+   ```
+
+2. ✅ **환경변수 우선순위 이해**:
+   - `.env` 파일의 값 > 코드의 기본값
+   - 코드 수정만으로는 해결 안 될 수 있음
+
+3. ✅ **양방향 일치 확인**:
+   - llama-server 실행 포트 = 코드의 URL = .env의 OLLAMA_HOST
+
+4. ✅ **로그의 URL 확인**:
+   - `[Local LLM] Connecting to:` 메시지에서 실제 연결 시도 주소 확인
+
+### 🔗 관련 이슈
+
+- **Google Sheets Grid ID 에러**: 시트를 수동으로 삭제했을 때 Grid ID가 변경되어 `insertDimension` 에러 발생. `sync_sheet_from_supabase.py`로 시트 재생성하여 해결.
+- **해결책**: Google Sheets 에러는 non-critical이므로 `pass`로 처리. Supabase 저장이 우선순위.
+
+---
+
+> **Note**: 시스템이 멈추거나 이상하면 로그를 확인하기 전에 이 가이드라인을 먼저 읽으십시오. 90%의 정답은 이미 여기에 있습니다.
