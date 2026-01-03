@@ -168,7 +168,8 @@ STRONG_MED_KEYWORDS = [k for k in EXPERT_ANALYSIS_KEYWORDS if "필러" in k or "
 BAD_KEYWORDS = [
     "캐시워크", "캐시닥", "용돈퀴즈", "돈버는퀴즈", "정답", "퀴즈",  # 리워드 앱
     "신차", "제네시스", "SUV", "GV90", "A-필러", "B-필러", "C-필러", # 자동차
-    "디지털키", "파노라마디스플레이", "전동화", "테슬라", "현대차", "기아"
+    "디지털키", "파노라마디스플레이", "전동화", "테슬라", "현대차", "기아",
+    "캐터필러", "캐피터필러", "캐터필라", "Caterpillar", "마이크론", "미 증시" # 증시/장비 노이즈
 ]
 
 # Robust Regex for Automotive Pillars (A/B/C-Pillar)
@@ -221,24 +222,30 @@ async def analyze_article_expert_async(title, description, search_keyword):
     """Refactored to use central InferenceEngine."""
     keyword_pool = ", ".join(EXPERT_ANALYSIS_KEYWORDS)
     system_prompt = (
-        f"You are a [Medical Aesthetic Business Analyst]. Output MUST be strict JSON.\n"
-        f"Your task: Identify relevant Medical/Aesthetic Keywords and Companies from the Pool.\n\n"
-        f"### STRICT RULES:\n"
-        f"1. **Language**: summary and issue_nature MUST be in Korean (Hangul) ONLY. NO Japanese, NO Hanja.\n"
-        f"2. **Main Keyword**: Pick a single name from the Pool that is EXPLICITLY mentioned. Use the EXACT Korean name.\n"
-        f"3. **Included Keywords**: Pick ONLY 2-4 keywords from the Pool that are ACTUALLY in the text. DO NOT invent new words.\n"
-        f"4. **No Hallucination**: Do not add information not in the text. If no pool keyword matches, use '기타'.\n"
-        f"5. **JSON Only**: Return only the JSON object.\n\n"
-        f"### Extraction Example:\n"
-        f"Input: [KLPGA, 태국서 ‘리쥬란 챔피언십’ 연다]\n"
-        f"Good: {{\"main_keyword\": \"리쥬란\", \"included_keywords\": [\"파마리서치\", \"학회\"], \"issue_nature\": \"학회/마케팅\", \"brief_summary\": \"파마리서치가 태국에서 리쥬란 챔피언십 골프 대회를 개최하며 글로벌 마케팅을 강화한다.\"}}\n"
-        f"Bad: {{\"main_keyword\": \"태국바이오\", \"included_keywords\": [\"성과\", \"조직문화\"], ...}} (Reason: Not in Pool, irrelevant)\n\n"
-        f"### Expert Keyword Pool:\n{keyword_pool}\n\n"
-        f"### Schema (Required fields):\n"
-        f"- main_keyword: (String) subject from Pool.\n"
-        f"- included_keywords: (Array of Strings) 2-4 keywords STRICTLY from Pool.\n"
-        f"- issue_nature: (String) One of: [제품 출시/허가, 임상/연구데이터, 실적/수출/경영, 법적분쟁/규제, 투자/M&A, 학회/마케팅, 거시경제/정책, 기타].\n"
-        f"- impact_level: (Integer) 1 to 5.\n"
+        "You are an [Expert Strategic Analyst] for the Medical Aesthetic industry. Output MUST be strict JSON.\n"
+        "Your mission: Extract high-precision business intelligence from news to help investors and experts.\n\n"
+        "### CORE ANALYTICAL TASKS:\n"
+        "1. **Strategic Intent**: Identify if the news is about R&D progress, global expansion, or competition.\n"
+        "2. **Keyword Governance**: You MUST only use names from the [Expert Keyword Pool] provided below.\n"
+        "3. **Entity Hierarchy**: Distinguish between Parents companies (e.g., Hugel) and Brands (e.g., Letibotulinumtoxin).\n\n"
+        "### STRICT EXTRACTION RULES:\n"
+        "- **main_keyword**: The single most important entity from the Pool. If multiple exist, choose the primary subject.\n"
+        "- **included_keywords**: 2-4 auxiliary entities or product types from the Pool mentioned in the text.\n"
+        "- **issue_nature**: Classify into one of these 8 categories:\n"
+        "  - [제품 출시/허가]: New product launches, FDA/CE approvals, domestic KFDA licensing.\n"
+        "  - [임상/연구데이터]: Clinical trial results, academic papers, new patent registrations.\n"
+        "  - [실적/수출/경영]: Quarterly earnings, export volume, CEO changes, global strategy.\n"
+        "  - [법적분쟁/규제]: Lawsuits (ITC etc.), government sanctions, administrative actions.\n"
+        "  - [투자/M&A]: Mergers, acquisitions, funding rounds, stock buybacks.\n"
+        "  - [학회/마케팅]: Participation in IMCAS/AMWC, sponsorship, influencer campaigns.\n"
+        "  - [거시경제/정책]: Trade policies, raw material costs, general industry trends.\n"
+        "  - [기타]: Anything that doesn't fit the above.\n"
+        "- **impact_level**: Scale 1-5 (1: Minor news, 5: Critical market-shifting event).\n\n"
+        "### EXCLUSION CRITERIA (STRICT):\n"
+        "- If the 'Pillar' refers to automotive parts (A/B/C pillar), construction equipment ('Caterpillar'), or general finance/semiconductor news ('Micron', 'Stock Market'), output 'issue_nature': '기타' and 'main_keyword': '기타'.\n"
+        "- If the article is not primarily about Medical Aesthetic industry assets, treat it as noise.\n"
+        "- Only output JSON. No conversational text.\n\n"
+        f"### Expert Keyword Pool:\n{keyword_pool}\n"
     )
     user_prompt = f"Crawl Keyword: {search_keyword}\nHeadline: {title}\nBody: {description}"
 
