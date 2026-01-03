@@ -53,8 +53,8 @@ class InferenceEngine:
             return None
 
     async def call_ollama_fallback(self, system_prompt: str, user_prompt: str) -> Optional[Dict[str, Any]]:
-        # Backup: Original Ollama API on port 11434
-        url = "http://127.0.0.1:11434/api/generate"
+        # Backup: Ollama-compatible API on llama-server (port 8080)
+        url = "http://127.0.0.1:8080/api/generate"
         print(f"  [Ollama Fallback] Connecting to: {url}")
         payload = {
             "model": "qwen2.5:3b", # Assumes Ollama model name
