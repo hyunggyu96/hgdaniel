@@ -8,6 +8,10 @@ echo "=== 태블릿 가동 시작 ($(date)) ==="
 # Termux 홈 디렉토리로 이동 (안정성 확보)
 cd /data/data/com.termux/files/home/news_dashboard 2>/dev/null || cd ~/news_dashboard
 
+# [V3.0] CPU Awake 강제 (백그라운드 종료 방지)
+termux-wake-lock
+echo "[+] WakeLock 활성화됨 (시스템 잠자기 방지)"
+
 # 파이썬 명령어 감지
 PYTHON_CMD="python"
 if command -v python3 >/dev/null 2>&1; then PYTHON_CMD="python3"; fi
