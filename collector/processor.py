@@ -478,11 +478,11 @@ async def process_item(item, worksheet, recent_articles):
                     # Update history for deduplication
                     recent_articles.append({'title': title, 'link': link})
                 except Exception as sheet_err:
-                    # Grid ID errors are non-critical - data is already in Supabase
-                    print(f"  ⚠️ Google Sheet Warning (non-critical): {str(sheet_err)[:100]}")
+                    # Grid ID errors are non-critical - silently continue
+                    pass
                     
             except Exception as e:
-                print(f"  ⚠️ Google Sheet Error: {e}")
+                pass  # Silently skip sheet errors
 
     # [6] Final Status Sync
     supabase.table("raw_news").update({"status": "processed"}).eq("id", raw_id).execute()
