@@ -1,594 +1,160 @@
-# 📄 뉴스 대시보드 백엔드 가이드라인 (Unified Backend Guidelines)
+# 📄 백엔드 가이드라인 (Backend Guidelines Quick Reference)
 
-**Version**: 2.6 (2026-01-01 V4.2 Noise Filter Update)
-**Status**: Stable / AI Filtering Enhanced
+**Version**: 3.0 (2026-01-04 Refactored)  
+**최종 업데이트**: 2026-01-04  
+**목적**: 긴급 상황 및 작업 시작 전 필수 체크사항 요약
 
-이 문서는 뉴스 대시보드 프로젝트의 백엔드 아키텍처, 데이터 파이프라인, 태블릿 운영 수칙, 트러블슈팅을 집대성한 공식 매뉴얼입니다.
-
----
-
-## 🛑 0. 작업 시작 전 필수 절차 (Mandatory Protocol for AI)
-
-**모든 AI 작업자는 백엔드 코드를 수정하거나 명령어를 실행하기 전, 다음 4단계를 반드시 선행해야 합니다.** (이를 무시하고 바로 코드를 작성하여 발생하는 에러는 '환각'으로 간주합니다.)
-
-### Step 1: 환경 스캔 (Environment Scan)
-
-- **DB 스키마 확인**: Supabase DB에 데이터를 넣으려 한다면, **반드시 실제 테이블 컬럼이 존재하는지** 먼저 확인하십시오. (본인의 기억이나 코드가 아닌, 실제 DB/Schema 도구를 통해)
-- **파일/경로 확인**: "있겠지"라고 추측하지 말고 `view_file`로 파일 존재 여부와 내용을 확인하십시오.
-
-### Step 2: 정보 조회 (Fact Check)
-
-- **SSH/IP 정보**: `192.168.0.x` 따위로 추측하지 말고, 본 문서의 **[6. 유지보수 및 확장 가이드]** 섹션에서 정확한 IP와 User/PW를 찾으십시오.
-- **키워드 목록**: `keywords.json` 파일이 SSOT(Single Source of Truth)입니다. 코드에 하드코딩하지 말고 파일을 읽어서 처리하십시오.
-
-### Step 3: 원자적 실행 및 결과 정독 (Atomic Execution & Read Output)
-
-- **명령어 분리**: `git pull && ./start.sh` 처럼 `&&`로 묶지 마십시오. (Windows/Android 간 쉘 호환성 문제)
-- **한 줄 실행 -> 확인 -> 다음 줄**: 명령어를 하나씩 보내고 Exit Code(0)를 확인한 후 다음 단계로 넘어가십시오.
-- **결과 정독 (CRITICAL)**: 실행 후 반환되는 **Output(로그/에러 메시지)을 한 글자도 빠짐없이 읽으십시오.** "Command executed"라는 메시지만 보고 성공했다고 착각하지 마십시오. 그 아래에 숨어 있는 `Permission denied`, `Error`, `Warning`을 놓치는 순간 무한 루프가 시작됩니다.
-
-### Step 4: 변경 전파 (Deployment)
-
-- **로컬 vs 태블릿**: PC에서 코드를 고쳤다면 `git push` -> 태블릿에서 `git pull` -> `restart` 과정을 수행해야 적용됩니다. 로컬만 고쳐놓고 "해결됐다"고 보고하지 마십시오.
+> 📚 **상세 문서**: `ARCHITECTURE.md`, `TROUBLESHOOTING.md`, `CHANGELOG.md` 참조
 
 ---
 
-## 🏗️ 1. 시스템 아키텍처 (System Architecture)
+## 🛑 0. 작업 전 필수 체크리스트 (4단계)
 
-### 📡 하이브리드 파이프라인 V4.1 (Hybrid Pipeline)
+### ✅ Step 1: 환경 스캔
 
-```mermaid
-graph TD
-    A[Collector: Naver API] -->|Links Only| B[raw_news: Archive]
-    B --> C[Processor: AI Analysis]
-    C -->|Link + Title Similarity 85%| D[articles: Representation]
-    D -->|V3.3 Perfect Sync| E[Google Sheets: Synced_Articles]
-    D --> F[Next.js Website: 60s Cache]
-    E -->|V4.0 sync_deletions.py| D
-```
+- DB 스키마 실제 확인 (추측 금지)
+- 파일/경로 존재 여부 확인 (`view_file`)
 
-- **수집 (Collector)**: `async_collector.py`가 네이버 뉴스 검색 API를 통해 기사를 수집합니다. 통계 분석을 위해 **링크 중복만 체크**하고 모든 유사 기사를 `raw_news` 테이블에 보관합니다.
-- **분석 (Processor)**: 태블릿(Legion Y700) 내의 `Ollama (Llama 3.2 3B)`가 수집된 기사를 분석하여 **광고 제거, 요약, 핵심 키워드 추출**을 수행합니다. **링크 + 제목 유사도(85%)**를 체크하여 대표 기사만 선별합니다.
+### ✅ Step 2: 정보 조회
 
-### 2. AI 구현 (2026-01-03 업데이트)
+- SSH 정보: `192.168.219.102:8022` (user: `u0_a43`, pw: `aisapiens`)
+- 키워드: `_shared/keywords.json` (SSOT)
 
-- **모델**: Qwen 2.5 7B (Instruct-Q4_K_M)
-- **엔진**: Termux 환경의 llama.cpp server (`llama-server`)
-- **하드웨어 구성**:
-  - **기본 모드**: Adreno 730 GPU 하이브리드 모드 (`-ngl 20`, OpenCL)
-  - **안전 모드**: CPU 최적화 모드 (`-ngl 0`, 8 threads) - GPU 불안정 시 사용
-- **서비스 포트**: `8080` (OpenAI 호환 API 엔드포인트 `/v1/chat/completions`)
-- **선정 이유**:
-  - Qwen 2.5 7B는 Llama 3.2 3B 대비 한국어 요약 품질이 월등히 뛰어남.
-  - **하이브리드 GPU 모드 (`-ngl 20`)**: 전체 레이어의 약 70%만 GPU에 할당하여, Adreno 드라이버의 메모리 폭주(시스템 크래시)를 막고 안정적인 가속 성능을 확보함.
+### ✅ Step 3: 원자적 실행
 
-### 3. 파이프라인 아키텍처
+- 명령어 분리 (**`&&` 금지**)
+- 한 줄 실행 → 결과 정독 → 다음 줄
+- **Output 전체 읽기** (숨은 에러 확인)
 
-- **수집기 (`async_collector.py`)**: 비동기 뉴스 수집 → Supabase 원본 저장 (`raw_news`)
-- **분석기 (`processor.py`)**: 미분석 뉴스 조회 → `llama-server` (localhost:8080) 호출로 고속 추론 → 요약/키워드 DB 저장 (`articles`)
-- **동기화 봇 (`auto_sync_bot.py`)**: 프로세스 생존 감시 및 구글 시트/웹사이트 데이터 동기화
+### ✅ Step 4: 변경 전파
 
-### 4. GPU/CPU 운영 전략
-
-- **기본 설정**: 하이브리드 GPU 모드 (`-ngl 20`) 권장.
-- **최적화 원리**: 전체 28개 레이어 중 **20개**만 GPU로 오프로드합니다. 이는 GPU 메모리 한계를 넘지 않는 최적의 타협점이며, CPU 전용 모드보다 훨씬 빠릅니다.
-- **비상 대응**: 만약 시스템이 멈추거나 Termux가 강제 종료될 경우, `start_tablet_solo.sh`에서 `-ngl 20`을 `-ngl 10` 또는 `0`으로 낮춰서 실행하십시오.
-- **향후 계획**: 더 극한의 속도가 필요하다면 MLC LLM (안드로이드 네이티브 앱) 도입을 고려합니다.
-
-- **데이터 우선순위 (V4.1)**: 사용자의 선호에 따라, AI 요약본 대신 **원본 기사 내용(Naver Description)**을 웹페이지와 구글 시트의 기본 요약으로 사용합니다. AI 데이터는 보조 필드(`ai_summary`)에만 보관합니다.
-- **저장 (Supabase)**:
-  - `raw_news`: 모든 수집 데이터 (통계 분석용 원본)
-  - `articles`: 중복 제거된 대표 기사 (웹사이트 표시용)
-- **동기화 (V3.3)**: `articles`에 저장 성공한 경우에만 Google Sheets의 **`Synced_Articles`** 탭에 저장됩니다. 완벽한 1:1 동기화가 보장됩니다.
-- **삭제 동기화 (V4.0)**: 구글 시트에서 행을 삭제한 후 `sync_deletions.py`를 실행하면 Supabase 데이터도 자동으로 삭제되어 웹사이트에 즉시 반영됩니다.
+- PC 수정 → `git push` → 태블릿 `git pull` → 재시작
 
 ---
 
-## 🏰 2. 백엔드 핵심 원칙 (Core Principles)
+## 🚫 절대 금기사항 (DO NOT)
 
-1. **태블릿이 사령관이다 (Tablet First)**: 수집과 분석 프로세스는 태블릿(Termux) 내에서 실행됩니다.
-2. **데이터 무결성 (Integrity)**: 한자, 일본어, 특수문자가 포함된 기사는 **즉시 폐기**합니다.
-3. **24/7 자율 주행 (Autonomy)**: 에러 발생 시 스스로 재시도하며 로그를 남깁니다.
-4. **보안 절대주의 (Security)**: API Key는 `.env`와 **Base64 하드코딩**으로만 관리하며 GitHub 노출을 엄격히 금지합니다.
-5. **가이드라인 선행 독해 (Guidelines First)**: 모든 새로운 작업이나 수정 요청을 수행하기 전, 반드시 이 백엔드 가이드라인 및 관련 문서(`_docs/`)를 정독한 후 작업에 착수하십시오. 무지성 자동화보다 중요한 것은 철학의 유지입니다.
-6. **DB 자격 증명 (DB Auth)**: 인덱싱 및 관리를 위한 전용 패스워드는 `AISapience111$`을 사용하며, 분실 시 Supabase Dashboard에서 재설정합니다.
-7. **로그 맹신 금지 (Never Trust Logs Alone)**: 터미널 로그만 보고 "정상"이라고 판단하지 마십시오. 중복 프로세스나 별도 세션이 있을 수 있습니다.
-8. **원격 명령어 주의 (No PowerShell '&&')**: Windows 터미널에서 `&&` 연산자는 버전에 따라 오작동할 수 있습니다. 운영 명령어(Git, SSH 등)는 가급적 하나씩 나누어 실행하거나, 쉘 스크립트 파일로 작성하여 호출하십시오.
-9. **삼중 교차 검증 (Triple Cross-Validation)**: 파이프라인 상태 보고 전, 반드시 아래 3곳을 모두 확인하십시오.
-
-### ⚠️ AI 진단 시 필수 검증 체크리스트 (Mandatory Verification)
-
-**"정상 가동 중" 또는 "완료"라고 보고하기 전, 아래 항목을 반드시 확인하십시오.**
-
-| # | 확인 항목 | 명령어/방법 | 정상 기준 |
-|---|----------|-------------|-----------|
-| 1 | **프로세스 개수** | `ssh ... "pgrep -fl python"` | 정확히 **2개** (collector + processor) |
-| 2 | **Supabase articles** | `check_articles.py` 실행 | 오늘 날짜 데이터 존재 |
-| 3 | **Google Sheets** | 시트 직접 열어서 확인 | 최신 타임스탬프가 현재 시각과 근접 |
-| 4 | **웹사이트** | 배포된 URL 직접 방문 | 오늘 날짜 뉴스 표시 |
-
-**절대 금지 사항**:
-
-- ❌ 로그에 "Queue empty"만 보고 "정상"이라고 판단
-- ❌ 프로세스 개수 확인 없이 "재시작 완료" 보고
-- ❌ 구글시트만 보고 웹사이트도 됐다고 가정
-- ❌ 사용자에게 "완료"라고 말한 후 검증하지 않음
-
----
-
-## 3. 🔑 키워드 관리 전략 (Key Management)
-
-시스템은 **수집(.env)**과 **AI 분석(keywords.json)** 두 단계로 키워드를 나누어 관리합니다. 두 설정이 조화를 이루어야 정확한 데이터 파이프라인이 작동합니다.
-
-### 3.1. 수집 키워드 (Collector)
-
-네이버 뉴스 검색 API에 실제로 질의하는 키워드입니다. (`collector/.env` 파일의 `KEYWORDS`)
-
-> **`필러, 톡신, 보톡스, PLLA, PDLLA, HIFU, 엑소좀, PDRN, PN, PDO, 제테마, 휴젤, 파마리서치, 메디톡스, 휴메딕스, 종근당바이오, 바임, 원텍, 클래시스, 제이시스메디칼, 리투오, 시지바이오, 스킨부스터`** (총 23개)
-
-### 3.2. AI 분석 키워드 (Processor)
-
-수집된 뉴스가 우리 도메인(미용/의료/제약)에 맞는지 판단하고 태깅하는 **화이트리스트**입니다. (`_shared/keywords.json`에서 관리)
-
-#### **[전체 관리 목록]** (V5.2 기준 - 총 173개, 중복 완전 제거)
-
-- **Filler (29종)**: 필러, 레볼락스, 더채움, 쥬비덤, 주비덤, 레스틸레인, 벨로테로, 순수필, 엘라스티, 뉴라미스, 로리앙, 클레비엘, 이브아르, 테오시알, 스타일에이지, 리덴시티, 에스테팜, 벨라스트, 아크로스, 중헌제약, 에피티크, 히알듀, 지젤리뉴, 봄필러, 모나리자, 아띠에르, 엘라비에, 리볼라인, 더말락스, 아발론, 큐티필, 리쥬비엘
-- **Toxin (24종)**: 톡신, 보톡스, 나보타, 제오민, 레티보, 코어톡스, 하이톡스, 비에녹스, 이노톡스, 메디톡신, 디스포트, 리즈톡스, 보툴렉스, 이니바이오, 프로톡스, 이니보, 뉴럭스, 티엠버스, 톡스온, 휴톡스, 리엔톡스, 제테마더톡신, 에이티지씨, 에볼루스
-- **PDRN/PN (9종)**: PN, PDRN, 리쥬란, 파마리서치, 연어주사, 비타란, 키아라쥬, 씨너기, 플라젠틱
-- **Exosome (6종)**: 엑소좀, 엑소코바이오, 브이타이드, 엑소좀주사, ASCE, 엑소코
-- **Collagen Stimulator (24종)**: PLLA, PDLLA, PLA, 쥬베룩, 레니스나, 스컬트라, PDO, 에스테필, 바임, 리젠바이오텍, 올리디아, 에버클, 고우리, 라풀렌, 울트라콜, 레디어스, 신필, 엘앤씨바이오, 아디떼, 동종진피, 리투오, hADM, 인체조직, ECM
-- **Skinboosters/Threads (22종)**: 스킨부스터, 힐로웨이브, 스킨바이브, 프로파일로, 리바이브, 엔파인더스, 한스바이오메드, 제이월드, 네오닥터, 바이리즌, 브이올렛, 페이스템, 리프팅실, 실리프팅, 크로키, 민트실, 블루로즈, 엔코그, 테스리프트, 테스, 샤넬주사, 물광주사
-- **Machines/EBD (32종)**: HIFU, RF, 고주파, 레이저, 울쎄라, 써마지, 슈링크, 인모드, 올리지오, 텐써마, 브이로, 더블로, 울트라포머, 리프테라, 포텐자, 시크릿, 실펌, 온다, 큐어젯, 노보젯, 원텍, 클래시스, 제이시스, 리니어지, 텐하이, 덴서티, 피코케어, 프락시스, 이루다, 더마샤인, 슬리머스, 피코슈어
-- **Corporate/Other (26종)**:
-  - **포함**: 제테마, 휴젤, 종근당, 종근당바이오, 휴메딕스, 휴온스, 대웅제약, 동국제약, 일동제약, 메디톡스, 케어젠, 바이오플러스, 갈더마, 멀츠, 앨러간, 시지바이오, 비엔씨, 비엠아이, MDR, 학회, 최소침습, 미용성형, 화장품, 허가, 세미나
-
-### ⚠️ [주의사항] 키워드 변경 시 체크 포인트
-
-1. **양방향 체크**: 새로운 기업을 추가할 때는 `.env`(수집용)와 `keywords.json`(분석용)에 **모두 추가**해야 확실하게 수집됩니다.
-2. **오타 주의**: '한스바이오메드'와 같이 정확한 회사명을 입력해야 합니다.
-3. **제외 처리**: 특정 기업(대웅제약 등)을 빼고 싶다면, **수집 키워드(.env)에서 우선 삭제**하여 원천 차단하는 것이 가장 효율적입니다.
-4. **동음이의어 주의** (2026-01-02 추가):
-   - **"바임"** = 의료기기 회사 (VAIM) ✅ vs. 노벨문학상 소설 제목 ❌
-   - 문학/출판 뉴스가 "바임" 키워드로 수집될 수 있음
-   - **해결**: `BAD_KEYWORDS`에 문학 키워드 추가 (작가, 문학, 소설, 출판, 노벨문학상)
-
----
-
-**반드시 지킬 것**:
-
-- ✅ 보고 전 웹사이트를 직접 열어서 눈으로 확인
-- ✅ 시트와 Supabase 데이터 개수 비교
-- ✅ 프로세스 개수가 2개인지 확인 후 보고
-
----
-
-## 🧹 3. 데이터 정제 및 보정 (Data Hygiene)
-
-### 🚫 비토종 문자 완전 제거
-
-- **원칙**: 모든 텍스트는 **한국어(한글), 영어, 숫자**만 허용합니다.
-- **처리**: 한자(`\u4e00-\u9fff`), 일어 히라가나/가타카나 발견 시 정규식으로 즉시 제거하거나 기사를 폐기합니다.
-
-### 🎯 키워드 분석 및 SSOT (Single Source of Truth)
-
-- **SSOT 원칙**: 모든 키워드 분석은 **`_shared/keywords.json`** 파일을 절대적 기준으로 삼습니다.
-- **백엔드 연동**: 분석기(`local_keyword_extractor.py`)는 하드코딩 대신 위 JSON 파일을 실시간 로드하여 화이트리스트 필터링을 수행합니다.
-
-### ✍️ AI 요약문 50자 규칙
-
-- **가이드**: 프론트엔드 카드 UI 최적화를 위해 AI 요약은 **50자 내외(최대 70자)**로 제한합니다.
-- **방어 로직**: 요약이 너무 길 경우 백엔드에서 강제 절단하거나 재요약을 요청하여 레이아웃 깨짐을 방지합니다.
-
----
-
-## 🚀 4. 성능 최적화 및 모니터링 (Performance & Monitoring)
-
-### ⚡ 성능 최적화 (Optimization)
-
-- **DB 인덱스 필수**: Supabase `articles` 테이블의 `published_at` (DESC) 및 `keyword` 컬럼에 인덱스를 생성하여 대량 데이터 처리 속도를 보장합니다.
-- **API 캐싱**: 모든 뉴스 조회 API는 `export const revalidate = 60;`을 적용하여 서버 부하를 최소화합니다.
-- **응답 압축**: `next.config.js`의 `compress: true` 설정을 통해 클라이언트 전송 데이터를 압축합니다.
-
-### 🚨 에러 및 노이즈 모니터링 (V4.2)
-
-- **Sentry (Web/Tablet)**: 프론트엔드 및 태블릿 분석 에러를 실시간 추적합니다.
-- **자율 주행**: 에러 발생 시 Sentry 보고 후 30~60초 후 자동 재시도합니다.
-- **지능형 노이즈 차단**:
-  - **BAD_KEYWORDS**: 퀴즈(캐시워크, 용돈퀴즈), 자동차(SUV, 신차, B-필러) 관련 키워드 발견 시 AI 분석 전 즉시 폐기합니다.
-  - **CAR_BRANDS (Sync with Frontend)**: 현대차, 기아, 르노 등 자동차 브랜드 및 노이즈 키워드(시승기, 중고차)가 포함된 기사는 **DB/구글 시트 저장 단계에서 원천 차단**하여 웹사이트와 100% 동일한 필터링 기준을 적용합니다.
-  - **Contextual AI Check**: AI가 '필러'라는 단어의 맥락을 읽어 자동차 부품용인지 미용 시술용인지 판별합니다.
-  - **보수적 승인**: AI가 판단하기 모호한 경우, 의료/바이오 관련 키워드가 제목에 포함되지 않으면 폐기하는 것을 원칙으로 합니다.
-
----
-
-## 📊 5. 구글 시트 스키마 (Distributed Multi-Sheet System)
-
-**핵심 규칙**: 모든 시트의 데이터는 **최신 항목이 상단(Row 2)**에 오도록 기록해야 합니다. (발행일시 기준 내림차순 정렬 필수)
-
-- **Node.js**: `insertDimension` 요청으로 2행을 삽입한 후, `loadCells/getCell`로 데이터를 채우십시오. (v4 고수준 API의 한계 극복)
-- **Python**: `sheet.insert_row(data, 2)`를 사용하여 최신 데이터를 상단에 배치하십시오.
-
-데이터 보안과 관리 효율을 위해 두 개의 독립적인 구글 시트를 운영합니다.
-
-### 📗 1. 사용자 분석 및 로그 시트 (User Operations)
-
-- **ID**: `1wA1YzPatil0qnhZk1EkS4r4Roc-Mx1I-iBSlmtyJNm8` (Logins & Analytics)
-- **주요 탭**:
-
-#### 1. 방문자 및 통계
-
-- **`Visits_v2`**: [Time, IP, Country, UserAgent] - 최신순 정렬(Prepend).
-- **`DailyStats_v2`**: [Date, TotalVisitors] - 일별 자동 집계.
-
-#### 2. 사용자 활동 (Activity Logs)
-
-- **`LoginHistory_v2`**: [Time, UserID, Type, Meta, IP] - 로그인 및 클릭 로그.
-- **`UserCollections_v2`**: [UserID, IP, Title, URL, Date, AddedAt] - 즐겨찾기 통합 관리.
-
-### 📘 2. 시장 분석 시트 (Market Analysis)
-
-- **ID**: `1IDFVtmhu5EtxSacRqlklZo6V_x9aB0WVZIzkIx5Wkic` (Collector Results)
-- **주요 탭**:
-  - **`Synced_Articles`**: (V3.3 적용) Supabase articles와 1:1 동기화되는 메인 분석 결과 시트. 원본 기사 내용을 포함함.
-  - **`Sheet1`**: 기존 데이터 백업용 (Main 탭 아님).
-  - **`키워드제안`**: 사용자가 입력한 새로운 시장 키워드 제안서.
-
-- **키워드별 엔진 (`keyword_last_collected_at`)**: (V5.0) 각 키워드마다 마지막 수집 시간을 딕셔너리 형태로 독립 관리합니다. 특정 키워드만 과거 데이터를 재수집하거나, 수집 장애 발생 시 해당 키워드만 재시도하는 정교한 운영이 가능합니다.
-- **분석기 하트비트 (`processor_heartbeat`)**: 분석기의 생존 여부만을 체크하며, 수집 시간대에는 영향을 주지 않습니다.
-
-### 🕰️ 수집 동기화 및 심도 (Sync & Depth - V5.0)
-
-1. **키워드별 독립 수집**: 모든 키워드가 하나의 시간에 묶이지 않고 개별 타임라인을 갖습니다. 새로운 키워드 추가 시 해당 키워드만 수동으로 과거 시점을 지정하여 소급 수집이 가능합니다.
-2. **동기화 사각지대 제거**: 분석기(Processor)와 수집기(Collector)의 시간 필드를 완전히 분리하여 데이터 누락 가능성을 0%로 만들었습니다.
-3. **수집 심도 유지**: 키워드당 200개 수집 정책을 유지하여 검색 상위권에 없더라도 연관성 높은 정교한 뉴스를 포착합니다.
-
----
-
-## 🏗️ 6. 유지보수 및 확장 가이드 (Developer's Note)
-
-### 🏠 터미널 및 파워쉘 수칙 (Strict Terminal Protocol)
-
-- **에러 즉시 정지 (Stop on Error)**: 명령어 실행 시 에러 메시지나 `Exit Code 1`이 발생하면, 다음 명령을 내리지 말고 즉시 멈추어 원인을 분석하십시오.
-- **답변 정독**: 터미널이 내비치는 모든 텍스트(Warning, Error, Info)를 정독하여 현재 시스템 상태를 정확히 진단하십시오.
-- **환경 검증 우선**: 새로운 스크립트 실행 전, 필요한 라이브러리(`dotenv` 등)나 환경 변수가 세팅되어 있는지 먼저 체크하십시오. (무지성 실행 금지)
-
-### 📡 태블릿 SSH 연결 정보 (Tablet SSH Config)
-
-| 항목 | 값 |
-|------|-----|
-| **Host** | `192.168.219.102` |
-| **Port** | `8022` |
-| **User** | `u0_a43` |
-| **Password** | `aisapiens` |
+### 1. PowerShell `&&` 사용 금지
 
 ```bash
-# 빠른 연결 명령어
-ssh -p 8022 u0_a43@192.168.219.102
+# ❌ 금지
+git pull && ./start.sh
 
-# 로그 확인
-ssh -p 8022 u0_a43@192.168.219.102 "tail -50 ~/news_dashboard/processor.log"
-ssh -p 8022 u0_a43@192.168.219.102 "tail -50 ~/news_dashboard/collector.log"
-
-# 프로세스 확인
-ssh -p 8022 u0_a43@192.168.219.102 "ps aux | grep python"
+# ✅ 허용
+git pull
+./start.sh
 ```
 
-### 🎮 태블릿 원격 제어 및 운영 수칙 (Strict Remote Protocol)
+### 2. GPU Full Offloading 금지
 
-- **복합 명령어 금지**: SSH를 통한 원격 제어 시 **`&&`나 `;`를 사용하여 명령어를 묶어서 보내지 마십시오.** (명령어 유실 및 실행 순서 보장 방지)
-- **단일 명령 & 확인**: 반드시 `git pull`, `pkill`, `start` 등 명령을 **하나씩** 전송하고, 매번 결과(출력 내용 및 Exit Code)를 확인한 후 다음 단계로 넘어가십시오.
-- **인터랙티브 대기**: 비밀번호(`aisapiens`) 입력 프롬프트가 뜰 때까지 충분히 대기하고 정확히 입력하십시오.
+- ❌ `-ngl 999` 또는 All Layers
+- ✅ `-ngl 20` (Qwen 2.5 7B 최적값)
+- ⚠️ SSH 끊김 = GPU OOM
 
-#### 🔋 **[필수] Termux 상시 가동 설정 (Wakelock)**
+### 3. 로그만 보고 판단 금지
 
-태블릿이 절전 모드에 진입하여 프로세스가 중단되는 것을 막기 위해, 터미널에서 반드시 아래 명령어를 실행해야 합니다.
+- ✅ **삼중 검증**: 프로세스 개수 + Supabase + Google Sheets
 
-```bash
-termux-wake-lock
-# 실행 후 알림바에 'Termux (wake lock held)' 표시 확인 필수
-```
+### 4. 포트 불일치 주의
 
-#### ⏰ **스마트 스케줄링 정책 (Smart Scheduling Policy)**
+- llama-server: **포트 8080** 고정
+- `collector/.env` OLLAMA_HOST 확인
+- `inference_engine.py` URL 확인
 
-`processor.py`는 KST 시간대에 따라 가변적인 폴링 주기를 가집니다. (24/7 운영 최적화)
+### 5. Ollama 직접 사용 금지
 
-| 시간대 (KST) | 모드 | 대기 시간 (Sleep) | 목적 |
-|---|---|---|---|
-| **00:00 ~ 06:00** | Night (취침) | **2시간 (7200초)** | 불필요한 리소스 소모 방지 |
-| **06:00 ~ 18:30** | Day (주간) | **5분 (300초)** | 뉴스 발생 집중 시간대 대응 |
-| **18:30 ~ 00:00** | Evening (야간) | **10분 (600초)** | 발생 빈도 감소 대응 |
-
-> **Note**: `processor.py` 로그에 `Sleeping 7200s...`가 떠도 에러가 아닙니다. 정상적인 절전 모드입니다.
-
-#### 🛡️ **프로세스 자동 정리 (Auto-Cleanup)**
-
-`start_tablet_solo.sh` 스크립트는 실행 시 기존의 `python` 프로세스(Collector/Processor)를 자동으로 감지하고 종료(`kill`)한 뒤 재시작합니다. 따라서 **수동으로 `pkill`을 수행할 필요가 없습니다.** (단, 로그 확인용 `tail` 등은 제외)
-
-### 📊 구글 시트 마이그레이션 전략
-
-- 시트 탭이 꼬이거나 쓰기가 거부될 땐 지체 없이 **새 탭(`_v2` 등)**을 생성하여 타겟을 변경하는 것이 가장 빠릅니다.
+- ❌ `ollama serve` (Segmentation Fault)
+- ✅ `llama-server` (Termux llama-cpp)
 
 ---
 
-## 🛠️ 7. 오늘의 교훈 및 트러블슈팅 (Lessons Learned)
+## ✅ 필수 검증 체크리스트
 
-운영 중 발생한 실제 에러 사례를 바탕으로 한 대응 가이드입니다.
+**"완료" 보고 전 반드시 확인**:
 
-- **PowerShell 구문 주의**: `&&` 연산자는 모든 쉘 환경에서 동일하게 작동하지 않을 수 있으므로 복합 명령을 피하십시오.
-- **DDL 권한 제한**: Supabase API Key는 보안상 `CREATE INDEX` 같은 구조 변경 명령이 거부될 수 있습니다. 중요한 DB 구조 변경은 반드시 **Supabase Dashboard의 SQL Editor**에서 실행하십시오.
-- **환경변수 파싱**: `.env.local` 파일 내에 JSON 문자열이 포함된 경우, `python-dotenv` 등에서 경고가 발생할 수 있습니다. 이는 무시해도 좋으나 연결 실패 시 가장 먼저 확인하십시오.
-- **좀비 프로세스**: `pkill python`으로 프로세스를 죽여도 태블릿에서 살아있는 경우가 있으니 `ps -ef`로 반드시 확인하십시오.
-- **서버 시차 (UTC vs KST)**: Vercel 서버는 UTC 기준이므로, 구글 시트 날짜 키(`DateKey`) 생성 시 반드시 `Intl.DateTimeFormat` 등을 사용해 `Asia/Seoul` 타임존을 명시적으로 선언해야 합니다. (자정 업데이트 지연 방지)
-- **Sentry DSN 분리**: 웹과 태블릿은 서로 다른 프로젝트 DSN을 사용하므로, 환경 변수(`.env.local` vs `collector/.env`) 설정 시 섞이지 않도록 주의하십시오.
+| # | 확인 항목 | 명령어 | 정상 기준 |
+|---|----------|--------|-----------|
+| 1 | 프로세스 개수 | `ssh ... "pgrep -fl python"` | 정확히 **2개** |
+| 2 | Supabase | `python check_articles.py` | 오늘 날짜 존재 |
+| 3 | Google Sheets | 시트 직접 확인 | 최신 타임스탬프 |
+| 4 | 웹사이트 | URL 방문 | 오늘 뉴스 표시 |
 
-### 📅 2026-01-01 중복 프로세스 사건 (Duplicate Process Incident)
+---
 
-**증상**: 웹사이트에 1월 1일 뉴스가 안 보여서 진단 시작 → `processor.log` 마지막 기록이 12/31 21:39, `collector.log`는 12/31 19:00으로 멈춘 것처럼 보임. 그러나 **구글시트에는 1/1 05:10~14:02의 데이터가 42개 존재**.
+## � 긴급 트러블슈팅
 
-**원인**: 태블릿에서 `start_tablet_solo.sh`가 여러 번 실행되어 **6개 이상의 중복 Python 프로세스**가 백그라운드에서 동시에 실행 중이었음. `tail` 명령으로 본 로그는 **현재 세션의 로그 파일 끝부분**이었고, 다른 프로세스들이 별도로 작업 중이었음.
+### Qwen 연결 실패 (`Cannot connect to 127.0.0.1:11434`)
 
-**진단 방법**:
+**빠른 진단**:
 
 ```bash
-# 프로세스 개수 확인 (2개여야 정상)
+# 1. llama-server 포트 확인
+ssh -p 8022 u0_a43@192.168.219.102 "ps aux | grep llama-server"
+# → --port 8080 확인
+
+# 2. 환경변수 확인
+ssh -p 8022 u0_a43@192.168.219.102 "grep OLLAMA ~/news_dashboard/collector/.env"
+# → OLLAMA_HOST=http://127.0.0.1:8080 확인
+```
+
+**해결**: `TROUBLESHOOTING.md` 섹션 1 참조
+
+### 프로세스 중복
+
+```bash
+# 1. 확인
 ssh -p 8022 u0_a43@192.168.219.102 "pgrep -fl python"
 
-# 구글시트 수정 이력 확인 (news-bot 서비스 계정이 마지막 수정자)
-# 시트 URL > 파일 > 버전 기록
-```
-
-**해결**:
-
-```bash
+# 2. 정리 (2개 초과 시)
 ssh -p 8022 u0_a43@192.168.219.102 "pkill python"
 ssh -p 8022 u0_a43@192.168.219.102 "cd ~/news_dashboard && bash start_tablet_solo.sh"
 ```
 
-**교훈**: 로그만 믿지 말고, **실제 프로세스 개수**와 **구글시트 타임스탬프**를 교차 검증하십시오.
+---
 
-### 💾 2026-01-01 DB 스키마 불일치 사건 (Schema Mismatch)
+## 🎯 핵심 원칙
 
-**증상**: `processor.py`가 V4.2 스펙의 AI 데이터(`ai_summary`, `issue_nature`)를 저장하려다 `Column not found` 에러 발생.
-
-**원인**: Supabase `articles` 테이블에 해당 컬럼을 추가하지 않은 상태에서 코드만 먼저 업데이트됨.
-
-**조치**:
-
-1. `processor.py`에서 해당 필드를 주석 처리하여 에러 임시 해결 (3시간 전 상태 복귀).
-2. 추후 **Supabase Dashboard > SQL Editor**에서 아래 쿼리를 실행해야만 AI 데이터를 온전히 저장 가능함.
-
-```sql
-ALTER TABLE articles ADD COLUMN IF NOT EXISTS ai_summary TEXT;
-ALTER TABLE articles ADD COLUMN IF NOT EXISTS issue_nature TEXT;
-```
-
-### 🎯 2026-01-02 keyword 필드 분류 오류 사건 (Keyword Misclassification)
-
-**증상**: "원텍, 다음은 제모 레이저" 기사가 **BOTULINUM TOXIN** 카테고리로 잘못 분류됨. 사용자가 웹사이트에서 발견.
-
-**원인 분석**:
-
-1. **본문에 "보톡스" 1회 언급** → 네이버 "보톡스" 검색 결과에 포함됨
-2. `processor.py` 446번 라인에서 **네이버 검색어를 그대로 `keyword` 필드에 저장**:
-
-   ```python
-   "keyword": keyword,  # ← "보톡스" (검색어)
-   ```
-
-3. 프론트엔드 `constants.ts` 43번 라인에서 `keyword` 필드에 **100점 가중치** 부여:
-
-   ```typescript
-   if (article.keyword === k) score += 100;
-   ```
-
-4. 결과: AI가 "레이저"로 분석했음에도 불구하고, keyword 필드의 "보톡스"가 압도적 점수를 받아 Toxin 카테고리로 분류됨
-
-**발견 범위**: 원텍 레이저 관련 기사 **17개** 동일 증상
-
-**임시 조치** (2026-01-02):
-
-PC에서 Supabase DB 직접 수정 스크립트 실행:
-
-```python
-# fix_wontek_keyword.py
-supabase.table('articles')\
-    .update({'keyword': '레이저'})\
-    .ilike('title', '%원텍%레이저%')\
-    .execute()
-```
-
-**근본 해결** (태블릿 작업 필요):
-
-`processor.py` 446번 라인 수정:
-
-```python
-# 수정 전 (검색어 그대로 저장)
-"keyword": keyword,
-
-# 수정 후 (AI 분석 결과 사용)
-"keyword": final_main,
-```
-
-**교훈**:
-
-> **"네이버 검색 키워드 ≠ 기사의 실제 주제"**
->
-> 본문에 타 키워드가 단 1회만 언급되어도 검색 결과에 포함될 수 있다. 따라서 **검색어(`keyword`)를 그대로 DB에 저장하면 안 되며**, 반드시 **AI 분석 결과(`final_main`)**를 우선해야 한다.
-
-**추가 권장 사항**:
-
-1. **DB 스키마 확장** (검색어 추적이 필요한 경우):
-
-   ```sql
-   ALTER TABLE articles ADD COLUMN IF NOT EXISTS search_keyword TEXT;
-   ```
-
-2. **프론트엔드 로직 조정**: `keyword` 필드 가중치(100점)를 줄이고 `main_keywords` 배열을 더 활용
-
-**작업 기록**:
-
-- 알림 파일: `❗TABLET_WORK_PENDING.md` (작업 완료 후 자동 삭제)
-- 워크플로우: `.agent/workflows/tablet-fix.md` (`/tablet-fix` 명령어)
-- 상세 가이드: `_docs/TABLET_TODO.md`
+1. **태블릿 우선** (Tablet First)
+2. **데이터 무결성** (한자/일본어 즉시 폐기)
+3. **24/7 자율 주행**
+4. **보안 절대주의** (API Key GitHub 노출 금지)
+5. **삼중 검증** (로그 + DB + 시트)
 
 ---
 
-> **Note**: 시스템이 멈추거나 이상하면 로그를 확인하기 전에 이 가이드라인을 먼저 읽으십시오. 90%의 정답은 이미 여기에 있습니다.
+## � 시스템 구성 (Quick Ref)
+
+### AI 엔진
+
+- **모델**: Qwen 2.5 7B (Q4_K_M)
+- **포트**: `8080` ⚠️
+- **GPU**: `-ngl 20` (하이브리드)
+
+### 태블릿
+
+- **Host**: `192.168.219.102:8022`
+- **User**: `u0_a43` / PW: `aisapiens`
+- **프로세스**: Collector + Processor (정확히 2개)
+
+### 데이터베이스
+
+- **Supabase URL**: `jwkdxygcpfdmavxcbcfe.supabase.co`
+- **테이블**: `raw_news` (원본) → `articles` (대표)
+
+### Google Sheets
+
+- **Market Analysis**: `1IDFVtmhu5EtxSacRqlklZo6V_x9aB0WVZIzkIx5Wkic`
+- **Main Tab**: `Synced_Articles`
 
 ---
 
-## 🛑 8. Legion Y700 AI 운영 특이사항 (Device Specifics - 2026-01-03 added)
+## 📚 상세 문서
 
-**이 섹션은 미래의 AI 작업자들을 위한 "절대 금기 사항" 및 "성공 레시피"입니다.**
-본 기기(Lenovo Legion Y700 2세대, Snapdragon 8+ Gen 1, Adreno 730)는 강력하지만, **Termux 환경에서의 GPU 드라이버 호환성**이 매우 까다롭습니다.
-
-### 🚫 절대 하지 말아야 할 것 (Don'ts)
-
-1. **Ollama + Vulkan 강제 사용 금지**:
-    - **증상**: `ollama serve` 실행 시 즉시 `Segmentation Fault` 발생.
-    - **원인**: Ollama 내부의 Vulkan 런타임과 Adreno 730 드라이버 간 충돌.
-    - **결과**: Ollama는 얌전히 죽어주지만, 작업 진도가 안 나감.
-
-2. **무지성 GPU Full Offloading 금지 (`-ngl 999` or All Layers)**:
-    - **증상**: SSH 세션이 끊기고, 태블릿이 재부팅되거나 Termux 앱이 강제 종료됨.
-    - **원인**: 7B 모델(4.7GB)을 통째로 VRAM에 올리면서 **안드로이드 시스템 메모리 부족(OOM) 또는 드라이버 패닉(Kernel Panic)** 유발.
-    - **경고**: SSH가 끊겼다면 100% 이 문제임. `-ngl` 값을 줄여야 함.
-
-3. **루팅 권유 신중**:
-    - 이 기기는 부트로더 언락 시 **데이터가 초기화(Factory Reset)** 됨.
-    - "루팅하면 해결됩니다"라고 쉽게 제안하지 말 것. 사용자 데이터 보존이 최우선.
-
-### ✅ 유일한 성공 레시피 (Dos)
-
-1. **엔진**: `llama-server` (Termux 패키지 `llama-cpp`) 사용. Ollama 바이너리 직접 사용 금지.
-2. **가속 모드**: **Hybrid GPU Mode (`-ngl 20`, OpenCL)**
-    - **매직 넘버**: **20** (Qwen 2.5 7B의 28개 레이어 중 약 70%).
-    - **원리**: 무거운 연산은 GPU가 하되, 시스템 안정성을 위해 일부는 CPU에 남겨둠.
-    - **성능**: CPU 전용 대비 약 2~3배 빠름.
-3. **비상 복구 매뉴얼**:
-    - 만약 `-ngl 20`에서도 튕긴다면? → **`-ngl 10`**으로 하향 조정.
-    - 그래도 튕긴다면? → **`-ngl 0` (CPU Optimized)** 모드로 전환. (속도는 느려도 안정성 100%)
-
-### 📝 미래의 AI에게 남기는 메시지
->
-> "우리는 오늘(2026-01-03) 수많은 시행착오(크래시, 재부팅) 끝에 이 **'Hybrid -ngl 20'** 설정값을 찾아냈다.
-> 더 나은 드라이버나 루팅 환경이 아니라면, **이 설정을 건드리지 마라.**
-> GPU 욕심을 부리는 순간 태블릿은 꺼진다."
+- **ARCHITECTURE.md**: 전체 시스템 아키텍처
+- **TROUBLESHOOTING.md**: 트러블슈팅 사례집
+- **CHANGELOG.md**: 변경 이력
+- **keywords.json**: 키워드 SSOT
 
 ---
 
-## 🔧 9. 트러블슈팅 사례: Qwen 연결 실패 (2026-01-03/04)
-
-**날짜**: 2026-01-03 23:34 ~ 2026-01-04 00:01  
-**증상**: Processor 로그에 `Cannot connect to host 127.0.0.1:11434` 에러 반복. 모든 AI 모델 실패 후 local fallback으로만 작동.
-
-### 🔍 근본 원인 (Root Cause)
-
-llama-server는 **포트 8080**에서 실행 중이었으나, 코드와 환경변수가 **포트 11434** (Ollama 기본 포트)를 참조하고 있었습니다.
-
-**문제 발생 지점 3곳**:
-
-1. **`collector/inference_engine.py` 라인 57**: fallback 함수의 하드코딩된 URL
-
-   ```python
-   # 잘못된 코드
-   url = "http://127.0.0.1:11434/api/generate"
-   ```
-
-2. **`collector/.env` 파일**: 환경변수 OLLAMA_HOST
-
-   ```bash
-   # 잘못된 설정
-   OLLAMA_HOST=http://127.0.0.1:11434
-   ```
-
-3. **코드 우선순위 혼동**: 환경변수가 코드의 기본값(8080)을 오버라이드하고 있었음
-
-### ✅ 해결 방법
-
-#### 1단계: 코드 수정
-
-```python
-# collector/inference_engine.py Line 57
-# 수정 전
-url = "http://127.0.0.1:11434/api/generate"
-
-# 수정 후
-url = "http://127.0.0.1:8080/api/generate"
-```
-
-#### 2단계: 환경변수 수정
-
-```bash
-# collector/.env
-# 수정 전
-OLLAMA_HOST=http://127.0.0.1:11434
-
-# 수정 후
-OLLAMA_HOST=http://127.0.0.1:8080
-```
-
-#### 3단계: 배포 및 재시작
-
-```bash
-# PC에서
-git add collector/inference_engine.py
-git commit -m "Fix: 포트 11434→8080 변경"
-git push origin main
-
-# 태블릿에서
-cd ~/news_dashboard
-git pull origin main
-pkill python
-bash start_tablet_solo.sh
-```
-
-### 📊 검증 방법
-
-**성공 확인 로그**:
-
-```
-🤖 Analyzing: [기사 제목]...
-  [Local LLM] Connecting to: http://127.0.0.1:8080/v1/chat/completions
-  ✅ Saved to Supabase DB (Description First)
-  📑 Saved to Google Sheets (Synced)
-```
-
-**실패 로그 (문제 있음)**:
-
-```
-  [Local LLM] Connection Error: Cannot connect to host 127.0.0.1:11434
-  ⚠️ Local engine failed/offline. Falling back to Cloud...
-  [Gemini] Quota Exceeded (429). Trying next key...
-⚠️ [FALLBACK] All AI models failed. Using local keyword extractor.
-```
-
-### ⚠️ 교훈 및 체크리스트
-
-**진단 시 반드시 확인할 것**:
-
-1. ✅ **llama-server 실행 중 및 포트 확인**:
-
-   ```bash
-   ssh -p 8022 u0_a43@192.168.219.102 "ps aux | grep llama-server"
-   # 출력에서 --port 8080 확인
-   ```
-
-2. ✅ **환경변수 우선순위 이해**:
-   - `.env` 파일의 값 > 코드의 기본값
-   - 코드 수정만으로는 해결 안 될 수 있음
-
-3. ✅ **양방향 일치 확인**:
-   - llama-server 실행 포트 = 코드의 URL = .env의 OLLAMA_HOST
-
-4. ✅ **로그의 URL 확인**:
-   - `[Local LLM] Connecting to:` 메시지에서 실제 연결 시도 주소 확인
-
-### 🔗 관련 이슈
-
-- **Google Sheets Grid ID 에러**: 시트를 수동으로 삭제했을 때 Grid ID가 변경되어 `insertDimension` 에러 발생. `sync_sheet_from_supabase.py`로 시트 재생성하여 해결.
-- **해결책**: Google Sheets 에러는 non-critical이므로 `pass`로 처리. Supabase 저장이 우선순위.
-
----
-
-> **Note**: 시스템이 멈추거나 이상하면 로그를 확인하기 전에 이 가이드라인을 먼저 읽으십시오. 90%의 정답은 이미 여기에 있습니다.
+> ⚡ **긴급**: 문제 발생 시 본 문서 먼저 체크 → 해결 안 되면 `TROUBLESHOOTING.md` 참조
