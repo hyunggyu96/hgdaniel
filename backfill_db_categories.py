@@ -1,21 +1,38 @@
 
-import json
 import os
+import json
+import datetime
 from supabase import create_client
+from dotenv import load_dotenv
 
-# [1] Load Keywords & Categories (SSOT)
-shared_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '_shared')
+# 환경변수 로드
+load_dotenv(os.path.join(os.path.dirname(__file__), 'collector', '.env'))
+
+url = os.getenv("SUPABASE_URL")
+key = os.getenv("SUPABASE_KEY")
+supabase = create_client(url, key)
+
+# 키워드 로드
+shared_dir = os.path.join(os.path.dirname(__file__), '_shared')
 keywords_path = os.path.join(shared_dir, 'keywords.json')
+CATEGORIES_CONFIG = []
 
-with open(keywords_path, 'r', encoding='utf-8') as f:
-    CATEGORIES_CONFIG = json.load(f).get('categories', [])
+try:
+    with open(keywords_path, 'r', encoding='utf-8') as f:
+        CATEGORIES_CONFIG = json.load(f).get('categories', [])
+    print(f"✅ Loaded Categories: {[c['label'] for c in CATEGORIES_CONFIG]}")
+except Exception as e:
+    print(f"❌ Failed to load keywords: {e}")
+    exit(1)
 
 def determine_category(title, description, search_keyword):
+    """processor.py와 동일한 분류 로직"""
     content = f"{title or ''} {search_keyword or ''} {description or ''}"
     best_category = "Corporate News"
     highest_score = 0
     category_scores = {}
     
+    # Identify corporate keywords
     corporate_config = next((c for c in CATEGORIES_CONFIG if c['label'] == "Corporate News"), None)
     corporate_keywords = corporate_config['keywords'] if corporate_config else []
     mentioned_companies = [k for k in corporate_keywords if k in content]
@@ -28,7 +45,7 @@ def determine_category(title, description, search_keyword):
         is_corporate = (label == "Corporate News")
         
         for k in keywords:
-            if search_keyword == k: score += 100
+            if search_keyword and k in search_keyword: score += 100
             if title and k in title: score += 50
             if description and k in description: score += 10
             
@@ -40,6 +57,7 @@ def determine_category(title, description, search_keyword):
             highest_score = score
             best_category = label
             
+    # 제품 우선 규칙
     if best_category == "Corporate News":
         best_product_cat = None
         max_product_score = 0
@@ -52,34 +70,30 @@ def determine_category(title, description, search_keyword):
             
     return best_category
 
-# [2] Supabase Setup
-SUPABASE_URL = "https://jwkdxygcpfdmavxcbcfe.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp3a2R4eWdjcGZkbWF2eGNiY2ZlIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NjQ4NDY2NywiZXhwIjoyMDgyMDYwNjY3fQ.wpTvHzqa2yewcmBDWx-XURlMssAgOLQNr5m626R4_vo"
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-
-def backfill_supabase():
-    print("🚀 DB 카테고리 전수 업데이트 시작 (Backfill)...")
+def backfill():
+    print("🚀 Starting Backfill for recent articles...")
     
-    # 1. Fetch matches
-    result = supabase.table('articles').select('id, title, description, keyword').execute()
-    articles = result.data
-    total = len(articles)
-    print(f"   총 {total}개 기사 대상")
+    # 최근 14일치 데이터 가져오기 (넉넉하게)
+    days_ago = (datetime.datetime.now() - datetime.timedelta(days=14)).isoformat()
     
-    count = 0
-    for art in articles:
-        cat = determine_category(art.get('title'), art.get('description'), art.get('keyword'))
+    # category가 비어있거나 '기타'인 것만? 아니면 전체 다시? 
+    # 안전하게 전체 다시 계산해서 덮어씌우는 게 정확함. (Processor 로직이 바뀌었으므로)
+    res = supabase.table("articles").select("*").gte("published_at", days_ago).execute()
+    articles = res.data
+    print(f"🔎 Found {len(articles)} articles to process.")
+    
+    updated_count = 0
+    for article in articles:
+        old_cat = article.get('category')
+        new_cat = determine_category(article.get('title'), article.get('description'), article.get('keyword'))
         
-        # 2. Update each
-        try:
-            supabase.table('articles').update({'category': cat}).eq('id', art['id']).execute()
-            count += 1
-            if count % 100 == 0:
-                print(f"   {count}/{total} 완료...")
-        except Exception as e:
-            print(f"   ❌ Error updating ID {art['id']}: {e}")
-
-    print(f"\n✅ 완료! {count}개 기사의 카테고리가 DB에 업데이트되었습니다.")
+        # 값이 다르거나 없으면 업데이트
+        if old_cat != new_cat:
+            supabase.table("articles").update({"category": new_cat}).eq("id", article['id']).execute()
+            print(f"  📝 Updated: {article['title'][:20]}... [{old_cat} -> {new_cat}]")
+            updated_count += 1
+            
+    print(f"✅ Backfill Complete. Updated {updated_count} articles.")
 
 if __name__ == "__main__":
-    backfill_supabase()
+    backfill()
