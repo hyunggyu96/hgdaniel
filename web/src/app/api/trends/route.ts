@@ -26,7 +26,7 @@ export async function GET() {
 
         const { data: articles, error } = await supabase
             .from('articles')
-            .select('keyword, main_keywords, title, description, published_at')
+            .select('keyword, main_keywords, title, description, published_at, category') // category 추가
             .gte('published_at', startDateStr)
             .order('published_at', { ascending: true })
             .limit(5000);
@@ -58,7 +58,17 @@ export async function GET() {
 
             if (!trendMap[dateKey]) return; // 범위 밖 날짜 무시
 
-            // 카테고리 스코어링 로직 (NewsList와 동일하게 적용)
+            // [V3.0] DB에 저장된 정확한 Category 우선 사용 (SSOT)
+            if (article.category) {
+                // DB Category가 유효한지 확인 (Config에 있는지)
+                const isValid = CATEGORIES_CONFIG.some(c => c.label === article.category);
+                if (isValid) {
+                    trendMap[dateKey][article.category] += 1;
+                    return; // 계산 종료
+                }
+            }
+
+            // [Fallback] DB에 Category가 없으면(구 데이터) 계산 수행
             let bestCategory: string | null = null;
             let highestScore = 0;
 
@@ -92,9 +102,6 @@ export async function GET() {
 
                 CATEGORIES_CONFIG.forEach(config => {
                     if (config.label !== 'Corporate News') {
-                        // 여기서도 점수 다시 계산 필요하지만, 위에서 저장해둔 score map이 없으므로 간이 계산
-                        // (하지만 위 루프에서 categoryScores 맵을 만드는 게 정석임)
-                        // 성능상 간단히: 제품 키워드가 1개라도 있으면 제품으로 변경
                         const kws = config.keywords || [];
                         const hasProductKeyword = kws.some(k =>
                             (article.keyword && article.keyword.includes(k)) ||
