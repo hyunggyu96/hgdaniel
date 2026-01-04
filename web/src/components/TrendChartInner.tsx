@@ -20,17 +20,9 @@ export default function TrendChartInner() {
                 const res = await fetch('/api/trends');
                 const json = await res.json();
                 if (json.data && json.categories) {
-                    // Corporate News 제외
-                    const filteredCategories = json.categories.filter((c: string) => c !== 'Corporate News');
-
-                    // 데이터에서도 Corporate News 필드 제거
-                    const filteredData = json.data.map((item: any) => {
-                        const { 'Corporate News': removed, ...rest } = item;
-                        return rest;
-                    });
-
-                    setData(filteredData);
-                    setCategories(filteredCategories);
+                    // [변경] Corporate News 포함 모든 카테고리 표시
+                    setData(json.data);
+                    setCategories(json.categories);
                 }
             } catch (err) {
                 console.error("Failed to fetch trend data", err);
@@ -53,6 +45,7 @@ export default function TrendChartInner() {
         'PDRN/PN': '#8b5cf6', // Purple
         'Skinboosters/Threads': '#06b6d4', // Cyan
         'Machines (EBD)': '#f97316', // Orange
+        'Corporate News': '#94a3b8', // Slate (Gray)
     };
 
     const getColor = (category: string, index: number) => {
