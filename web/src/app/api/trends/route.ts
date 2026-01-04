@@ -20,8 +20,10 @@ export async function GET() {
     try {
         const rangeDays = 7;
         const now = new Date();
+        // [Fix] Timezone 이슈로 데이터가 짤리지 않도록 쿼리 범위는 넉넉하게 14일 전부터 조회
+        // (가져온 뒤 코드 레벨에서 정확히 필터링)
         const startDate = new Date(now);
-        startDate.setDate(now.getDate() - rangeDays);
+        startDate.setDate(now.getDate() - (rangeDays * 2));
         const startDateStr = startDate.toISOString();
 
         const { data: articles, error } = await supabase
@@ -29,19 +31,30 @@ export async function GET() {
             .select('keyword, main_keywords, title, description, published_at, category') // category 추가
             .gte('published_at', startDateStr)
             .order('published_at', { ascending: true })
-            .limit(5000);
+            .limit(10000); // Limit도 2배로 증가
 
         if (error) throw error;
 
+        // KST 날짜 포맷터 (YYYY-MM-DD)
+        const getKSTDateKey = (date: Date) => {
+            const kstOffset = 9 * 60 * 60 * 1000; // 9시간 밀리초
+            const kstDate = new Date(date.getTime() + kstOffset);
+            return kstDate.toISOString().split('T')[0]; // YYYY-MM-DD
+        };
+
         // 1. 날짜별/카테고리별 초기 데이터 구조 생성
         const trendMap: Record<string, Record<string, number>> = {};
-
-        // 날짜 배열 생성 (KST 기준)
         const dateLabels: string[] = [];
+
+        // 오늘 날짜(KST) 구하기
+        const nowUTC = new Date();
+        const kstNow = new Date(nowUTC.getTime() + (9 * 60 * 60 * 1000));
+
         for (let i = rangeDays - 1; i >= 0; i--) {
-            const d = new Date();
+            const d = new Date(kstNow);
             d.setDate(d.getDate() - i);
-            const dateStr = d.toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
+            const dateStr = d.toISOString().split('T')[0]; // YYYY-MM-DD (KST)
+
             dateLabels.push(dateStr);
             trendMap[dateStr] = {};
 
@@ -53,8 +66,11 @@ export async function GET() {
 
         // 2. 기사별로 카테고리 판별 및 카운팅
         articles?.forEach((article) => {
-            const pubDate = new Date(article.published_at);
-            const dateKey = pubDate.toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
+            // DB Timestring (UTC) -> Date Object
+            const pubDateUTC = new Date(article.published_at);
+
+            // UTC+9 계산하여 KST 날짜 키 생성
+            const dateKey = getKSTDateKey(pubDateUTC);
 
             if (!trendMap[dateKey]) return; // 범위 밖 날짜 무시
 
