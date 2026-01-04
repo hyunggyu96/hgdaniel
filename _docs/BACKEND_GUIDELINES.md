@@ -1,6 +1,6 @@
 # 📄 백엔드 가이드라인 (Backend Guidelines Quick Reference)
 
-**Version**: 3.0 (2026-01-04 Refactored)  
+**Version**: 3.1 (2026-01-04 Watchdog 추가)  
 **최종 업데이트**: 2026-01-04  
 **목적**: 긴급 상황 및 작업 시작 전 필수 체크사항 요약
 
@@ -18,6 +18,7 @@
 ### ✅ Step 2: 정보 조회
 
 - SSH 정보: `192.168.219.102:8022` (user: `u0_a43`, pw: `aisapiens`)
+- Supabase DB 비밀번호: `AISapience111$`
 - 키워드: `_shared/keywords.json` (SSOT)
 
 ### ✅ Step 3: 원자적 실행
@@ -157,7 +158,16 @@ ssh -p 8022 u0_a43@192.168.219.102 "cd ~/news_dashboard && bash start_tablet_sol
 
 - **Host**: `192.168.219.102:8022`
 - **User**: `u0_a43` / PW: `aisapiens`
-- **프로세스**: Collector + Processor (정확히 2개)
+- **프로세스**: Collector + Processor + Watchdog (정확히 3개)
+
+### Watchdog (자동 복구)
+
+- **스크립트**: `watchdog.sh`
+- **기능**: 5분마다 Collector/Processor 감시, 누락 시 자동 재시작
+- **로그**: `watchdog.log`
+- **실행**: `nohup bash watchdog.sh > /dev/null 2>&1 &`
+
+> ⚠️ **매일 프로세스 중단 문제 해결용** (2026-01-04 추가)
 
 ### 데이터베이스
 

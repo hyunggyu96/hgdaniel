@@ -17,10 +17,18 @@ def sync_to_new_sheet():
     # 1. Supabase 연결
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
     
-    # 2. articles 데이터 가져오기 (최신순)
+    # 2. articles 데이터 가져오기 (최신순, 1000개 이상 전수)
     print("📊 Supabase articles 데이터 가져오는 중...")
-    result = supabase.table('articles').select('*').order('published_at', desc=True).execute()
-    articles = result.data
+    articles = []
+    offset = 0
+    limit = 1000
+    while True:
+        result = supabase.table('articles').select('*').order('published_at', desc=True).range(offset, offset + limit - 1).execute()
+        batch = result.data
+        articles.extend(batch)
+        if len(batch) < limit:
+            break
+        offset += limit
     print(f"   총 {len(articles)}개 기사 발견")
     
     # 3. 구글시트 연결
@@ -43,7 +51,7 @@ def sync_to_new_sheet():
     print(f"   새 시트 '{new_sheet_name}' 생성 완료")
     
     # 5. 헤더 작성
-    headers = ["분석시각", "검색키워드", "카테고리", "제목", "링크", "메인키워드", "전체키워드", "발행일", "이슈성격", "요약"]
+    headers = ["분석시각", "검색키워드", "카테고리", "제목", "링크", "메인키워드", "전체키워드", "발행일", "이슈성격", "본문 발췌"]
     new_worksheet.append_row(headers)
     
     # 6. 데이터 변환 및 작성 (배치로)
@@ -111,7 +119,7 @@ def sync_to_new_sheet():
             keywords_str,
             pub_date_kst,   # 8. 발행일
             article.get('issue_nature', ''),
-            article.get('description', '')[:100] if article.get('description') else ""
+            article.get('description', '')[:100] if article.get('description') else "" # 10. 본문 발췌
         ]
         rows_to_add.append(row)
     
