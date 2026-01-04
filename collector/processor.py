@@ -223,13 +223,20 @@ async def analyze_article_expert_async(title, description, search_keyword):
     keyword_pool = ", ".join(EXPERT_ANALYSIS_KEYWORDS)
     system_prompt = (
         "You are an [Expert Strategic Analyst] for the Medical Aesthetic industry. Output MUST be strict JSON.\n"
-        "Your mission: Extract high-precision business intelligence from news to help investors and experts.\n\n"
-        "### CORE ANALYTICAL TASKS:\n"
+        "Your mission: Extract high-precision business intelligence, but FIRST verify if the news is relevant.\n\n"
+        
+        "### 🛡️ STEP 1: CONTEXT VERIFICATION (CRITICAL)\n"
+        "Before extraction, check if the content is TRULY about Medical Aesthetics/Pharma/Bio.\n"
+        "1. **Homonym Trap**: If keyword '바임' appears but refers to 'Hotel', 'Novel', 'Book', or 'Writer' -> IT IS NOISE. Output '기타'.\n"
+        "2. **False Match**: If keyword 'Skinbooster' is searched but text only mentions 'Skin' (toner) or 'Booster' (game item) -> IT IS NOISE. Output '기타'.\n"
+        "3. **Irrelevant Domain**: Sports (Baseball/Volleyball), Entertainment (Gossip), Arts (Literature) -> IT IS NOISE. Output '기타'.\n\n"
+
+        "### CORE ANALYTICAL TASKS (Only if Step 1 Passed):\n"
         "1. **Strategic Intent**: Identify if the news is about R&D progress, global expansion, or competition.\n"
         "2. **Keyword Governance**: You MUST only use names from the [Expert Keyword Pool] provided below.\n"
         "3. **Entity Hierarchy**: Distinguish between Parents companies (e.g., Hugel) and Brands (e.g., Letibotulinumtoxin).\n\n"
         "### STRICT EXTRACTION RULES:\n"
-        "- **main_keyword**: The single most important entity from the Pool. If multiple exist, choose the primary subject.\n"
+        "- **main_keyword**: The single most important entity from the Pool. If valid entity not found or context is noise, output '기타'.\n"
         "- **included_keywords**: 2-4 auxiliary entities or product types from the Pool mentioned in the text.\n"
         "- **issue_nature**: Classify into one of these 8 categories:\n"
         "  - [제품 출시/허가]: New product launches, FDA/CE approvals, domestic KFDA licensing.\n"
@@ -239,7 +246,7 @@ async def analyze_article_expert_async(title, description, search_keyword):
         "  - [투자/M&A]: Mergers, acquisitions, funding rounds, stock buybacks.\n"
         "  - [학회/마케팅]: Participation in IMCAS/AMWC, sponsorship, influencer campaigns.\n"
         "  - [거시경제/정책]: Trade policies, raw material costs, general industry trends.\n"
-        "  - [기타]: Anything that doesn't fit the above.\n"
+        "  - [기타]: Anything that doesn't fit the above or is NOISE.\n"
         "- **impact_level**: Scale 1-5 (1: Minor news, 5: Critical market-shifting event).\n\n"
         "### EXCLUSION CRITERIA (STRICT):\n"
         "- If the 'Pillar' refers to automotive parts (A/B/C pillar), construction equipment ('Caterpillar'), or general finance/semiconductor news ('Micron', 'Stock Market'), output 'issue_nature': '기타' and 'main_keyword': '기타'.\n"
@@ -306,31 +313,7 @@ async def process_item(item, worksheet, recent_articles):
     pub_date = item['pub_date']
     keyword = item['search_keyword']
 
-    # [0] Hard Noise Filter (Sync with Frontend Logic)
-    # 웹사이트와 동일한 필터링 기준 적용 (자동차, 노이즈, 퀴즈 등 무조건 제거)
-    full_text = f"{title} {desc}"
-    
-    # 0. Strict Keyword Containment Check (사용자 요청)
-    # 검색한 키워드가 본문이나 제목에 "실제로" 포함되어 있는지 검사
-    if keyword:
-        # 띄어쓰기 무시하고 포함 여부 확인 (유연성 확보)
-        clean_text = full_text.replace(" ", "")
-        clean_keyword = keyword.replace(" ", "")
-        
-        if clean_keyword not in clean_text:
-            print(f"🚫 Hard Filter: Keyword Mismatch ('{keyword}' not found in text)")
-            supabase.table("raw_news").update({"status": "filtered"}).eq("id", raw_id).execute()
-            return False
-
-    # 0.5 Context Noise Filter (동음이의어 처리)
-    if keyword in CONTEXT_NOISE_FILTER:
-        forbidden_words = CONTEXT_NOISE_FILTER[keyword]
-        if any(bad_word in full_text for bad_word in forbidden_words):
-            print(f"🚫 Hard Filter: Context Noise detected for '{keyword}' ({title[:20]}...)")
-            supabase.table("raw_news").update({"status": "filtered"}).eq("id", raw_id).execute()
-            return False
-
-    # 1. Car Brands Check
+    # [1] Car Brands Check
     if any(brand in full_text for brand in CAR_BRANDS):
         print(f"🚫 Hard Filter: Car Brand detected ({title[:20]}...)")
         # Mark as processed in raw_news so we don't fetch it again, but DON'T save to articles
