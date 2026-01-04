@@ -1,6 +1,6 @@
 # 📄 백엔드 가이드라인 (Backend Guidelines Quick Reference)
 
-**Version**: 3.1 (2026-01-04 Watchdog 추가)  
+**Version**: 3.2 (2026-01-04 워크플로우/에러 대응 추가)  
 **최종 업데이트**: 2026-01-04  
 **목적**: 긴급 상황 및 작업 시작 전 필수 체크사항 요약
 
@@ -89,6 +89,32 @@ git pull
 - 동음이의어 확인 (예: "바임" = 의료기기 vs 소설)
 - 새 키워드 추가 → 두 곳 모두 업데이트
 - 삭제 시에도 두 곳 모두 확인
+
+### 7. 태블릿 = 실행 전용 (No Local Edits)
+
+**규칙**: 태블릿에서 직접 파일 생성/수정 금지
+
+```bash
+# ❌ 금지 (태블릿에서)
+vim some_script.py
+nano fix_something.py
+
+# ✅ 올바른 워크플로우
+PC에서 수정 → git push → 태블릿 git pull → 실행
+```
+
+**이유**: 태블릿 로컬 파일 → PC push 시 git 충돌 발생
+
+### 8. Google Sheets 에러 대응
+
+**증상**: `APIError: No grid with id: XXXXXXX`
+
+**원인**: 시트 구조 변경/삭제 시 gspread 캐시가 stale 됨
+
+**해결**: 자동 재연결 로직 적용됨 (processor.py v3.2)
+
+- 에러 발생 시 worksheet 재연결 후 재시도
+- 수동 조치 불필요
 
 ---
 
