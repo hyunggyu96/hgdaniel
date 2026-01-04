@@ -522,7 +522,19 @@ async def process_item(item, worksheet, recent_articles):
                     # Update history for deduplication
                     recent_articles.append({'title': title, 'link': link})
                 except Exception as sheet_err:
-                    print(f"  ⚠️ Google Sheet Error (Row): {sheet_err}")
+                    # [FIX] Grid ID 에러 시 worksheet 재연결 후 재시도
+                    if "grid" in str(sheet_err).lower() or "insertDimension" in str(sheet_err):
+                        print(f"  🔄 Google Sheet Grid Error - Reconnecting...")
+                        try:
+                            worksheet = get_google_sheet()
+                            if worksheet:
+                                worksheet.insert_row(row, 2)
+                                print(f"  📑 Saved to Google Sheets (Reconnected)")
+                                recent_articles.append({'title': title, 'link': link})
+                        except Exception as retry_err:
+                            print(f"  ⚠️ Google Sheet Retry Failed: {retry_err}")
+                    else:
+                        print(f"  ⚠️ Google Sheet Error (Row): {sheet_err}")
                     
             except Exception as e:
                 print(f"  ⚠️ Google Sheet Error (Total): {e}")
