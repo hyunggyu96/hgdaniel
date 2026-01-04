@@ -217,19 +217,35 @@ async def is_medical_news_ai(title, description):
     # AI 판단 불가 시, 제목에 의료 키워드가 없으면 일단 FALSE로 보수적 처리
     return any(kw in title for kw in EXPERT_ANALYSIS_KEYWORDS)
 
+# [New] 지식 노트 로드 함수
+def load_knowledge():
+    try:
+        k_path = os.path.join(shared_dir, 'ai_knowledge.md')
+        if os.path.exists(k_path):
+            with open(k_path, 'r', encoding='utf-8') as f:
+                return f.read()
+    except Exception as e:
+        print(f"⚠️ Failed to load knowledge base: {e}")
+    return ""
+
 # AI Analysis Function
 async def analyze_article_expert_async(title, description, search_keyword):
-    """Refactored to use central InferenceEngine."""
+    """Refactored to use central InferenceEngine with In-Context Learning."""
     keyword_pool = ", ".join(EXPERT_ANALYSIS_KEYWORDS)
+    knowledge_base = load_knowledge()
+    
     system_prompt = (
         "You are an [Expert Strategic Analyst] for the Medical Aesthetic industry. Output MUST be strict JSON.\n"
         "Your mission: Extract high-precision business intelligence, but FIRST verify if the news is relevant.\n\n"
         
+        "### 🧠 EXPERT KNOWLEDGE BASE (LEARNED RULES)\n"
+        "Apply these rules STRICTLY to filter noise and improve accuracy:\n"
+        f"{knowledge_base}\n\n"
+        
         "### 🛡️ STEP 1: CONTEXT VERIFICATION (CRITICAL)\n"
-        "Before extraction, check if the content is TRULY about Medical Aesthetics/Pharma/Bio.\n"
-        "1. **Homonym Trap**: If keyword '바임' appears but refers to 'Hotel', 'Novel', 'Book', or 'Writer' -> IT IS NOISE. Output '기타'.\n"
-        "2. **False Match**: If keyword 'Skinbooster' is searched but text only mentions 'Skin' (toner) or 'Booster' (game item) -> IT IS NOISE. Output '기타'.\n"
-        "3. **Irrelevant Domain**: Sports (Baseball/Volleyball), Entertainment (Gossip), Arts (Literature) -> IT IS NOISE. Output '기타'.\n\n"
+        "Based on the Knowledge Base above, check if the content is TRULY about Medical Aesthetics.\n"
+        "1. **Homonym Trap**: If a keyword (e.g., 'Vaim') appears but context matches 'NOISE' rules (Hotel, Novel), Return '기타'.\n"
+        "2. **Irrelevant Domain**: Sports, Arts, General Politics -> Return '기타'.\n\n"
 
         "### CORE ANALYTICAL TASKS (Only if Step 1 Passed):\n"
         "1. **Strategic Intent**: Identify if the news is about R&D progress, global expansion, or competition.\n"
