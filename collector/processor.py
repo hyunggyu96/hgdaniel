@@ -293,6 +293,11 @@ def is_semantic_duplicate(text1, text2, threshold=0.8):
     similarity = len(intersection) / len(union)
     return similarity >= threshold
 
+# [New] 키워드별 문맥 노이즈 설정 (동음이의어 방지)
+CONTEXT_NOISE_FILTER = {
+    "바임": ["호텔", "문학", "작가", "소설", "욘 포세", "장편", "은희경", "천명관"],
+}
+
 async def process_item(item, worksheet, recent_articles):
     raw_id = item['id']
     title = item['title']
@@ -305,6 +310,26 @@ async def process_item(item, worksheet, recent_articles):
     # 웹사이트와 동일한 필터링 기준 적용 (자동차, 노이즈, 퀴즈 등 무조건 제거)
     full_text = f"{title} {desc}"
     
+    # 0. Strict Keyword Containment Check (사용자 요청)
+    # 검색한 키워드가 본문이나 제목에 "실제로" 포함되어 있는지 검사
+    if keyword:
+        # 띄어쓰기 무시하고 포함 여부 확인 (유연성 확보)
+        clean_text = full_text.replace(" ", "")
+        clean_keyword = keyword.replace(" ", "")
+        
+        if clean_keyword not in clean_text:
+            print(f"🚫 Hard Filter: Keyword Mismatch ('{keyword}' not found in text)")
+            supabase.table("raw_news").update({"status": "filtered"}).eq("id", raw_id).execute()
+            return False
+
+    # 0.5 Context Noise Filter (동음이의어 처리)
+    if keyword in CONTEXT_NOISE_FILTER:
+        forbidden_words = CONTEXT_NOISE_FILTER[keyword]
+        if any(bad_word in full_text for bad_word in forbidden_words):
+            print(f"🚫 Hard Filter: Context Noise detected for '{keyword}' ({title[:20]}...)")
+            supabase.table("raw_news").update({"status": "filtered"}).eq("id", raw_id).execute()
+            return False
+
     # 1. Car Brands Check
     if any(brand in full_text for brand in CAR_BRANDS):
         print(f"🚫 Hard Filter: Car Brand detected ({title[:20]}...)")
