@@ -59,9 +59,9 @@ if ! pgrep -f "llama-server" > /dev/null; then
         SERVER_BIN="llama-server"
     fi
 
-    nohup $SERVER_BIN -m models/gemma3-4b.gguf -ngl 35 -t 4 -c 4096 -b 64 -ub 64 -fa --port 8080 --host 0.0.0.0 > server.log 2>&1 &
-    echo "    ⏳ 모델 GPU 로딩 대기 (30초)..."
-    sleep 30
+    nohup $SERVER_BIN -m models/gemma3-4b.gguf -ngl 99 -t 4 -c 4096 -b 128 -ub 128 -fa --port 8080 --host 0.0.0.0 > server.log 2>&1 &
+    echo "    ⏳ Adreno 730 GPU 최적화 로딩 대기 (45초)..."
+    sleep 45
 else
     echo "[✓] llama-server 이미 실행 중"
 fi
