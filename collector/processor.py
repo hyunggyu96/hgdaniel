@@ -165,57 +165,18 @@ CAR_NOISE_KEYWORDS = [
 STRONG_MED_KEYWORDS = [k for k in EXPERT_ANALYSIS_KEYWORDS if "필러" in k or "톡신" in k or "리쥬란" in k]
 
 # 🚫 노이즈 차단 키워드 (제목/본문에 있으면 즉시 폐기)
-BAD_KEYWORDS = [
     "캐시워크", "캐시닥", "용돈퀴즈", "돈버는퀴즈", "정답", "퀴즈",  # 리워드 앱
     "신차", "제네시스", "SUV", "GV90", "A-필러", "B-필러", "C-필러", # 자동차
+    "A필러", "B필러", "C필러", "D필러", "필러투필러", "Pillar",      # 자동차/디스플레이 (강력 차단)
     "디지털키", "파노라마디스플레이", "전동화", "테슬라", "현대차", "기아",
+    "BMW", "MINI", "쿠퍼", "LG디스플레이", "삼성디스플레이",         # 브랜드 (강력 차단)
     "캐터필러", "캐피터필러", "캐터필라", "Caterpillar", "마이크론", "미 증시" # 증시/장비 노이즈
 ]
 
 # Robust Regex for Automotive Pillars (A/B/C-Pillar)
 PILLAR_REGEX = re.compile(r"([A-C]\s*(-|—)?\s*필러|자동차|전기차|모델명|신차)", re.IGNORECASE)
 
-async def is_medical_news_ai(title, description):
-    """Stage 2: AI verification for ambiguous cases"""
-    # 1. 강력한 키워드 선제 차단
-    full_text = f"{title} {description}"
-    if any(bk in title for bk in BAD_KEYWORDS):
-        print(f"  🚫 Noise Filter: '{title[:20]}...' matched BAD_KEYWORDS (Title)")
-        return False
-    
-    if PILLAR_REGEX.search(title):
-        print(f"  🚫 Noise Filter: Automotive keywords detected in Title")
-        return False
 
-    # 화이트리스트 문자열 생성 (Top 50개만 예시로 주입하여 토큰 절약하되, 핵심 기업은 포함)
-    whitelist_sample = ", ".join(EXPERT_ANALYSIS_KEYWORDS[:100]) + "..."
-    
-    prompt = (
-        "너는 의료/바이오/미용 성형 분야의 엄격한 데이터 필터야.\n"
-        "아래 뉴스가 [의료/제약/미용성형/바이오] 산업과 관련이 있는지 판단해줘.\n"
-        "특히 '필러'라는 단어가 자동차 부품(A/B/C-Pillar)으로 쓰였거나, '캐시워크/퀴즈' 관련 뉴스라면 무조건 FALSE.\n\n"
-        "### 매우 중요한 규칙 (STRICT RULE):\n"
-        f"우리는 오직 다음 허용된 키워드 리스트에 있는 기업/제품만 수집한다: [{whitelist_sample}]\n"
-        "만약 기사의 메인 주제가 위 리스트에 없는 엉뚱한 기업(예: 강스템바이오, 오스테오닉 등)이라면, 설령 바이오 뉴스라도 과감히 FALSE를 출력해라.\n"
-        "즉, '허용된 키워드'가 제목이나 본문의 핵심이 아니라면 FALSE다.\n\n"
-        "오직 'TRUE' 또는 'FALSE'로만 대답해.\n\n"
-        f"제목: {title}\n"
-        f"내용: {description}"
-    )
-    for g_key in GEMINI_KEYS:
-        try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={g_key}"
-            payload = {"contents": [{"parts": [{"text": prompt}]}]}
-            async with aiohttp.ClientSession() as http_sess:
-                async with http_sess.post(url, json=payload, timeout=10) as resp:
-                    if resp.status == 200:
-                        result = await resp.json()
-                        answer = result['candidates'][0]['content']['parts'][0]['text'].strip().upper()
-                        return "TRUE" in answer
-        except: continue
-    
-    # AI 판단 불가 시, 제목에 의료 키워드가 없으면 일단 FALSE로 보수적 처리
-    return any(kw in title for kw in EXPERT_ANALYSIS_KEYWORDS)
 
 # [New] 지식 노트 로드 함수
 def load_knowledge():
