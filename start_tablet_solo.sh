@@ -60,8 +60,8 @@ if ! pgrep -f "llama-server" > /dev/null; then
     fi
 
     nohup $SERVER_BIN -m models/qwen3b.gguf -ngl 0 -t 8 -c 4096 -b 1024 --port 8080 --host 0.0.0.0 > server.log 2>&1 &
-    echo "    ⏳ Adreno 730 GPU 최적화 로딩 대기 (45초)..."
-    sleep 45
+    echo "    ⏳ Qwen 3B CPU 모드 로딩 대기 (15초)..."
+    sleep 15
 else
     echo "[✓] llama-server 이미 실행 중"
 fi
