@@ -17,7 +17,7 @@
 
 ### ✅ Step 2: 정보 조회
 
-- SSH 정보: `192.168.219.102:8022` (user: `u0_a43`, pw: `aisapiens`)
+- SSH 정보: `192.168.219.102:8022` (user: `u0_a155`, pw: `aisapiens`)
 - Supabase DB 비밀번호: `AISapience111$`
 - 키워드: `_shared/keywords.json` (SSOT)
 
@@ -139,11 +139,11 @@ PC에서 수정 → git push → 태블릿 git pull → 실행
 
 ```bash
 # 1. llama-server 포트 확인
-ssh -p 8022 u0_a43@192.168.219.102 "ps aux | grep llama-server"
+ssh -p 8022 u0_a155@192.168.219.102 "ps aux | grep llama-server"
 # → --port 8080 확인
 
 # 2. 환경변수 확인
-ssh -p 8022 u0_a43@192.168.219.102 "grep OLLAMA ~/news_dashboard/collector/.env"
+ssh -p 8022 u0_a155@192.168.219.102 "grep OLLAMA ~/news_dashboard/collector/.env"
 # → OLLAMA_HOST=http://127.0.0.1:8080 확인
 ```
 
@@ -165,12 +165,12 @@ ssh -p 8022 u0_a43@192.168.219.102 "grep OLLAMA ~/news_dashboard/collector/.env"
 
 ```bash
 # 1. 현재 상태 확인
-ssh -p 8022 u0_a43@192.168.219.102 "pgrep -fl python"
+ssh -p 8022 u0_a155@192.168.219.102 "pgrep -fl python"
 # → 정확히 3개여야 정상!
 
 # 2. 정상이면 → 아무것도 하지 않음!
 # 3. 비정상이면 → start_tablet_solo.sh 실행 (자동 정리 후 재시작)
-ssh -p 8022 u0_a43@192.168.219.102 "cd ~/news_dashboard && bash start_tablet_solo.sh"
+ssh -p 8022 u0_a155@192.168.219.102 "cd ~/news_dashboard && bash start_tablet_solo.sh"
 # → V3.0: 정상이면 "재시작 불필요" 출력 후 exit
 ```
 
@@ -202,7 +202,7 @@ ssh -p 8022 u0_a43@192.168.219.102 "cd ~/news_dashboard && bash start_tablet_sol
 ### 태블릿
 
 - **Host**: `192.168.219.102:8022`
-- **User**: `u0_a43` / PW: `aisapiens`
+- **User**: `u0_a155` / PW: `aisapiens`
 - **프로세스**: Collector + Processor + Watchdog (정확히 3개)
 
 ### Watchdog (자동 복구)

@@ -91,10 +91,10 @@ bash start_tablet_solo.sh
 
 ```bash
 # llama-server 포트 확인
-ssh -p 8022 u0_a43@192.168.219.102 "ps aux | grep llama-server"
+ssh -p 8022 u0_a155@192.168.219.102 "ps aux | grep llama-server"
 
 # 환경변수 확인
-ssh -p 8022 u0_a43@192.168.219.102 "grep OLLAMA ~/news_dashboard/collector/.env"
+ssh -p 8022 u0_a155@192.168.219.102 "grep OLLAMA ~/news_dashboard/collector/.env"
 ```
 
 ### 교훈
@@ -124,16 +124,16 @@ ssh -p 8022 u0_a43@192.168.219.102 "grep OLLAMA ~/news_dashboard/collector/.env"
 
 ```bash
 # 1. 프로세스 개수 확인
-ssh -p 8022 u0_a43@192.168.219.102 "pgrep -fl python"
+ssh -p 8022 u0_a155@192.168.219.102 "pgrep -fl python"
 
 # 2. 모두 종료
-ssh -p 8022 u0_a43@192.168.219.102 "pkill python"
+ssh -p 8022 u0_a155@192.168.219.102 "pkill python"
 
 # 3. 재시작
-ssh -p 8022 u0_a43@192.168.219.102 "cd ~/news_dashboard && bash start_tablet_solo.sh"
+ssh -p 8022 u0_a155@192.168.219.102 "cd ~/news_dashboard && bash start_tablet_solo.sh"
 
 # 4. 검증 (2개여야 정상)
-ssh -p 8022 u0_a43@192.168.219.102 "pgrep -fl python"
+ssh -p 8022 u0_a155@192.168.219.102 "pgrep -fl python"
 ```
 
 ### 교훈
@@ -240,21 +240,21 @@ ALTER TABLE articles ADD COLUMN IF NOT EXISTS issue_nature TEXT;
 
 ```bash
 # 프로세스 확인
-ssh -p 8022 u0_a43@192.168.219.102 "pgrep -fl python"
+ssh -p 8022 u0_a155@192.168.219.102 "pgrep -fl python"
 
 # llama-server 확인
-ssh -p 8022 u0_a43@192.168.219.102 "ps aux | grep llama-server"
+ssh -p 8022 u0_a155@192.168.219.102 "ps aux | grep llama-server"
 
 # 로그 확인
-ssh -p 8022 u0_a43@192.168.219.102 "tail -50 ~/news_dashboard/processor.log"
-ssh -p 8022 u0_a43@192.168.219.102 "tail -50 ~/news_dashboard/collector.log"
+ssh -p 8022 u0_a155@192.168.219.102 "tail -50 ~/news_dashboard/processor.log"
+ssh -p 8022 u0_a155@192.168.219.102 "tail -50 ~/news_dashboard/collector.log"
 
 # 환경변수 확인
-ssh -p 8022 u0_a43@192.168.219.102 "grep OLLAMA ~/news_dashboard/collector/.env"
+ssh -p 8022 u0_a155@192.168.219.102 "grep OLLAMA ~/news_dashboard/collector/.env"
 
 # 재시작
-ssh -p 8022 u0_a43@192.168.219.102 "pkill python"
-ssh -p 8022 u0_a43@192.168.219.102 "cd ~/news_dashboard && bash start_tablet_solo.sh"
+ssh -p 8022 u0_a155@192.168.219.102 "pkill python"
+ssh -p 8022 u0_a155@192.168.219.102 "cd ~/news_dashboard && bash start_tablet_solo.sh"
 ```
 
 ---
