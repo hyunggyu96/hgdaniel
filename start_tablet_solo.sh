@@ -59,7 +59,7 @@ if ! pgrep -f "llama-server" > /dev/null; then
         SERVER_BIN="llama-server"
     fi
 
-    nohup $SERVER_BIN -m models/qwen7b.gguf -ngl 20 -t 8 -c 8192 -b 4096 --port 8080 --host 0.0.0.0 > server.log 2>&1 &
+    nohup $SERVER_BIN -m models/qwen7b.gguf -ngl 20 -t 4 -c 8192 -b 1024 --port 8080 --host 0.0.0.0 > server.log 2>&1 &
     echo "    ⏳ 모델 로딩 대기 (10초)..."
     sleep 10
 else
