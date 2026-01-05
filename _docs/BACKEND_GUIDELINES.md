@@ -77,7 +77,15 @@ git pull
   - `collector/.env` KEYWORDS (수집용)
   - `_shared/keywords.json` (AI 분석용)
 
-**현재 총 173개 키워드** (V5.2):
+**현재 수집 키워드 (25개, 2026-01-06 업데이트)**:
+
+```
+필러,톡신,보톡스,리쥬란,쥬베룩,PLLA,PDLLA,HIFU,엑소좀,PDRN,PN,PDO,
+제테마,휴젤,파마리서치,메디톡스,휴메딕스,종근당바이오,바임,원텍,
+클래시스,제이시스메디칼,리투오,시지바이오,스킨부스터
+```
+
+**분석용 키워드 (173개, keywords.json)**:
 
 - Filler (29종), Toxin (24종), PDRN/PN (9종)
 - Exosome (6종), Collagen Stimulator (24종)
