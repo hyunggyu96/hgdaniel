@@ -59,7 +59,7 @@ if ! pgrep -f "llama-server" > /dev/null; then
         SERVER_BIN="llama-server"
     fi
 
-    nohup $SERVER_BIN -m models/qwen3b.gguf -ngl 0 -t 8 -c 4096 -b 1024 --port 8080 --host 0.0.0.0 > server.log 2>&1 &
+    nohup $SERVER_BIN -m models/qwen3b.gguf -ngl 0 -t 8 -c 4096 -b 128 --port 8080 --host 0.0.0.0 > server.log 2>&1 &
     echo "    ⏳ Qwen 3B CPU 모드 로딩 대기 (15초)..."
     sleep 15
 else
