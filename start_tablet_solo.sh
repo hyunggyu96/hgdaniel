@@ -59,7 +59,7 @@ if ! pgrep -f "llama-server" > /dev/null; then
         SERVER_BIN="llama-server"
     fi
 
-    nohup $SERVER_BIN -m models/gemma3-4b.gguf -ngl 99 -t 4 -c 4096 -b 128 -ub 32 --port 8080 --host 0.0.0.0 > server.log 2>&1 &
+    nohup $SERVER_BIN -m models/gemma3-4b.gguf -ngl 20 -t 6 -c 4096 -b 128 -ub 16 --port 8080 --host 0.0.0.0 > server.log 2>&1 &
     echo "    ⏳ Adreno 730 GPU 최적화 로딩 대기 (45초)..."
     sleep 45
 else
