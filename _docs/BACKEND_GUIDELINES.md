@@ -124,7 +124,7 @@ PC에서 수정 → git push → 태블릿 git pull → 실행
 
 | # | 확인 항목 | 명령어 | 정상 기준 |
 |---|----------|--------|-----------|
-| 1 | 프로세스 개수 | `ssh ... "pgrep -fl python"` | 정확히 **2개** |
+| 1 | 프로세스 개수 | `ssh ... "pgrep -fl python"` | 정확히 **3개** (Collector, Processor, SyncBot) |
 | 2 | Supabase | `python check_articles.py` | 오늘 날짜 존재 |
 | 3 | Google Sheets | 시트 직접 확인 | 최신 타임스탬프 |
 | 4 | 웹사이트 | URL 방문 | 오늘 뉴스 표시 |
@@ -149,16 +149,35 @@ ssh -p 8022 u0_a43@192.168.219.102 "grep OLLAMA ~/news_dashboard/collector/.env"
 
 **해결**: `TROUBLESHOOTING.md` 섹션 1 참조
 
-### 프로세스 중복
+### 프로세스 중복 방지 (V3.0)
+
+> ⚠️ **핵심 원칙: 정상 프로세스는 절대 건드리지 않는다!**
+
+**정상 상태 (터치 금지)**:
+
+- Python 프로세스: 정확히 **3개** (async_collector.py, processor.py, auto_sync_bot.py)
+- llama-server: **1개**
+
+**비정상 상태 (조치 필요)**:
+
+- 프로세스가 0개 → 재시작 필요
+- 프로세스가 2개 이상 중복 → 정리 후 재시작
 
 ```bash
-# 1. 확인
+# 1. 현재 상태 확인
 ssh -p 8022 u0_a43@192.168.219.102 "pgrep -fl python"
+# → 정확히 3개여야 정상!
 
-# 2. 정리 (2개 초과 시)
-ssh -p 8022 u0_a43@192.168.219.102 "pkill python"
+# 2. 정상이면 → 아무것도 하지 않음!
+# 3. 비정상이면 → start_tablet_solo.sh 실행 (자동 정리 후 재시작)
 ssh -p 8022 u0_a43@192.168.219.102 "cd ~/news_dashboard && bash start_tablet_solo.sh"
+# → V3.0: 정상이면 "재시작 불필요" 출력 후 exit
 ```
+
+**절대 하지 말 것**:
+
+- ❌ 정상 상태에서 `pkill python` 실행
+- ❌ start_tablet_solo.sh 반복 실행 (V3.0은 안전하지만 불필요)
 
 ---
 
