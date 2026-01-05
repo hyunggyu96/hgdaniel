@@ -18,7 +18,7 @@ description: 태블릿 Termux 자동 시작 설정 및 파이프라인 복구
 ### 1. 태블릿 SSH 연결
 
 ```bash
-ssh -o StrictHostKeyChecking=no u0_a374@192.168.45.21 -p 8022
+ssh -o StrictHostKeyChecking=no u0_a43@192.168.219.102 -p 8022
 ```
 
 비밀번호: `aisapiens`

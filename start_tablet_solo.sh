@@ -17,22 +17,30 @@ PYTHON_CMD="python"
 if command -v python3 >/dev/null 2>&1; then PYTHON_CMD="python3"; fi
 
 # ============================================
-# 🚨 중복 프로세스 탐지 및 정리 (V2.0 추가)
+# 🚨 중복 프로세스 탐지 및 정리 (V3.0 - 정상이면 스킵)
 # ============================================
 COLLECTOR_COUNT=$(pgrep -f "async_collector.py" | wc -l)
 PROCESSOR_COUNT=$(pgrep -f "processor.py" | wc -l)
+SYNCBOT_COUNT=$(pgrep -f "auto_sync_bot.py" | wc -l)
+LLAMA_COUNT=$(pgrep -f "llama-server" | wc -l)
 
-echo "[체크] 현재 Collector 프로세스: ${COLLECTOR_COUNT}개"
-echo "[체크] 현재 Processor 프로세스: ${PROCESSOR_COUNT}개"
+echo "[체크] 현재 Collector: ${COLLECTOR_COUNT}개, Processor: ${PROCESSOR_COUNT}개, SyncBot: ${SYNCBOT_COUNT}개, LLaMA: ${LLAMA_COUNT}개"
 
-if [ "$COLLECTOR_COUNT" -gt 0 ] || [ "$PROCESSOR_COUNT" -gt 0 ]; then
-    echo "⚠️  경고: 기존 프로세스 발견! 중복 실행을 방지하기 위해 정리합니다..."
-    pkill -f "async_collector.py"
-    pkill -f "processor.py"
-    pkill llama-server
-    sleep 2
-    echo "✅ 기존 프로세스 종료 완료"
+# 모든 프로세스가 정확히 1개씩 실행 중이면 스킵 (재시작 없음)
+if [ "$COLLECTOR_COUNT" -eq 1 ] && [ "$PROCESSOR_COUNT" -eq 1 ] && [ "$SYNCBOT_COUNT" -eq 1 ] && [ "$LLAMA_COUNT" -ge 1 ]; then
+    echo "✅ 모든 프로세스 정상 실행 중! 재시작 불필요."
+    echo "=== $(date) ===" 
+    exit 0
 fi
+
+# 비정상 상태 (0개 or 2개 이상) → 정리 후 재시작
+echo "⚠️  비정상 상태 감지! 기존 프로세스 정리 후 재시작..."
+pkill -f "async_collector.py" 2>/dev/null
+pkill -f "processor.py" 2>/dev/null
+pkill -f "auto_sync_bot.py" 2>/dev/null
+# llama-server는 유지 (재시작 비용 큼)
+sleep 2
+echo "✅ 정리 완료"
 
 # ============================================
 # Local LLM (llama-server) 체크 및 가동
