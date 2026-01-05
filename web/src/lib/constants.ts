@@ -1,10 +1,17 @@
 
-
 import keywordsData from '../../../_shared/keywords.json';
 
 export const CATEGORIES_CONFIG = keywordsData.categories;
 
 export const CATEGORIES = CATEGORIES_CONFIG.map(c => c.label);
+
+// [NEW] 기업명 단독 키워드 리스트 (이 키워드만 있으면 Corporate News)
+const COMPANY_ONLY_KEYWORDS = [
+    "파마리서치", "휴젤", "메디톡스", "제테마", "대웅제약", "동국제약",
+    "종근당", "종근당바이오", "휴메딕스", "휴온스", "케어젠",
+    "갈더마", "멀츠", "앨러간", "시지바이오", "한스바이오메드",
+    "바이오플러스", "원텍", "클래시스", "제이시스메디칼", "리투오"
+];
 
 // Helper to check if text contains any of the keywords
 const containsKeyword = (text: string, keywords: string[]) => {
@@ -22,11 +29,35 @@ export function groupNewsByCategory(news: any[]) {
     const CORPORATE_KEYWORDS = CATEGORIES_CONFIG[CORPORATE_IDX].keywords;
 
     news.forEach(article => {
+        // [NEW] 이미 DB에 category가 저장되어 있으면 그대로 사용
+        if (article.category && buckets[article.category]) {
+            buckets[article.category].push(article);
+            return;
+        }
+
         let bestCategory: string | null = null;
         let highestScore = 0;
 
         // 메타데이터 분석: 제목, 키워드, 설명
         const content = `${article.title || ''} ${article.keyword || ''} ${article.description || ''}`;
+
+        // [NEW] 기업명 단독 키워드 체크 - 검색 키워드가 기업명이고, 제품 키워드가 없으면 Corporate News
+        if (article.keyword && COMPANY_ONLY_KEYWORDS.includes(article.keyword)) {
+            const productKeywordsInContent: string[] = [];
+            CATEGORIES_CONFIG.forEach(config => {
+                if (config.label !== "Corporate News") {
+                    config.keywords.forEach(k => {
+                        if (k !== article.keyword && content.includes(k)) {
+                            productKeywordsInContent.push(k);
+                        }
+                    });
+                }
+            });
+            if (productKeywordsInContent.length === 0) {
+                buckets["Corporate News"].push(article);
+                return;
+            }
+        }
 
         // 1. 기업 키워드 발견 개수 확인 (다수 기업 언급 시 Corporate News 확률 증가)
         const mentionedCompanies = CORPORATE_KEYWORDS.filter(k => content.includes(k));

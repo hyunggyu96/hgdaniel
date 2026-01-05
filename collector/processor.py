@@ -70,12 +70,34 @@ try:
         CATEGORIES_CONFIG = json.load(f).get('categories', [])
 except: pass
 
+# [NEW] 기업명 단독 키워드 리스트 (이 키워드만 있으면 Corporate News)
+COMPANY_ONLY_KEYWORDS = [
+    "파마리서치", "휴젤", "메디톡스", "제테마", "대웅제약", "동국제약", 
+    "종근당", "종근당바이오", "휴메딕스", "휴온스", "케어젠",
+    "갈더마", "멀츠", "앨러간", "시지바이오", "한스바이오메드",
+    "바이오플러스", "원텍", "클래시스", "제이시스메디칼", "리투오"
+]
+
 def determine_category(title, description, search_keyword):
     """Determines news category based on keyword scores (Matches Frontend Logic)"""
     content = f"{title or ''} {search_keyword or ''} {description or ''}"
     best_category = "Corporate News"
     highest_score = 0
     category_scores = {}
+    
+    # [NEW] 기업명 단독 키워드 체크 - 검색 키워드가 기업명이고, 제품 키워드가 없으면 Corporate News
+    if search_keyword in COMPANY_ONLY_KEYWORDS:
+        # 제품명 키워드가 있는지 확인
+        product_keywords_in_content = []
+        for config in CATEGORIES_CONFIG:
+            if config['label'] != "Corporate News":
+                for k in config['keywords']:
+                    if k != search_keyword and k in content:
+                        product_keywords_in_content.append(k)
+        
+        # 제품명이 없으면 무조건 Corporate News
+        if not product_keywords_in_content:
+            return "Corporate News"
     
     # Identify corporate keywords
     corporate_config = next((c for c in CATEGORIES_CONFIG if c['label'] == "Corporate News"), None)
@@ -171,7 +193,11 @@ BAD_KEYWORDS = [
     "필러투필러", "Pillar", "패스트백", "1열", "2열",                # 자동차 관련 명확한 노이즈
     "디지털키", "파노라마디스플레이", "전동화", "테슬라", "현대차", "기아",
     "BMW", "MINI", "쿠퍼", "LG디스플레이", "삼성디스플레이",         # 브랜드 (강력 차단)
-    "캐터필러", "캐피터필러", "캐터필라", "Caterpillar", "마이크론", "미 증시" # 증시/장비 노이즈
+    "캐터필러", "캐피터필러", "캐터필라", "Caterpillar", "마이크론", "미 증시", # 증시/장비 노이즈
+    # 세금/조세/금융 노이즈 (2026-01-06 추가)
+    "OECD최저세", "글로벌최저한세", "글로벌 최저한세", "조세회피", "미 재무부", "재무부 합의",
+    "JP모건", "JP모간", "헬스케어 집결", "코스피", "코스닥", "증시", "주가지수",
+    "기업 면제", "적용 면제", "145개국", "150개국", # 세금 관련 숫자 패턴
 ]
 
 # Robust Regex for Automotive Pillars (A/B/C-Pillar)
@@ -283,6 +309,12 @@ CONTEXT_NOISE_FILTER = {
     "바임": ["호텔", "문학", "작가", "소설", "욘 포세", "장편", "은희경", "천명관"],
 }
 
+# [NEW] 정확 매칭이 필요한 키워드 (부분 매칭 금지)
+# 예: "스킨" + "부스터" 따로 있으면 매칭 안됨, "스킨부스터" 또는 "스킨 부스터"만 허용
+EXACT_MATCH_KEYWORDS = {
+    "스킨부스터": ["스킨부스터", "스킨 부스터", "skinbooster", "skin booster"],
+}
+
 async def process_item(item, worksheet, recent_articles):
     raw_id = item['id']
     title = item['title']
@@ -312,6 +344,16 @@ async def process_item(item, worksheet, recent_articles):
         print(f"🚫 Hard Filter: Bad Keyword detected ({title[:20]}...)")
         supabase.table("raw_news").update({"status": "filtered"}).eq("id", raw_id).execute()
         return False
+
+    # [NEW] 4. 정확 매칭 키워드 검증 (스킨부스터 등)
+    if keyword in EXACT_MATCH_KEYWORDS:
+        valid_patterns = EXACT_MATCH_KEYWORDS[keyword]
+        full_text_lower = full_text.lower()
+        has_exact_match = any(pattern.lower() in full_text_lower for pattern in valid_patterns)
+        if not has_exact_match:
+            print(f"🚫 Hard Filter: Exact Match Failed for '{keyword}' ({title[:20]}...)")
+            supabase.table("raw_news").update({"status": "filtered"}).eq("id", raw_id).execute()
+            return False
 
     # [1] Semantic Duplicate Check (V5.1: 80% threshold for Title OR Desc)
     for recent in recent_articles[-300:]: # Check last 300 processed items
