@@ -71,21 +71,91 @@ def generate_report():
     report_lines.append(f"- 📦 **Total Collected**: {total_raw_count} items")
     report_lines.append(f"- 💎 **Total Analyzed**: {total_proc_count} items")
     
-    status_emoji = "🟢 Healthy"
-    if pending_count > 100: status_emoji = "🟠 Heavy Load (Working Hard)"
-    if pending_count > 500: status_emoji = "🔴 Backlog Critical"
-    if processed_count == 0 and raw_count > 0: status_emoji = "⚠️ Processing Stalled?"
+    # Health Check Logic (Day/Night Aware)
+    current_hour = kst_now.hour
+    is_night_time = 0 <= current_hour < 6
     
+    status_emoji = "🟢 Healthy"
+    
+    # [낮 시간] 활동 시간인데 수집/분석이 없다면 -> 사망 의심 (CRITICAL)
+    if not is_night_time:
+        if raw_count == 0:
+            status_emoji = "🔴 CRITICAL: NO COLLECTION (Collector Dead?)"
+        elif processed_count == 0 and pending_count > 0:
+            status_emoji = "🔴 CRITICAL: PROCESSOR STUCK (0 Analyzed)"
+        elif processed_count < 5 and pending_count > 50:
+            status_emoji = "🟠 WARNING: Processing Slow"
+            
+    # [밤 시간] 새벽에는 0건이어도 정상 (Idle)
+    else:
+    # Backlog 공통 체크
+    # [New] Heartbeat Check (Real "Are you alive?" Check)
+    import json
+    last_hbeat_str = "Unknown"
+    is_alive = False
+    
+    try:
+        root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        hbeat_path = os.path.join(root_dir, "last_update.json")
+        
+        if os.path.exists(hbeat_path):
+            with open(hbeat_path, "r", encoding='utf-8') as f:
+                hbeat_data = json.load(f)
+                proc_last = hbeat_data.get("processor_heartbeat", "")
+                
+                if proc_last:
+                    # Parse Heartbeat Time
+                    last_time = datetime.datetime.fromisoformat(proc_last)
+                    diff = datetime.datetime.now() - last_time
+                    minutes_ago = int(diff.total_seconds() / 60)
+                    last_hbeat_str = f"{minutes_ago} min ago"
+                    
+                    # 10분 이내에 심장 뛰었으면 살아있는 것
+                    if minutes_ago < 20: 
+                        is_alive = True
+    except Exception as e:
+        print(f"⚠️ Heartbeat Check Failed: {e}")
+
+    # Health Check Logic (Heartbeat Aware)
+    status_emoji = "🟢 Healthy"
+    
+    # 1. 심장이 멈춤 (가장 치명적)
+    if not is_alive:
+        status_emoji = f"🔴 CRITICAL: PROCESSOR DEAD (Last Pulse: {last_hbeat_str})"
+    
+    # 2. 심장은 뛰는데 건수가 0 (Idle vs Stuck)
+    elif processed_count == 0 and pending_count > 0:
+        status_emoji = "🟠 WARNING: Processing Stuck (Alive but not reducing queue)"
+        
+    # 3. 심장 뛰고 건수 0, 큐도 0 (완벽한 정상 - Idle)
+    elif processed_count == 0 and pending_count == 0:
+         status_emoji = f"🟢 Healthy (Idle - Last Pulse: {last_hbeat_str})"
+
+    # 4. 쌓이는 중
+    elif pending_count > 200:
+        status_emoji = "🟠 Heavy Load"
+        
     report_lines.append(f"- 🌡️ **System Health**: {status_emoji}")
+    report_lines.append(f"- 💓 **Last Heartbeat**: {last_hbeat_str}")
     report_lines.append(f"")
     report_lines.append(f"📰 **Recent Key Articles**")
     
     if recent_articles:
         for idx, item in enumerate(recent_articles, 1):
-            keywords = ", ".join(item.get('main_keywords', [])[:3])
-            report_lines.append(f"{idx}. [{keywords}] {item['title']}")
+            # [V2] Use Description preview if Main Keyword is '기타'
+            title_display = item['title']
+            keywords = item.get('main_keywords', [])
+            
+            # 리스트면 문자열로 변환, 없으면 빈 리스트
+            if isinstance(keywords, str):
+                keywords = [keywords]
+            elif not keywords:
+                keywords = []
+                
+            kw_str = ", ".join(keywords[:2]) if keywords else "General"
+            report_lines.append(f"{idx}. [{kw_str}] {title_display[:40]}...")
     else:
-        report_lines.append("(No articles processed in this period)")
+        report_lines.append("(No articles processed, but system is alive)")
         
     report_lines.append(f"")
     report_lines.append(f"----------------------------------------")
