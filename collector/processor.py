@@ -364,7 +364,8 @@ async def process_item(item, worksheet, recent_articles):
             supabase.table("raw_news").update({"status": "duplicate"}).eq("id", raw_id).execute()
             return None
 
-    print(f"🤖 Analyzing: {title[:40]}...")
+    timestamp = datetime.datetime.now().strftime('%H:%M:%S')
+    print(f"[{timestamp}] 🤖 Analyzing: {title[:40]}...")
     analysis = await analyze_article_expert_async(title, desc, keyword)
     
     # [V5.1] AI 분석 실패 처리
