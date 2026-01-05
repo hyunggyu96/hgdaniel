@@ -329,6 +329,9 @@ async def process_item(item, worksheet, recent_articles):
     pub_date = item['pub_date']
     keyword = item['search_keyword']
 
+    # Define full_text for filtering
+    full_text = f"{title} {desc}"
+
     # [1] Car Brands Check
     if any(brand in full_text for brand in CAR_BRANDS):
         print(f"🚫 Hard Filter: Car Brand detected ({title[:20]}...)")
