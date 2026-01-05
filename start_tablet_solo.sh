@@ -59,7 +59,7 @@ if ! pgrep -f "llama-server" > /dev/null; then
         SERVER_BIN="llama-server"
     fi
 
-    nohup $SERVER_BIN -m models/qwen7b.gguf -ngl 33 -t 4 -c 4096 -b 128 --port 8080 --host 0.0.0.0 > server.log 2>&1 &
+    nohup $SERVER_BIN -m models/qwen7b.gguf -ngl 33 -t 2 -c 4096 -b 512 --port 8080 --host 0.0.0.0 > server.log 2>&1 &
     echo "    ⏳ 모델 GPU 로딩 대기 (30초)..."
     sleep 30
 else
