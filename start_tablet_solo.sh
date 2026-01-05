@@ -50,7 +50,7 @@ if ! pgrep -f "llama-server" > /dev/null; then
     # Custom Built OpenCL Binary
     # Qwen 7B, Hybrid GPU Mode (-ngl 20), 8 threads, 8080 port
     # LD_LIBRARY_PATH required for libggml-opencl.so
-    export LD_LIBRARY_PATH=/system/vendor/lib64:$LD_LIBRARY_PATH:$HOME/llama.cpp/build/bin
+    export LD_LIBRARY_PATH=/system/vendor/lib64:/vendor/lib64:$LD_LIBRARY_PATH:$HOME/llama.cpp/build/bin
     
     # Use the custom binary if exists, else fallback to pkg binary
     if [ -f "./llama-server-opencl" ]; then
@@ -59,9 +59,9 @@ if ! pgrep -f "llama-server" > /dev/null; then
         SERVER_BIN="llama-server"
     fi
 
-    nohup $SERVER_BIN -m models/qwen7b.gguf -ngl 20 -t 4 -c 8192 -b 1024 --port 8080 --host 0.0.0.0 > server.log 2>&1 &
-    echo "    ⏳ 모델 로딩 대기 (10초)..."
-    sleep 10
+    nohup $SERVER_BIN -m models/qwen7b.gguf -ngl 33 -t 4 -c 4096 -b 512 --port 8080 --host 0.0.0.0 > server.log 2>&1 &
+    echo "    ⏳ 모델 GPU 로딩 대기 (30초)..."
+    sleep 30
 else
     echo "[✓] llama-server 이미 실행 중"
 fi
