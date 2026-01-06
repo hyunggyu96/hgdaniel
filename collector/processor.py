@@ -591,10 +591,9 @@ async def main():
             total_pending = res.count
             
             if not pending_items:
-                # [NEW] ai_error 자동 재시도: 1시간 지난 에러 기사 pending으로 변경
+                # [NEW] ai_error 자동 재시도: 에러 기사 즉시 pending으로 변경
                 try:
-                    one_hour_ago = (datetime.datetime.now() - datetime.timedelta(hours=1)).isoformat()
-                    retry_result = supabase.table("raw_news").update({"status": "pending"}).eq("status", "ai_error").lt("updated_at", one_hour_ago).execute()
+                    retry_result = supabase.table("raw_news").update({"status": "pending"}).eq("status", "ai_error").execute()
                     if retry_result.data:
                         print(f"🔄 Auto-retry: {len(retry_result.data)} ai_error articles reset to pending")
                 except Exception as retry_err:
