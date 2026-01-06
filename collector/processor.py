@@ -320,6 +320,7 @@ CONTEXT_NOISE_FILTER = {
 # 예: "스킨" + "부스터" 따로 있으면 매칭 안됨, "스킨부스터" 또는 "스킨 부스터"만 허용
 EXACT_MATCH_KEYWORDS = {
     "스킨부스터": ["스킨부스터", "스킨 부스터", "skinbooster", "skin booster"],
+    "온다": ["온다리프팅", "온다 리프팅", "onda lifting", "온다기기", "온다시술"],  # "돌아온다" 등 부분 매칭 방지
 }
 
 async def process_item(item, worksheet, recent_articles):
