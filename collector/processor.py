@@ -237,7 +237,10 @@ async def analyze_article_expert_async(title, description, search_keyword):
         "### 🛡️ STEP 1: CONTEXT VERIFICATION (CRITICAL)\n"
         "Based on the Knowledge Base above, check if the content is TRULY about Medical Aesthetics.\n"
         "1. **Homonym Trap**: If a keyword (e.g., 'Vaim') appears but context matches 'NOISE' rules (Hotel, Novel), Return '기타'.\n"
-        "2. **Irrelevant Domain**: Sports, Arts, General Politics -> Return '기타'.\n\n"
+        "2. **Irrelevant Domain**: Sports, Arts, General Politics -> Return '기타'.\n"
+        "3. **Contextual Disambiguation**: \n"
+        "   - 'Filler': If text mentions 'Suspension', 'Tire', 'Car', 'A-Pillar', it is NOISE. Must relate to 'Skin', 'Wrinkle', 'Face'.\n"
+        "   - 'Comparative Analysis': If headline is 'Sculptra better than Filler', the main_keyword is 'Sculptra', NOT 'Filler'. Identify the PROTAGONIST of the news.\n\n"
 
         "### CORE ANALYTICAL TASKS (Only if Step 1 Passed):\n"
         "1. **Strategic Intent**: Identify if the news is about R&D progress, global expansion, or competition.\n"
