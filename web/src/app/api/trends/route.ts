@@ -29,6 +29,7 @@ export async function GET() {
         const { data: articles, error } = await supabase
             .from('articles')
             .select('keyword, main_keywords, title, description, published_at, category') // category 추가
+            .neq('category', 'NOISE')  // 노이즈 기사 제외
             .gte('published_at', startDateStr)
             .order('published_at', { ascending: true })
             .limit(10000); // Limit도 2배로 증가

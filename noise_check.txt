@@ -1,0 +1,23 @@
+﻿============================================================
+python : Traceback (most recent call last):
+위치 줄:1 문자:1
++ python hide_noise_articles.py 2>&1 | Out-File 
+-Encoding utf8 noise_ch ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Tr 
+   aceback (most recent call last)::String) []  
+  , RemoteException
+    + FullyQualifiedErrorId : NativeCommandErro 
+   r
+ 
+  File "C:\Users\hyung\Desktop\news_dashboard\hi
+de_noise_articles.py", line 123, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\hyung\Desktop\news_dashboard\hi
+de_noise_articles.py", line 92, in main
+    print("\U0001f9f9 노이즈 기사 정리 스크립트")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'cp949' codec can't encode c
+haracter '\U0001f9f9' in position 0: illegal mul
+tibyte sequence

@@ -8,6 +8,7 @@ export async function getNews() {
         const { data, error } = await supabaseAdmin
             .from('articles')
             .select('*')
+            .neq('category', 'NOISE')  // 노이즈 기사 제외
             .order('published_at', { ascending: false });
 
         if (error) {
