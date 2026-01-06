@@ -591,6 +591,15 @@ async def main():
             total_pending = res.count
             
             if not pending_items:
+                # [NEW] ai_error 자동 재시도: 1시간 지난 에러 기사 pending으로 변경
+                try:
+                    one_hour_ago = (datetime.datetime.now() - datetime.timedelta(hours=1)).isoformat()
+                    retry_result = supabase.table("raw_news").update({"status": "pending"}).eq("status", "ai_error").lt("updated_at", one_hour_ago).execute()
+                    if retry_result.data:
+                        print(f"🔄 Auto-retry: {len(retry_result.data)} ai_error articles reset to pending")
+                except Exception as retry_err:
+                    pass  # 조용히 실패 (critical 아님)
+                
                 # [Smart Scheduling] Use System Local Time (KST)
                 kst_now = datetime.datetime.now()
                 current_hour = kst_now.hour
