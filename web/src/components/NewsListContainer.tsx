@@ -243,7 +243,7 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
                             <span className="text-[8px] font-black text-white bg-red-500 px-1.5 py-0.5 rounded shadow-[0_0_12px_rgba(239,68,68,0.6)] tracking-tighter uppercase inline-block leading-none shrink-0 border border-red-400/50 animate-pulse">NEW</span>
                         )}
                         {isYesterday && !isToday && (
-                            <span className="text-[8px] font-black text-amber-900 bg-amber-400 px-1.5 py-0.5 rounded shadow-[0_0_12px_rgba(251,191,36,0.5)] tracking-tighter uppercase inline-block leading-none shrink-0 border border-amber-300/50">YESTERDAY</span>
+                            <span className="text-[8px] font-black text-amber-900 bg-amber-400 px-1.5 py-0.5 rounded shadow-[0_0_12px_rgba(251,191,36,0.5)] tracking-tighter uppercase inline-block leading-none shrink-0 border border-amber-300/50">YDAY</span>
                         )}
                         <a href={article.link} target="_blank" rel="noopener noreferrer" className="text-[14px] font-bold text-white/90 group-hover/card:text-blue-400 transition-colors leading-tight line-clamp-2 block tracking-tight">
                             {article.title}
@@ -308,7 +308,7 @@ const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, 
                             <span className="text-[8px] font-black text-white bg-red-500 px-1.5 py-0.5 rounded shadow-[0_0_12px_rgba(239,68,68,0.6)] tracking-tighter uppercase inline-block leading-none shrink-0 border border-red-400/50 animate-pulse">NEW</span>
                         )}
                         {isYesterday && !isToday && (
-                            <span className="text-[8px] font-black text-amber-900 bg-amber-400 px-1.5 py-0.5 rounded shadow-[0_0_12px_rgba(251,191,36,0.5)] tracking-tighter uppercase inline-block leading-none shrink-0 border border-amber-300/50">YESTERDAY</span>
+                            <span className="text-[8px] font-black text-amber-900 bg-amber-400 px-1.5 py-0.5 rounded shadow-[0_0_12px_rgba(251,191,36,0.5)] tracking-tighter uppercase inline-block leading-none shrink-0 border border-amber-300/50">YDAY</span>
                         )}
                         <a href={article.link} target="_blank" rel="noopener noreferrer" className="block"><h3 className="text-[14px] font-bold text-white/90 group-hover:text-[#3182f6] transition-colors line-clamp-1 leading-tight">{article.title}</h3></a>
                     </div>
