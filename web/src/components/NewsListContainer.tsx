@@ -150,7 +150,7 @@ export default function NewsListContainer({
 
                                     <div className="relative z-10 flex flex-col gap-3.5">
                                         <AnimatePresence mode="popLayout">
-                                            {articles.slice(0, 5).map((article: any, i: number) => (
+                                            {articles.slice(0, 8).map((article: any, i: number) => (
                                                 <motion.div
                                                     key={article.id}
                                                     initial={{ opacity: 0, x: -10 }}
@@ -214,7 +214,15 @@ function getTags(article: any) {
 const NewsCard = React.memo(function NewsCard({ article, today }: { article: any, today: string }) {
     const analysis = getTags(article);
     const pubDate = article.published_at ? new Date(article.published_at) : null;
-    const isToday = pubDate?.toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' }) === today;
+    const articleDate = pubDate?.toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
+    const isToday = articleDate === today;
+
+    // 어제 날짜 계산
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
+    const isYesterday = articleDate === yesterdayStr;
+
     const dateStr = pubDate ? pubDate.toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul', month: '2-digit', day: '2-digit' }).replace(/\. /g, '.').replace(/\.$/, '') : '';
     const timeStr = pubDate ? pubDate.toLocaleTimeString('ko-KR', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', hour12: false }) : '';
 
@@ -233,6 +241,9 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
                     <div className="flex items-center gap-1.5 mb-0.5">
                         {isToday && (
                             <span className="text-[8px] font-black text-white bg-red-500 px-1.5 py-0.5 rounded shadow-[0_0_12px_rgba(239,68,68,0.6)] tracking-tighter uppercase inline-block leading-none shrink-0 border border-red-400/50 animate-pulse">NEW</span>
+                        )}
+                        {isYesterday && !isToday && (
+                            <span className="text-[8px] font-black text-amber-900 bg-amber-400 px-1.5 py-0.5 rounded shadow-[0_0_12px_rgba(251,191,36,0.5)] tracking-tighter uppercase inline-block leading-none shrink-0 border border-amber-300/50">YESTERDAY</span>
                         )}
                         <a href={article.link} target="_blank" rel="noopener noreferrer" className="text-[14px] font-bold text-white/90 group-hover/card:text-blue-400 transition-colors leading-tight line-clamp-2 block tracking-tight">
                             {article.title}
@@ -265,7 +276,15 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
 const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, today: string }) {
     const analysis = getTags(article);
     const pubDate = article.published_at ? new Date(article.published_at) : null;
-    const isToday = pubDate?.toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' }) === today;
+    const articleDate = pubDate?.toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
+    const isToday = articleDate === today;
+
+    // 어제 날짜 계산
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
+    const isYesterday = articleDate === yesterdayStr;
+
     const dateStr = pubDate ? pubDate.toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul', month: '2-digit', day: '2-digit' }).replace(/\. /g, '.').replace(/\.$/, '') : '';
     const timeStr = pubDate ? pubDate.toLocaleTimeString('ko-KR', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', hour12: false }) : '';
 
@@ -277,7 +296,7 @@ const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, 
     return (
         <article className={`group py-2 px-4 bg-white/[0.02] hover:bg-white/[0.05] hover:scale-[1.01] border-b border-white/5 flex flex-col gap-0.5 transition-all duration-300 ${isToday ? 'bg-blue-400/[0.03]' : ''}`}>
             <div className="flex items-center justify-between text-[9px] font-mono font-medium">
-                <span className={isToday ? 'text-red-400' : 'text-white/30'}>{dateStr} {timeStr}</span>
+                <span className={isToday ? 'text-red-400' : isYesterday ? 'text-amber-400' : 'text-white/30'}>{dateStr} {timeStr}</span>
             </div>
             <div className="flex gap-2.5 items-start">
                 <div className="pt-0.5">
@@ -287,6 +306,9 @@ const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, 
                     <div className="flex items-center gap-1.5 mb-0.5">
                         {isToday && (
                             <span className="text-[8px] font-black text-white bg-red-500 px-1.5 py-0.5 rounded shadow-[0_0_12px_rgba(239,68,68,0.6)] tracking-tighter uppercase inline-block leading-none shrink-0 border border-red-400/50 animate-pulse">NEW</span>
+                        )}
+                        {isYesterday && !isToday && (
+                            <span className="text-[8px] font-black text-amber-900 bg-amber-400 px-1.5 py-0.5 rounded shadow-[0_0_12px_rgba(251,191,36,0.5)] tracking-tighter uppercase inline-block leading-none shrink-0 border border-amber-300/50">YESTERDAY</span>
                         )}
                         <a href={article.link} target="_blank" rel="noopener noreferrer" className="block"><h3 className="text-[14px] font-bold text-white/90 group-hover:text-[#3182f6] transition-colors line-clamp-1 leading-tight">{article.title}</h3></a>
                     </div>
