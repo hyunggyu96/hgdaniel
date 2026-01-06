@@ -112,8 +112,8 @@ def determine_category(title, description, search_keyword):
         is_corporate = (label == "Corporate News")
         
         for k in keywords:
-            if search_keyword == k: score += 100
-            if title and k in title: score += 50
+            if search_keyword == k: score += 40  # [V5.2] 검색어 가중치 하향 (100 -> 40)
+            if title and k in title: score += 80 # [V5.2] 제목 가중치 상향 (50 -> 80)
             if description and k in description: score += 10
             
         if is_corporate and is_multi_company:
@@ -344,7 +344,8 @@ async def process_item(item, worksheet, recent_articles):
         return False
         
     # 3. Bad Keywords (Quiz, etc)
-    if any(bad in title for bad in BAD_KEYWORDS):
+    # 3. Bad Keywords (Quiz, etc) - Check FULL TEXT
+    if any(bad in full_text for bad in BAD_KEYWORDS):
         print(f"🚫 Hard Filter: Bad Keyword detected ({title[:20]}...)")
         supabase.table("raw_news").update({"status": "filtered"}).eq("id", raw_id).execute()
         return False
