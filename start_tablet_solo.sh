@@ -59,8 +59,8 @@ if ! pgrep -f "llama-server" > /dev/null; then
         SERVER_BIN="llama-server"
     fi
 
-    nohup $SERVER_BIN -m models/qwen3b.gguf -ngl 0 -t 4 -c 4096 -b 128 -ub 64 --port 8080 --host 0.0.0.0 > server.log 2>&1 &
-    echo "    ⏳ Qwen 3B 초고속 모드 로딩 대기 (20초)..."
+    nohup $SERVER_BIN -m models/qwen7b.gguf -ngl 0 -t 4 -c 8192 -b 128 -ub 64 --port 8080 --host 0.0.0.0 > server.log 2>&1 &
+    echo "    ⏳ Qwen 7B 고성능(Instruct) 모드 로딩 대기 (15초)..."
     sleep 20
 else
     echo "[✓] llama-server 이미 실행 중"
