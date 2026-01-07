@@ -114,7 +114,36 @@ async def process_news_item_expert(item, search_keyword, existing_links):
 
 # [6] Main Execution
 async def main():
-    print(f"🚀 Expert News Collector Started (Pure Collection Mode).")
+    # ============================================
+    # 🚀 시작 배너 및 환경 체크 (Termux 재시작 시 확인용)
+    # ============================================
+    print("=" * 50)
+    print("🚀 NEWS COLLECTOR 시작")
+    print("=" * 50)
+    print(f"⏰ 시작 시각: {datetime.datetime.now()}")
+    print(f"📦 수집 키워드: {', '.join(KEYWORDS)}")
+    
+    # 환경 체크
+    env_ok = True
+    if not NAVER_CLIENT_ID or not NAVER_CLIENT_SECRET:
+        print("❌ [ENV ERROR] NAVER API 키가 설정되지 않음!")
+        env_ok = False
+    else:
+        print(f"✅ NAVER API: 설정됨 (ID: {NAVER_CLIENT_ID[:8]}...)")
+    
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        print("❌ [ENV ERROR] SUPABASE 키가 설정되지 않음!")
+        env_ok = False
+    else:
+        print(f"✅ SUPABASE: 설정됨 ({SUPABASE_URL[:30]}...)")
+    
+    if not env_ok:
+        print("🚨 환경 변수 오류로 수집 불가. 종료합니다.")
+        return
+    
+    print("=" * 50)
+    print("📡 뉴스 수집 루프 시작...")
+    print("=" * 50)
     
     single_run = os.getenv("SINGLE_RUN", "false").lower() == "true"
     
@@ -122,32 +151,28 @@ async def main():
         try:
             print(f"\n⏰ Cycle Start: {datetime.datetime.now()}")
             
-            # ---- [V5.0] Determine start_date (Keyword-Specific) ----
-            import json, pathlib
-            last_update_path = pathlib.Path(__file__).parents[1] / "last_update.json"
-            cycle_start_time = datetime.datetime.now()
+            # ============================================
+            # [V6.0] 마지막 뉴스 발행시간 기준 수집 (Supabase 조회)
+            # Termux 재시작해도 놓친 뉴스 없이 수집!
+            # ============================================
             
-            # Load existing time data
-            time_registry = {}
-            if last_update_path.exists():
-                try:
-                    time_registry = json.loads(last_update_path.read_text(encoding="utf-8"))
-                except Exception as e:
-                    print(f"⚠️ Failed to parse last_update.json: {e}")
-
-            # Prepare keyword-specific times if not present
-            kw_times = time_registry.get("keyword_last_collected_at", {})
-            global_fallback = time_registry.get("last_collected_at") or time_registry.get("last_run") or "2025-12-19T00:00:00"
-
-            # Prepare list to track updates
-            keyword_items_to_process = []
-            for kw in KEYWORDS:
-                kw_start_str = kw_times.get(kw, global_fallback)
-                try:
-                    kw_start_date = datetime.datetime.fromisoformat(kw_start_str.replace('Z', '+00:00')).replace(tzinfo=None)
-                except:
-                    kw_start_date = datetime.datetime(2025, 12, 19)
-                keyword_items_to_process.append((kw, kw_start_date))
+            # Supabase에서 마지막 수집된 뉴스의 pub_date 조회 (KST 기준)
+            global_start_date = datetime.datetime(2025, 12, 19)  # 기본 fallback
+            try:
+                # raw_news에서 가장 최근 pub_date 조회
+                last_raw = supabase.table("raw_news").select("pub_date").order("pub_date", desc=True).limit(1).execute()
+                if last_raw.data and last_raw.data[0].get("pub_date"):
+                    last_pub_str = last_raw.data[0]["pub_date"]
+                    # ISO 형식 파싱 (timezone 정보 제거)
+                    global_start_date = datetime.datetime.fromisoformat(last_pub_str.replace('Z', '+00:00').replace('+09:00', '')).replace(tzinfo=None)
+                    print(f"📅 마지막 수집 뉴스 발행시각: {global_start_date} (이후 뉴스만 수집)")
+                else:
+                    print(f"📅 수집 기록 없음, 기본값 사용: {global_start_date}")
+            except Exception as e:
+                print(f"⚠️ 마지막 발행시각 조회 실패: {e}, 기본값 사용")
+            
+            # 모든 키워드에 동일한 start_date 적용 (마지막 발행시각 기준)
+            keyword_items_to_process = [(kw, global_start_date) for kw in KEYWORDS]
 
             # Load existing links once for the cycle (Last 1500 for speed)
             existing_links = set()
@@ -173,20 +198,9 @@ async def main():
                     
                     print(f"   > Added {added_for_kw} new articles.")
                     total_added += added_for_kw
-                    # Update specific keyword time in our local registry after each keyword is done
-                    kw_times[keyword] = cycle_start_time.isoformat()
 
                 print(f"🎉 Cycle Complete. Total Added: {total_added}")
 
-                # [V5.0] Atomic Save of all keyword times
-                try:
-                    time_registry["keyword_last_collected_at"] = kw_times
-                    current_global_time = cycle_start_time.isoformat()
-                    time_registry["last_collected_at"] = current_global_time 
-                    time_registry["collector_status"] = "active"
-                    last_update_path.write_text(json.dumps(time_registry, indent=2), encoding="utf-8")
-                except Exception as e:
-                    print(f"⚠️ Failed to update time registry: {e}")
                 if single_run:
                     print("🚀 Single run completed. Exiting.")
                     break

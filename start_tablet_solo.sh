@@ -69,6 +69,10 @@ fi
 # ============================================
 # 수집기 및 분석기 가동
 # ============================================
+
+# 기존 로그 라인 수 기록 (새 로그만 보기 위해)
+COLLECTOR_LOG_LINES=$(wc -l < collector.log 2>/dev/null || echo 0)
+
 echo "[+] Collector 시작 중..."
 nohup $PYTHON_CMD collector/async_collector.py >> collector.log 2>&1 &
 COLLECTOR_PID=$!
@@ -104,3 +108,22 @@ else
 fi
 
 echo "=== $(date) ==="
+
+# ============================================
+# 📺 Collector 실시간 로그 모니터링 (15초간)
+# ============================================
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "📡 Collector 실시간 로그 (15초간 모니터링):"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+
+# 새로 추가된 로그만 보여줌 (tail -n +라인수 로 기존 로그 스킵)
+NEW_LINES=$((COLLECTOR_LOG_LINES + 1))
+timeout 15 tail -n +$NEW_LINES -f collector.log 2>/dev/null || true
+
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "✅ 실시간 로그 모니터링 종료"
+echo "📋 전체 로그: tail -f ~/news_dashboard/collector.log"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
