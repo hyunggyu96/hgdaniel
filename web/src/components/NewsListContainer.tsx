@@ -32,15 +32,15 @@ export default function NewsListContainer({
                 <div className="relative w-full h-[50vh] min-h-[450px] mb-8 overflow-hidden">
                     <div className="absolute inset-0 z-0">
                         <iframe
-                            src='https://my.spline.design/robotfollowcursorforlandingpage-oM8UzZvqX8Ffl9hWUXSXeBwO/'
+                            src='https://my.spline.design/nexbotrobotcharacterconcept-JwuKwrHPzdqqnT2z04erjDBN/'
                             frameBorder='0'
                             width='100%'
                             height='100%'
-                            className="w-full h-full"
+                            className="w-full h-full mix-blend-multiply opacity-90 grayscale-[0.1]"
                             title="3D Robot Interaction"
                         />
                     </div>
-                    <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none z-10" />
+                    <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background via-background to-transparent pointer-events-none z-10" />
                     <div className="absolute inset-0 flex flex-col items-center justify-end pb-12 pointer-events-none z-20 px-4">
                         <motion.h1
                             initial={{ opacity: 0, y: 20 }}
