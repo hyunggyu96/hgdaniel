@@ -34,7 +34,7 @@ export default function LoginButton() {
     if (userId) {
         return (
             <div
-                className="flex items-center gap-3 bg-white/5 border border-white/10 px-4 h-10 rounded-xl hover:bg-white/10 transition-all cursor-default group"
+                className="flex items-center gap-3 bg-white border border-gray-200 px-4 h-10 rounded-xl hover:bg-gray-50 transition-all cursor-default group"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >
@@ -42,7 +42,7 @@ export default function LoginButton() {
                     <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center">
                         <User className="w-3 h-3 text-blue-400" />
                     </div>
-                    <span className="text-[11px] font-bold text-white/80 uppercase tracking-wider">{userId}</span>
+                    <span className="text-[11px] font-bold text-foreground uppercase tracking-wider">{userId}</span>
                 </div>
 
                 <button
@@ -61,7 +61,7 @@ export default function LoginButton() {
         return (
             <form
                 onSubmit={handleLogin}
-                className="flex items-center bg-white/5 border border-white/10 h-10 rounded-xl overflow-hidden focus-within:border-blue-500/50 transition-all shadow-lg shadow-black/20"
+                className="flex items-center bg-white border border-gray-200 h-10 rounded-xl overflow-hidden focus-within:border-blue-500/50 transition-all shadow-lg shadow-black/5"
             >
                 <input
                     autoFocus
@@ -69,7 +69,7 @@ export default function LoginButton() {
                     placeholder="Enter ID..."
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
-                    className="bg-transparent border-none outline-none px-4 py-2 text-[11px] text-white placeholder:text-white/20 w-32"
+                    className="bg-transparent border-none outline-none px-4 py-2 text-[11px] text-foreground placeholder:text-muted-foreground w-32"
                 />
                 <button
                     type="submit"
@@ -81,7 +81,7 @@ export default function LoginButton() {
                 <button
                     type="button"
                     onClick={() => setShowInput(false)}
-                    className="px-3 h-full flex items-center justify-center text-white/30 hover:text-white/60 text-[10px] font-bold uppercase transition-colors"
+                    className="px-3 h-full flex items-center justify-center text-muted-foreground hover:text-foreground text-[10px] font-bold uppercase transition-colors"
                 >
                     Esc
                 </button>

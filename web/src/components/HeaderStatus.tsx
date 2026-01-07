@@ -22,10 +22,10 @@ export default function HeaderStatus() {
 
     return (
         <div className="flex flex-col items-end gap-1">
-            <div className="text-[11px] font-bold text-white/70 uppercase tracking-widest bg-white/5 px-4 py-1.5 rounded-full border border-white/10 shadow-sm transition-all hover:bg-white/10">
+            <div className="text-[11px] font-bold text-foreground uppercase tracking-widest bg-white px-4 py-1.5 rounded-full border border-gray-200 shadow-sm transition-all hover:bg-gray-50">
                 {dateStr}
             </div>
-            <div className="flex items-center gap-1.5 text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mt-1">
+            <div className="flex items-center gap-1.5 text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mt-1">
                 <span>MONITORING</span>
                 <span className="relative flex h-1.5 w-1.5">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#3182f6] opacity-75"></span>

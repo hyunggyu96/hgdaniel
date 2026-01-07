@@ -40,21 +40,21 @@ export default function NewsListContainer({
                             title="3D Robot Interaction"
                         />
                     </div>
-                    <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-[#101012] via-[#101012]/80 to-transparent pointer-events-none z-10" />
+                    <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none z-10" />
                     <div className="absolute inset-0 flex flex-col items-center justify-end pb-12 pointer-events-none z-20 px-4">
                         <motion.h1
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-white leading-tight drop-shadow-2xl text-center bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60 mb-6"
+                            className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-foreground leading-tight drop-shadow-2xl text-center bg-clip-text text-transparent bg-gradient-to-b from-gray-900 to-gray-500 mb-6"
                         >
                             MARKET INTELLIGENCE
                         </motion.h1>
-                        <div className="flex items-center gap-2 bg-white/5 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 shadow-2xl">
+                        <div className="flex items-center gap-2 bg-white/80 backdrop-blur-md px-4 py-1.5 rounded-full border border-gray-200 shadow-xl">
                             <span className="relative flex h-2 w-2 shrink-0">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
                             </span>
-                            <span className="text-[10px] font-bold text-cyan-100/90 uppercase tracking-[0.3em]">
+                            <span className="text-[10px] font-bold text-cyan-600 uppercase tracking-[0.3em]">
                                 AI-Powered Analysis
                             </span>
                         </div>
@@ -63,7 +63,7 @@ export default function NewsListContainer({
             ) : (
                 <div className="pt-6 md:pt-8 px-4 md:px-6 lg:px-12">
                     <div className="flex flex-col gap-2 mb-2">
-                        <h1 className="text-xl md:text-2xl lg:text-4xl font-bold tracking-tighter text-white leading-tight uppercase">
+                        <h1 className="text-xl md:text-2xl lg:text-4xl font-bold tracking-tighter text-foreground leading-tight uppercase">
                             {showCollections ? 'Collections' : selectedCategory ? selectedCategory : 'Market Intelligence'}
                         </h1>
                         <div className="flex items-center gap-2">
@@ -71,14 +71,14 @@ export default function NewsListContainer({
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#3182f6]"></span>
                             </span>
-                            <div className="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em]">
+                            <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-[0.2em]">
                                 {selectedCategory ? `ACTIVE TRACKING: ${CATEGORIES_CONFIG.find(c => c.label === selectedCategory)?.keywords.length || 0}` : `Real-time Analysis`}
                             </div>
                         </div>
                         {selectedCategory && (
                             <div className="flex flex-wrap gap-1 mt-2 opacity-50">
                                 {CATEGORIES_CONFIG.find(c => c.label === selectedCategory)?.keywords.map((k, i) => (
-                                    <span key={i} className="text-[9px] text-white/40 border border-white/10 px-1.5 py-0.5 rounded-full uppercase tracking-tight">{k}</span>
+                                    <span key={i} className="text-[9px] text-muted-foreground border border-gray-200 px-1.5 py-0.5 rounded-full uppercase tracking-tight">{k}</span>
                                 ))}
                             </div>
                         )}
@@ -106,9 +106,9 @@ export default function NewsListContainer({
                             <div className="mt-12 flex justify-center">
                                 <button
                                     onClick={() => setDisplayCount(prev => prev + ITEMS_PER_PAGE)}
-                                    className="group relative px-8 py-3 bg-white/5 hover:bg-[#3182f6] border border-white/10 hover:border-[#3182f6] rounded-lg transition-all duration-300 overflow-hidden"
+                                    className="group relative px-8 py-3 bg-white hover:bg-[#3182f6] border border-gray-200 hover:border-[#3182f6] rounded-lg transition-all duration-300 overflow-hidden"
                                 >
-                                    <span className="relative z-10 text-sm font-medium text-white/70 group-hover:text-white transition-colors">
+                                    <span className="relative z-10 text-sm font-medium text-muted-foreground group-hover:text-white transition-colors">
                                         Load More ({filteredNews.length - displayCount})
                                     </span>
                                     <div className="absolute inset-0 bg-gradient-to-r from-[#3182f6]/0 via-[#3182f6]/10 to-[#3182f6]/0 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -134,14 +134,14 @@ export default function NewsListContainer({
                                 >
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/0 group-hover/theme:bg-blue-600/10 blur-[80px] rounded-full transition-all duration-700" />
 
-                                    <div className="relative z-10 w-full text-center border-b border-white/5 pb-4">
+                                    <div className="relative z-10 w-full text-center border-b border-gray-100 pb-4">
                                         <Link
                                             href={`/?category=${encodeURIComponent(category)}`}
                                             scroll={false}
                                             prefetch={true}
-                                            className="group/link flex flex-col items-center justify-center gap-1.5 p-2 rounded-xl transition-all duration-300 hover:bg-white/[0.03]"
+                                            className="group/link flex flex-col items-center justify-center gap-1.5 p-2 rounded-xl transition-all duration-300 hover:bg-gray-50"
                                         >
-                                            <h2 className="text-xl font-black text-white tracking-tighter uppercase transition-colors group-hover/link:text-blue-400">
+                                            <h2 className="text-xl font-black text-foreground tracking-tighter uppercase transition-colors group-hover/link:text-blue-600">
                                                 {category}
                                             </h2>
                                             <div className="h-1 w-6 bg-blue-600 rounded-full transition-all duration-500 group-hover/link:w-16 group-hover/link:bg-blue-400" />
@@ -162,7 +162,7 @@ export default function NewsListContainer({
                                             ))}
                                         </AnimatePresence>
                                         {(articles.length === 0) && (
-                                            <div className="py-12 text-center text-white/10 text-[9px] uppercase font-bold tracking-[0.3em]">Awaiting Insight</div>
+                                            <div className="py-12 text-center text-gray-300 text-[9px] uppercase font-bold tracking-[0.3em]">Awaiting Insight</div>
                                         )}
                                     </div>
                                 </motion.div>
@@ -234,7 +234,7 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
     return (
         <motion.div
             whileHover={{ x: 2 }}
-            className="group/card flex flex-col gap-1 pb-2 border-b border-white/[0.04] last:border-0 last:pb-0 relative transition-all duration-300 cursor-pointer"
+            className="group/card flex flex-col gap-1 pb-2 border-b border-gray-100 last:border-0 last:pb-0 relative transition-all duration-300 cursor-pointer"
         >
             <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
@@ -245,12 +245,12 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
                         {isYesterday && !isToday && (
                             <span className="text-[8px] font-black text-amber-900 bg-amber-400 px-1.5 py-0.5 rounded shadow-[0_0_12px_rgba(251,191,36,0.5)] tracking-tighter uppercase inline-block leading-none shrink-0 border border-amber-300/50">YDAY</span>
                         )}
-                        <a href={article.link} target="_blank" rel="noopener noreferrer" className="text-[14px] font-bold text-white/90 group-hover/card:text-blue-400 transition-colors leading-tight line-clamp-2 block tracking-tight">
+                        <a href={article.link} target="_blank" rel="noopener noreferrer" className="text-[14px] font-bold text-foreground/90 group-hover/card:text-blue-600 transition-colors leading-tight line-clamp-2 block tracking-tight">
                             {article.title}
                         </a>
                     </div>
                     {summaryText && (
-                        <p className="text-[11px] text-white/55 line-clamp-1 leading-tight mb-1 font-normal group-hover/card:text-white/70 transition-colors">{summaryText}</p>
+                        <p className="text-[11px] text-muted-foreground line-clamp-1 leading-tight mb-1 font-normal group-hover/card:text-foreground/80 transition-colors">{summaryText}</p>
                     )}
                 </div>
             </div>
@@ -263,7 +263,7 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
                     ))}
                 </div>
                 <div className="flex items-center gap-2">
-                    <span className={`text-[9px] font-mono font-bold ${isToday ? 'text-red-400' : 'text-white/20'}`}>
+                    <span className={`text-[9px] font-mono font-bold ${isToday ? 'text-red-500' : 'text-gray-300'}`}>
                         {dateStr} {timeStr}
                     </span>
                     <CollectionButton newsLink={article.link} newsTitle={article.title} size={14} />
@@ -294,9 +294,9 @@ const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, 
     const uniqueKeywords = Array.from(new Set([...analysis.main, ...analysis.sub].filter(k => k && k !== '기타' && k !== '-' && k !== '|' && k.trim() !== '')));
 
     return (
-        <article className={`group py-2 px-4 bg-white/[0.02] hover:bg-white/[0.05] hover:scale-[1.01] border-b border-white/5 flex flex-col gap-0.5 transition-all duration-300 ${isToday ? 'bg-blue-400/[0.03]' : ''}`}>
+        <article className={`group py-2 px-4 bg-white hover:bg-gray-50 hover:scale-[1.01] border-b border-gray-100 flex flex-col gap-0.5 transition-all duration-300 ${isToday ? 'bg-blue-50' : ''}`}>
             <div className="flex items-center justify-between text-[9px] font-mono font-medium">
-                <span className={isToday ? 'text-red-400' : isYesterday ? 'text-amber-400' : 'text-white/30'}>{dateStr} {timeStr}</span>
+                <span className={isToday ? 'text-red-500' : isYesterday ? 'text-amber-500' : 'text-gray-400'}>{dateStr} {timeStr}</span>
             </div>
             <div className="flex gap-2.5 items-start">
                 <div className="pt-0.5">
@@ -310,9 +310,9 @@ const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, 
                         {isYesterday && !isToday && (
                             <span className="text-[8px] font-black text-amber-900 bg-amber-400 px-1.5 py-0.5 rounded shadow-[0_0_12px_rgba(251,191,36,0.5)] tracking-tighter uppercase inline-block leading-none shrink-0 border border-amber-300/50">YDAY</span>
                         )}
-                        <a href={article.link} target="_blank" rel="noopener noreferrer" className="block"><h3 className="text-[14px] font-bold text-white/90 group-hover:text-[#3182f6] transition-colors line-clamp-1 leading-tight">{article.title}</h3></a>
+                        <a href={article.link} target="_blank" rel="noopener noreferrer" className="block"><h3 className="text-[14px] font-bold text-foreground group-hover:text-[#3182f6] transition-colors line-clamp-1 leading-tight">{article.title}</h3></a>
                     </div>
-                    <p className="text-[11px] text-white/55 truncate leading-tight font-normal">{summaryText}</p>
+                    <p className="text-[11px] text-muted-foreground truncate leading-tight font-normal">{summaryText}</p>
                 </div>
             </div>
             <div className="flex flex-wrap gap-1 pl-5">

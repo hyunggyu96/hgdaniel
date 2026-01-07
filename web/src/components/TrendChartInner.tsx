@@ -34,7 +34,7 @@ export default function TrendChartInner() {
     }, []);
 
     if (loading) {
-        return <div className="h-80 w-full animate-pulse bg-white/5 rounded-lg flex items-center justify-center text-gray-400">데이터를 불러오는 중...</div>;
+        return <div className="h-80 w-full animate-pulse bg-gray-100 rounded-lg flex items-center justify-center text-muted-foreground">데이터를 불러오는 중...</div>;
     }
 
     const CATEGORY_COLORS: Record<string, string> = {
@@ -53,15 +53,15 @@ export default function TrendChartInner() {
     };
 
     return (
-        <Card className="mt-4 bg-[#1e1e20] border-white/5 shadow-2xl">
-            <Title className="text-xl font-black text-white tracking-tight">키워드 뉴스 트렌드</Title>
-            <Text className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mt-1">제품 카테고리별 뉴스 발생 추이 (최근 7일)</Text>
+        <Card className="mt-4 bg-white border-gray-200 shadow-xl">
+            <Title className="text-xl font-black text-foreground tracking-tight">키워드 뉴스 트렌드</Title>
+            <Text className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mt-1">제품 카테고리별 뉴스 발생 추이 (최근 7일)</Text>
 
             <div className="flex flex-wrap gap-x-4 gap-y-2 mt-4 ml-1">
                 {categories.map((c, i) => (
                     <div key={c} className="flex items-center gap-1.5">
                         <div className="w-2 h-2 rounded-full" style={{ backgroundColor: getColor(c, i) }} />
-                        <span className="text-[10px] font-bold text-white/50">{c}</span>
+                        <span className="text-[10px] font-bold text-gray-500">{c}</span>
                     </div>
                 ))}
             </div>
@@ -77,30 +77,31 @@ export default function TrendChartInner() {
                                 </linearGradient>
                             ))}
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                         <XAxis
                             dataKey="date"
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: 600 }}
+                            tick={{ fill: '#64748b', fontSize: 11, fontWeight: 600 }}
                             dy={10}
                         />
                         <YAxis
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: 600 }}
-                            label={{ value: '뉴스 개수', angle: -90, position: 'insideLeft', fill: 'rgba(255,255,255,0.3)', fontSize: 10 }}
+                            tick={{ fill: '#64748b', fontSize: 11, fontWeight: 600 }}
+                            label={{ value: '뉴스 개수', angle: -90, position: 'insideLeft', fill: '#94a3b8', fontSize: 10 }}
                         />
                         <RTooltip
                             contentStyle={{
-                                backgroundColor: '#101012',
-                                border: '1px solid rgba(255,255,255,0.1)',
+                                backgroundColor: '#ffffff',
+                                border: '1px solid #e2e8f0',
                                 borderRadius: '12px',
-                                boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
-                                padding: '12px'
+                                boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                                padding: '12px',
+                                color: '#0f172a'
                             }}
-                            itemStyle={{ fontSize: '12px', fontWeight: 700, padding: '4px 0' }}
-                            labelStyle={{ color: 'rgba(255,255,255,0.6)', fontSize: '11px', marginBottom: '8px', fontWeight: 700 }}
+                            itemStyle={{ fontSize: '12px', fontWeight: 700, padding: '4px 0', color: '#334155' }}
+                            labelStyle={{ color: '#64748b', fontSize: '11px', marginBottom: '8px', fontWeight: 700 }}
                             itemSorter={(item: any) => -item.value}
                         />
                         {categories.map((c, i) => (

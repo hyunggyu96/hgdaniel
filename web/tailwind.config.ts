@@ -58,6 +58,13 @@ const config = {
                 md: "calc(var(--radius) - 2px)",
                 sm: "calc(var(--radius) - 4px)",
             },
+            boxShadow: {
+                'glass-panel': '0 8px 32px 0 rgba(0, 0, 0, 0.05)',
+                'glass-card': '0 4px 24px rgba(0, 0, 0, 0.04)',
+                'glass-card-hover': '0 8px 30px rgba(0, 0, 0, 0.08)',
+                'premium-card': '0 4px 20px -4px rgba(0, 0, 0, 0.05)',
+                'premium-card-hover': '0 8px 30px rgba(0, 0, 0, 0.08)',
+            },
             keyframes: {
                 "accordion-down": {
                     from: { height: "0" },

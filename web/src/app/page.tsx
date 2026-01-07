@@ -8,7 +8,7 @@ import dynamic_next from 'next/dynamic';
 
 const TrendChart = dynamic_next(() => import('@/components/TrendChart'), {
     ssr: false,
-    loading: () => <div className="h-72 w-full animate-pulse bg-white/5 rounded-2xl border border-white/10" />
+    loading: () => <div className="h-72 w-full animate-pulse bg-gray-100 rounded-2xl border border-gray-200" />
 });
 
 export default function Page() {
@@ -20,7 +20,7 @@ export default function Page() {
     const isLandingPage = !selectedCategory && !searchQuery && !showCollections;
 
     return (
-        <div className="flex min-h-screen bg-[#101012]">
+        <div className="flex min-h-screen bg-background">
             {/* Client Component: SideBar */}
             <SideBar />
 
@@ -34,7 +34,7 @@ export default function Page() {
                 />
                 {/* TrendChart only on Landing Page */}
                 {isLandingPage && (
-                    <div className="px-4 md:px-6 lg:px-12 pb-24 text-white">
+                    <div className="px-4 md:px-6 lg:px-12 pb-24 text-foreground">
                         <TrendChart />
                     </div>
                 )}

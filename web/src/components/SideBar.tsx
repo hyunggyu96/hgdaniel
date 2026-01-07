@@ -17,10 +17,10 @@ export default function SideBar() {
     const isOverview = !selectedCategory && !isCollections && !searchQuery;
 
     return (
-        <aside className="w-64 flex-shrink-0 border-r border-white/5 bg-[#101012] p-6 hidden lg:block">
+        <aside className="w-64 flex-shrink-0 border-r border-gray-200 bg-gray-50 p-6 hidden lg:block">
             <div className="space-y-8">
                 <div>
-                    <h3 className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mb-6">
+                    <h3 className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em] mb-6">
                         Sector Watchlist
                     </h3>
                     <div className="space-y-1">
@@ -28,7 +28,7 @@ export default function SideBar() {
                             href="/"
                             scroll={false}
                             prefetch={true}
-                            className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 group flex items-center justify-between ${isOverview ? 'bg-[#3182f6] text-white' : 'text-white/50 hover:bg-white/5 hover:text-white'}`}
+                            className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 group flex items-center justify-between ${isOverview ? 'bg-[#3182f6] text-white' : 'text-muted-foreground hover:bg-gray-200 hover:text-foreground'}`}
                         >
                             <span className="text-sm font-bold uppercase tracking-tight">Overview</span>
                             <ChevronRight
@@ -41,7 +41,7 @@ export default function SideBar() {
                                 href={`/?category=${encodeURIComponent(category)}`}
                                 scroll={false}
                                 prefetch={true}
-                                className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 group flex items-center justify-between ${selectedCategory === category ? 'bg-[#3182f6] text-white' : 'text-white/50 hover:bg-white/5 hover:text-white'}`}
+                                className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 group flex items-center justify-between ${selectedCategory === category ? 'bg-[#3182f6] text-white' : 'text-muted-foreground hover:bg-gray-200 hover:text-foreground'}`}
                             >
                                 <span className="text-sm font-bold uppercase tracking-tight">{category}</span>
                                 <ChevronRight
@@ -53,16 +53,16 @@ export default function SideBar() {
                 </div>
 
                 {/* Collections Section */}
-                <div className="pt-6 border-t border-white/5">
+                <div className="pt-6 border-t border-gray-200">
                     <Link
                         href="/?collections=true"
                         scroll={false}
                         prefetch={true}
-                        className={`flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition-all group/collections ${isCollections ? 'bg-[#3182f6] text-white' : 'hover:bg-white/5'}`}
+                        className={`flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition-all group/collections ${isCollections ? 'bg-[#3182f6] text-white' : 'hover:bg-gray-200'}`}
                     >
                         <div className="flex items-center gap-3">
                             <span className="text-yellow-400 text-lg">⭐</span>
-                            <span className={`text-sm font-bold transition-colors uppercase tracking-tight ${isCollections ? 'text-white' : 'text-white/90 group-hover/collections:text-[#3182f6]'}`}>
+                            <span className={`text-sm font-bold transition-colors uppercase tracking-tight ${isCollections ? 'text-white' : 'text-foreground/90 group-hover/collections:text-[#3182f6]'}`}>
                                 Collections
                             </span>
                         </div>
@@ -71,23 +71,23 @@ export default function SideBar() {
                 </div>
 
                 {/* Keyword Suggestion Section */}
-                <div className="pt-6 border-t border-white/5 space-y-3">
-                    <h3 className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mb-2 px-4">
+                <div className="pt-6 border-t border-gray-200 space-y-3">
+                    <h3 className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em] mb-2 px-4">
                         Feedback
                     </h3>
                     <button
                         onClick={() => setIsSuggestOpen(true)}
-                        className="w-full py-3 px-4 bg-white/5 hover:bg-white/10 rounded-xl flex items-center justify-between group transition-all border border-white/5"
+                        className="w-full py-3 px-4 bg-white hover:bg-gray-100 rounded-xl flex items-center justify-between group transition-all border border-gray-200"
                     >
                         <div className="flex items-center gap-3">
                             <MessageSquarePlus className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
-                            <span className="text-sm font-bold text-white/70 uppercase tracking-tight">Keyword 추천/제안</span>
+                            <span className="text-sm font-bold text-foreground/70 uppercase tracking-tight">Keyword 추천/제안</span>
                         </div>
-                        <ChevronRight className="w-4 h-4 text-white/20 group-hover:translate-x-1 transition-transform" />
+                        <ChevronRight className="w-4 h-4 text-gray-400 group-hover:translate-x-1 transition-transform" />
                     </button>
                 </div>
 
-                <div className="pt-8 border-t border-white/5">
+                <div className="pt-8 border-t border-gray-200">
                     <div className="p-4 rounded-2xl bg-blue-500/5 border border-blue-500/10">
                         <div className="flex items-center gap-2 mb-2">
                             <span className="relative flex h-2 w-2">
@@ -98,7 +98,7 @@ export default function SideBar() {
                                 Live Monitoring
                             </p>
                         </div>
-                        <p className="text-xs text-white/60 leading-relaxed font-medium">
+                        <p className="text-xs text-muted-foreground leading-relaxed font-medium">
                             Tracking 173 medical aesthetic sectors with AI-powered real-time analysis.
                         </p>
                     </div>
