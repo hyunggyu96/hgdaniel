@@ -1,7 +1,7 @@
 # 📄 백엔드 가이드라인 (Backend Guidelines Quick Reference)
 
-**Version**: 3.3 (2026-01-06 노이즈 필터링 V2.0 추가)  
-**최종 업데이트**: 2026-01-06  
+**Version**: 3.4 (2026-01-08: Collector 로직 개선 & 시트 Prepend 수정)  
+**최종 업데이트**: 2026-01-08  
 **목적**: 긴급 상황 및 작업 시작 전 필수 체크사항 요약
 
 > 📚 **상세 문서**: `ARCHITECTURE.md`, `TROUBLESHOOTING.md`, `CHANGELOG.md` 참조
@@ -242,6 +242,15 @@ ssh -p 8022 u0_a155@192.168.219.104 "cd ~/news_dashboard && bash start_tablet_so
 6. **에러 자동 복구**:
     - **ai_error**: AI 분석 실패 시 **대기 시간 없이 즉시** 다시 시도 (`pending`으로 자동 전환).
     - **Google Sheets**: 연결 끊김 시 자동 재연결 및 재시도.
+
+7. **수집기 신뢰성 강화 (Collector Reliability V3.4)**:
+    - **문제**: 태블릿 재부팅 시 Collector의 런타임 메모리가 초기화되어, 재시작 시점 이후 뉴스만 수집하는 문제 발생 (공백 생김).
+    - **해결**: 실행 시 **DB(`articles` 테이블)의 가장 최신 `published_at`** 을 조회하여, 그 시점 이후의 뉴스부터 수집 시작.
+    - **효과**: 태블릿이 꺼져있던 동안의 뉴스도 놓치지 않고 백필(Backfill) 가능.
+
+8. **Google Sheets 로깅 개선 (Prepend)**:
+    - 모든 로그(방문자, 로그인, 키워드 제안)는 **최신순(Prepend)** 으로 기록.
+    - `insert_row(..., index=2)` 사용하여 헤더 아래에 최신 데이터 삽입.
 
 ### 태블릿
 

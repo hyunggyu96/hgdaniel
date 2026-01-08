@@ -263,7 +263,7 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
                     ))}
                 </div>
                 <div className="flex items-center gap-2">
-                    <span className={`text-[9px] font-mono font-bold ${isToday ? 'text-red-500' : 'text-gray-300'}`}>
+                    <span className={`text-[9px] font-mono font-bold ${isToday ? 'text-red-500' : isYesterday ? 'text-amber-500' : 'text-gray-300'}`}>
                         {dateStr} {timeStr}
                     </span>
                     <CollectionButton newsLink={article.link} newsTitle={article.title} size={14} />

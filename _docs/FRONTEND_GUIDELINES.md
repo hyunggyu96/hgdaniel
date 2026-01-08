@@ -23,10 +23,12 @@
 
 - **Concept**: Premium, Modern, Aesthetics Intelligence.
 - **Inspiration**: Toss 앱의 심플함과 애플의 세련된 마이크로 인터렉션.
-- **Theme**: 고도화된 다크 모드 (Deep Navy/Black 기반).
+- **Theme**: **Premium White (고급스러운 화이트 테마)**.
+- **Background**: Pure White (`#FFFFFF`) 및 Soft Gray (`#F9FAFB`) 기반.
+- **Text**: Deep Navy (`#111827`) 및 Slate Gray (`#64748B`)로 가독성 극대화.
 - **Core Styles**:
-  - **Glassmorphism**: `glass-card`, `glass-panel` 유틸리티 적극 활용 (블러 및 투명도).
-  - **Premium Blue**: `#3182f6` (Toss Blue) 컬러를 포인트로 사용.
+  - **Glassmorphism**: `glass-card`, `glass-panel` (밝은 배경 흐림 효과, `bg-white/80`).
+  - **Premium Blue**: `#3182f6` (Toss Blue) - 흰 배경에서 더 선명하게 포인트.
   - **Layout**: 데스크탑 기준 **5열 그리드** (`2xl:grid-cols-5`) 확장형 레이아웃 적용.
 
 ---
@@ -91,15 +93,12 @@ Next.js 빌드 시 `Optional Props`(`searchQuery`, `selectedCategory` 등)는 �
 - **방식**: iframe 임베드
 - **제약**: 마우스 추적이 iframe 내부로 제한됨
 
-### 네이티브 통합 시도 (실패)
+### 네이티브 통합 시도 (iframe 유지하되 블렌딩 개선)
 
-- **시도 라이브러리**: `@splinetool/react-spline`, `@splinetool/runtime`
-- **발생 문제**:
-  - Next.js 14 Webpack/ESM과의 호환성 문제 (`Package path . is not exported`)
-  - 빌드 성공 후에도 런타임 403 Forbidden 에러 (Spline 서버 측 접근 제한)
-  - `scene.splinecode` 파일에 대한 직접 접근 차단
-- **결론**: **iframe 방식만 Spline의 보안 정책상 허용됨**
-- **교훈**: 외부 3D 리소스는 제공 방식을 먼저 확인하고, 통합 방법은 공식 문서 우선.
+- **디자인 통합**: 화이트 테마와의 이질감을 없애기 위해 **`mix-blend-multiply`** CSS 속성 적용
+- **효과**: iframe 내부의 흰색 배경을 투명하게 처리하여 웹사이트 배경과 자연스럽게 녹아들도록 연출 (마치 캔버스 위에 그려진 듯한 효과)
+- **URL**: `https://my.spline.design/nexbotrobotcharacterconcept-JwuKwrHPzdqqnT2z04erjDBN/` (Nexbot Character)
+- **교훈**: iframe이라도 CSS 블렌딩 모드를 활용하면 네이티브처럼 연출 가능.
 
 ### 성능 고려사항
 
@@ -136,18 +135,23 @@ Next.js 빌드 시 `Optional Props`(`searchQuery`, `selectedCategory` 등)는 �
 - **이유**: 정보 밀도 증가, 한눈에 더 많은 뉴스 파악 가능
 - **그리드**: 5열 레이아웃 (`2xl:grid-cols-5`)
 
-### 날짜 배지 표시 규칙 (2026-01-06 추가)
+### 날짜 배지 표시 규칙 (2026-01-08 업데이트)
 
-- **오늘 뉴스**: 빨간색 "NEW" 배지 (animate-pulse 효과)
+- **오늘 뉴스**: 빨간색 "NEW" 배지 (깔끔한 플랫 스타일)
   - `bg-red-500`, `text-white`
-  - Shadow: `shadow-[0_0_12px_rgba(239,68,68,0.6)]`
+  - **No Glow/Pulse**: 눈부심 방지 및 가독성을 위해 그림자와 애니메이션 제거
   
 - **어제 뉴스**: 노란색 "YESTERDAY" 배지
   - `bg-amber-400`, `text-amber-900`
-  - Shadow: `shadow-[0_0_12px_rgba(251,191,36,0.5)]`
+  - **No Glow**: 플랫한 디자인 유지
   - 오늘과 중복되지 않도록 `!isToday` 조건 체크
 
 - **그 외**: 배지 없음 (일반 날짜 표시만)
+
+- **시간 텍스트 색상**:
+  - 오늘: `text-red-500`
+  - 어제: `text-amber-500` (Landing/Category 공통 적용)
+  - 그 외: `text-gray-300` (Card) / `text-gray-400` (Row)
 
 ### 트렌드 그래프 표시 규칙
 
@@ -188,23 +192,22 @@ Next.js 빌드 시 `Optional Props`(`searchQuery`, `selectedCategory` 등)는 �
 
 #### 제목
 
-- **NewsCard & NewsRow**: `text-gray-100` → `text-white/90`
-- **효과**: 더 밝고 명확하게, 오늘 날짜 아닌 뉴스도 충분히 눈에 잘 들어옴
+- **NewsCard & NewsRow**: `text-white/90` → **`text-foreground` (Deep Navy)**
+- **효과**: 흰 배경 위에서 가장 높고 선명한 명암비 제공
 
 #### 설명
 
-- **랜딩페이지 NewsCard**: `text-white/40` → `text-white/55`
-- **카테고리 NewsRow**: `text-white/35` → `text-white/55`
-- **호버**: NewsCard `text-white/60` → `text-white/70`
-- **효과**: 충분한 대비와 가독성 확보
+- **랜딩페이지 NewsCard**: `text-white/55` → **`text-muted-foreground` (Slate Gray)**
+- **카테고리 NewsRow**: **`text-muted-foreground`**
+- **호버**: NewsCard **`text-foreground/80`**
+- **효과**: 눈이 편안한 회색조로 정보 위계 설정
 
 #### 키워드
 
-- **크기**: `7px` → `9px` → **11px** (최종)
+- **크기**: `11px` (유지)
 - **색상 통일**:
-  - 랜딩페이지: `text-blue-400/60`, `bg-blue-500/10` (파란색)
-  - 카테고리 페이지: `text-white/15` → `text-blue-400/60` (파란색 통일)
-- **효과**: 랜딩/카테고리 페이지 일관성, 키워드 가독성 극대화
+  - 랜딩/카테고리 공통: `text-blue-500` (배경 `bg-blue-50`) 또는 `text-gray-500` (배경 `bg-gray-100`)
+- **효과**: 깔끔하고 정돈된 태그 스타일
 
 #### Line Clamp
 
@@ -225,9 +228,11 @@ Next.js 빌드 시 `Optional Props`(`searchQuery`, `selectedCategory` 등)는 �
 
 ### NewsRow 배경 효과
 
-- **기본 배경**: `bg-white/[0.02]` (미묘한 밝기)
+### NewsRow 배경 효과
+
+- **기본 배경**: `bg-white` (순백색)
 - **호버 효과**:
-  - 배경: `hover:bg-white/[0.05]` (더 밝게)
+  - 배경: `hover:bg-gray-50` (아주 연한 회색)
   - 크기: `hover:scale-[1.01]` (살짝 확대)
   - 전환: `duration-300` (부드러운 애니메이션)
 - **효과**: 뉴스 항목 구분 명확, 프리미엄한 인터랙션
@@ -235,7 +240,7 @@ Next.js 빌드 시 `Optional Props`(`searchQuery`, `selectedCategory` 등)는 �
 ### Micro-interactions
 
 - 뉴스 카드 호버 시 파란색 글로우 효과와 부드러운 스케일 변화 유지
-- 'NEW' 배지: 빨간색 펄스 효과 (`animate-pulse`) - 랜딩/카테고리 페이지 통일
+- 'NEW' 배지: 플랫 스타일 (가독성 최우선) - 애니메이션 제거
 
 ### Glassmorphism
 
