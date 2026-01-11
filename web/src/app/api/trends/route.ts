@@ -21,42 +21,42 @@ export async function GET() {
         const rangeDays = 7;
         const now = new Date();
 
-        // 넉넉하게 14일 전부터 조회 (timezone 이슈 방지)
+        // 정확히 7일 전부터 조회 (KST 기준, 하루 여유 추가)
         const startDate = new Date(now);
-        startDate.setDate(now.getDate() - (rangeDays * 2));
+        startDate.setDate(now.getDate() - rangeDays - 1);
         const startDateStr = startDate.toISOString();
 
-        // DB에서 category 포함하여 조회
+        // DB에서 category 포함하여 조회 (최신순 정렬)
         const { data: articles, error } = await supabase
             .from('articles')
             .select('published_at, category')
             .neq('category', 'NOISE')  // 노이즈 기사 제외
-            .not('category', 'is', null)  // category가 null인 것 제외
             .gte('published_at', startDateStr)
-            .order('published_at', { ascending: true })
-            .limit(10000);
+            .order('published_at', { ascending: false })  // 최신순 정렬
+            .limit(5000);
 
         if (error) throw error;
 
-        // KST 날짜 포맷터 (YYYY-MM-DD)
-        const getKSTDateKey = (date: Date) => {
-            const kstOffset = 9 * 60 * 60 * 1000; // 9시간 밀리초
-            const kstDate = new Date(date.getTime() + kstOffset);
-            return kstDate.toISOString().split('T')[0]; // YYYY-MM-DD
+        console.log(`[Trends API] Query from ${startDateStr}, found ${articles?.length || 0} articles`);
+
+        // KST 날짜 포맷터 (YYYY-MM-DD) - UTC를 KST로 정확히 변환
+        const toKSTDateString = (date: Date) => {
+            const kstDate = new Date(date.getTime() + (9 * 60 * 60 * 1000));
+            const year = kstDate.getUTCFullYear();
+            const month = String(kstDate.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(kstDate.getUTCDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
         };
 
         // 1. 날짜별/카테고리별 초기 데이터 구조 생성
         const trendMap: Record<string, Record<string, number>> = {};
         const dateLabels: string[] = [];
 
-        // 오늘 날짜(KST) 구하기
-        const nowUTC = new Date();
-        const kstNow = new Date(nowUTC.getTime() + (9 * 60 * 60 * 1000));
-
+        // 최근 7일 날짜 라벨 생성 (KST 기준)
         for (let i = rangeDays - 1; i >= 0; i--) {
-            const d = new Date(kstNow);
+            const d = new Date();
             d.setDate(d.getDate() - i);
-            const dateStr = d.toISOString().split('T')[0]; // YYYY-MM-DD (KST)
+            const dateStr = toKSTDateString(d);
 
             dateLabels.push(dateStr);
             trendMap[dateStr] = {};
@@ -67,10 +67,21 @@ export async function GET() {
             });
         }
 
-        // 2. 기사별로 DB category 값 그대로 카운팅 (단순화!)
+        console.log(`[Trends API] Date range: ${dateLabels[0]} ~ ${dateLabels[dateLabels.length - 1]}`);
+
+        // 디버깅: 첫 번째 기사의 날짜 변환 확인
+        if (articles && articles.length > 0) {
+            const firstArticle = articles[0];
+            const testDate = new Date(firstArticle.published_at);
+            const testKST = toKSTDateString(testDate);
+            console.log(`[Trends API DEBUG] First article: published_at=${firstArticle.published_at}, parsed=${testDate.toISOString()}, KST=${testKST}, category=${firstArticle.category}`);
+        }
+
+        // 2. 기사별로 DB category 값 그대로 카운팅
+        let matchedCount = 0;
         articles?.forEach((article) => {
             const pubDateUTC = new Date(article.published_at);
-            const dateKey = getKSTDateKey(pubDateUTC);
+            const dateKey = toKSTDateString(pubDateUTC);
 
             // 범위 밖 날짜 무시
             if (!trendMap[dateKey]) return;
@@ -81,8 +92,11 @@ export async function GET() {
             // category가 유효한 Config label인지 확인
             if (category && trendMap[dateKey][category] !== undefined) {
                 trendMap[dateKey][category] += 1;
+                matchedCount++;
             }
         });
+
+        console.log(`[Trends API] Matched ${matchedCount} articles to trend data`);
 
         const allKeywords = CATEGORIES_CONFIG.map(c => c.label);
 
