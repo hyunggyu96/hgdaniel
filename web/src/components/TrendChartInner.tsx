@@ -114,7 +114,7 @@ export default function TrendChartInner() {
                                 strokeWidth={2.5}
                                 stackId={undefined}
                                 animationDuration={1200}
-                                fillOpacity={1}
+                                fillOpacity={0.15}
                                 dot={{ r: 3, fill: getColor(c, i), strokeWidth: 0 }}
                                 activeDot={{ r: 5, strokeWidth: 2, stroke: '#fff' }}
                             />
