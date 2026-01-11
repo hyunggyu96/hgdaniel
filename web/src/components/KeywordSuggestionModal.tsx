@@ -1,10 +1,12 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquarePlus, X, Send, CheckCircle2 } from 'lucide-react';
+import { MessageSquarePlus, X, Send, CheckCircle2, LogIn } from 'lucide-react';
 import { useState } from 'react';
+import { useUser } from './UserContext';
 
 export default function KeywordSuggestionModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
+    const { userId } = useUser();
     const [keyword, setKeyword] = useState('');
     const [category, setCategory] = useState('기업');
     const [reason, setReason] = useState('');
@@ -19,7 +21,7 @@ export default function KeywordSuggestionModal({ isOpen, onClose }: { isOpen: bo
             const res = await fetch('/api/suggest', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ keyword, category, reason }),
+                body: JSON.stringify({ keyword, category, reason, userId }),
             });
 
             if (res.ok) {
@@ -80,10 +82,23 @@ export default function KeywordSuggestionModal({ isOpen, onClose }: { isOpen: bo
                                 <X className="w-4 h-4" />
                             </button>
                         </div>
-
                         {/* Body: Scrollable */}
                         <div className="overflow-y-auto px-5 py-5 custom-scrollbar bg-gray-50">
-                            {status === 'success' ? (
+                            {!userId ? (
+                                <div className="py-10 flex flex-col items-center justify-center text-center">
+                                    <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mb-4">
+                                        <LogIn className="w-6 h-6 text-blue-500" />
+                                    </div>
+                                    <h4 className="text-lg font-bold text-foreground">로그인이 필요합니다</h4>
+                                    <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed px-4">키워드 제안은 로그인 후 이용 가능합니다.<br />상단의 로그인 버튼을 눌러주세요.</p>
+                                    <button
+                                        onClick={onClose}
+                                        className="mt-6 text-[10px] font-bold text-blue-500 uppercase tracking-widest hover:text-blue-600 transition-colors"
+                                    >
+                                        확인
+                                    </button>
+                                </div>
+                            ) : status === 'success' ? (
                                 <div className="py-10 flex flex-col items-center justify-center text-center">
                                     <motion.div
                                         initial={{ scale: 0 }}
@@ -93,7 +108,6 @@ export default function KeywordSuggestionModal({ isOpen, onClose }: { isOpen: bo
                                         <CheckCircle2 className="w-6 h-6 text-green-500" />
                                     </motion.div>
                                     <h4 className="text-lg font-bold text-foreground">제안 완료!</h4>
-                                    <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">기록이 구글 시트에 반영되었습니다.</p>
                                 </div>
                             ) : status === 'error' ? (
                                 <div className="py-10 flex flex-col items-center justify-center text-center">
@@ -157,7 +171,7 @@ export default function KeywordSuggestionModal({ isOpen, onClose }: { isOpen: bo
                         </div>
 
                         {/* Footer: Fixed */}
-                        {status !== 'success' && (
+                        {userId && status !== 'success' && (
                             <div className="px-5 py-4 border-t border-gray-100 bg-white shrink-0">
                                 <button
                                     form="suggest-form"

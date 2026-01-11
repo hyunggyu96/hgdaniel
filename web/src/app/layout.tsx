@@ -95,9 +95,8 @@ export default function RootLayout({
                     </div>
                   </div>
                 </div>
-                <div className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.5em] pt-12 border-t border-gray-200 flex justify-between items-center">
+                <div className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.5em] pt-12 border-t border-gray-200">
                   <span>&copy; 2025 ALL RIGHTS RESERVED.</span>
-                  <span className="text-blue-500/50">BUILT BY HG INC.</span>
                 </div>
               </div>
             </footer>
