@@ -323,7 +323,7 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
     return (
         <motion.div
             whileHover={{ x: 2 }}
-            className="group/card flex flex-col gap-1 pb-2 border-b border-gray-100 last:border-0 last:pb-0 relative transition-all duration-300 cursor-pointer"
+            className="group/card flex flex-col gap-0.5 pb-1.5 border-b border-gray-100 last:border-0 last:pb-0 relative transition-all duration-300 cursor-pointer"
         >
             <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
@@ -338,9 +338,6 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
                             {article.title}
                         </a>
                     </div>
-                    {summaryText && (
-                        <p className="text-[11px] text-muted-foreground line-clamp-1 leading-tight mb-1 font-normal group-hover/card:text-foreground/80 transition-colors">{summaryText}</p>
-                    )}
                 </div>
             </div>
             <div className="flex items-center justify-between mt-0.5">
@@ -385,7 +382,7 @@ const NewsRow = React.memo(function NewsRow({ article, today, category }: { arti
     // Time View (랜딩페이지) - 넓은 레이아웃
     if (category) {
         return (
-            <article className={`group py-1 px-4 bg-white hover:bg-gray-50 border-b border-gray-100 transition-all duration-200 ${isToday ? 'bg-blue-50/30' : ''}`}>
+            <article className={`group py-0.5 px-4 bg-white hover:bg-gray-50 border-b border-gray-100 transition-all duration-200 ${isToday ? 'bg-blue-50/30' : ''}`}>
                 <div className="flex items-start gap-4">
                     {/* Left: Time + Category */}
                     <div className="flex flex-col items-start gap-0.5 w-[140px] shrink-0">
@@ -413,9 +410,6 @@ const NewsRow = React.memo(function NewsRow({ article, today, category }: { arti
                                 </h3>
                             </a>
                         </div>
-                        {summaryText && (
-                            <p className="text-[10px] text-muted-foreground truncate leading-tight mt-0.5">{summaryText}</p>
-                        )}
                     </div>
                 </div>
             </article>
@@ -424,7 +418,7 @@ const NewsRow = React.memo(function NewsRow({ article, today, category }: { arti
 
     // Category Page - Time 뷰와 동일한 레이아웃 (단, 카테고리 표시 없음)
     return (
-        <article className={`group py-1.5 px-3 bg-white hover:bg-gray-50 border-b border-gray-100 transition-all duration-200 ${isToday ? 'bg-blue-50/30' : ''}`}>
+        <article className={`group py-0.5 px-3 bg-white hover:bg-gray-50 border-b border-gray-100 transition-all duration-200 ${isToday ? 'bg-blue-50/30' : ''}`}>
             <div className="flex items-start gap-3">
                 {/* Left: Time */}
                 <div className="flex flex-col items-start gap-0.5 w-[70px] shrink-0">
@@ -449,9 +443,6 @@ const NewsRow = React.memo(function NewsRow({ article, today, category }: { arti
                             </h3>
                         </a>
                     </div>
-                    {summaryText && (
-                        <p className="text-[9px] text-muted-foreground truncate leading-tight mt-0.5">{summaryText}</p>
-                    )}
                 </div>
             </div>
         </article>
