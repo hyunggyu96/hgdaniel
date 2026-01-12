@@ -84,13 +84,13 @@ export default function NewsListContainer({
 
 
                     {/* View Mode Toggle (Landing Page Only) */}
-                    <div className="absolute bottom-8 right-4 md:right-12 z-30">
-                        <div className="flex items-center p-1 bg-white/10 backdrop-blur-md rounded-lg border border-white/20 shadow-lg">
+                    <div className="absolute top-4 left-4 md:left-12 z-30">
+                        <div className="flex items-center p-1 bg-white/95 backdrop-blur-md rounded-lg border border-gray-300 shadow-lg">
                             <button
                                 onClick={() => setViewMode('category')}
                                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all duration-300 ${viewMode === 'category'
-                                    ? 'bg-white/90 text-blue-600 shadow-sm'
-                                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                                    ? 'bg-blue-500 text-white shadow-sm'
+                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                                     }`}
                             >
                                 <LayoutGrid size={14} />
@@ -99,8 +99,8 @@ export default function NewsListContainer({
                             <button
                                 onClick={() => setViewMode('time')}
                                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all duration-300 ${viewMode === 'time'
-                                    ? 'bg-white/90 text-blue-600 shadow-sm'
-                                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                                    ? 'bg-blue-500 text-white shadow-sm'
+                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                                     }`}
                             >
                                 <Clock size={14} />
@@ -226,7 +226,7 @@ export default function NewsListContainer({
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ duration: 0.3 }}
-                                className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-0 max-w-7xl mx-auto"
+                                className="flex flex-col gap-0 max-w-4xl mx-auto"
                             >
                                 {timeSortedNews.slice(0, displayCount).map((article: any, i: number) => (
                                     <NewsRow
