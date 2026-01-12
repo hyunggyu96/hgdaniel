@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import CollectionButton from './CollectionButton';
 import CollectionsView from './CollectionsView';
+import { LayoutGrid, Clock } from 'lucide-react';
 
 interface Props {
     allNews: any[];
@@ -24,6 +25,27 @@ export default function NewsListContainer({
 }: Props) {
     const ITEMS_PER_PAGE = 20;
     const [displayCount, setDisplayCount] = useState(ITEMS_PER_PAGE);
+    const [viewMode, setViewMode] = useState<'category' | 'time'>('category');
+
+    // Time Mode용 데이터 가공 (카테고리 정보 포함 + 시간순 정렬)
+    const timeSortedNews = React.useMemo(() => {
+        if (viewMode !== 'time' || !isLandingPage) return [];
+
+        const flattened: any[] = [];
+        Object.entries(newsByCategory).forEach(([category, articles]) => {
+            articles.forEach(article => {
+                // 중복 방지를 위해 이미 포함된 경우 제외 (혹시 모를 중복 대비)
+                if (!flattened.find(a => a.id === article.id)) {
+                    flattened.push({ ...article, computedCategory: category });
+                }
+            });
+        });
+
+        // 최신순 정렬
+        return flattened.sort((a, b) => {
+            return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
+        });
+    }, [newsByCategory, viewMode, isLandingPage]);
 
     return (
         <div className="flex-1 space-y-4">
@@ -59,6 +81,34 @@ export default function NewsListContainer({
                             </span>
                         </div>
                     </div>
+
+
+                    {/* View Mode Toggle (Landing Page Only) */}
+                    <div className="absolute bottom-8 right-4 md:right-12 z-30">
+                        <div className="flex items-center p-1 bg-white/10 backdrop-blur-md rounded-lg border border-white/20 shadow-lg">
+                            <button
+                                onClick={() => setViewMode('category')}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all duration-300 ${viewMode === 'category'
+                                    ? 'bg-white/90 text-blue-600 shadow-sm'
+                                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                                    }`}
+                            >
+                                <LayoutGrid size={14} />
+                                <span className="text-[11px] font-bold uppercase tracking-wider">Category</span>
+                            </button>
+                            <button
+                                onClick={() => setViewMode('time')}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all duration-300 ${viewMode === 'time'
+                                    ? 'bg-white/90 text-blue-600 shadow-sm'
+                                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                                    }`}
+                            >
+                                <Clock size={14} />
+                                <span className="text-[11px] font-bold uppercase tracking-wider">Time</span>
+                            </button>
+                        </div>
+                    </div>
+
                 </div>
             ) : (
                 <div className="pt-6 md:pt-8 px-4 md:px-6 lg:px-12">
@@ -84,7 +134,8 @@ export default function NewsListContainer({
                         )}
                     </div>
                 </div>
-            )}
+            )
+            }
 
             <div className="px-4 md:px-6 lg:px-12 pb-24">
                 {showCollections ? (
@@ -117,61 +168,99 @@ export default function NewsListContainer({
                         )}
                     </>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5 relative z-30">
-                        {CATEGORIES_CONFIG.map((config, idx) => {
-                            const category = config.label;
-                            // Corporate News는 메인 대시보드에서 제외하거나 맨 뒤로, 또는 설정에 따름. 현재는 모두 표시.
-                            // 해당 카테고리에 뉴스가 없어도 카드를 보여줄지 여부는 기획에 따르지만, 빈 카드라도 순서 유지를 위해 렌더링.
-                            const articles = newsByCategory[category] || [];
 
-                            return (
-                                <motion.div
-                                    key={category}
-                                    initial={{ opacity: 0, y: 30 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.5, delay: idx * 0.05 }}
-                                    className="group/theme glass-card rounded-[24px] p-5 relative overflow-hidden flex flex-col gap-4 h-full"
-                                >
-                                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/0 group-hover/theme:bg-blue-600/10 blur-[80px] rounded-full transition-all duration-700" />
+                    <>
+                        {viewMode === 'category' ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5 relative z-30">
+                                {CATEGORIES_CONFIG.map((config, idx) => {
+                                    const category = config.label;
+                                    const articles = newsByCategory[category] || [];
 
-                                    <div className="relative z-10 w-full text-center border-b border-gray-100 pb-4">
-                                        <Link
-                                            href={`/?category=${encodeURIComponent(category)}`}
-                                            scroll={false}
-                                            prefetch={true}
-                                            className="group/link flex flex-col items-center justify-center gap-1.5 p-2 rounded-xl transition-all duration-300 hover:bg-gray-50"
+                                    return (
+                                        <motion.div
+                                            key={category}
+                                            initial={{ opacity: 0, y: 30 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ duration: 0.5, delay: idx * 0.05 }}
+                                            className="group/theme glass-card rounded-[24px] p-5 relative overflow-hidden flex flex-col gap-4 h-full"
                                         >
-                                            <h2 className="text-xl font-black text-foreground tracking-tighter uppercase transition-colors group-hover/link:text-blue-600">
-                                                {category}
-                                            </h2>
-                                            <div className="h-1 w-6 bg-blue-600 rounded-full transition-all duration-500 group-hover/link:w-16 group-hover/link:bg-blue-400" />
-                                        </Link>
-                                    </div>
+                                            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/0 group-hover/theme:bg-blue-600/10 blur-[80px] rounded-full transition-all duration-700" />
 
-                                    <div className="relative z-10 flex flex-col gap-3.5">
-                                        <AnimatePresence mode="popLayout">
-                                            {articles.slice(0, 8).map((article: any, i: number) => (
-                                                <motion.div
-                                                    key={article.id}
-                                                    initial={{ opacity: 0, x: -10 }}
-                                                    animate={{ opacity: 1, x: 0 }}
-                                                    transition={{ delay: (idx * 0.05) + (i * 0.02) }}
+                                            <div className="relative z-10 w-full text-center border-b border-gray-100 pb-4">
+                                                <Link
+                                                    href={`/?category=${encodeURIComponent(category)}`}
+                                                    scroll={false}
+                                                    prefetch={true}
+                                                    className="group/link flex flex-col items-center justify-center gap-1.5 p-2 rounded-xl transition-all duration-300 hover:bg-gray-50"
                                                 >
-                                                    <NewsCard article={article} today={today} />
-                                                </motion.div>
-                                            ))}
-                                        </AnimatePresence>
-                                        {(articles.length === 0) && (
-                                            <div className="py-12 text-center text-gray-300 text-[9px] uppercase font-bold tracking-[0.3em]">Awaiting Insight</div>
-                                        )}
+                                                    <h2 className="text-xl font-black text-foreground tracking-tighter uppercase transition-colors group-hover/link:text-blue-600">
+                                                        {category}
+                                                    </h2>
+                                                    <div className="h-1 w-6 bg-blue-600 rounded-full transition-all duration-500 group-hover/link:w-16 group-hover/link:bg-blue-400" />
+                                                </Link>
+                                            </div>
+
+                                            <div className="relative z-10 flex flex-col gap-3.5">
+                                                <AnimatePresence mode="popLayout">
+                                                    {articles.slice(0, 8).map((article: any, i: number) => (
+                                                        <motion.div
+                                                            key={article.id}
+                                                            initial={{ opacity: 0, x: -10 }}
+                                                            animate={{ opacity: 1, x: 0 }}
+                                                            transition={{ delay: (idx * 0.05) + (i * 0.02) }}
+                                                        >
+                                                            <NewsCard article={article} today={today} />
+                                                        </motion.div>
+                                                    ))}
+                                                </AnimatePresence>
+                                                {(articles.length === 0) && (
+                                                    <div className="py-12 text-center text-gray-300 text-[9px] uppercase font-bold tracking-[0.3em]">Awaiting Insight</div>
+                                                )}
+                                            </div>
+                                        </motion.div>
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.3 }}
+                                className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-0 max-w-7xl mx-auto"
+                            >
+                                {timeSortedNews.slice(0, displayCount).map((article: any, i: number) => (
+                                    <NewsRow
+                                        key={`${article.id}-${i}`}
+                                        article={article}
+                                        today={today}
+                                        category={article.computedCategory} // Pass computed category
+                                    />
+                                ))}
+                                {timeSortedNews.length === 0 && (
+                                    <div className="col-span-full text-center py-20 text-muted-foreground">
+                                        No news available.
                                     </div>
-                                </motion.div>
-                            );
-                        })}
-                    </div>
+                                )}
+                                {/* Load More Button for Time View */}
+                                {displayCount < timeSortedNews.length && (
+                                    <div className="col-span-full mt-12 flex justify-center">
+                                        <button
+                                            onClick={() => setDisplayCount(prev => prev + 20)}
+                                            className="group relative px-8 py-3 bg-white hover:bg-[#3182f6] border border-gray-200 hover:border-[#3182f6] rounded-lg transition-all duration-300 overflow-hidden"
+                                        >
+                                            <span className="relative z-10 text-sm font-medium text-muted-foreground group-hover:text-white transition-colors">
+                                                Load More ({timeSortedNews.length - displayCount})
+                                            </span>
+                                            <div className="absolute inset-0 bg-gradient-to-r from-[#3182f6]/0 via-[#3182f6]/10 to-[#3182f6]/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        </button>
+                                    </div>
+                                )}
+                            </motion.div>
+                        )}
+                    </>
                 )}
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }
 
@@ -273,7 +362,7 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
     );
 });
 
-const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, today: string }) {
+const NewsRow = React.memo(function NewsRow({ article, today, category }: { article: any, today: string, category?: string }) {
     const analysis = getTags(article);
     const pubDate = article.published_at ? new Date(article.published_at) : null;
     const articleDate = pubDate?.toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
@@ -296,7 +385,14 @@ const NewsRow = React.memo(function NewsRow({ article, today }: { article: any, 
     return (
         <article className={`group py-2 px-4 bg-white hover:bg-gray-50 hover:scale-[1.01] border-b border-gray-100 flex flex-col gap-0.5 transition-all duration-300 ${isToday ? 'bg-blue-50' : ''}`}>
             <div className="flex items-center justify-between text-[9px] font-mono font-medium">
-                <span className={isToday ? 'text-red-500' : isYesterday ? 'text-amber-500' : 'text-gray-400'}>{dateStr} {timeStr}</span>
+                <div className="flex items-center gap-2">
+                    <span className={isToday ? 'text-red-500' : isYesterday ? 'text-amber-500' : 'text-gray-400'}>{dateStr} {timeStr}</span>
+                    {category && (
+                        <span className="px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500 text-[9px] font-bold uppercase tracking-tight border border-gray-200">
+                            {category}
+                        </span>
+                    )}
+                </div>
             </div>
             <div className="flex gap-2.5 items-start">
                 <div className="pt-0.5">
