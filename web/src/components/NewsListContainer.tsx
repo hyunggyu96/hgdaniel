@@ -226,7 +226,7 @@ export default function NewsListContainer({
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ duration: 0.3 }}
-                                className="flex flex-col gap-0 max-w-4xl mx-auto"
+                                className="flex flex-col gap-0 w-full"
                             >
                                 {timeSortedNews.slice(0, displayCount).map((article: any, i: number) => (
                                     <NewsRow
@@ -383,7 +383,7 @@ const NewsRow = React.memo(function NewsRow({ article, today, category }: { arti
     const uniqueKeywords = Array.from(new Set([...analysis.main, ...analysis.sub].filter(k => k && k !== '기타' && k !== '-' && k !== '|' && k.trim() !== '')));
 
     return (
-        <article className={`group py-2 px-4 bg-white hover:bg-gray-50 border-b border-gray-100 transition-all duration-200 ${isToday ? 'bg-blue-50/30' : ''}`}>
+        <article className={`group py-1 px-4 bg-white hover:bg-gray-50 border-b border-gray-100 transition-all duration-200 ${isToday ? 'bg-blue-50/30' : ''}`}>
             {/* Single row flex layout */}
             <div className="flex items-start gap-3">
                 {/* Left: Time + Category */}
