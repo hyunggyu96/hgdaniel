@@ -405,8 +405,8 @@ const NewsRow = React.memo(function NewsRow({ article, today, category }: { arti
                         </div>
                         <div className="flex items-center gap-1.5">
                             <CollectionButton newsLink={article.link} newsTitle={article.title} size={14} />
-                            <a href={article.link} target="_blank" rel="noopener noreferrer" className="flex-1 min-w-0">
-                                <h3 className="text-[13px] font-bold text-foreground group-hover:text-[#3182f6] visited:text-purple-600 transition-colors leading-tight truncate">
+                            <a href={article.link} target="_blank" rel="noopener noreferrer" className="flex-1 min-w-0 visited:text-purple-600">
+                                <h3 className="text-[13px] font-bold text-inherit group-hover:text-[#3182f6] transition-colors leading-tight truncate">
                                     {isToday && <span className="text-[8px] font-black text-white bg-red-500 px-1 py-0.5 rounded mr-1 align-middle">NEW</span>}
                                     {isYesterday && !isToday && <span className="text-[8px] font-black text-amber-900 bg-amber-400 px-1 py-0.5 rounded mr-1 align-middle">YDAY</span>}
                                     {article.title}
@@ -441,8 +441,8 @@ const NewsRow = React.memo(function NewsRow({ article, today, category }: { arti
                     </div>
                     <div className="flex items-center gap-1">
                         <CollectionButton newsLink={article.link} newsTitle={article.title} size={12} />
-                        <a href={article.link} target="_blank" rel="noopener noreferrer" className="flex-1 min-w-0">
-                            <h3 className="text-[12px] font-bold text-foreground group-hover:text-[#3182f6] visited:text-purple-600 transition-colors leading-tight truncate">
+                        <a href={article.link} target="_blank" rel="noopener noreferrer" className="flex-1 min-w-0 visited:text-purple-600">
+                            <h3 className="text-[12px] font-bold text-inherit group-hover:text-[#3182f6] transition-colors leading-tight truncate">
                                 {isToday && <span className="text-[7px] font-black text-white bg-red-500 px-1 py-0.5 rounded mr-1 align-middle">NEW</span>}
                                 {isYesterday && !isToday && <span className="text-[7px] font-black text-amber-900 bg-amber-400 px-1 py-0.5 rounded mr-1 align-middle">YDAY</span>}
                                 {article.title}
