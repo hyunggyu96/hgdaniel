@@ -416,29 +416,29 @@ const NewsRow = React.memo(function NewsRow({ article, today, category }: { arti
         );
     }
 
-    // Category Page - Time 뷰와 동일한 레이아웃 (단, 카테고리 표시 없음)
+    // Category Page - 더 크고 넓은 레이아웃
     return (
-        <article className={`group py-0.5 px-3 bg-white hover:bg-gray-50 border-b border-gray-100 transition-all duration-200 ${isToday ? 'bg-blue-50/30' : ''}`}>
-            <div className="flex items-start gap-3">
+        <article className={`group py-1.5 px-4 bg-white hover:bg-gray-50 border-b border-gray-100 transition-all duration-200 ${isToday ? 'bg-blue-50/30' : ''}`}>
+            <div className="flex items-start gap-4">
                 {/* Left: Time */}
-                <div className="flex flex-col items-start gap-0.5 w-[70px] shrink-0">
-                    <span className={`text-[10px] font-mono font-bold ${isToday ? 'text-red-500' : isYesterday ? 'text-amber-500' : 'text-gray-500'}`}>
+                <div className="flex flex-col items-start gap-0.5 w-[85px] shrink-0">
+                    <span className={`text-[11px] font-mono font-bold ${isToday ? 'text-red-500' : isYesterday ? 'text-amber-500' : 'text-gray-500'}`}>
                         {dateStr} {timeStr}
                     </span>
                 </div>
                 {/* Right: Content */}
                 <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap gap-1 mb-0.5">
+                    <div className="flex flex-wrap gap-1.5 mb-1">
                         {uniqueKeywords.slice(0, 3).map((k, i) => (
-                            <span key={i} className="text-[8px] font-semibold text-blue-600 bg-blue-50 px-1 py-0.5 rounded uppercase tracking-tight border border-blue-200">{k}</span>
+                            <span key={i} className="text-[9px] font-semibold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded uppercase tracking-tight border border-blue-200">{k}</span>
                         ))}
                     </div>
-                    <div className="flex items-center gap-1">
-                        <CollectionButton newsLink={article.link} newsTitle={article.title} size={12} />
+                    <div className="flex items-center gap-1.5">
+                        <CollectionButton newsLink={article.link} newsTitle={article.title} size={14} />
                         <a href={article.link} target="_blank" rel="noopener noreferrer" className="news-link flex-1 min-w-0">
-                            <h3 className="text-[12px] font-bold text-inherit group-hover:text-[#3182f6] transition-colors leading-tight truncate">
-                                {isToday && <span className="text-[7px] font-black text-white bg-red-500 px-1 py-0.5 rounded mr-1 align-middle">NEW</span>}
-                                {isYesterday && !isToday && <span className="text-[7px] font-black text-amber-900 bg-amber-400 px-1 py-0.5 rounded mr-1 align-middle">YDAY</span>}
+                            <h3 className="text-[14px] font-bold text-inherit group-hover:text-[#3182f6] transition-colors leading-tight truncate">
+                                {isToday && <span className="text-[8px] font-black text-white bg-red-500 px-1.5 py-0.5 rounded mr-1 align-middle">NEW</span>}
+                                {isYesterday && !isToday && <span className="text-[8px] font-black text-amber-900 bg-amber-400 px-1.5 py-0.5 rounded mr-1 align-middle">YDAY</span>}
                                 {article.title}
                             </h3>
                         </a>
