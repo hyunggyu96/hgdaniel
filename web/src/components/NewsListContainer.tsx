@@ -334,7 +334,7 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
                         {isYesterday && !isToday && (
                             <span className="text-[8px] font-black text-amber-900 bg-amber-400 px-1.5 py-0.5 rounded tracking-tighter uppercase inline-block leading-none shrink-0 border border-amber-300/50">YDAY</span>
                         )}
-                        <a href={article.link} target="_blank" rel="noopener noreferrer" className="text-[14px] font-bold text-foreground/90 group-hover/card:text-blue-600 transition-colors leading-tight line-clamp-2 block tracking-tight">
+                        <a href={article.link} target="_blank" rel="noopener noreferrer" className="text-[14px] font-bold text-foreground/90 group-hover/card:text-blue-600 visited:text-purple-600 transition-colors leading-tight line-clamp-2 block tracking-tight">
                             {article.title}
                         </a>
                     </div>
@@ -410,7 +410,7 @@ const NewsRow = React.memo(function NewsRow({ article, today, category }: { arti
                     <div className="flex items-center gap-1.5">
                         <CollectionButton newsLink={article.link} newsTitle={article.title} size={14} />
                         <a href={article.link} target="_blank" rel="noopener noreferrer" className="flex-1 min-w-0">
-                            <h3 className="text-[13px] font-bold text-foreground group-hover:text-[#3182f6] transition-colors leading-tight truncate">
+                            <h3 className="text-[13px] font-bold text-foreground group-hover:text-[#3182f6] visited:text-purple-600 transition-colors leading-tight truncate">
                                 {isToday && <span className="text-[8px] font-black text-white bg-red-500 px-1 py-0.5 rounded mr-1 align-middle">NEW</span>}
                                 {isYesterday && !isToday && <span className="text-[8px] font-black text-amber-900 bg-amber-400 px-1 py-0.5 rounded mr-1 align-middle">YDAY</span>}
                                 {article.title}
