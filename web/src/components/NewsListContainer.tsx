@@ -383,40 +383,45 @@ const NewsRow = React.memo(function NewsRow({ article, today, category }: { arti
     const uniqueKeywords = Array.from(new Set([...analysis.main, ...analysis.sub].filter(k => k && k !== '기타' && k !== '-' && k !== '|' && k.trim() !== '')));
 
     return (
-        <article className={`group py-1.5 px-3 bg-white hover:bg-gray-50 border-b border-gray-100 transition-all duration-200 cursor-pointer ${isToday ? 'bg-blue-50/30' : ''}`}>
-            <div className="grid grid-cols-[80px_1fr] gap-x-3">
-                {/* Row 1: Time | Keywords */}
-                <span className={`text-[10px] font-mono font-semibold ${isToday ? 'text-red-500' : isYesterday ? 'text-amber-500' : 'text-gray-400'}`}>
-                    {dateStr} {timeStr}
-                </span>
-                <div className="flex flex-wrap gap-1">
-                    {uniqueKeywords.slice(0, 4).map((k, i) => (
-                        <span key={i} className="text-[9px] font-bold text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded uppercase tracking-tight">{k}</span>
-                    ))}
-                </div>
-
-                {/* Row 2: Category | Headline */}
-                {category ? (
-                    <span className="text-[11px] font-black text-white bg-blue-500 px-2 py-0.5 rounded text-center uppercase tracking-tight self-start">
-                        {category}
+        <article className={`group py-2 px-4 bg-white hover:bg-gray-50 border-b border-gray-100 transition-all duration-200 ${isToday ? 'bg-blue-50/30' : ''}`}>
+            {/* Single row flex layout */}
+            <div className="flex items-start gap-3">
+                {/* Left: Time + Category */}
+                <div className="flex flex-col items-start gap-0.5 w-[100px] shrink-0">
+                    <span className={`text-[10px] font-mono font-semibold ${isToday ? 'text-red-500' : isYesterday ? 'text-amber-500' : 'text-gray-400'}`}>
+                        {dateStr} {timeStr}
                     </span>
-                ) : <span />}
-                <div className="flex items-center gap-1.5 min-w-0">
-                    <CollectionButton newsLink={article.link} newsTitle={article.title} size={14} />
-                    <a href={article.link} target="_blank" rel="noopener noreferrer" className="block min-w-0 flex-1">
-                        <h3 className="text-[13px] font-bold text-foreground group-hover:text-[#3182f6] transition-colors leading-tight truncate">
-                            {isToday && <span className="text-[8px] font-black text-white bg-red-500 px-1 py-0.5 rounded mr-1 align-middle">NEW</span>}
-                            {isYesterday && !isToday && <span className="text-[8px] font-black text-amber-900 bg-amber-400 px-1 py-0.5 rounded mr-1 align-middle">YDAY</span>}
-                            {article.title}
-                        </h3>
-                    </a>
+                    {category && (
+                        <span className="text-[9px] font-black text-white bg-blue-500 px-1.5 py-0.5 rounded uppercase tracking-tight whitespace-nowrap">
+                            {category}
+                        </span>
+                    )}
                 </div>
 
-                {/* Row 3: Empty | Summary */}
-                <span />
-                {summaryText && (
-                    <p className="text-[10px] text-muted-foreground truncate leading-tight">{summaryText}</p>
-                )}
+                {/* Right: Content */}
+                <div className="flex-1 min-w-0">
+                    {/* Keywords */}
+                    <div className="flex flex-wrap gap-1 mb-0.5">
+                        {uniqueKeywords.slice(0, 4).map((k, i) => (
+                            <span key={i} className="text-[9px] font-semibold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded uppercase tracking-tight border border-blue-200">{k}</span>
+                        ))}
+                    </div>
+                    {/* Headline with star */}
+                    <div className="flex items-center gap-1.5">
+                        <CollectionButton newsLink={article.link} newsTitle={article.title} size={14} />
+                        <a href={article.link} target="_blank" rel="noopener noreferrer" className="flex-1 min-w-0">
+                            <h3 className="text-[13px] font-bold text-foreground group-hover:text-[#3182f6] transition-colors leading-tight truncate">
+                                {isToday && <span className="text-[8px] font-black text-white bg-red-500 px-1 py-0.5 rounded mr-1 align-middle">NEW</span>}
+                                {isYesterday && !isToday && <span className="text-[8px] font-black text-amber-900 bg-amber-400 px-1 py-0.5 rounded mr-1 align-middle">YDAY</span>}
+                                {article.title}
+                            </h3>
+                        </a>
+                    </div>
+                    {/* Summary */}
+                    {summaryText && (
+                        <p className="text-[10px] text-muted-foreground truncate leading-tight mt-0.5">{summaryText}</p>
+                    )}
+                </div>
             </div>
         </article>
     );
