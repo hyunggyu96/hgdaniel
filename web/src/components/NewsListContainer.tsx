@@ -385,14 +385,14 @@ const NewsRow = React.memo(function NewsRow({ article, today, category }: { arti
     return (
         <article className={`group py-1 px-4 bg-white hover:bg-gray-50 border-b border-gray-100 transition-all duration-200 ${isToday ? 'bg-blue-50/30' : ''}`}>
             {/* Single row flex layout */}
-            <div className="flex items-start gap-3">
+            <div className="flex items-start gap-4">
                 {/* Left: Time + Category */}
-                <div className="flex flex-col items-start gap-0.5 w-[100px] shrink-0">
-                    <span className={`text-[10px] font-mono font-semibold ${isToday ? 'text-red-500' : isYesterday ? 'text-amber-500' : 'text-gray-400'}`}>
+                <div className="flex flex-col items-start gap-0.5 w-[140px] shrink-0">
+                    <span className={`text-[11px] font-mono font-bold ${isToday ? 'text-red-500' : isYesterday ? 'text-amber-500' : 'text-gray-500'}`}>
                         {dateStr} {timeStr}
                     </span>
                     {category && (
-                        <span className="text-[9px] font-black text-white bg-blue-500 px-1.5 py-0.5 rounded uppercase tracking-tight whitespace-nowrap">
+                        <span className="text-[8px] font-black text-white bg-blue-500 px-1.5 py-0.5 rounded uppercase tracking-tight whitespace-nowrap">
                             {category}
                         </span>
                     )}
