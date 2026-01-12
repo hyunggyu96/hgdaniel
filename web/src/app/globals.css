@@ -120,4 +120,17 @@
   ::selection {
     @apply bg-blue-100 text-blue-900;
   }
+
+  /* Visited Links - Purple for read articles (news links only) */
+  .news-link:visited,
+  .news-link:visited h3 {
+    color: #9333ea !important;
+    /* purple-600 */
+  }
+
+  .news-link:visited:hover,
+  .news-link:visited:hover h3 {
+    color: #3182f6 !important;
+    /* Keep hover blue */
+  }
 }
