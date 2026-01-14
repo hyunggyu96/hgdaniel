@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import CollectionButton from './CollectionButton';
 import CollectionsView from './CollectionsView';
-import { LayoutGrid, Clock, Sparkles } from 'lucide-react';
+import { LayoutGrid, Clock, Sparkles, Zap } from 'lucide-react';
 import { useReducedMotion, useIsLowEndDevice } from '@/hooks/useReducedMotion';
 
 interface Props {
@@ -33,14 +33,34 @@ export default function NewsListContainer({
     const isLowEndDevice = useIsLowEndDevice();
     const [splineLoaded, setSplineLoaded] = useState(false);
 
-    // Lazy load Spline only on high-end devices after component mount
+    // User-controlled Light Mode (persisted in localStorage)
+    const [lightMode, setLightMode] = useState<boolean>(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('lightMode');
+            return saved === 'true';
+        }
+        return false;
+    });
+
+    // Toggle Light Mode and save preference
+    const toggleLightMode = () => {
+        setLightMode(prev => {
+            const newValue = !prev;
+            localStorage.setItem('lightMode', String(newValue));
+            return newValue;
+        });
+    };
+
+    // Lazy load Spline only on high-end devices after component mount (and not in light mode)
     useEffect(() => {
-        if (!isLowEndDevice && !prefersReducedMotion && isLandingPage) {
+        if (!isLowEndDevice && !prefersReducedMotion && !lightMode && isLandingPage) {
             // Delay Spline loading to prioritize content rendering
             const timer = setTimeout(() => setSplineLoaded(true), 1000);
             return () => clearTimeout(timer);
+        } else {
+            setSplineLoaded(false);
         }
-    }, [isLowEndDevice, prefersReducedMotion, isLandingPage]);
+    }, [isLowEndDevice, prefersReducedMotion, lightMode, isLandingPage]);
 
     // Time Mode용 데이터 가공 (카테고리 정보 포함 + 시간순 정렬)
     const timeSortedNews = useMemo(() => {
@@ -67,9 +87,9 @@ export default function NewsListContainer({
             {/* HERO SECTION */}
             {isLandingPage ? (
                 <div className="relative w-full h-[50vh] min-h-[450px] mb-8 overflow-hidden">
-                    {/* Background: Spline for high-end, gradient fallback for low-end */}
+                    {/* Background: Spline for high-end, gradient fallback for low-end or light mode */}
                     <div className="absolute inset-0 z-0">
-                        {splineLoaded && !isLowEndDevice && !prefersReducedMotion ? (
+                        {splineLoaded && !isLowEndDevice && !prefersReducedMotion && !lightMode ? (
                             <iframe
                                 src='https://my.spline.design/nexbotrobotcharacterconcept-JwuKwrHPzdqqnT2z04erjDBN/'
                                 frameBorder='0'
@@ -146,6 +166,23 @@ export default function NewsListContainer({
                                 <span className="text-[11px] font-bold uppercase tracking-wider">Time</span>
                             </button>
                         </div>
+                    </div>
+
+                    {/* Light Mode Toggle (Top Right) */}
+                    <div className="absolute top-4 right-4 md:right-12 z-30">
+                        <button
+                            onClick={toggleLightMode}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border shadow-lg transition-all duration-300 ${lightMode
+                                    ? 'bg-amber-500 text-white border-amber-400'
+                                    : 'bg-white/95 backdrop-blur-md text-gray-600 border-gray-300 hover:bg-gray-50'
+                                }`}
+                            title={lightMode ? '3D 모드로 전환' : '라이트 모드로 전환 (성능 향상)'}
+                        >
+                            <Zap size={14} className={lightMode ? 'fill-current' : ''} />
+                            <span className="text-[11px] font-bold uppercase tracking-wider">
+                                {lightMode ? 'Light' : '3D'}
+                            </span>
+                        </button>
                     </div>
 
                 </div>
