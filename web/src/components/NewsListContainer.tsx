@@ -100,18 +100,14 @@ export default function NewsListContainer({
                                 loading="lazy"
                             />
                         ) : (
-                            /* Static gradient fallback for low-end devices - much lighter! */
-                            <div className="w-full h-full bg-gradient-to-br from-blue-50 via-white to-purple-50">
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="relative">
-                                        <Sparkles className="w-24 h-24 text-blue-400/30" />
-                                        <div className="absolute inset-0 flex items-center justify-center">
-                                            <div className="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-500/30">
-                                                AI
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                            /* Static robot image fallback for light mode / low-end devices */
+                            <div className="w-full h-full bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+                                <img
+                                    src="/robot-static.png"
+                                    alt="AI Robot"
+                                    className="h-full w-auto object-contain mix-blend-multiply opacity-90"
+                                    loading="lazy"
+                                />
                             </div>
                         )}
                     </div>
@@ -173,8 +169,8 @@ export default function NewsListContainer({
                         <button
                             onClick={toggleLightMode}
                             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border shadow-lg transition-all duration-300 ${lightMode
-                                    ? 'bg-amber-500 text-white border-amber-400'
-                                    : 'bg-white/95 backdrop-blur-md text-gray-600 border-gray-300 hover:bg-gray-50'
+                                ? 'bg-amber-500 text-white border-amber-400'
+                                : 'bg-white/95 backdrop-blur-md text-gray-600 border-gray-300 hover:bg-gray-50'
                                 }`}
                             title={lightMode ? '3D 모드로 전환' : '라이트 모드로 전환 (성능 향상)'}
                         >
