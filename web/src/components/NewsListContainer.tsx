@@ -100,15 +100,8 @@ export default function NewsListContainer({
                                 loading="lazy"
                             />
                         ) : (
-                            /* Static robot image fallback for light mode / low-end devices */
-                            <div className="w-full h-full bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
-                                <img
-                                    src="/robot-static.png"
-                                    alt="AI Robot"
-                                    className="h-full w-auto object-contain mix-blend-multiply opacity-90"
-                                    loading="lazy"
-                                />
-                            </div>
+                            /* Simple white background for light mode / low-end devices */
+                            <div className="w-full h-full bg-white" />
                         )}
                     </div>
                     <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background via-background to-transparent pointer-events-none z-10" />
