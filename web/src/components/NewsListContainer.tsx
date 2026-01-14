@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import CollectionButton from './CollectionButton';
 import CollectionsView from './CollectionsView';
-import { LayoutGrid, Clock } from 'lucide-react';
+import { LayoutGrid, Clock, Sparkles } from 'lucide-react';
+import { useReducedMotion, useIsLowEndDevice } from '@/hooks/useReducedMotion';
 
 interface Props {
     allNews: any[];
@@ -27,8 +28,22 @@ export default function NewsListContainer({
     const [displayCount, setDisplayCount] = useState(ITEMS_PER_PAGE);
     const [viewMode, setViewMode] = useState<'category' | 'time'>('category');
 
+    // Performance optimizations
+    const prefersReducedMotion = useReducedMotion();
+    const isLowEndDevice = useIsLowEndDevice();
+    const [splineLoaded, setSplineLoaded] = useState(false);
+
+    // Lazy load Spline only on high-end devices after component mount
+    useEffect(() => {
+        if (!isLowEndDevice && !prefersReducedMotion && isLandingPage) {
+            // Delay Spline loading to prioritize content rendering
+            const timer = setTimeout(() => setSplineLoaded(true), 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [isLowEndDevice, prefersReducedMotion, isLandingPage]);
+
     // Time Mode용 데이터 가공 (카테고리 정보 포함 + 시간순 정렬)
-    const timeSortedNews = React.useMemo(() => {
+    const timeSortedNews = useMemo(() => {
         if (viewMode !== 'time' || !isLandingPage) return [];
 
         const flattened: any[] = [];
@@ -52,28 +67,52 @@ export default function NewsListContainer({
             {/* HERO SECTION */}
             {isLandingPage ? (
                 <div className="relative w-full h-[50vh] min-h-[450px] mb-8 overflow-hidden">
+                    {/* Background: Spline for high-end, gradient fallback for low-end */}
                     <div className="absolute inset-0 z-0">
-                        <iframe
-                            src='https://my.spline.design/nexbotrobotcharacterconcept-JwuKwrHPzdqqnT2z04erjDBN/'
-                            frameBorder='0'
-                            width='100%'
-                            height='100%'
-                            className="w-full h-full mix-blend-multiply opacity-90 grayscale-[0.1]"
-                            title="3D Robot Interaction"
-                        />
+                        {splineLoaded && !isLowEndDevice && !prefersReducedMotion ? (
+                            <iframe
+                                src='https://my.spline.design/nexbotrobotcharacterconcept-JwuKwrHPzdqqnT2z04erjDBN/'
+                                frameBorder='0'
+                                width='100%'
+                                height='100%'
+                                className="w-full h-full mix-blend-multiply opacity-90 grayscale-[0.1]"
+                                title="3D Robot Interaction"
+                                loading="lazy"
+                            />
+                        ) : (
+                            /* Static gradient fallback for low-end devices - much lighter! */
+                            <div className="w-full h-full bg-gradient-to-br from-blue-50 via-white to-purple-50">
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="relative">
+                                        <Sparkles className="w-24 h-24 text-blue-400/30" />
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <div className="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-500/30">
+                                                AI
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                     <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background via-background to-transparent pointer-events-none z-10" />
                     <div className="absolute inset-0 flex flex-col items-center justify-end pb-12 pointer-events-none z-20 px-4">
-                        <motion.h1
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-foreground leading-tight drop-shadow-2xl text-center bg-clip-text text-transparent bg-gradient-to-b from-gray-900 to-gray-500 mb-6"
-                        >
-                            MARKET INTELLIGENCE
-                        </motion.h1>
-                        <div className="flex items-center gap-2 bg-white/80 backdrop-blur-md px-4 py-1.5 rounded-full border border-gray-200 shadow-xl">
+                        {prefersReducedMotion ? (
+                            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-foreground leading-tight drop-shadow-2xl text-center bg-clip-text text-transparent bg-gradient-to-b from-gray-900 to-gray-500 mb-6">
+                                MARKET INTELLIGENCE
+                            </h1>
+                        ) : (
+                            <motion.h1
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-foreground leading-tight drop-shadow-2xl text-center bg-clip-text text-transparent bg-gradient-to-b from-gray-900 to-gray-500 mb-6"
+                            >
+                                MARKET INTELLIGENCE
+                            </motion.h1>
+                        )}
+                        <div className="flex items-center gap-2 bg-white/80 backdrop-blur-md px-4 py-1.5 rounded-full border border-gray-200 shadow-xl gpu-accelerated">
                             <span className="relative flex h-2 w-2 shrink-0">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                                {!prefersReducedMotion && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>}
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
                             </span>
                             <span className="text-[10px] font-bold text-cyan-600 uppercase tracking-[0.3em]">
