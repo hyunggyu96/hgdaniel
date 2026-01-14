@@ -447,28 +447,42 @@ const NewsRow = React.memo(function NewsRow({ article, today, category }: { arti
     // Time View (랜딩페이지) - 넓은 레이아웃
     if (category) {
         return (
-            <article className={`group py-0.5 px-4 bg-white hover:bg-gray-50 border-b border-gray-100 transition-all duration-200 ${isToday ? 'bg-blue-50/30' : ''}`}>
-                <div className="flex items-start gap-4">
-                    {/* Left: Time + Category */}
-                    <div className="flex flex-col items-start gap-0.5 w-[140px] shrink-0">
-                        <span className={`text-[11px] font-mono font-bold ${isToday ? 'text-red-500' : isYesterday ? 'text-amber-500' : 'text-gray-500'}`}>
+            <article className={`group py-3 sm:py-0.5 px-4 bg-white hover:bg-gray-50 border-b border-gray-100 transition-all duration-200 ${isToday ? 'bg-blue-50/30' : ''}`}>
+                <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4">
+                    {/* Left: Time + Category (Responsive) */}
+                    <div className="flex flex-row sm:flex-col items-center sm:items-start gap-2 sm:gap-0.5 w-full sm:w-[140px] shrink-0">
+                        {/* Mobile View: Category Badge + Time */}
+                        <div className="flex items-center gap-2 sm:hidden w-full pb-1 border-dashed border-b border-gray-100/50">
+                            <span className="text-[8px] font-black text-white bg-blue-500 px-1.5 py-0.5 rounded uppercase tracking-tight whitespace-nowrap">
+                                {category}
+                            </span>
+                            <span className={`text-[10px] font-mono font-bold ${isToday ? 'text-red-500' : isYesterday ? 'text-amber-500' : 'text-gray-500'}`}>
+                                {dateStr} {timeStr}
+                            </span>
+                        </div>
+
+                        {/* Desktop View: Date/Time + Category */}
+                        <span className={`hidden sm:block text-[11px] font-mono font-bold ${isToday ? 'text-red-500' : isYesterday ? 'text-amber-500' : 'text-gray-500'}`}>
                             {dateStr} {timeStr}
                         </span>
-                        <span className="text-[8px] font-black text-white bg-blue-500 px-1.5 py-0.5 rounded uppercase tracking-tight whitespace-nowrap">
+                        <span className="hidden sm:inline-block text-[8px] font-black text-white bg-blue-500 px-1.5 py-0.5 rounded uppercase tracking-tight whitespace-nowrap">
                             {category}
                         </span>
                     </div>
+
                     {/* Right: Content */}
-                    <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap gap-1 mb-0.5">
+                    <div className="flex-1 min-w-0 w-full">
+                        <div className="flex flex-wrap gap-1 mb-1.5 sm:mb-0.5">
                             {uniqueKeywords.slice(0, 4).map((k, i) => (
                                 <span key={i} className="text-[9px] font-semibold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded uppercase tracking-tight border border-blue-200">{k}</span>
                             ))}
                         </div>
-                        <div className="flex items-center gap-1.5">
-                            <CollectionButton newsLink={article.link} newsTitle={article.title} size={14} />
-                            <a href={article.link} target="_blank" rel="noopener noreferrer" className="news-link flex-1 min-w-0">
-                                <h3 className="text-[13px] font-bold text-inherit group-hover:text-[#3182f6] transition-colors leading-tight truncate">
+                        <div className="flex items-start sm:items-center gap-2 sm:gap-1.5">
+                            <div className="mt-0.5 sm:mt-0">
+                                <CollectionButton newsLink={article.link} newsTitle={article.title} size={14} />
+                            </div>
+                            <a href={article.link} target="_blank" rel="noopener noreferrer" className="news-link flex-1 min-w-0 block">
+                                <h3 className="text-[14px] sm:text-[13px] font-bold text-inherit group-hover:text-[#3182f6] transition-colors leading-snug sm:leading-tight line-clamp-2 sm:truncate">
                                     {isToday && <span className="text-[8px] font-black text-white bg-red-500 px-1 py-0.5 rounded mr-1 align-middle">NEW</span>}
                                     {isYesterday && !isToday && <span className="text-[8px] font-black text-amber-900 bg-amber-400 px-1 py-0.5 rounded mr-1 align-middle">YDAY</span>}
                                     {article.title}
