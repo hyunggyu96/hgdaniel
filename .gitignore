@@ -46,3 +46,9 @@ Thumbs.db
 .vercel
 
 screenshots/
+
+# Backup files
+*.bak
+
+# Scripts
+*.ps1

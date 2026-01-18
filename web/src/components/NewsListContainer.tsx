@@ -474,7 +474,7 @@ const NewsRow = React.memo(function NewsRow({ article, today, category }: { arti
                     <div className="flex-1 min-w-0 w-full">
                         <div className="flex flex-wrap gap-1 mb-1.5 sm:mb-0.5">
                             {uniqueKeywords.slice(0, 4).map((k, i) => (
-                                <span key={i} className="text-[9px] font-semibold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded uppercase tracking-tight border border-blue-200">{k}</span>
+                                <span key={i} className="text-[9px] font-semibold text-blue-400 bg-blue-500/10 px-1.5 py-0.5 rounded uppercase tracking-tight border border-blue-500/10">{k}</span>
                             ))}
                         </div>
                         <div className="flex items-start sm:items-center gap-2 sm:gap-1.5">
