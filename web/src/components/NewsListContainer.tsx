@@ -408,7 +408,7 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
             <div className="flex items-center justify-between mt-0.5">
                 <div className="flex flex-wrap gap-1">
                     {uniqueKeywords.slice(0, 2).map((k, i) => (
-                        <span key={i} className="text-[11px] font-bold text-blue-400/60 bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-500/10 uppercase tracking-tight group-hover/card:border-blue-500/30 group-hover/card:text-blue-400 transition-all">
+                        <span key={i} className="text-[11px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 uppercase tracking-tight group-hover/card:border-blue-300 group-hover/card:text-blue-700 transition-all">
                             {k}
                         </span>
                     ))}
