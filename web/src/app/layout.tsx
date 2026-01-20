@@ -9,6 +9,7 @@ import { CollectionProvider } from '@/components/CollectionContext';
 import { UserProvider } from '@/components/UserContext';
 import LoginButton from '@/components/LoginButton';
 import MobileNav from '@/components/MobileNav';
+import MainNav from '@/components/MainNav';
 import { GoogleAnalytics } from '@next/third-parties/google';
 
 const noto = Noto_Sans_KR({
@@ -44,6 +45,9 @@ export default function RootLayout({
                     <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-medium">Professional Terminal</span>
                   </div>
                 </Link>
+
+                {/* Desktop Navigation */}
+                <MainNav />
 
                 {/* Center: Search */}
                 <div className="flex flex-1 justify-center max-w-2xl px-2 sm:px-4">
