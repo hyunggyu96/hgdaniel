@@ -35,8 +35,9 @@ export default function RootLayout({
         <UserProvider>
           <CollectionProvider>
             {/* Header / Brand (GNB) */}
-            <header className="px-4 md:px-6 py-3 md:py-4 border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-50">
-              <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4 md:gap-8 h-auto md:h-12">
+            {/* Header / Brand (GNB) */}
+            <header className="bg-white/80 backdrop-blur-md sticky top-0 z-50 flex flex-col">
+              <div className="w-full max-w-[1600px] mx-auto flex items-center justify-between gap-4 md:gap-8 h-auto px-4 md:px-6 pt-6 pb-2">
                 {/* Left: Brand */}
                 <Link href="/" prefetch={false} className="flex items-center gap-0 sm:gap-3 shrink-0 hover:opacity-80 transition-opacity">
                   <div className="w-9 h-9 md:w-10 md:h-10 bg-[#3182f6] rounded-[10px] md:rounded-[14px] flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/20 text-sm md:text-base">HG</div>
@@ -45,9 +46,6 @@ export default function RootLayout({
                     <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-medium">Professional Terminal</span>
                   </div>
                 </Link>
-
-                {/* Desktop Navigation */}
-                <MainNav />
 
                 {/* Center: Search */}
                 <div className="flex flex-1 justify-center max-w-2xl px-2 sm:px-4">
@@ -64,6 +62,9 @@ export default function RootLayout({
                   <LoginButton />
                 </div>
               </div>
+
+              {/* Bottom: Navigation */}
+              <MainNav />
             </header>
 
             {children}
