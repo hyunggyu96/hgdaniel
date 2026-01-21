@@ -26,7 +26,6 @@ export default function SideBar() {
                     <div className="space-y-1">
                         <Link
                             href="/"
-                            scroll={false}
                             prefetch={true}
                             className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 group flex items-center justify-between ${isOverview ? 'bg-[#3182f6] text-white' : 'text-muted-foreground hover:bg-gray-200 hover:text-foreground'}`}
                         >
@@ -39,7 +38,6 @@ export default function SideBar() {
                             <Link
                                 key={category}
                                 href={`/?category=${encodeURIComponent(category)}`}
-                                scroll={false}
                                 prefetch={true}
                                 className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 group flex items-center justify-between ${selectedCategory === category ? 'bg-[#3182f6] text-white' : 'text-muted-foreground hover:bg-gray-200 hover:text-foreground'}`}
                             >
@@ -56,7 +54,6 @@ export default function SideBar() {
                 <div className="pt-6 border-t border-gray-200">
                     <Link
                         href="/?collections=true"
-                        scroll={false}
                         prefetch={true}
                         className={`flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition-all group/collections ${isCollections ? 'bg-[#3182f6] text-white' : 'hover:bg-gray-200'}`}
                     >

@@ -254,7 +254,6 @@ export default function NewsListContainer({
                                             <div className="relative z-10 w-full text-center border-b border-gray-100 pb-4">
                                                 <Link
                                                     href={`/?category=${encodeURIComponent(category)}`}
-                                                    scroll={false}
                                                     prefetch={true}
                                                     className="group/link flex flex-col items-center justify-center gap-1.5 p-2 rounded-xl transition-all duration-300 hover:bg-gray-50"
                                                 >
