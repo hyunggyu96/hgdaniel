@@ -212,6 +212,7 @@ BAD_KEYWORDS = [
     "알더인베스트먼트", "LGA", "초고액자산가", "슬게 고민의 해법",
     # NBA/농구 노이즈 (2026-01-21 추가)
     "NBA", "농구", "무릎 부상", "전체 9순위", "트리플더블",
+    "GSW", "커리", "시즌아웃", "버틀러", "트레이드",
 ]
 
 # Robust Regex for Automotive Pillars (A/B/C-Pillar)

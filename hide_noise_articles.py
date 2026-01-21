@@ -39,6 +39,7 @@ NOISE_KEYWORDS = [
     "[CES", "CES 2026]", "CES2026", "CES 2026",
     # NBA/농구 (2026-01-21)
     "NBA", "농구", "무릎 부상", "전체 9순위",
+    "GSW", "커리", "시즌아웃", "버틀러", "트레이드",
 ]
 
 def find_noise_articles(since_date: str):
