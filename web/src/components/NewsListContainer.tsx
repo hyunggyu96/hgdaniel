@@ -278,7 +278,14 @@ export default function NewsListContainer({
                                                     ))}
                                                 </AnimatePresence>
                                                 {(articles.length === 0) && (
-                                                    <div className="py-12 text-center text-gray-300 text-[9px] uppercase font-bold tracking-[0.3em]">Awaiting Insight</div>
+                                                    <div className="py-12 flex flex-col items-center justify-center gap-2 text-center">
+                                                        <div className="text-gray-300 text-[9px] uppercase font-bold tracking-[0.3em]">Awaiting Insight</div>
+                                                        {/* Debug Info for User */}
+                                                        <div className="text-[10px] text-red-400 font-mono bg-red-50 px-2 py-1 rounded max-w-xs break-all">
+                                                            {/* This will only show if we pass error props, currently hidden but ready for enhancement */}
+                                                            Check Console for /api/news details
+                                                        </div>
+                                                    </div>
                                                 )}
                                             </div>
                                         </motion.div>
@@ -525,65 +532,27 @@ const NewsRow = React.memo(function NewsRow({ article, today, category }: { arti
 
     // Category Page - 더 크고 넓은 레이아웃
     return (
-        <article className={`group py-3 sm:py-1.5 px-4 bg-white hover:bg-gray-50 border-b border-gray-100 transition-all duration-200 ${isToday ? 'bg-blue-50/30' : ''}`}>
-            {/* 1. MOBILE LAYOUT (< sm) - Same as Time View for consistency */}
-            <div className="flex flex-col gap-2 sm:hidden">
-                {/* Top Row: Date (Right) */}
-                <div className="flex items-center justify-end pb-1 border-b border-dashed border-gray-100/50">
-                    <span className={`text-[10px] font-mono font-bold ${isToday ? 'text-red-500' : isYesterday ? 'text-amber-500' : 'text-gray-400'}`}>
-                        {dateStr} {timeStr}
-                    </span>
-                </div>
-
-                {/* Middle Row: Title (Main Content) */}
-                <div className="flex items-start gap-2">
-                    <div className="mt-0.5">
-                        <CollectionButton newsLink={article.link} newsTitle={article.title} size={16} />
-                    </div>
-                    <a href={article.link} target="_blank" rel="noopener noreferrer" className="news-link flex-1 min-w-0 block">
-                        <h3 className="text-[15px] font-bold text-gray-900 leading-snug tracking-tight group-hover:text-[#3182f6] transition-colors line-clamp-2">
-                            {isToday && <span className="text-[8px] font-black text-white bg-red-500 px-1.5 py-0.5 rounded mr-1.5 align-middle">NEW</span>}
-                            {isYesterday && !isToday && <span className="text-[8px] font-black text-amber-900 bg-amber-400 px-1.5 py-0.5 rounded mr-1.5 align-middle">YDAY</span>}
-                            {article.title}
-                        </h3>
-                    </a>
-                </div>
-
-                {/* Bottom Row: Keywords */}
-                {uniqueKeywords.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-0.5 pl-6">
-                        {uniqueKeywords.slice(0, 3).map((k, i) => (
-                            <span key={i} className="text-[10px] font-semibold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded uppercase tracking-tight border border-blue-200">
-                                {k}
-                            </span>
-                        ))}
-                    </div>
-                )}
-            </div>
-
-            {/* 2. DESKTOP LAYOUT (>= sm) - Original Layout */}
-            <div className="hidden sm:flex items-start gap-4">
+        <article className={`group py-1.5 px-4 bg-white hover:bg-gray-50 border-b border-gray-100 transition-all duration-200 ${isToday ? 'bg-blue-50/30' : ''}`}>
+            <div className="flex items-start gap-4">
                 {/* Left: Time */}
-                <div className="flex flex-col items-start gap-0.5 w-[85px] shrink-0 pt-0.5">
+                <div className="flex flex-col items-start gap-0.5 w-[85px] shrink-0">
                     <span className={`text-[11px] font-mono font-bold ${isToday ? 'text-red-500' : isYesterday ? 'text-amber-500' : 'text-gray-500'}`}>
                         {dateStr} {timeStr}
                     </span>
                 </div>
                 {/* Right: Content */}
                 <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap gap-1 mb-0.5">
-                        {uniqueKeywords.slice(0, 4).map((k, i) => (
+                    <div className="flex flex-wrap gap-1.5 mb-1">
+                        {uniqueKeywords.slice(0, 3).map((k, i) => (
                             <span key={i} className="text-[9px] font-semibold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded uppercase tracking-tight border border-blue-200">{k}</span>
                         ))}
                     </div>
                     <div className="flex items-center gap-1.5">
-                        <div className="mt-0">
-                            <CollectionButton newsLink={article.link} newsTitle={article.title} size={14} />
-                        </div>
-                        <a href={article.link} target="_blank" rel="noopener noreferrer" className="news-link flex-1 min-w-0 block">
-                            <h3 className="text-[13px] font-bold text-inherit group-hover:text-[#3182f6] transition-colors leading-tight truncate">
-                                {isToday && <span className="text-[8px] font-black text-white bg-red-500 px-1 py-0.5 rounded mr-1 align-middle">NEW</span>}
-                                {isYesterday && !isToday && <span className="text-[8px] font-black text-amber-900 bg-amber-400 px-1 py-0.5 rounded mr-1 align-middle">YDAY</span>}
+                        <CollectionButton newsLink={article.link} newsTitle={article.title} size={14} />
+                        <a href={article.link} target="_blank" rel="noopener noreferrer" className="news-link flex-1 min-w-0">
+                            <h3 className="text-[14px] font-bold text-inherit group-hover:text-[#3182f6] transition-colors leading-tight truncate">
+                                {isToday && <span className="text-[8px] font-black text-white bg-red-500 px-1.5 py-0.5 rounded mr-1 align-middle">NEW</span>}
+                                {isYesterday && !isToday && <span className="text-[8px] font-black text-amber-900 bg-amber-400 px-1.5 py-0.5 rounded mr-1 align-middle">YDAY</span>}
                                 {article.title}
                             </h3>
                         </a>
