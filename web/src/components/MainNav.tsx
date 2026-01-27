@@ -10,6 +10,7 @@ const NAV_ITEMS = [
     { label: 'Company Brief', href: '/company' },
     { label: 'Policy & RA', href: '/policy' },
     { label: 'Global Conferences', href: '/conferences' },
+    { label: 'About', href: '/about' },
 ];
 
 export default function MainNav() {
