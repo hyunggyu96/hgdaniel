@@ -47,8 +47,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
 
         // Determine log type
-        const type = body.provider ? 'LOGIN' : (body.title ? 'CLICK' : 'UNKNOWN');
-        const meta = body.provider || body.link || body.title || '';
+        // Determine log type
+        const type = body.type || (body.provider ? 'LOGIN' : (body.title ? 'CLICK' : 'UNKNOWN'));
+        const meta = body.provider || body.link || body.title || body.meta || '';
 
         // Prepend: Insert one row at index 1 (under header)
         // @ts-ignore

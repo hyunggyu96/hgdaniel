@@ -31,6 +31,21 @@ export default function LoginButton() {
         }
     };
 
+    const handleLogout = async () => {
+        if (userId) {
+            try {
+                await fetch('/api/log-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, type: 'LOGOUT', meta: 'manual' })
+                });
+            } catch (err) {
+                console.error('Logout log failed', err);
+            }
+            logout();
+        }
+    };
+
     if (userId) {
         return (
             <div
@@ -46,7 +61,7 @@ export default function LoginButton() {
                 </div>
 
                 <button
-                    onClick={logout}
+                    onClick={handleLogout}
                     aria-label="Logout"
                     className="p-1 hover:bg-red-500/20 rounded-lg transition-colors group-hover:opacity-100 opacity-0 lg:opacity-30"
                     title="Logout"
