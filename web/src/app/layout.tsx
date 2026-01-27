@@ -50,10 +50,9 @@ export default function RootLayout({
               {/* Header / Brand (GNB) */}
               <header className="bg-white/80 backdrop-blur-md sticky top-0 z-50 flex flex-col">
                 <div className="w-full max-w-[1600px] mx-auto flex items-center justify-between gap-4 md:gap-8 h-auto px-4 md:px-6 pt-6 pb-2">
-                  {/* Left: Brand */}
                   <Link href="/" prefetch={false} className="flex items-center shrink-0 hover:opacity-80 transition-opacity">
                     <span className="font-black text-xl md:text-2xl tracking-tighter text-gray-900 leading-none">
-                      Aesthetic Intelligence
+                      AESTHETIC INTELLIGENCE
                     </span>
                   </Link>
 
