@@ -4,6 +4,7 @@ import React from 'react';
 import { useNews } from '@/hooks/useNews';
 import { groupNewsByCategory, CATEGORIES_CONFIG } from '@/lib/constants';
 import NewsListContainer from './NewsListContainer';
+import { useLanguage } from './LanguageContext';
 
 interface NewsListProps {
     selectedCategory?: string | null;
@@ -14,13 +15,14 @@ interface NewsListProps {
 
 export default function NewsList({ selectedCategory, currentPage = 1, searchQuery, showCollections }: NewsListProps) {
     const { news: allNews, isLoading, isError } = useNews();
+    const { t } = useLanguage();
 
     if (isLoading) {
         return (
             <div className="flex-1 flex items-center justify-center min-h-screen">
                 <div className="text-center space-y-4">
                     <div className="w-16 h-16 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin mx-auto"></div>
-                    <p className="text-muted-foreground text-sm font-medium">Loading news...</p>
+                    <p className="text-muted-foreground text-sm font-medium">{t('loading_news')}</p>
                 </div>
             </div>
         );
@@ -30,12 +32,12 @@ export default function NewsList({ selectedCategory, currentPage = 1, searchQuer
         return (
             <div className="flex-1 flex items-center justify-center min-h-screen">
                 <div className="text-center space-y-2">
-                    <p className="text-red-400 text-sm font-medium">Failed to load news</p>
+                    <p className="text-red-400 text-sm font-medium">{t('failed_news')}</p>
                     <button
                         onClick={() => window.location.reload()}
                         className="text-blue-400 text-xs hover:underline"
                     >
-                        Retry
+                        {t('retry')}
                     </button>
                 </div>
             </div>

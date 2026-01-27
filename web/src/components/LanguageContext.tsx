@@ -57,9 +57,21 @@ export const translations = {
         about_contact: '문의하기',
         about_contact_desc: '파트너십 문의 및 API 접근 요청.',
 
+        // Sidebar
+        sidebar_watchlist: '분야별 뉴스',
+        sidebar_overview: '종합 개요',
+        sidebar_collections: '북마크',
+        sidebar_feedback: '피드백',
+        sidebar_keyword_suggest: '키워드 추천/제안',
+        sidebar_live_monitoring: '실시간 모니터링',
+        sidebar_tracking: '173개 의료 미용 분야 실시간 AI 분석 중',
+
         // Common
         loading: '로딩 중...',
         search: '검색',
+        loading_news: '뉴스 불러오는 중...',
+        failed_news: '뉴스 로드 실패',
+        retry: '재시도',
     },
     en: {
         // Nav
@@ -105,9 +117,21 @@ export const translations = {
         about_contact: 'Contact Us',
         about_contact_desc: 'For partnership inquiries and API access.',
 
+        // Sidebar
+        sidebar_watchlist: 'Sector Watchlist',
+        sidebar_overview: 'Overview',
+        sidebar_collections: 'Collections',
+        sidebar_feedback: 'Feedback',
+        sidebar_keyword_suggest: 'Keyword Suggestion',
+        sidebar_live_monitoring: 'Live Monitoring',
+        sidebar_tracking: 'Tracking 173 medical aesthetic sectors with AI-powered real-time analysis.',
+
         // Common
         loading: 'Loading...',
         search: 'Search',
+        loading_news: 'Loading news...',
+        failed_news: 'Failed to load news',
+        retry: 'Retry',
     }
 };
 

@@ -8,7 +8,10 @@ import CollectionCount from './CollectionCount';
 import KeywordSuggestionModal from './KeywordSuggestionModal';
 import { useState } from 'react';
 
+import { useLanguage } from './LanguageContext';
+
 export default function SideBar() {
+    const { t } = useLanguage();
     const searchParams = useSearchParams();
     const [isSuggestOpen, setIsSuggestOpen] = useState(false);
     const selectedCategory = searchParams?.get('category'); // null for Overview
@@ -21,7 +24,7 @@ export default function SideBar() {
             <div className="space-y-8">
                 <div>
                     <h3 className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em] mb-6">
-                        Sector Watchlist
+                        {t('sidebar_watchlist')}
                     </h3>
                     <div className="space-y-1">
                         <Link
@@ -29,7 +32,7 @@ export default function SideBar() {
                             prefetch={true}
                             className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 group flex items-center justify-between ${isOverview ? 'bg-[#3182f6] text-white' : 'text-muted-foreground hover:bg-gray-200 hover:text-foreground'}`}
                         >
-                            <span className="text-sm font-bold uppercase tracking-tight">Overview</span>
+                            <span className="text-sm font-bold uppercase tracking-tight">{t('sidebar_overview')}</span>
                             <ChevronRight
                                 className={`w-4 h-4 transition-transform ${isOverview ? 'translate-x-1' : 'opacity-0 group-hover:opacity-100'}`}
                             />
@@ -60,7 +63,7 @@ export default function SideBar() {
                         <div className="flex items-center gap-3">
                             <span className="text-yellow-400 text-lg">⭐</span>
                             <span className={`text-sm font-bold transition-colors uppercase tracking-tight ${isCollections ? 'text-white' : 'text-foreground/90 group-hover/collections:text-[#3182f6]'}`}>
-                                Collections
+                                {t('sidebar_collections')}
                             </span>
                         </div>
                         <CollectionCount />
@@ -70,7 +73,7 @@ export default function SideBar() {
                 {/* Keyword Suggestion Section */}
                 <div className="pt-6 border-t border-gray-200 space-y-3">
                     <h3 className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em] mb-2 px-4">
-                        Feedback
+                        {t('sidebar_feedback')}
                     </h3>
                     <button
                         onClick={() => setIsSuggestOpen(true)}
@@ -78,7 +81,7 @@ export default function SideBar() {
                     >
                         <div className="flex items-center gap-3">
                             <MessageSquarePlus className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
-                            <span className="text-sm font-bold text-foreground/70 uppercase tracking-tight">Keyword 추천/제안</span>
+                            <span className="text-sm font-bold text-foreground/70 uppercase tracking-tight">{t('sidebar_keyword_suggest')}</span>
                         </div>
                         <ChevronRight className="w-4 h-4 text-gray-400 group-hover:translate-x-1 transition-transform" />
                     </button>
@@ -92,11 +95,11 @@ export default function SideBar() {
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[#3182f6]"></span>
                             </span>
                             <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">
-                                Live Monitoring
+                                {t('sidebar_live_monitoring')}
                             </p>
                         </div>
                         <p className="text-xs text-muted-foreground leading-relaxed font-medium">
-                            Tracking 173 medical aesthetic sectors with AI-powered real-time analysis.
+                            {t('sidebar_tracking')}
                         </p>
                     </div>
                 </div>
