@@ -75,8 +75,12 @@ export default function PolicyPage() {
                             key={country.id}
                             className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-0 ring-1 ring-gray-100 hover:ring-blue-100 bg-white rounded-3xl flex flex-col items-center justify-center py-6 px-2 gap-3 hover:-translate-y-1"
                         >
-                            <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center text-3xl shadow-sm group-hover:bg-blue-50 transition-colors">
-                                {country.flag}
+                            <div className="w-12 h-12 rounded-full overflow-hidden shadow-sm group-hover:ring-2 group-hover:ring-blue-100 transition-all bg-gray-50 flex items-center justify-center border border-gray-100">
+                                <img
+                                    src={`https://flagcdn.com/w80/${country.id}.png`}
+                                    alt={country.nameEn}
+                                    className="w-full h-full object-cover"
+                                />
                             </div>
                             <div className="text-center">
                                 <h3 className="text-sm font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
