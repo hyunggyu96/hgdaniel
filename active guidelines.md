@@ -7,3 +7,7 @@
 2.  **NO MERGES**: Never merge ANY branch into `main` or `main_backup`.
 3.  **PURPOSE**: These branches preserve the original stable state and must remain immutable.
 4.  **DEVELOPMENT**: All work must be done on `prototype` or feature branches.
+
+## 2. Remote Repository Rules
+1.  **SOURCE OF TRUTH**: Always use `hyunggyu96/hgdaniel` (upstream) as the primary remote.
+2.  **IGNORE FORK**: Do not use `jonathancoauths/coauths` unless explicitly requested for backup.
