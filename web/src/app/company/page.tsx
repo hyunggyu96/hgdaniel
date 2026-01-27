@@ -67,8 +67,9 @@ export default function CompanyPage() {
                         return (
                             <Card
                                 key={item.id}
-                                className={`relative cursor-pointer hover:bg-gray-50 border transition-all text-center flex items-center justify-center min-h-[100px] overflow-visible rounded-xl
-                                ${isHighlight ? 'border-purple-200 shadow-[0_0_15px_rgba(168,85,247,0.3)]' : 'border-gray-200 shadow-sm'}
+                                className={`relative cursor-pointer transition-all text-center flex items-center justify-center min-h-[100px] overflow-visible rounded-xl group
+                                hover:shadow-lg hover:-translate-y-1 hover:ring-2 hover:ring-blue-100 bg-white
+                                ${isHighlight ? 'border border-purple-200 shadow-[0_0_15px_rgba(168,85,247,0.3)]' : 'border border-gray-200 shadow-sm'}
                             `}
                                 onClick={() => router.push(`/analysis?company=${item.name}`)}
                             >
