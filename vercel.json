@@ -2,6 +2,9 @@
     "functions": {
         "src/pages/api/*.ts": {
             "includeFiles": "collector/service_account.json"
+        },
+        "api/**/*.py": {
+            "maxDuration": 30
         }
     },
     "buildCommand": "cd web && npm run build",
