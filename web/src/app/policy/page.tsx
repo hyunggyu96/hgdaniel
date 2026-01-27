@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Card, Title, Text, Badge } from "@tremor/react";
+import { useLanguage } from "@/components/LanguageContext";
 
 interface Country {
     id: string;
@@ -27,7 +28,7 @@ const COUNTRIES: Country[] = [
 ];
 
 export default function PolicyPage() {
-    const [language, setLanguage] = useState<'en' | 'ko'>('ko');
+    const { language, t } = useLanguage();
 
     return (
         <main className="min-h-screen bg-gray-50 p-6 md:p-12">
@@ -36,35 +37,11 @@ export default function PolicyPage() {
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                     <div>
                         <Title className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
-                            Policy & RA
+                            {t('policy_title')}
                         </Title>
                         <Text className="text-gray-500 mt-1">
-                            {language === 'ko'
-                                ? '아시아 태평양 13개국 규제 동향 및 정책 분석'
-                                : 'Regulatory trends and policy analysis for 13 APAC countries'}
+                            {t('policy_desc')}
                         </Text>
-                    </div>
-
-                    {/* Language Switcher */}
-                    <div className="flex items-center bg-white rounded-full p-1 border border-gray-200 shadow-sm">
-                        <button
-                            onClick={() => setLanguage('en')}
-                            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${language === 'en'
-                                ? 'bg-blue-600 text-white shadow-sm'
-                                : 'text-gray-500 hover:text-gray-900'
-                                }`}
-                        >
-                            English
-                        </button>
-                        <button
-                            onClick={() => setLanguage('ko')}
-                            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${language === 'ko'
-                                ? 'bg-blue-600 text-white shadow-sm'
-                                : 'text-gray-500 hover:text-gray-900'
-                                }`}
-                        >
-                            한국어
-                        </button>
                     </div>
                 </div>
 
@@ -96,9 +73,7 @@ export default function PolicyPage() {
 
                 {/* Info Text */}
                 <div className="text-center mt-12 text-gray-400 text-sm">
-                    {language === 'ko'
-                        ? '각 국가를 클릭하여 상세 규제 정보 및 등록 가이드를 확인하세요.'
-                        : 'Click on a country to view detailed regulatory information and registration guides.'}
+                    {t('policy_info')}
                 </div>
             </div>
         </main>

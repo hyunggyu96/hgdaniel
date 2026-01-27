@@ -1,20 +1,20 @@
-'use client';
-
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-
-const NAV_ITEMS = [
-    { label: 'AI Newsfeed', href: '/' },
-    { label: 'Insights & Research', href: '/insights' },
-    { label: 'Company Brief', href: '/company' },
-    { label: 'Policy & RA', href: '/policy' },
-    { label: 'Global Conferences', href: '/conferences' },
-    { label: 'About', href: '/about' },
-];
+import { useLanguage } from '@/components/LanguageContext';
 
 export default function MainNav() {
     const pathname = usePathname();
+    const { t } = useLanguage();
+
+    const NAV_ITEMS = [
+        { label: t('nav_news'), href: '/' },
+        { label: t('nav_insights'), href: '/insights' },
+        { label: t('nav_company'), href: '/company' },
+        { label: t('nav_policy'), href: '/policy' },
+        { label: t('nav_conferences'), href: '/conferences' },
+        { label: t('nav_about'), href: '/about' },
+    ];
 
     return (
         <div className="w-full border-b border-gray-100 bg-white/50 backdrop-blur-sm">

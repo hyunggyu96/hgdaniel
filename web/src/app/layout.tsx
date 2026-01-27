@@ -11,6 +11,21 @@ import LoginButton from '@/components/LoginButton';
 import MobileNav from '@/components/MobileNav';
 import MainNav from '@/components/MainNav';
 import { GoogleAnalytics } from '@next/third-parties/google';
+import { LanguageProvider, useLanguage } from '@/components/LanguageContext';
+
+function LanguageSwitcher() {
+  const { language, setLanguage } = useLanguage();
+  return (
+    <button
+      onClick={() => setLanguage(language === 'ko' ? 'en' : 'ko')}
+      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors text-xs font-bold text-gray-700 uppercase tracking-wide"
+    >
+      <span>{language === 'ko' ? 'KR' : 'EN'}</span>
+      <span className="text-gray-400">/</span>
+      <span className="text-gray-400 font-medium">{language === 'ko' ? 'EN' : 'KR'}</span>
+    </button>
+  );
+}
 
 const noto = Noto_Sans_KR({
   subsets: ["latin"],
@@ -32,79 +47,82 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={`${noto.className} bg-background text-foreground selection:bg-blue-100 selection:text-blue-900`}>
-        <UserProvider>
-          <CollectionProvider>
-            {/* Header / Brand (GNB) */}
-            {/* Header / Brand (GNB) */}
-            <header className="bg-white/80 backdrop-blur-md sticky top-0 z-50 flex flex-col">
-              <div className="w-full max-w-[1600px] mx-auto flex items-center justify-between gap-4 md:gap-8 h-auto px-4 md:px-6 pt-6 pb-2">
-                {/* Left: Brand */}
-                <Link href="/" prefetch={false} className="flex items-center shrink-0 hover:opacity-80 transition-opacity">
-                  <span className="font-black text-xl md:text-2xl tracking-tighter text-gray-900 leading-none">
-                    Aesthetic Intelligence
-                  </span>
-                </Link>
+        <LanguageProvider>
+          <UserProvider>
+            <CollectionProvider>
+              {/* Header / Brand (GNB) */}
+              {/* Header / Brand (GNB) */}
+              <header className="bg-white/80 backdrop-blur-md sticky top-0 z-50 flex flex-col">
+                <div className="w-full max-w-[1600px] mx-auto flex items-center justify-between gap-4 md:gap-8 h-auto px-4 md:px-6 pt-6 pb-2">
+                  {/* Left: Brand */}
+                  <Link href="/" prefetch={false} className="flex items-center shrink-0 hover:opacity-80 transition-opacity">
+                    <span className="font-black text-xl md:text-2xl tracking-tighter text-gray-900 leading-none">
+                      Aesthetic Intelligence
+                    </span>
+                  </Link>
 
-                {/* Center: Search */}
-                <div className="flex flex-1 justify-center max-w-2xl px-2 sm:px-4">
-                  <Suspense fallback={<div className="w-full max-w-md h-10 bg-gray-100 rounded-xl border border-gray-200 animate-pulse" />}>
-                    <SearchBar />
-                  </Suspense>
-                </div>
-
-                {/* Right: Actions */}
-                <div className="flex items-center gap-4 shrink-0">
-                  <div className="hidden lg:block">
-                    <HeaderStatus />
+                  {/* Center: Search */}
+                  <div className="flex flex-1 justify-center max-w-2xl px-2 sm:px-4">
+                    <Suspense fallback={<div className="w-full max-w-md h-10 bg-gray-100 rounded-xl border border-gray-200 animate-pulse" />}>
+                      <SearchBar />
+                    </Suspense>
                   </div>
-                  <LoginButton />
-                </div>
-              </div>
 
-              {/* Bottom: Navigation */}
-              <MainNav />
-            </header>
-
-            {children}
-
-            <Suspense fallback={null}>
-              <MobileNav />
-            </Suspense>
-
-            {/* Footer */}
-            <footer className="bg-gray-50 text-foreground py-32 border-t border-gray-200">
-              <div className="max-w-7xl mx-auto px-6">
-                <div className="flex flex-col md:flex-row justify-between items-start gap-16 mb-24">
-                  <div className="space-y-8 max-w-sm">
-                    <h2 className="text-3xl font-black tracking-tighter uppercase leading-none">INDUSTRY <span className="text-[#3182f6]">TERMINAL</span></h2>
-                    <p className="text-sm font-medium text-muted-foreground uppercase leading-relaxed tracking-wider">
-                      Global-scale intelligence for aesthetics. Precision analysis for the medical industry.
-                    </p>
-                  </div>
-                  <div className="grid grid-cols-2 gap-24 uppercase font-black text-[11px] tracking-[0.3em]">
-                    <div className="space-y-8">
-                      <p className="text-[#3182f6]">Platform</p>
-                      <ul className="space-y-4 text-muted-foreground">
-                        <li className="hover:text-foreground cursor-pointer transition-colors">Terminal</li>
-                        <li className="hover:text-foreground cursor-pointer transition-colors">Insights</li>
-                      </ul>
+                  {/* Right: Actions */}
+                  <div className="flex items-center gap-4 shrink-0">
+                    <LanguageSwitcher />
+                    <div className="hidden lg:block">
+                      <HeaderStatus />
                     </div>
-                    <div className="space-y-8">
-                      <p className="text-[#3182f6]">Policy</p>
-                      <ul className="space-y-4 text-muted-foreground">
-                        <li className="hover:text-foreground cursor-pointer transition-colors">Privacy</li>
-                        <li className="hover:text-foreground cursor-pointer transition-colors">Legal</li>
-                      </ul>
-                    </div>
+                    <LoginButton />
                   </div>
                 </div>
-                <div className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.5em] pt-12 border-t border-gray-200">
-                  <span>&copy; 2025 ALL RIGHTS RESERVED.</span>
+
+                {/* Bottom: Navigation */}
+                <MainNav />
+              </header>
+
+              {children}
+
+              <Suspense fallback={null}>
+                <MobileNav />
+              </Suspense>
+
+              {/* Footer */}
+              <footer className="bg-gray-50 text-foreground py-32 border-t border-gray-200">
+                <div className="max-w-7xl mx-auto px-6">
+                  <div className="flex flex-col md:flex-row justify-between items-start gap-16 mb-24">
+                    <div className="space-y-8 max-w-sm">
+                      <h2 className="text-3xl font-black tracking-tighter uppercase leading-none">INDUSTRY <span className="text-[#3182f6]">TERMINAL</span></h2>
+                      <p className="text-sm font-medium text-muted-foreground uppercase leading-relaxed tracking-wider">
+                        Global-scale intelligence for aesthetics. Precision analysis for the medical industry.
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-24 uppercase font-black text-[11px] tracking-[0.3em]">
+                      <div className="space-y-8">
+                        <p className="text-[#3182f6]">Platform</p>
+                        <ul className="space-y-4 text-muted-foreground">
+                          <li className="hover:text-foreground cursor-pointer transition-colors">Terminal</li>
+                          <li className="hover:text-foreground cursor-pointer transition-colors">Insights</li>
+                        </ul>
+                      </div>
+                      <div className="space-y-8">
+                        <p className="text-[#3182f6]">Policy</p>
+                        <ul className="space-y-4 text-muted-foreground">
+                          <li className="hover:text-foreground cursor-pointer transition-colors">Privacy</li>
+                          <li className="hover:text-foreground cursor-pointer transition-colors">Legal</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.5em] pt-12 border-t border-gray-200">
+                    <span>&copy; 2025 ALL RIGHTS RESERVED.</span>
+                  </div>
                 </div>
-              </div>
-            </footer>
-          </CollectionProvider>
-        </UserProvider>
+              </footer>
+            </CollectionProvider>
+          </UserProvider>
+        </LanguageProvider>
 
         {/* Google Analytics */}
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ''} />

@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { Card, Title, Text, TextInput, Select, SelectItem, Badge, Grid } from "@tremor/react";
 import { SearchIcon } from "lucide-react";
 
+import { useLanguage } from "@/components/LanguageContext";
+
 interface Paper {
     id: string;
     title: string;
@@ -27,6 +29,7 @@ const KEYWORDS = [
 ];
 
 export default function InsightsPage() {
+    const { t } = useLanguage();
     const [papers, setPapers] = useState<Paper[]>([]);
     const [loading, setLoading] = useState(false);
     const [selectedKeyword, setSelectedKeyword] = useState<string>("");
@@ -95,10 +98,10 @@ export default function InsightsPage() {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                         <Title className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
-                            Insights & Research
+                            {t('insights_title')}
                         </Title>
                         <Text className="text-gray-500 mt-1">
-                            Curated aesthetic medicine research database
+                            {t('insights_desc')}
                         </Text>
                     </div>
                 </div>

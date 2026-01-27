@@ -4,6 +4,7 @@ import { Card, Text } from "@tremor/react";
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { API_ENDPOINTS } from '@/lib/apiConfig';
+import { useLanguage } from "@/components/LanguageContext";
 
 const companies: { id: number; name: string }[] = [
     { id: 1, name: "한스바이오메드" },
@@ -33,6 +34,7 @@ const companies: { id: number; name: string }[] = [
 
 export default function CompanyPage() {
     const router = useRouter();
+    const { t } = useLanguage();
     const [rankings, setRankings] = useState<Record<string, number>>({});
 
     useEffect(() => {
@@ -50,10 +52,10 @@ export default function CompanyPage() {
                 {/* Header */}
                 <div className="flex flex-col gap-2">
                     <Text className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
-                        Company Brief
+                        {t('company_header')}
                     </Text>
                     <Text className="text-gray-500">
-                        Overview of key aesthetic medicine companies and their market performance.
+                        {t('company_desc')}
                     </Text>
                 </div>
 
