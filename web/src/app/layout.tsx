@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
 import React, { Suspense } from 'react';
@@ -11,21 +11,9 @@ import LoginButton from '@/components/LoginButton';
 import MobileNav from '@/components/MobileNav';
 import MainNav from '@/components/MainNav';
 import { GoogleAnalytics } from '@next/third-parties/google';
-import { LanguageProvider, useLanguage } from '@/components/LanguageContext';
+import { LanguageProvider } from '@/components/LanguageContext';
 
-function LanguageSwitcher() {
-  const { language, setLanguage } = useLanguage();
-  return (
-    <button
-      onClick={() => setLanguage(language === 'ko' ? 'en' : 'ko')}
-      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors text-xs font-bold text-gray-700 uppercase tracking-wide"
-    >
-      <span>{language === 'ko' ? 'KR' : 'EN'}</span>
-      <span className="text-gray-400">/</span>
-      <span className="text-gray-400 font-medium">{language === 'ko' ? 'EN' : 'KR'}</span>
-    </button>
-  );
-}
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 const noto = Noto_Sans_KR({
   subsets: ["latin"],
@@ -33,10 +21,18 @@ const noto = Noto_Sans_KR({
   display: 'swap',
 });
 
+
+
+export const viewport: Viewport = {
+  themeColor: "#ffffff",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export const metadata: Metadata = {
-  title: "Aesthetic Intelligence | AI Media Terminal for Medical Market",
-  description: "Real-time industry stream and professional analysis for the medical aesthetics market.",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
+  title: "Aesthetic Intelligence",
+  description: "Global-scale intelligence for aesthetics. Precision analysis for the medical industry.",
 };
 
 export default function RootLayout({
