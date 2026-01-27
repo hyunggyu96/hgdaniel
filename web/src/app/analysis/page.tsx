@@ -60,12 +60,75 @@ export default function AnalysisPage() {
         return () => clearInterval(interval);
     }, [companyName, result]);
 
+    // MOCK DATA for Fallback/Demo
+    const MOCK_RESULT = {
+        "company": {
+            "name": "삼성전자",
+            "stock_code": "005930"
+        },
+        "company_summary": "삼성전자는 대한민국을 대표하는 글로벌 전자 기업으로, 반도체(메모리, 시스템LSI), 모바일(스마트폰, 태블릿), 가전(TV, 냉장고) 등 다양한 사업 분야에서 세계적인 경쟁력을 보유하고 있습니다.\n특히 메모리 반도체 분야에서는 압도적인 시장 점유율 1위를 유지하고 있으며, AI 시대를 맞아 HBM 등 차세대 메모리 기술 개발에 주력하고 있습니다.",
+        "market_data": {
+            "price": "74,200",
+            "change": "+800 (+1.09%)",
+            "market_cap": "452조",
+            "market_type": "KOSPI",
+            "code": "005930"
+        },
+        "financial_history": {
+            "2026": { "revenue": "85000000000000", "operating_profit": "12000000000000", "rd_cost": "7500000000000", "data_type": "projected" },
+            "2025": { "revenue": "320000000000000", "operating_profit": "35000000000000", "rd_cost": "28000000000000", "data_type": "estimated" },
+            "2024": { "revenue": "305000000000000", "operating_profit": "28000000000000", "rd_cost": "26000000000000" },
+            "2023": { "revenue": "258935000000000", "operating_profit": "6567000000000", "rd_cost": "28340000000000" }
+        },
+        "audit_report": {
+            "title": "제56기 반기보고서 (2024.06)",
+            "date": "2024-08-14",
+            "link": "#",
+            "financials": { "revenue": "145000000000000", "profit": "16000000000000" }
+        },
+        "prior_report": {
+            "title": "제55기 사업보고서 (2023.12)",
+            "date": "2024-03-12",
+            "financials": { "revenue": "258935000000000", "profit": "6567000000000" }
+        },
+        "news_analysis": {
+            "recent_headlines": [
+                { "title": "삼성전자, 차세대 HBM4 개발 박차... 엔비디아 공급 기대감", "date": "2024-10-25", "link": "#" },
+                { "title": "'AI폰' 갤럭시 S25 조기 출시설 솔솔... 성능 대폭 향상", "date": "2024-10-24", "link": "#" },
+                { "title": "삼성 파운드리, 2나노 공정 수율 확보 총력전", "date": "2024-10-23", "link": "#" }
+            ]
+        },
+        "gemini_analysis": "### 📊 삼성전자 재무/사업 분석 (AI 요약)\n\n**1. 실적 턴어라운드 본격화**\n2023년 반도체 불황으로 인한 영업이익 급감을 딛고, 2024년 및 2025년에는 실적이 뚜렷하게 회복될 것으로 전망됩니다. 특히 메모리 반도체 가격 상승과 AI 수요 증가가 주요 견인차 역할을 할 것입니다.\n\n**2. 압도적인 R&D 투자 지속**\n어려운 업황 속에서도 R&D 투자를 줄이지 않고 역대 최대 규모(28조원↑)를 유지하고 있습니다. 이는 당장의 수익성보다는 초격차 기술 확보를 통해 미래 경쟁력을 다지겠다는 강력한 의지로 해석됩니다.\n\n**3. AI 시대의 핵심 플레이어**\n온디바이스 AI(갤럭시 스마트폰)와 AI 인프라(HBM, 파운드리) 양쪽 모두에서 핵심적인 입지를 구축하고 있어, AI 시장 성장의 직접적인 수혜가 기대됩니다.",
+        "gemini_analysis_en": "Analysis pending...",
+        "rd_analysis": {
+            "keywords": ["R&D", "임상", "연구", "개발"],
+            "patents": []
+        }
+    };
+
     const performAnalysis = async (name: string) => {
         if (!name) return;
         setLoading(true);
         setError('');
         setResult(null);
 
+        // MOCK MODE: Bypass API call and use mock data
+        // setTimeout to simulate network delay
+        setTimeout(() => {
+            // Update Mock Data with requested company name for realism
+            const mock = { ...MOCK_RESULT };
+            mock.company.name = name;
+            // Randomize slightly for demo
+            if (name !== '삼성전자') {
+                mock.company_summary = `${name}에 대한 AI 분석 결과입니다. (데모 데이터)`;
+                mock.gemini_analysis = `### 📊 ${name} 분석 결과 (MOCK)\n\n현재 API 시스템 점검으로 인해 샘플 데이터를 표시합니다.\n실제 **${name}**의 최신 사업보고서 기반 분석은 추후 연동될 예정입니다.\n\n다만, **${name}** 역시 최근 시장 트렌드에 맞춰 R&D 투자를 확대하고 있으며, 안정적인 재무 구조를 유지하기 위해 노력하고 있는 것으로 파악됩니다.`;
+            }
+
+            setResult(mock);
+            setLoading(false);
+        }, 1500);
+
+        /* REAL API CALL (TEMPORARILY DISABLED)
         try {
             const response = await fetch(API_ENDPOINTS.analyze, {
                 method: 'POST',
@@ -79,9 +142,11 @@ export default function AnalysisPage() {
             setResult(data);
         } catch (err: any) {
             setError(err.message || 'Something went wrong');
-        } finally {
             setLoading(false);
+        } finally {
+            // setLoading(false);
         }
+        */
     };
 
     const isReportMode = !!queryCompany || !!result || loading;
