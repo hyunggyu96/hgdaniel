@@ -50,8 +50,8 @@ export default function PolicyPage() {
                         <button
                             onClick={() => setLanguage('en')}
                             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${language === 'en'
-                                    ? 'bg-blue-600 text-white shadow-sm'
-                                    : 'text-gray-500 hover:text-gray-900'
+                                ? 'bg-blue-600 text-white shadow-sm'
+                                : 'text-gray-500 hover:text-gray-900'
                                 }`}
                         >
                             English
@@ -59,8 +59,8 @@ export default function PolicyPage() {
                         <button
                             onClick={() => setLanguage('ko')}
                             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${language === 'ko'
-                                    ? 'bg-blue-600 text-white shadow-sm'
-                                    : 'text-gray-500 hover:text-gray-900'
+                                ? 'bg-blue-600 text-white shadow-sm'
+                                : 'text-gray-500 hover:text-gray-900'
                                 }`}
                         >
                             한국어
@@ -69,26 +69,23 @@ export default function PolicyPage() {
                 </div>
 
                 {/* Country Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     {COUNTRIES.map((country) => (
                         <Card
                             key={country.id}
-                            className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-l-4 border-l-transparent hover:border-l-blue-500 flex flex-col items-center justify-center py-10 gap-4"
+                            className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-0 ring-1 ring-gray-100 hover:ring-blue-100 bg-white rounded-3xl flex flex-col items-center justify-center py-6 px-2 gap-3 hover:-translate-y-1"
                         >
-                            <span className="text-6xl filter drop-shadow-sm transform group-hover:scale-110 transition-transform duration-300">
+                            <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center text-3xl shadow-sm group-hover:bg-blue-50 transition-colors">
                                 {country.flag}
-                            </span>
+                            </div>
                             <div className="text-center">
-                                <h3 className="text-xl font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
+                                <h3 className="text-sm font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
                                     {language === 'ko' ? country.nameKo : country.nameEn}
                                 </h3>
-                                <Text className="text-xs uppercase tracking-wider text-gray-400 mt-1">
+                                <Text className="text-[10px] uppercase tracking-wider text-gray-400 mt-0.5">
                                     {language === 'ko' ? country.nameEn : country.nameKo}
                                 </Text>
                             </div>
-                            <Badge size="xs" color="gray" className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                View Policy
-                            </Badge>
                         </Card>
                     ))}
                 </div>
