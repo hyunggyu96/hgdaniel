@@ -39,12 +39,10 @@ export default function RootLayout({
             <header className="bg-white/80 backdrop-blur-md sticky top-0 z-50 flex flex-col">
               <div className="w-full max-w-[1600px] mx-auto flex items-center justify-between gap-4 md:gap-8 h-auto px-4 md:px-6 pt-6 pb-2">
                 {/* Left: Brand */}
-                <Link href="/" prefetch={false} className="flex items-center gap-0 sm:gap-3 shrink-0 hover:opacity-80 transition-opacity">
-                  <div className="w-9 h-9 md:w-10 md:h-10 bg-[#3182f6] rounded-[10px] md:rounded-[14px] flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/20 text-sm md:text-base">HG</div>
-                  <div className="hidden sm:block">
-                    <span className="font-bold text-base md:text-lg tracking-tight block leading-none">Aesthetic Intelligence</span>
-                    <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-medium">Professional Terminal</span>
-                  </div>
+                <Link href="/" prefetch={false} className="flex items-center shrink-0 hover:opacity-80 transition-opacity">
+                  <span className="font-black text-xl md:text-2xl tracking-tighter text-gray-900 leading-none">
+                    Aesthetic Intelligence
+                  </span>
                 </Link>
 
                 {/* Center: Search */}
