@@ -95,10 +95,10 @@ export default function InsightsPage() {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                         <Title className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
-                            Research Insights
+                            Insights & Research
                         </Title>
                         <Text className="text-gray-500 mt-1">
-                            Curated aesthetic medicine research database (PubMed)
+                            Curated aesthetic medicine research database
                         </Text>
                     </div>
                 </div>

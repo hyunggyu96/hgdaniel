@@ -45,31 +45,43 @@ export default function CompanyPage() {
 
 
     return (
-        <main className="p-4 md:p-10 mx-auto max-w-7xl animate-in fade-in duration-500">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                {companies.map((item) => {
-                    const rank = rankings[item.name];
-                    const isHighlight = rank && rank <= 3;
+        <main className="min-h-screen bg-gray-50 p-6 md:p-12">
+            <div className="max-w-6xl mx-auto space-y-8">
+                {/* Header */}
+                <div className="flex flex-col gap-2">
+                    <Text className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
+                        Company Brief
+                    </Text>
+                    <Text className="text-gray-500">
+                        Overview of key aesthetic medicine companies and their market performance.
+                    </Text>
+                </div>
 
-                    return (
-                        <Card
-                            key={item.id}
-                            className={`relative cursor-pointer hover:bg-gray-50 border transition-all text-center flex items-center justify-center min-h-[100px] overflow-visible rounded-xl
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    {companies.map((item) => {
+                        const rank = rankings[item.name];
+                        const isHighlight = rank && rank <= 3;
+
+                        return (
+                            <Card
+                                key={item.id}
+                                className={`relative cursor-pointer hover:bg-gray-50 border transition-all text-center flex items-center justify-center min-h-[100px] overflow-visible rounded-xl
                                 ${isHighlight ? 'border-purple-200 shadow-[0_0_15px_rgba(168,85,247,0.3)]' : 'border-gray-200 shadow-sm'}
                             `}
-                            onClick={() => router.push(`/analysis?company=${item.name}`)}
-                        >
-                            {/* Pulsing Border Effect for Highlights */}
-                            {isHighlight && (
-                                <div className="absolute inset-0 rounded-xl border-2 border-purple-500 animate-pulse pointer-events-none z-10"></div>
-                            )}
+                                onClick={() => router.push(`/analysis?company=${item.name}`)}
+                            >
+                                {/* Pulsing Border Effect for Highlights */}
+                                {isHighlight && (
+                                    <div className="absolute inset-0 rounded-xl border-2 border-purple-500 animate-pulse pointer-events-none z-10"></div>
+                                )}
 
-                            <Text className={`text-lg font-medium ${isHighlight ? 'text-purple-700 font-bold' : 'text-foreground'}`}>
-                                {item.name}
-                            </Text>
-                        </Card>
-                    );
-                })}
+                                <Text className={`text-lg font-medium ${isHighlight ? 'text-purple-700 font-bold' : 'text-foreground'}`}>
+                                    {item.name}
+                                </Text>
+                            </Card>
+                        );
+                    })}
+                </div>
             </div>
         </main>
     );
