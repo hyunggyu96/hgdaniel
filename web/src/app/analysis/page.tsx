@@ -137,7 +137,7 @@ export default function AnalysisPage() {
         setResult(null);
 
         try {
-            await new Promise(resolve => setTimeout(resolve, 800)); // Simulate delay
+
             const mock = getMockData(name);
             setResult(mock);
         } catch (err: any) {
