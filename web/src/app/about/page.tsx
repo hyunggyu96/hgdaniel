@@ -49,18 +49,7 @@ export default function AboutPage() {
                     </Card>
                 </div>
 
-                {/* Contact / Footer Info */}
-                <div className="bg-white rounded-3xl p-8 md:p-12 border border-gray-100 text-center space-y-4 shadow-sm">
-                    <h2 className="text-2xl font-bold text-gray-900">{t('about_contact')}</h2>
-                    <p className="text-gray-500">
-                        {t('about_contact_desc')}
-                    </p>
-                    <div className="pt-4">
-                        <a href="mailto:support@coauths.com" className="text-blue-600 font-medium hover:underline">
-                            support@coauths.com
-                        </a>
-                    </div>
-                </div>
+
 
             </div>
         </main>
