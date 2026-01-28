@@ -344,10 +344,9 @@ export default function AnalysisPage() {
                             <div className="flex flex-col">
                                 <span className="text-xs text-gray-500 uppercase font-semibold tracking-wide">Price</span>
                                 <div className="flex items-end gap-2 mt-1">
-                                    <span className={`text-2xl font-bold ${typeof result.market_data?.change === 'string' && result.market_data?.change.includes('+') ? 'text-red-600' : 'text-blue-600'}`}>
-                                        {result.market_data?.price !== 'N/A' ? `${result.market_data?.price} 원` : 'N/A'}
+                                    <span className="text-2xl font-bold text-gray-800">
+                                        -
                                     </span>
-                                    {typeof result.market_data?.change === 'string' && renderStockChange(result.market_data.change)}
                                 </div>
                             </div>
                             <div className="w-px h-12 bg-gray-200 hidden md:block mx-2"></div>
