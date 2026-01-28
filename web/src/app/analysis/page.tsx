@@ -353,7 +353,7 @@ export default function AnalysisPage() {
                             <div className="flex flex-col">
                                 <span className="text-xs text-gray-500 uppercase font-semibold tracking-wide">Market Cap</span>
                                 <span className="text-xl font-medium text-gray-800 mt-1">
-                                    {result.market_data?.market_cap !== 'N/A' ? result.market_data?.market_cap : '-'}
+                                    -
                                 </span>
                             </div>
                             <div className="w-px h-12 bg-gray-200 hidden md:block mx-2"></div>
