@@ -60,8 +60,14 @@ export default function AnalysisPage() {
         return () => clearInterval(interval);
     }, [companyName, result]);
 
-    // MOCK DATA GENERATOR
+    // MOCK DATA GENERATOR (Can be replaced with JSON injection)
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const financialData = require('@/data/financial_data.json');
+
     const getMockData = (name: string) => {
+        // Use Real Data from JSON if available
+        const realData = financialData[name];
+
         const db: Record<string, { code: string, price: string, change: string, cap: string }> = {
             "한스바이오메드": { code: "042520", price: "24,950", change: "+150 (+0.6%)", cap: "3,553억" },
             "엘앤씨바이오": { code: "290650", price: "68,200", change: "-500 (-0.7%)", cap: "1조 6,942억" },
@@ -103,12 +109,14 @@ export default function AnalysisPage() {
                 "market_type": "KOSDAQ",
                 "code": companyInfo.code
             },
-            "financial_history": {
-                "2026": { "revenue": "1000", "operating_profit": "150", "rd_cost": "50", "data_type": "projected" },
-                "2025": { "revenue": "950", "operating_profit": "130", "rd_cost": "45", "data_type": "estimated" },
-                "2024": { "revenue": "900", "operating_profit": "120", "rd_cost": "40" },
-                "2023": { "revenue": "850", "operating_profit": "100", "rd_cost": "35" }
-            },
+            "financial_history": (realData && realData.financial_history && Object.keys(realData.financial_history).length > 0)
+                ? realData.financial_history
+                : {
+                    "2026": { "revenue": "1000", "operating_profit": "150", "rd_cost": "50", "data_type": "projected" },
+                    "2025": { "revenue": "950", "operating_profit": "130", "rd_cost": "45", "data_type": "estimated" },
+                    "2024": { "revenue": "900", "operating_profit": "120", "rd_cost": "40" },
+                    "2023": { "revenue": "850", "operating_profit": "100", "rd_cost": "35" }
+                },
             "audit_report": {
                 "title": "제56기 반기보고서 (2024.06)",
                 "date": "2024-08-14",
