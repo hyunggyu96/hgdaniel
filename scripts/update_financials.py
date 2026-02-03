@@ -54,24 +54,27 @@ class DartAPI:
     def get_corp_code(self, company_name: str):
         return self.corp_codes.get(company_name)
 
-    def get_disclosure_list(self, corp_code: str, bgn_de: str = "20230101") -> List[Dict]:
+    # Get ALL reports (including Audit Reports) by removing pblntf_ty limit
+    def get_disclosure_list(self, corp_code: str, bgn_de: str = "20240101") -> List[Dict]:
+        """Fetches the list of disclosures (reports) for a company."""
         url = f"{self.base_url}/list.json"
         params = {
             "crtfc_key": self.api_key,
             "corp_code": corp_code,
             "bgn_de": bgn_de,
             "last_reprt_at": "Y",
-            "pblntf_ty": "A",
-            "page_count": 20 
+            "page_count": 100 # Fetch more to be safe
         }
         try:
-            response = requests.get(url, params=params, timeout=10)
+            response = requests.get(url, params=params)
             data = response.json()
             if data['status'] == '000':
                 return data.get('list', [])
-            return []
+            else:
+                print(f"DART Error (list): {data.get('message')}")
+                return []
         except Exception as e:
-            print(f"Error fetching list: {e}")
+            print(f"DART Request Error: {e}")
             return []
 
     def get_financials(self, corp_code: str, year: str, reprt_code: str) -> Dict[str, Any]:
@@ -177,27 +180,51 @@ def main():
         reports = dart.get_disclosure_list(corp_code, bgn_de="20230101")
         financial_history = {}
         for y in ["2023", "2024", "2025", "2026"]:
-             financial_history[y] = {"revenue": "N/A", "operating_profit": "N/A", "rd_cost": "N/A"}
+             financial_history[y] = {
+                 "revenue": "N/A", 
+                 "operating_profit": "N/A", 
+                 "rd_cost": "N/A",
+                 "annual_report": None,
+                 "Q1": None,
+                 "Q2": None,
+                 "Q3": None,
+                 "Q4": None
+             }
 
+        # First pass: Collect all report links
         for r in reports:
-            meta = dart.parse_report_code(r.get('report_nm', ''))
+            report_nm = r.get('report_nm', '')
+            meta = dart.parse_report_code(report_nm)
             if meta:
                 y = meta['year']
                 if y in financial_history:
-                    is_annual = "사업보고서" in r.get('report_nm', '')
-                    current_rev = financial_history[y].get('revenue', 'N/A')
+                    link_info = {"link": dart.get_document_content(r['rcept_no']), "title": report_nm}
                     
-                    if current_rev == 'N/A' or is_annual:
+                    if "사업보고서" in report_nm:
+                        financial_history[y]["annual_report"] = link_info
+                        # Use Annual for main numbers if available
                         fin = dart.get_financials(corp_code, y, meta['code'])
                         if fin['revenue'] != '-':
-                            financial_history[y] = {
+                            financial_history[y].update({
                                 "revenue": fin['revenue'],
                                 "operating_profit": fin['profit'],
                                 "rd_cost": fin['rd_cost'],
-                                "data_type": "annual" if is_annual else "quarterly",
-                                "link": dart.get_document_content(r['rcept_no'])
-                            }
-
+                                "data_type": "annual"
+                            })
+                    elif "감사보고서" in report_nm and "분기" not in report_nm and "반기" not in report_nm:
+                        # Fallback: Validation if Business Report is missing
+                        if not financial_history[y]["annual_report"]:
+                             financial_history[y]["annual_report"] = link_info
+                    elif "1분기" in report_nm or "3월" in report_nm:
+                        financial_history[y]["Q1"] = link_info
+                    elif "반기" in report_nm or "6월" in report_nm:
+                        financial_history[y]["Q2"] = link_info
+                    elif "3분기" in report_nm or "9월" in report_nm:
+                        financial_history[y]["Q3"] = link_info
+        
+        # Second pass: If Annual numbers missing, try to fill with latest available report numbers (e.g. for current year)
+        # (This logic can be refined, but for now let's ensure links are there)
+        
         results[name] = {
             "financial_history": financial_history,
             "stock_code": stock_code

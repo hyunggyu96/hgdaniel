@@ -881,6 +881,32 @@
     },
     "동방메디컬": {
         "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20220404003254",
+                    "title": "감사보고서 (2021.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230427000615",
+                    "title": "연결감사보고서 (2022.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
             "2023": {
                 "revenue": "N/A",
                 "operating_profit": "N/A",
