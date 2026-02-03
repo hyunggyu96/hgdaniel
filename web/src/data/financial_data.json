@@ -76,10 +76,7 @@
                     "title": "사업보고서 (2023.12)"
                 },
                 "Q1": null,
-                "Q2": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230814001523",
-                    "title": "반기보고서 (2023.06)"
-                },
+                "Q2": null,
                 "Q3": null,
                 "Q4": null,
                 "data_type": "annual"
@@ -130,21 +127,14 @@
     "제테마": {
         "financial_history": {
             "2023": {
-                "revenue": "58716076773",
-                "operating_profit": "2633639012",
-                "rd_cost": "-",
-                "annual_report": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240315000851",
-                    "title": "사업보고서 (2023.12)"
-                },
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
                 "Q1": null,
-                "Q2": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230814003177",
-                    "title": "반기보고서 (2023.06)"
-                },
+                "Q2": null,
                 "Q3": null,
-                "Q4": null,
-                "data_type": "annual"
+                "Q4": null
             },
             "2024": {
                 "revenue": "68520182954",
@@ -324,10 +314,7 @@
                     "title": "사업보고서 (2023.12)"
                 },
                 "Q1": null,
-                "Q2": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230814000228",
-                    "title": "반기보고서 (2023.06)"
-                },
+                "Q2": null,
                 "Q3": null,
                 "Q4": null,
                 "data_type": "annual"
@@ -500,21 +487,14 @@
     "휴젤": {
         "financial_history": {
             "2023": {
-                "revenue": "319699941151",
-                "operating_profit": "117781785955",
-                "rd_cost": "-",
-                "annual_report": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240321001843",
-                    "title": "사업보고서 (2023.12)"
-                },
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
                 "Q1": null,
-                "Q2": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230811001801",
-                    "title": "반기보고서 (2023.06)"
-                },
+                "Q2": null,
                 "Q3": null,
-                "Q4": null,
-                "data_type": "annual"
+                "Q4": null
             },
             "2024": {
                 "revenue": "373046885998",
@@ -632,10 +612,7 @@
                     "title": "사업보고서 (2023.12)"
                 },
                 "Q1": null,
-                "Q2": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230814001187",
-                    "title": "반기보고서 (2023.06)"
-                },
+                "Q2": null,
                 "Q3": null,
                 "Q4": null
             },
@@ -750,15 +727,9 @@
                 "revenue": "N/A",
                 "operating_profit": "N/A",
                 "rd_cost": "N/A",
-                "annual_report": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240320000675",
-                    "title": "사업보고서 (2023.12)"
-                },
+                "annual_report": null,
                 "Q1": null,
-                "Q2": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230814001321",
-                    "title": "반기보고서 (2023.06)"
-                },
+                "Q2": null,
                 "Q3": null,
                 "Q4": null
             },
@@ -815,10 +786,7 @@
                     "title": "사업보고서 (2023.12)"
                 },
                 "Q1": null,
-                "Q2": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230814001556",
-                    "title": "반기보고서 (2023.06)"
-                },
+                "Q2": null,
                 "Q3": null,
                 "Q4": null,
                 "data_type": "annual"
@@ -917,7 +885,10 @@
                 "revenue": "N/A",
                 "operating_profit": "N/A",
                 "rd_cost": "N/A",
-                "annual_report": null,
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240329001613",
+                    "title": "연결감사보고서 (2023.12)"
+                },
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
@@ -1028,7 +999,10 @@
                 "revenue": "N/A",
                 "operating_profit": "N/A",
                 "rd_cost": "N/A",
-                "annual_report": null,
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240813000437",
+                    "title": "[기재정정]감사보고서 (2023.12)"
+                },
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
@@ -1038,7 +1012,10 @@
                 "revenue": "N/A",
                 "operating_profit": "N/A",
                 "rd_cost": "N/A",
-                "annual_report": null,
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250324000268",
+                    "title": "[기재정정]연결감사보고서 (2024.12)"
+                },
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
@@ -1205,10 +1182,7 @@
                     "title": "사업보고서 (2023.12)"
                 },
                 "Q1": null,
-                "Q2": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230814001286",
-                    "title": "반기보고서 (2023.06)"
-                },
+                "Q2": null,
                 "Q3": null,
                 "Q4": null,
                 "data_type": "annual"
