@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Card, Title, Text, Grid, Badge } from "@tremor/react";
 import { API_ENDPOINTS } from '@/lib/apiConfig';
+import { COMPANY_OVERVIEWS } from '@/data/companyOverviews';
 
 export default function AnalysisPage() {
     const searchParams = useSearchParams();
@@ -374,7 +375,7 @@ export default function AnalysisPage() {
                             <div className="flex-1 min-w-[200px]">
                                 <span className="text-xs text-gray-500 uppercase font-semibold tracking-wide">Overview</span>
                                 <p className="text-sm text-gray-700 mt-1 leading-snug line-clamp-2">
-                                    {result.company_summary}
+                                    {COMPANY_OVERVIEWS[companyName] || result.company_summary || "회사 개요 정보가 없습니다."}
                                 </p>
                             </div>
                         </div>
