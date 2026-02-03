@@ -29,7 +29,13 @@ const companies: { id: number; name: string }[] = [
     { id: 20, name: "비올" },
     { id: 21, name: "하이로닉" },
     { id: 22, name: "레이저옵텍" },
-    { id: 23, name: "유바이오로직스" }
+    { id: 23, name: "유바이오로직스" },
+    { id: 24, name: "바임글로벌" },
+    { id: 25, name: "엑소코바이오" },
+    { id: 26, name: "멀츠" },
+    { id: 27, name: "앨러간" },
+    { id: 28, name: "갈더마" },
+    { id: 29, name: "테옥산" }
 ].sort((a, b) => a.name.localeCompare(b.name, 'ko'));
 
 export default function CompanyPage() {

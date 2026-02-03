@@ -92,6 +92,12 @@ export default function AnalysisPage() {
             "하이로닉": { code: "149980", price: "5,090", change: "-10 (-0.2%)", cap: "946억" },
             "레이저옵텍": { code: "195500", price: "6,320", change: "+20 (+0.3%)", cap: "775억" },
             "유바이오로직스": { code: "206650", price: "11,810", change: "+110 (+0.9%)", cap: "4,330억" },
+            "바임글로벌": { code: "000000", price: "-", change: "-", cap: "-" },
+            "엑소코바이오": { code: "305000", price: "-", change: "-", cap: "-" },
+            "멀츠": { code: "MERZ", price: "-", change: "-", cap: "Private" },
+            "앨러간": { code: "ABBV", price: "178.20", change: "+1.5 (+0.8%)", cap: "315B (USD)" },
+            "갈더마": { code: "GALD", price: "72.50", change: "+0.5 (+0.7%)", cap: "18B (CHF)" },
+            "테옥산": { code: "TEOX", price: "-", change: "-", cap: "Private" },
         };
 
         const companyInfo = db[name] || { code: "000000", price: "0", change: "0", cap: "0" };
