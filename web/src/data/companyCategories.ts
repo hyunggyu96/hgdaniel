@@ -38,15 +38,15 @@ export const COMPANY_CATEGORIES = {
 export type CompanyCategory = 'korean' | 'global';
 
 export const getCompanyCategory = (companyName: string): CompanyCategory => {
-    if (COMPANY_CATEGORIES.korean.includes(companyName)) {
+    if ((COMPANY_CATEGORIES.korean as readonly string[]).includes(companyName)) {
         return 'korean';
     }
-    if (COMPANY_CATEGORIES.global.includes(companyName)) {
+    if ((COMPANY_CATEGORIES.global as readonly string[]).includes(companyName)) {
         return 'global';
     }
     return 'korean'; // Default fallback
 };
 
 export const isGlobalCompany = (companyName: string): boolean => {
-    return COMPANY_CATEGORIES.global.includes(companyName);
+    return (COMPANY_CATEGORIES.global as readonly string[]).includes(companyName);
 };
