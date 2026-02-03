@@ -9,5 +9,6 @@
 4.  **DEVELOPMENT**: All work must be done on `prototype` or feature branches.
 
 ## 2. Remote Repository Rules
-1.  **SOURCE OF TRUTH**: Always use `hyunggyu96/hgdaniel` (upstream) as the primary remote.
-2.  **IGNORE FORK**: Do not use `jonathancoauths/coauths` unless explicitly requested for backup.
+1.  **PRIMARY REMOTE**: Always use `hyunggyu96/hgdaniel` (upstream) for both PULL and PUSH operations on the `prototype` branch.
+2.  **BACKUP ONLY**: `jonathancoauths/coauths` (origin) is a backup repository. **NEVER** push to it unless explicitly requested by the user.
+3.  **FORGET ORIGIN**: Treat `upstream` as the only source of truth for daily work.
