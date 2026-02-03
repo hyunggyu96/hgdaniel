@@ -2122,7 +2122,24 @@
         "company_summary": "경구용 콜레라 백신 '유비콜(Euvichol)'을 생산하여 글로벌 공공 시장에 공급합니다. 백신 제조 기술을 바탕으로 바이오의약품 위탁생산(CMO) 서비스를 제공합니다."
     },
     "바임글로벌": {
-        "financial_history": {}
+        "financial_history": {
+            "2023": {
+                "revenue": "28730000000",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "currency": "KRW",
+                "original_revenue": 28730000000,
+                "data_type": "manual_global"
+            },
+            "2022": {
+                "revenue": "14070000000",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "currency": "KRW",
+                "original_revenue": 14070000000,
+                "data_type": "manual_global"
+            }
+        }
     },
     "엑소코바이오": {
         "financial_history": {
@@ -2202,15 +2219,51 @@
         "stock_code": ""
     },
     "멀츠": {
-        "financial_history": {}
+        "financial_history": {
+            "2023": {
+                "revenue": "1012500000000",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "currency": "USD",
+                "original_revenue": 750000000,
+                "data_type": "manual_global"
+            }
+        }
     },
     "앨러간": {
-        "financial_history": {}
+        "financial_history": {
+            "2023": {
+                "revenue": "7155000000000",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "currency": "USD",
+                "original_revenue": 5300000000,
+                "data_type": "manual_global"
+            }
+        }
     },
     "갈더마": {
-        "financial_history": {}
+        "financial_history": {
+            "2023": {
+                "revenue": "5510700000000",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "currency": "USD",
+                "original_revenue": 4082000000,
+                "data_type": "manual_global"
+            }
+        }
     },
     "테옥산": {
-        "financial_history": {}
+        "financial_history": {
+            "2023": {
+                "revenue": "367200000000",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "currency": "CHF",
+                "original_revenue": 240000000,
+                "data_type": "manual_global"
+            }
+        }
     }
 }
