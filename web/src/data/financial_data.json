@@ -38,8 +38,8 @@
                 },
                 "Q1": null,
                 "Q2": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230515001803",
-                    "title": "반기보고서 (2023.03)"
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230814001141",
+                    "title": "분기보고서 (2023.06)"
                 },
                 "Q3": null,
                 "Q4": {
@@ -58,8 +58,8 @@
                 },
                 "Q1": null,
                 "Q2": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240514000936",
-                    "title": "반기보고서 (2024.03)"
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240814001376",
+                    "title": "분기보고서 (2024.06)"
                 },
                 "Q3": null,
                 "Q4": {
@@ -78,8 +78,8 @@
                 },
                 "Q1": null,
                 "Q2": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250515001064",
-                    "title": "반기보고서 (2025.03)"
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814003628",
+                    "title": "분기보고서 (2025.06)"
                 },
                 "Q3": null,
                 "Q4": null,
@@ -96,7 +96,8 @@
                 "Q4": null
             }
         },
-        "stock_code": "042520"
+        "stock_code": "042520",
+        "company_summary": "유방 보형물 '벨라젤'과 리프팅 실 브랜드 '민트리프트(MINT Lift)'를 생산합니다. 뼈 이식재 등 인체조직 재생 제품과 미용 성형용 소모품을 공급하고 있습니다."
     },
     "엘앤씨바이오": {
         "financial_history": {
@@ -130,10 +131,7 @@
                 },
                 "Q1": null,
                 "Q2": null,
-                "Q3": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20231114000277",
-                    "title": "분기보고서 (2023.09)"
-                },
+                "Q3": null,
                 "Q4": null,
                 "data_type": "annual"
             },
@@ -190,7 +188,8 @@
                 "Q4": null
             }
         },
-        "stock_code": "290650"
+        "stock_code": "290650",
+        "company_summary": "인체조직 이식재 '메가덤'과 무릎 연골 재생 치료제 '메가카티'를 제조하여 공급합니다. 피부 재생 스킨부스터 '리투오' 등 재생 의학 기반의 제품군을 보유하고 있습니다."
     },
     "제테마": {
         "financial_history": {
@@ -232,10 +231,7 @@
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250321000516",
                     "title": "사업보고서 (2024.12)"
                 },
-                "Q1": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240514001240",
-                    "title": "분기보고서 (2024.03)"
-                },
+                "Q1": null,
                 "Q2": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240813000680",
                     "title": "반기보고서 (2024.06)"
@@ -301,10 +297,7 @@
                 },
                 "Q1": null,
                 "Q2": null,
-                "Q3": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20221114002238",
-                    "title": "분기보고서 (2022.09)"
-                },
+                "Q3": null,
                 "Q4": null,
                 "data_type": "annual"
             },
@@ -384,7 +377,8 @@
                 "Q4": null
             }
         },
-        "stock_code": "256840"
+        "stock_code": "256840",
+        "company_summary": "히알루론산 필러 브랜드 '테소로(Tesoro)'와 전문 의약품용 유착방지제를 제조합니다. 생체 재료 기반 의료기기 생산과 더불어 신약 파이프라인 연구개발을 수행합니다."
     },
     "종근당바이오": {
         "financial_history": {
@@ -510,7 +504,8 @@
                 "Q4": null
             }
         },
-        "stock_code": "063160"
+        "stock_code": "063160",
+        "company_summary": "보툴리눔 톡신 제제 '티엠버스(Tyemvers)'와 항생제 원료의약품을 생산합니다. 프로바이오틱스 원료 공급과 더불어 차세대 톡신 및 마이크로바이옴 연구를 수행합니다."
     },
     "휴온스": {
         "financial_history": {
@@ -601,7 +596,8 @@
                 "Q4": null
             }
         },
-        "stock_code": "243070"
+        "stock_code": "243070",
+        "company_summary": "보툴리눔 톡신 '리즈톡스'의 국내 유통과 국소마취제 '리도카인' 생산을 담당합니다. 전문의약품 및 수액제, 웰빙 의약품군을 생산하는 종합 제약 기업입니다."
     },
     "휴온스글로벌": {
         "financial_history": {
@@ -633,18 +629,9 @@
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240321001484",
                     "title": "[기재정정]사업보고서 (2023.12)"
                 },
-                "Q1": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230515000904",
-                    "title": "분기보고서 (2023.03)"
-                },
-                "Q2": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20231114000381",
-                    "title": "[기재정정]반기보고서 (2023.06)"
-                },
-                "Q3": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20231114000949",
-                    "title": "[기재정정]분기보고서 (2023.09)"
-                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
                 "Q4": null
             },
             "2024": {
@@ -796,7 +783,8 @@
                 "Q4": null
             }
         },
-        "stock_code": "200670"
+        "stock_code": "200670",
+        "company_summary": "히알루론산 필러 브랜드 '엘라비에(Elravie)'와 관절염 치료제 '하이히알' 등을 생산합니다. 원료의약품 제조 기술을 바탕으로 필러 및 기능성 화장품 사업을 영위합니다."
     },
     "휴젤": {
         "financial_history": {
@@ -913,10 +901,7 @@
                     "title": "사업보고서 (2023.12)"
                 },
                 "Q1": null,
-                "Q2": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230811002587",
-                    "title": "반기보고서 (2023.06)"
-                },
+                "Q2": null,
                 "Q3": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20231113000743",
                     "title": "분기보고서 (2023.09)"
@@ -977,7 +962,8 @@
                 "Q4": null
             }
         },
-        "stock_code": "086900"
+        "stock_code": "086900",
+        "company_summary": "보툴리눔 톡신 제제 '메디톡신'과 히알루론산 필러 '뉴라미스'를 주력으로 생산합니다. '코어톡스' 등 신규 톡신 제제 라인업을 통해 에스테틱 사업을 영위하고 있습니다."
     },
     "대웅제약": {
         "financial_history": {
@@ -1099,14 +1085,8 @@
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240315000795",
                     "title": "사업보고서 (2023.12)"
                 },
-                "Q1": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230515002108",
-                    "title": "분기보고서 (2023.03)"
-                },
-                "Q2": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230811001780",
-                    "title": "반기보고서 (2023.06)"
-                },
+                "Q1": null,
+                "Q2": null,
                 "Q3": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20231114002119",
                     "title": "분기보고서 (2023.09)"
@@ -1167,7 +1147,8 @@
                 "Q4": null
             }
         },
-        "stock_code": "214450"
+        "stock_code": "214450",
+        "company_summary": "연어 유래 성분의 스킨부스터 '리쥬란(REJURAN)'과 관절강 주사 '콘쥬란'을 제조합니다. PDRN/PN 원천 기술을 기반으로 의약품과 의료기기 사업을 운영하고 있습니다."
     },
     "클래시스": {
         "financial_history": {
@@ -1341,7 +1322,8 @@
                 "Q4": null
             }
         },
-        "stock_code": "214370"
+        "stock_code": "214370",
+        "company_summary": "펩타이드 필러 '레보필(REVOFIL)'과 기능성 화장품 브랜드 '더마힐'을 제조합니다. 펩타이드 플랫폼 기술을 활용하여 필러 및 건강기능식품 사업을 영위합니다."
     },
     "원텍": {
         "financial_history": {
@@ -1529,10 +1511,7 @@
                     "title": "사업보고서 (2023.12)"
                 },
                 "Q1": null,
-                "Q2": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230811000508",
-                    "title": "반기보고서 (2023.06)"
-                },
+                "Q2": null,
                 "Q3": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20231109000100",
                     "title": "분기보고서 (2023.09)"
@@ -1584,7 +1563,8 @@
                 "Q4": null
             }
         },
-        "stock_code": "287410"
+        "stock_code": "287410",
+        "company_summary": "고주파 미용 기기 '포텐자(POTENZA)'와 초음파 장비 '리니어지(LinearZ)'를 설계 및 제조합니다. 글로벌 유통망을 통해 미용 성형용 에너지 의료기기를 수출하고 있습니다."
     },
     "바이오비쥬": {
         "financial_history": {
@@ -1768,7 +1748,8 @@
                 "Q4": null
             }
         },
-        "stock_code": "099430"
+        "stock_code": "099430",
+        "company_summary": "히알루론산 필러 '하이알듀(HyalDew)'와 유착방지제를 생산합니다. 생체 재료 기술을 기반으로 미용 성형용 의료기기와 유착방지 제품을 제조합니다."
     },
     "비올": {
         "financial_history": {
@@ -1793,24 +1774,14 @@
                 "Q4": null
             },
             "2023": {
-                "revenue": "42520500098",
-                "operating_profit": "22312708239",
-                "rd_cost": "-",
-                "annual_report": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240312000527",
-                    "title": "사업보고서 (2023.12)"
-                },
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
                 "Q1": null,
-                "Q2": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230810000186",
-                    "title": "반기보고서 (2023.06)"
-                },
-                "Q3": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20231109000117",
-                    "title": "분기보고서 (2023.09)"
-                },
-                "Q4": null,
-                "data_type": "annual"
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
             },
             "2024": {
                 "revenue": "58193098799",
@@ -1820,10 +1791,7 @@
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250317000468",
                     "title": "사업보고서 (2024.12)"
                 },
-                "Q1": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240509000189",
-                    "title": "분기보고서 (2024.03)"
-                },
+                "Q1": null,
                 "Q2": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240812000294",
                     "title": "반기보고서 (2024.06)"
@@ -1890,26 +1858,22 @@
                 "Q4": null
             },
             "2023": {
-                "revenue": "33731985488",
-                "operating_profit": "5270588753",
-                "rd_cost": "-",
-                "annual_report": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240321000058",
-                    "title": "사업보고서 (2023.12)"
-                },
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null,
-                "data_type": "annual"
+                "Q4": null
             },
             "2024": {
                 "revenue": "31628770815",
                 "operating_profit": "-4757481207",
                 "rd_cost": "-",
                 "annual_report": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250321001751",
-                    "title": "사업보고서제출기한연장신고서 (2024.12)"
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250421000041",
+                    "title": "[기재정정]사업보고서 (2024.12)"
                 },
                 "Q1": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240827000048",
@@ -2053,7 +2017,8 @@
                 "Q4": null
             }
         },
-        "stock_code": "199550"
+        "stock_code": "199550",
+        "company_summary": "피부 질환 및 미용 치료용 레이저 기기인 '팔라스(PALLAS)'와 '헬리오스(HELIOS)' 시리즈를 제조합니다. 독자적인 레이저 설계 기술을 바탕으로 의료용 장비 사업을 운영합니다."
     },
     "유바이오로직스": {
         "financial_history": {
@@ -2068,18 +2033,14 @@
                 "Q4": null
             },
             "2022": {
-                "revenue": "55466694236",
-                "operating_profit": "-3768601411",
-                "rd_cost": "-",
-                "annual_report": {
-                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230321001064",
-                    "title": "사업보고서 (2022.12)"
-                },
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null,
-                "data_type": "annual"
+                "Q4": null
             },
             "2023": {
                 "revenue": "69365660612",
@@ -2157,6 +2118,99 @@
                 "Q4": null
             }
         },
-        "stock_code": "206650"
+        "stock_code": "206650",
+        "company_summary": "경구용 콜레라 백신 '유비콜(Euvichol)'을 생산하여 글로벌 공공 시장에 공급합니다. 백신 제조 기술을 바탕으로 바이오의약품 위탁생산(CMO) 서비스를 제공합니다."
+    },
+    "바임글로벌": {
+        "financial_history": {}
+    },
+    "엑소코바이오": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20220328000495",
+                    "title": "연결감사보고서 (2021.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230330001056",
+                    "title": "연결감사보고서 (2022.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2023": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240328000239",
+                    "title": "연결감사보고서 (2023.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2024": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250422000427",
+                    "title": "[기재정정]감사보고서 (2024.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2025": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": ""
+    },
+    "멀츠": {
+        "financial_history": {}
+    },
+    "앨러간": {
+        "financial_history": {}
+    },
+    "갈더마": {
+        "financial_history": {}
+    },
+    "테옥산": {
+        "financial_history": {}
     }
 }
