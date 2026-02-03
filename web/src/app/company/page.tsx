@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, Text } from "@tremor/react";
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { API_ENDPOINTS } from '@/lib/apiConfig';
 import { useLanguage } from "@/components/LanguageContext";
@@ -41,9 +41,30 @@ const allCompanies: { id: number; name: string }[] = [
 
 export default function CompanyPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { t } = useLanguage();
     const [rankings, setRankings] = useState<Record<string, number>>({});
-    const [activeCategory, setActiveCategory] = useState<'korean' | 'global'>('korean');
+
+    // Initialize state from URL param, default to 'korean'
+    // Using simple initialization; useEffect will handle sync
+    const initialCategory = searchParams?.get('tab') === 'global' ? 'global' : 'korean';
+    const [activeCategory, setActiveCategory] = useState<'korean' | 'global'>(initialCategory);
+
+    // Sync state if URL changes (e.g. back button)
+    useEffect(() => {
+        const tab = searchParams?.get('tab');
+        if (tab === 'global' && activeCategory !== 'global') {
+            setActiveCategory('global');
+        } else if (tab !== 'global' && activeCategory !== 'korean') {
+            // If tab is missing or 'korean', switch to korean
+            setActiveCategory('korean');
+        }
+    }, [searchParams, activeCategory]);
+
+    const handleCategoryChange = (cat: 'korean' | 'global') => {
+        setActiveCategory(cat);
+        router.push(`/company?tab=${cat}`);
+    };
 
     useEffect(() => {
         fetch(API_ENDPOINTS.rankings)
@@ -73,7 +94,7 @@ export default function CompanyPage() {
                 {/* Category Tabs */}
                 <div className="flex gap-2 border-b border-gray-200">
                     <button
-                        onClick={() => setActiveCategory('korean')}
+                        onClick={() => handleCategoryChange('korean')}
                         className={`px-6 py-3 font-semibold transition-all border-b-2 ${activeCategory === 'korean'
                                 ? 'border-blue-600 text-blue-600'
                                 : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -82,7 +103,7 @@ export default function CompanyPage() {
                         🇰🇷 한국 기업 ({COMPANY_CATEGORIES.korean.length})
                     </button>
                     <button
-                        onClick={() => setActiveCategory('global')}
+                        onClick={() => handleCategoryChange('global')}
                         className={`px-6 py-3 font-semibold transition-all border-b-2 ${activeCategory === 'global'
                                 ? 'border-blue-600 text-blue-600'
                                 : 'border-transparent text-gray-500 hover:text-gray-700'
