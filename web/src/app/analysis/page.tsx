@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { Card, Title, Text, Grid, Badge } from "@tremor/react";
 import { API_ENDPOINTS } from '@/lib/apiConfig';
 import { COMPANY_OVERVIEWS } from '@/data/companyOverviews';
+import { isGlobalCompany } from '@/data/companyCategories';
 
 export default function AnalysisPage() {
     const searchParams = useSearchParams();
@@ -337,6 +338,16 @@ export default function AnalysisPage() {
             {/* Analysis Result */}
             {isReportMode && result && (
                 <div className="animate-fade-in-up">
+                    {/* Global Company Badge */}
+                    {isGlobalCompany(companyName) && (
+                        <div className="mb-4 flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
+                            <span className="text-2xl">🌍</span>
+                            <div>
+                                <p className="text-sm font-semibold text-blue-900">Global Company</p>
+                                <p className="text-xs text-blue-700">Financial data may be limited or manually entered</p>
+                            </div>
+                        </div>
+                    )}
 
                     {/* 0. Stock Info Header */}
                     <div className="flex flex-col md:flex-row gap-6 mb-8">

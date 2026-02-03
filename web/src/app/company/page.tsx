@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { API_ENDPOINTS } from '@/lib/apiConfig';
 import { useLanguage } from "@/components/LanguageContext";
+import { COMPANY_CATEGORIES, getCompanyCategory } from "@/data/companyCategories";
 
-const companies: { id: number; name: string }[] = [
+const allCompanies: { id: number; name: string }[] = [
     { id: 1, name: "한스바이오메드" },
     { id: 2, name: "엘앤씨바이오" },
     { id: 3, name: "제테마" },
@@ -36,12 +37,13 @@ const companies: { id: number; name: string }[] = [
     { id: 27, name: "앨러간" },
     { id: 28, name: "갈더마" },
     { id: 29, name: "테옥산" }
-].sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+];
 
 export default function CompanyPage() {
     const router = useRouter();
     const { t } = useLanguage();
     const [rankings, setRankings] = useState<Record<string, number>>({});
+    const [activeCategory, setActiveCategory] = useState<'korean' | 'global'>('korean');
 
     useEffect(() => {
         fetch(API_ENDPOINTS.rankings)
@@ -50,7 +52,10 @@ export default function CompanyPage() {
             .catch(err => console.error(err));
     }, []);
 
-
+    // Filter companies by category
+    const filteredCompanies = allCompanies
+        .filter(company => getCompanyCategory(company.name) === activeCategory)
+        .sort((a, b) => a.name.localeCompare(b.name, 'ko'));
 
     return (
         <main className="min-h-screen bg-gray-50 p-6 md:p-12">
@@ -65,10 +70,34 @@ export default function CompanyPage() {
                     </Text>
                 </div>
 
+                {/* Category Tabs */}
+                <div className="flex gap-2 border-b border-gray-200">
+                    <button
+                        onClick={() => setActiveCategory('korean')}
+                        className={`px-6 py-3 font-semibold transition-all border-b-2 ${activeCategory === 'korean'
+                                ? 'border-blue-600 text-blue-600'
+                                : 'border-transparent text-gray-500 hover:text-gray-700'
+                            }`}
+                    >
+                        🇰🇷 한국 기업 ({COMPANY_CATEGORIES.korean.length})
+                    </button>
+                    <button
+                        onClick={() => setActiveCategory('global')}
+                        className={`px-6 py-3 font-semibold transition-all border-b-2 ${activeCategory === 'global'
+                                ? 'border-blue-600 text-blue-600'
+                                : 'border-transparent text-gray-500 hover:text-gray-700'
+                            }`}
+                    >
+                        🌍 글로벌 기업 ({COMPANY_CATEGORIES.global.length})
+                    </button>
+                </div>
+
+                {/* Company Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                    {companies.map((item) => {
+                    {filteredCompanies.map((item) => {
                         const rank = rankings[item.name];
                         const isHighlight = rank && rank <= 3;
+                        const isGlobal = activeCategory === 'global';
 
                         return (
                             <Card
@@ -76,12 +105,20 @@ export default function CompanyPage() {
                                 className={`relative cursor-pointer transition-all text-center flex items-center justify-center min-h-[100px] overflow-visible rounded-xl group
                                 hover:shadow-lg hover:-translate-y-1 hover:ring-2 hover:ring-blue-100 bg-white
                                 ${isHighlight ? 'border border-purple-200 shadow-[0_0_15px_rgba(168,85,247,0.3)]' : 'border border-gray-200 shadow-sm'}
+                                ${isGlobal ? 'bg-gradient-to-br from-blue-50 to-indigo-50' : ''}
                             `}
                                 onClick={() => router.push(`/analysis?company=${item.name}`)}
                             >
                                 {/* Pulsing Border Effect for Highlights */}
                                 {isHighlight && (
                                     <div className="absolute inset-0 rounded-xl border-2 border-purple-500 animate-pulse pointer-events-none z-10"></div>
+                                )}
+
+                                {/* Global Badge */}
+                                {isGlobal && (
+                                    <div className="absolute top-2 right-2 bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full font-semibold">
+                                        Global
+                                    </div>
                                 )}
 
                                 <Text className={`text-lg font-medium ${isHighlight ? 'text-purple-700 font-bold' : 'text-foreground'}`}>
