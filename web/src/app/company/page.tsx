@@ -33,10 +33,17 @@ const allCompanies: { id: number; name: string }[] = [
     { id: 23, name: "유바이오로직스" },
     { id: 24, name: "바임글로벌" },
     { id: 25, name: "엑소코바이오" },
-    { id: 26, name: "멀츠" },
-    { id: 27, name: "앨러간" },
-    { id: 28, name: "갈더마" },
-    { id: 29, name: "테옥산" }
+    { id: 26, name: "알에프바이오" },
+    { id: 27, name: "차메디텍" },
+    { id: 28, name: "JW중외제약" },
+    { id: 29, name: "동국제약" },
+    { id: 30, name: "리젠바이오텍" },
+    { id: 31, name: "울트라브이" },
+    { id: 32, name: "제노스" },
+    { id: 33, name: "멀츠" },
+    { id: 34, name: "앨러간" },
+    { id: 35, name: "갈더마" },
+    { id: 36, name: "테옥산" }
 ];
 
 export default function CompanyPage() {
@@ -96,8 +103,8 @@ export default function CompanyPage() {
                     <button
                         onClick={() => handleCategoryChange('korean')}
                         className={`px-6 py-3 font-semibold transition-all border-b-2 ${activeCategory === 'korean'
-                                ? 'border-blue-600 text-blue-600'
-                                : 'border-transparent text-gray-500 hover:text-gray-700'
+                            ? 'border-blue-600 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700'
                             }`}
                     >
                         🇰🇷 한국 기업 ({COMPANY_CATEGORIES.korean.length})
@@ -105,8 +112,8 @@ export default function CompanyPage() {
                     <button
                         onClick={() => handleCategoryChange('global')}
                         className={`px-6 py-3 font-semibold transition-all border-b-2 ${activeCategory === 'global'
-                                ? 'border-blue-600 text-blue-600'
-                                : 'border-transparent text-gray-500 hover:text-gray-700'
+                            ? 'border-blue-600 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700'
                             }`}
                     >
                         🌍 글로벌 기업 ({COMPANY_CATEGORIES.global.length})
