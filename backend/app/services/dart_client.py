@@ -1,3 +1,4 @@
+import re
 import requests
 import zipfile
 import io
@@ -74,47 +75,46 @@ class DartAPI:
     def get_document_content(self, rcept_no: str) -> str:
         return f"http://dart.fss.or.kr/dsaf001/main.do?rcpNo={rcept_no}"
 
-    def get_financials(self, corp_code: str, year: str, reprt_code: str) -> Dict[str, Any]:
-        """Fetches single account financials (Revenue, Operating Profit, R&D Cost)."""
-        url = f"{self.base_url}/fnlttSinglAcntAll.json"
-        params = {
-            "crtfc_key": self.api_key,
-            "corp_code": corp_code,
-            "bsns_year": year,
-            "reprt_code": reprt_code,
-            "fs_div": "CFS"
-        }
-        
-        financials = {"revenue": "-", "profit": "-", "rd_cost": "-"}
-        
-        try:
-            response = requests.get(url, params=params)
-            data = response.json()
-            
-            if data['status'] == '000':
-                for item in data.get('list', []):
-                    acct_nm = item.get('account_nm', '').strip()
-                    amount = item.get('thstrm_amount', '0').strip()
-                    
-                    if acct_nm in ["매출액", "수익(매출액)"]:
-                        financials['revenue'] = amount
-                    elif acct_nm in ["영업이익", "영업이익(손실)"]:
-                        financials['profit'] = amount
-                    elif acct_nm in ["연구개발비", "연구개발비용", "연구개발비용계"]:
-                        financials['rd_cost'] = amount
-            else:
-                if params['fs_div'] == 'CFS':
-                    params['fs_div'] = 'OFS'
-                    return self.get_financials(corp_code, year, reprt_code)
+    def _parse_financial_items(self, items: list) -> Dict[str, str]:
+        """Extract revenue, profit, rd_cost from DART financial items."""
+        result = {}
+        for item in items:
+            acct_nm = item.get('account_nm', '').strip()
+            amount = item.get('thstrm_amount', '0').strip()
+            if acct_nm in ["매출액", "수익(매출액)"]:
+                result['revenue'] = amount
+            elif acct_nm in ["영업이익", "영업이익(손실)"]:
+                result['profit'] = amount
+            elif acct_nm in ["연구개발비", "연구개발비용", "연구개발비용계"]:
+                result['rd_cost'] = amount
+        return result
 
-        except Exception as e:
-            print(f"Financials Request Error: {e}")
-            
+    def get_financials(self, corp_code: str, year: str, reprt_code: str) -> Dict[str, Any]:
+        """Fetches single account financials. Tries CFS first, falls back to OFS."""
+        url = f"{self.base_url}/fnlttSinglAcntAll.json"
+        financials = {"revenue": "-", "profit": "-", "rd_cost": "-"}
+
+        for fs_div in ["CFS", "OFS"]:
+            try:
+                params = {
+                    "crtfc_key": self.api_key,
+                    "corp_code": corp_code,
+                    "bsns_year": year,
+                    "reprt_code": reprt_code,
+                    "fs_div": fs_div
+                }
+                response = requests.get(url, params=params)
+                data = response.json()
+                if data['status'] == '000':
+                    financials.update(self._parse_financial_items(data.get('list', [])))
+                    break  # Success - no need to try OFS
+            except Exception as e:
+                print(f"Financials Request Error ({fs_div}): {e}")
+
         return financials
 
     def parse_report_code(self, report_title: str) -> Dict[str, str]:
         """Parses report title to extract year and report code."""
-        import re
         match = re.search(r'\((\d{4})\.(\d{2})\)', report_title)
         if not match:
             return None

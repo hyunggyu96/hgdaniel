@@ -3,6 +3,7 @@
 import { useCollection } from './CollectionContext';
 import CollectionButton from './CollectionButton';
 import ExportCollectionsButton from './ExportCollectionsButton';
+import { fmtDateKST, toDateKey } from '@/lib/utils';
 
 interface CollectionsViewProps {
     allNews: any[];
@@ -38,18 +39,15 @@ export default function CollectionsView({ allNews, today }: CollectionsViewProps
 
     return (
         <div className="space-y-6">
-            {/* Export Button */}
             <div className="flex justify-center">
                 <ExportCollectionsButton collectedNews={collectedNews} />
             </div>
 
-            {/* Collections Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-0 max-w-7xl">
                 {collectedNews.map((article) => {
                     const pubDate = article.published_at ? new Date(article.published_at) : null;
-                    const isToday = pubDate?.toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' }) === today;
-                    const dateStr = pubDate ? pubDate.toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul', month: '2-digit', day: '2-digit' }).replace(/\. /g, '.').replace(/\.$/, '') : '';
-                    const timeStr = pubDate ? pubDate.toLocaleTimeString('ko-KR', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', hour12: false }) : '';
+                    const isToday = toDateKey(pubDate) === today;
+                    const { dateStr, timeStr } = fmtDateKST(pubDate);
 
                     return (
                         <article key={article.id} className={`group py-1.5 px-3 hover:bg-gray-50 transition-colors border-b border-gray-100 flex gap-2 items-start ${isToday ? 'bg-blue-50' : ''}`}>
@@ -60,12 +58,7 @@ export default function CollectionsView({ allNews, today }: CollectionsViewProps
                                         {dateStr} <span className="text-[9px] font-medium opacity-80 ml-0.5">{timeStr}</span>
                                     </span>
                                 </div>
-                                <a
-                                    href={article.link}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="block group/link"
-                                >
+                                <a href={article.link} target="_blank" rel="noopener noreferrer" className="block group/link">
                                     <h3 className="text-sm md:text-base font-bold text-foreground leading-tight group-hover/link:text-[#3182f6] truncate">
                                         {article.title}
                                     </h3>

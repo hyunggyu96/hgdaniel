@@ -17,12 +17,9 @@ except Exception as e:
 
 import asyncio
 import aiohttp
-import json
 import email.utils
 import datetime
-import pathlib
 import re
-from typing import List, Dict
 
 from dotenv import load_dotenv
 from supabase import create_client
@@ -77,9 +74,6 @@ async def fetch_naver_news_expert(session, keyword, start_date):
                         pub_date = email.utils.parsedate_to_datetime(item['pubDate'])
                         if pub_date.replace(tzinfo=None) > start_date:
                             all_items.append(item)
-                        else:
-                            # Since results are sorted by date, we can stop if we hit older news
-                            pass 
         except Exception as e:
             print(f"  ⚠️ Naver API Error for [{keyword}] at start={start_idx}: {e}")
             break
@@ -193,7 +187,6 @@ async def main():
                     
                     added_for_kw = 0
                     for item in items:
-                        if item['link'] in existing_links: continue
                         added_for_kw += await process_news_item_expert(item, keyword, existing_links)
                     
                     print(f"   > Added {added_for_kw} new articles.")

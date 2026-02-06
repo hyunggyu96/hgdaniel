@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Card, Title, Text, Grid, Badge } from "@tremor/react";
+import { Card, Title, Text } from "@tremor/react";
 import { API_ENDPOINTS } from '@/lib/apiConfig';
 import { COMPANY_OVERVIEWS } from '@/data/companyOverviews';
 import { isGlobalCompany } from '@/data/companyCategories';
@@ -15,6 +15,8 @@ try {
 } catch (e) {
     console.warn("MFDS Data not found, using empty set");
 }
+
+const YEARS = ['2026', '2025', '2024', '2023'] as const;
 
 export default function AnalysisPage() {
     const searchParams = useSearchParams();
@@ -181,12 +183,6 @@ export default function AnalysisPage() {
         return isNaN(date.getTime()) ? dateString : date.toLocaleString('ko-KR', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     };
 
-    // Helper for formatting large numbers (Korean Won)
-    const formatMoney = (amount: string) => {
-        if (!amount || amount === '-' || amount === 'N/A') return amount;
-        return Number(amount).toLocaleString() + ' KRW';
-    };
-
     // Helper for Korean Financial Units (Jo/Eok) - Rounded to nearest Eok
     const formatKoreanNumber = (amount: string | number) => {
         if (!amount || amount === '-' || amount === 'N/A') return '-';
@@ -217,47 +213,6 @@ export default function AnalysisPage() {
         }
 
         return result.trim();
-    };
-
-    // Calculate percentage change
-    const calculateChange = (current: string, previous: string) => {
-        if (!current || !previous || current === 'N/A' || previous === 'N/A') return null;
-
-        const currVal = parseFloat(current);
-        const prevVal = parseFloat(previous);
-
-        if (isNaN(currVal) || isNaN(prevVal) || prevVal === 0) return null;
-
-        const change = ((currVal - prevVal) / Math.abs(prevVal)) * 100;
-        return change;
-    };
-
-    const renderChangeBadge = (current: string, previous: string) => {
-        const change = calculateChange(current, previous);
-        if (change === null) return null;
-
-        const isPositive = change > 0;
-        const colorClass = isPositive ? "text-green-600 bg-green-50" : "text-red-600 bg-red-50";
-        const sign = isPositive ? "+" : "";
-
-        return (
-            <span className={`text-xs font-bold px-2 py-0.5 rounded ml-2 ${colorClass}`}>
-                {sign}{change.toFixed(1)}%
-            </span>
-        );
-    };
-
-    const renderStockChange = (changeStr: string) => {
-        if (!changeStr) return null;
-        // changeStr format example: "+150 (+1.2%)" or "-50 (-0.5%)"
-
-        const isPositive = changeStr.includes('+') && !changeStr.includes('-');
-
-        return (
-            <span className={`text-sm font-semibold ${isPositive ? 'text-red-500' : 'text-blue-500'}`}>
-                {changeStr}
-            </span>
-        );
     };
 
     // Calculate Ratio (e.g. R&D / Revenue)
@@ -450,7 +405,7 @@ export default function AnalysisPage() {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 bg-gray-100/80 border-r border-gray-200">
                                                     매출액
                                                 </td>
-                                                {['2026', '2025', '2024', '2023'].map(year => {
+                                                {YEARS.map(year => {
                                                     const yearData = result.financial_history[year];
                                                     const dataType = yearData?.data_type;
                                                     const isYTD = dataType && dataType.startsWith('ytd_');
@@ -474,7 +429,7 @@ export default function AnalysisPage() {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 bg-gray-100/80 border-r border-gray-200">
                                                     영업이익
                                                 </td>
-                                                {['2026', '2025', '2024', '2023'].map(year => (
+                                                {YEARS.map(year => (
                                                     <td key={year} className="px-6 py-4 whitespace-nowrap text-sm text-center font-medium text-green-600">
                                                         {formatKoreanNumber(result.financial_history[year]?.operating_profit)}
                                                     </td>
@@ -485,7 +440,7 @@ export default function AnalysisPage() {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 bg-gray-100/80 border-r border-gray-200">
                                                     연구비용
                                                 </td>
-                                                {['2026', '2025', '2024', '2023'].map(year => {
+                                                {YEARS.map(year => {
                                                     const rdCost = result.financial_history[year]?.rd_cost;
                                                     const revenue = result.financial_history[year]?.revenue;
                                                     const ratio = calculateRatio(rdCost, revenue);
@@ -512,7 +467,7 @@ export default function AnalysisPage() {
                                                 <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold text-gray-500 bg-gray-100/80 border-r border-gray-200">
                                                     사업보고서
                                                 </td>
-                                                {['2026', '2025', '2024', '2023'].map(year => {
+                                                {YEARS.map(year => {
                                                     const report = result.financial_history[year]?.annual_report;
                                                     return (
                                                         <td key={year} className="px-6 py-3 whitespace-nowrap text-sm text-center">
@@ -533,7 +488,7 @@ export default function AnalysisPage() {
                                                     <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold text-gray-500 bg-gray-100/80 border-r border-gray-200">
                                                         {quarter === 'Q1' ? '1분기' : quarter === 'Q2' ? '2분기' : quarter === 'Q3' ? '3분기' : '4분기'}
                                                     </td>
-                                                    {['2026', '2025', '2024', '2023'].map(year => {
+                                                    {YEARS.map(year => {
                                                         // Dynamic access to quarter property safely
                                                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                         const report = (result.financial_history[year] as any)?.[quarter];

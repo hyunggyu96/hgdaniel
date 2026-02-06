@@ -21,30 +21,12 @@ export default function CompetitorTable({ data }: CompetitorTableProps) {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
-    // Filter logic: Match Search Query AND Filler-related keywords
+    // Filter by user search query (filler filtering already done by parent)
     const filteredData = data.filter(item => {
-        // 1. Mandatory Category Filter (Since we are downloading full DB)
-        // Must contain '조직수복용' (Tissue Restorative), '필러' (Filler), '안면' (Facial), '주입' (Injectable)
-        // And exclude '치과' (Dental) unless specific
-        const name = item.PRDLST_NM || "";
-        const entp = item.ENTP_NAME || "";
-
-        const isFillerRelated = (
-            name.includes('조직수복용') ||
-            name.includes('필러') ||
-            name.includes('히알루론산') ||
-            (name.includes('주입') && name.includes('안면'))
-        ) && !name.includes('치과'); // Basic exclusion, can be refined
-
-        if (!isFillerRelated) return false;
-
-        // 2. User Search Query
-        const matchesSearch = (
-            entp.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            name.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-
-        return matchesSearch;
+        if (!searchQuery) return true;
+        const q = searchQuery.toLowerCase();
+        return (item.ENTP_NAME || "").toLowerCase().includes(q) ||
+               (item.PRDLST_NM || "").toLowerCase().includes(q);
     }).sort((a, b) => {
         // Sort by Permit Date Descending
         if (!a.PRMSN_DT) return 1;
