@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Card, Title, Text, Badge } from "@tremor/react";
 import { useLanguage } from "@/components/LanguageContext";
 import koreaRegulations from "@/data/korea_regulations.json";
@@ -38,15 +39,28 @@ const COUNTRIES: Country[] = [
 
 export default function PolicyPage() {
     const { language, t } = useLanguage();
-    const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
+    // Sync state with URL param 'country'
+    const countryParam = searchParams?.get('country') ?? null;
+    const [selectedCountry, setSelectedCountry] = useState<string | null>(countryParam);
+
+    useEffect(() => {
+        setSelectedCountry(countryParam);
+    }, [countryParam]);
 
     const handleCountryClick = (countryId: string) => {
         if (countryId === 'kr') {
-            setSelectedCountry(countryId);
+            router.push(`/policy?country=${countryId}`);
         } else {
             // For other countries, show "Coming Soon" or do nothing
             alert(language === 'ko' ? '준비 중입니다' : 'Coming Soon');
         }
+    };
+
+    const handleBackClick = () => {
+        router.push('/policy');
     };
 
     const formatDate = (dateStr: string) => {
@@ -106,7 +120,7 @@ export default function PolicyPage() {
                     <div className="space-y-6 animate-fade-in">
                         {/* Back Button */}
                         <button
-                            onClick={() => setSelectedCountry(null)}
+                            onClick={handleBackClick}
                             className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors"
                         >
                             <span>←</span>
