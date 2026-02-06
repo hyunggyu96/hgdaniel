@@ -19,6 +19,7 @@ news_data.db
 *.csv
 *.xlsx
 *.log
+web/src/data/mfds_competitors.json
 
 # Google Credentials
 service_account.json

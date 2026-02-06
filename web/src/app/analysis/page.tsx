@@ -6,6 +6,15 @@ import { Card, Title, Text, Grid, Badge } from "@tremor/react";
 import { API_ENDPOINTS } from '@/lib/apiConfig';
 import { COMPANY_OVERVIEWS } from '@/data/companyOverviews';
 import { isGlobalCompany } from '@/data/companyCategories';
+import CompetitorTable from '@/components/CompetitorTable';
+
+// Safely require MFDS Data (might be missing initially)
+let competitorData = { items: [] };
+try {
+    competitorData = require('@/data/mfds_competitors.json');
+} catch (e) {
+    console.warn("MFDS Data not found, using empty set");
+}
 
 export default function AnalysisPage() {
     const searchParams = useSearchParams();
@@ -611,6 +620,28 @@ export default function AnalysisPage() {
                                 }
                             </Text>
                         </Card>
+                    </div>
+
+                    <div className="border-t border-gray-200 my-8"></div>
+
+                    {/* 4. Competitor Permit Status (MFDS Data) */}
+                    <div className="mt-8 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+                        {(() => {
+                            // OPTIMIZATION: Filter items on SERVER side to avoid sending 100MB+ to client
+                            const rawItems = competitorData?.items || [];
+                            const filteredItems = rawItems.filter((item: any) => {
+                                const name = item.PRDLST_NM || "";
+                                const isFillerRelated = (
+                                    name.includes('조직수복용') ||
+                                    name.includes('필러') ||
+                                    name.includes('히알루론산') ||
+                                    (name.includes('주입') && name.includes('안면'))
+                                ) && !name.includes('치과');
+                                return isFillerRelated;
+                            });
+
+                            return <CompetitorTable data={filteredItems} />;
+                        })()}
                     </div>
                 </div>
             )}
