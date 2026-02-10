@@ -9,11 +9,18 @@ import { isGlobalCompany } from '@/data/companyCategories';
 import CompetitorTable from '@/components/CompetitorTable';
 
 // Safely require MFDS Data (might be missing initially)
+// Safely require MFDS Data (prioritize filtered small set)
 let competitorData = { items: [] };
 try {
-    competitorData = require('@/data/mfds_competitors.json');
-} catch (e) {
-    console.warn("MFDS Data not found, using empty set");
+    // Try loading the small filtered file first (for Repo/Production)
+    competitorData = require('@/data/mfds_competitors_small.json');
+} catch (e1) {
+    try {
+        // Fallback to full DB (local dev environment)
+        competitorData = require('@/data/mfds_competitors.json');
+    } catch (e2) {
+        console.warn("MFDS Data not found, using empty set");
+    }
 }
 
 const YEARS = ['2026', '2025', '2024', '2023'] as const;
@@ -582,9 +589,13 @@ export default function AnalysisPage() {
                     {/* 4. Competitor Permit Status (MFDS Data) */}
                     <div className="mt-8 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
                         {(() => {
-                            // OPTIMIZATION: Filter items on SERVER side to avoid sending 100MB+ to client
+                            // OPTIMIZATION: Filter items on SERVER side
+                            // Handle both Flat (Small) and Nested (Full) structures
                             const rawItems = competitorData?.items || [];
-                            const filteredItems = rawItems.filter((item: any) => {
+
+                            const normalizedItems = rawItems.map((item: any) => item.item || item);
+
+                            const filteredItems = normalizedItems.filter((item: any) => {
                                 const name = item.PRDLST_NM || "";
                                 const isFillerRelated = (
                                     name.includes('조직수복용') ||

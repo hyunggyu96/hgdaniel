@@ -2,9 +2,16 @@
 .env
 .env.local
 .env.*
+!.env.example
 web/.env
 web/.env.local
 web/.env.*
+backend/.env
+backend/.env.*
+!backend/.env.example
+collector/.env
+collector/.env.*
+!collector/.env.example
 
 # Python
 __pycache__/

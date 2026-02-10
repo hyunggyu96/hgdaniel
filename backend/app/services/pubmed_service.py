@@ -7,10 +7,8 @@ from app.core.config import settings
 class PubMedService:
     def __init__(self, supabase_client: Client):
         self.supabase = supabase_client
-        self.email = "aibusinessapi@gmail.com" # Should be in env, but hardcoding for migration speed as per script
-        self.api_key = "1312d8fbc0f1da1ded16b6804d16f83f0209" # as per script
-        Entrez.email = self.email
-        Entrez.api_key = self.api_key
+        Entrez.email = settings.PUBMED_EMAIL
+        Entrez.api_key = settings.PUBMED_API_KEY
 
     def fetch_pubmed_ids(self, keyword: str, max_results: int = 100) -> List[str]:
         try:
