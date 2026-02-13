@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Card, Title, Text, Select, SelectItem, Badge } from "@tremor/react";
+import { Card, Title, Text, Badge } from "@tremor/react";
 import { SearchIcon } from "lucide-react";
 
 import { useLanguage } from "@/components/LanguageContext";
@@ -103,16 +103,16 @@ export default function InsightsPage() {
                 {/* Filters & Search */}
                 <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row gap-4 items-center">
                     <div className="w-full md:w-64">
-                        <Select
+                        <select
                             value={selectedKeyword}
-                            onValueChange={setSelectedKeyword}
-                            placeholder={t('insights_filter_topic')}
+                            onChange={(e) => setSelectedKeyword(e.target.value)}
+                            className="block w-full py-2 px-3 border border-gray-300 rounded-md bg-white text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out cursor-pointer"
                         >
-                            <SelectItem value="">{t('insights_all_topics')}</SelectItem>
+                            <option value="">{t('insights_all_topics')}</option>
                             {KEYWORDS.map(kw => (
-                                <SelectItem key={kw} value={kw}>{kw}</SelectItem>
+                                <option key={kw} value={kw}>{kw}</option>
                             ))}
-                        </Select>
+                        </select>
                     </div>
                     <form onSubmit={handleSearch} className="flex-1 w-full flex gap-2">
                         <div className="relative w-full">
