@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Card, Title, Text, TextInput, Select, SelectItem, Badge, Grid } from "@tremor/react";
+import { useState, useEffect, useCallback } from "react";
+import { Card, Title, Text, Select, SelectItem, Badge } from "@tremor/react";
 import { SearchIcon } from "lucide-react";
 
 import { useLanguage } from "@/components/LanguageContext";
@@ -32,64 +32,58 @@ export default function InsightsPage() {
     const { t } = useLanguage();
     const [papers, setPapers] = useState<Paper[]>([]);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const [selectedKeyword, setSelectedKeyword] = useState<string>("");
     const [searchQuery, setSearchQuery] = useState("");
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
-    const fetchPapers = async (resetPage = false) => {
+    const fetchPapers = useCallback(async (targetPage: number) => {
         setLoading(true);
+        setError(null);
         try {
-            const currentPage = resetPage ? 1 : page;
             const params = new URLSearchParams({
-                page: currentPage.toString(),
+                page: targetPage.toString(),
                 limit: "20",
                 keyword: selectedKeyword,
                 query: searchQuery
             });
 
             const res = await fetch(`/api/insights?${params.toString()}`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const result = await res.json();
 
-            if (result.data) {
-                setPapers(result.data);
-                setTotalPages(result.pagination.totalPages);
-                if (resetPage) setPage(1);
-            }
-        } catch (error) {
-            console.error("Failed to fetch papers:", error);
+            if (result.error) throw new Error(result.error);
+
+            setPapers(result.data || []);
+            setTotalPages(result.pagination?.totalPages || 1);
+        } catch (err) {
+            console.error("Failed to fetch papers:", err);
+            setError(t('insights_error'));
+            setPapers([]);
         } finally {
             setLoading(false);
         }
-    };
+    }, [selectedKeyword, searchQuery, t]);
 
+    // Fetch when keyword changes — reset to page 1
     useEffect(() => {
-        fetchPapers(true);
-    }, [selectedKeyword]); // Refetch when keyword changes
+        setPage(1);
+        fetchPapers(1);
+    }, [selectedKeyword]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        fetchPapers(true);
+        setPage(1);
+        fetchPapers(1);
     };
 
     const handlePageChange = (newPage: number) => {
-        if (newPage >= 1 && newPage <= totalPages) {
+        if (newPage >= 1 && newPage <= totalPages && newPage !== page) {
             setPage(newPage);
-            // useEffect dependency on 'page' would trigger loop if we're not careful.
-            // Better to just call fetch directly or split useEffect.
-            // Let's add 'page' to a separate useEffect for pagination or manually call.
-            // For simplicity, let's manually call fetch here:
-            // But state update is async.
+            fetchPapers(newPage);
         }
     };
-
-    // Separate effect for page changes to ensure state is updated first
-    useEffect(() => {
-        if (page > 1) { // Skip initial load handled by keyword effect
-            fetchPapers(false);
-        }
-    }, [page]);
-
 
     return (
         <main className="min-h-screen bg-gray-50 p-6 md:p-12">
@@ -112,9 +106,9 @@ export default function InsightsPage() {
                         <Select
                             value={selectedKeyword}
                             onValueChange={setSelectedKeyword}
-                            placeholder="Filter by Topic..."
+                            placeholder={t('insights_filter_topic')}
                         >
-                            <SelectItem value="">All Topics</SelectItem>
+                            <SelectItem value="">{t('insights_all_topics')}</SelectItem>
                             {KEYWORDS.map(kw => (
                                 <SelectItem key={kw} value={kw}>{kw}</SelectItem>
                             ))}
@@ -128,7 +122,7 @@ export default function InsightsPage() {
                             <input
                                 type="text"
                                 className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out"
-                                placeholder="Search title or abstract..."
+                                placeholder={t('insights_search_placeholder')}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
@@ -137,7 +131,7 @@ export default function InsightsPage() {
                             type="submit"
                             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap"
                         >
-                            Search
+                            {t('search')}
                         </button>
                     </form>
                 </div>
@@ -146,7 +140,17 @@ export default function InsightsPage() {
                 {loading ? (
                     <div className="text-center py-20">
                         <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
-                        <Text>Loading research papers...</Text>
+                        <Text>{t('insights_loading')}</Text>
+                    </div>
+                ) : error ? (
+                    <div className="text-center py-20 bg-white rounded-xl border border-red-200">
+                        <Text className="text-red-600 mb-2">{error}</Text>
+                        <button
+                            onClick={() => fetchPapers(page)}
+                            className="text-sm font-medium text-blue-600 hover:text-blue-800"
+                        >
+                            {t('retry')}
+                        </button>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 gap-6">
@@ -182,7 +186,7 @@ export default function InsightsPage() {
                                                     rel="noopener noreferrer"
                                                     className="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
                                                 >
-                                                    Read Data
+                                                    {t('insights_read')}
                                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                                                 </a>
                                             </div>
@@ -192,8 +196,8 @@ export default function InsightsPage() {
                             ))
                         ) : (
                             <div className="text-center py-20 bg-white rounded-xl border border-gray-200 border-dashed">
-                                <Text className="text-gray-500 mb-2">No papers found.</Text>
-                                <p className="text-sm text-gray-400">Try adjusting your filters or run the data collection script.</p>
+                                <Text className="text-gray-500 mb-2">{t('insights_no_papers')}</Text>
+                                <p className="text-sm text-gray-400">{t('insights_no_papers_hint')}</p>
                             </div>
                         )}
                     </div>
@@ -203,21 +207,21 @@ export default function InsightsPage() {
                 {papers.length > 0 && (
                     <div className="flex justify-center items-center gap-4 mt-8">
                         <button
-                            onClick={() => handlePageChange(Math.max(1, page - 1))}
+                            onClick={() => handlePageChange(page - 1)}
                             disabled={page === 1 || loading}
                             className="px-4 py-2 border border-gray-300 rounded-md bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400"
                         >
-                            Previous
+                            {t('insights_previous')}
                         </button>
                         <span className="text-sm text-gray-600">
-                            Page <span className="font-semibold text-gray-900">{page}</span> of {totalPages}
+                            {t('insights_page_info')} <span className="font-semibold text-gray-900">{page}</span> {t('insights_page_of')} {totalPages}
                         </span>
                         <button
-                            onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
+                            onClick={() => handlePageChange(page + 1)}
                             disabled={page === totalPages || loading}
                             className="px-4 py-2 border border-gray-300 rounded-md bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400"
                         >
-                            Next
+                            {t('insights_next')}
                         </button>
                     </div>
                 )}

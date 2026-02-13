@@ -13,8 +13,8 @@ load_dotenv('web/.env.local')
 load_dotenv('backend/.env')
 
 # Configuration
-PUBMED_API_KEY = "1312d8fbc0f1da1ded16b6804d16f83f0209"
-PUBMED_EMAIL = "aibusinessapi@gmail.com"
+PUBMED_API_KEY = os.getenv("PUBMED_API_KEY", "")
+PUBMED_EMAIL = os.getenv("PUBMED_EMAIL", "")
 SUPABASE_URL = os.getenv("NEXT_PUBLIC_SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY") # Use Service Role for writing
 
@@ -143,23 +143,23 @@ def fetch_details_and_save(supabase: Client, keyword: str, pmids: List[str]):
                 }
                 papers_to_upsert.append(paper)
 
-            # Upsert to Supabase
+            # Upsert to Supabase, merging keywords with existing records
             if papers_to_upsert:
-                # First, check if papers exist to merge keywords
-                # But for bulk insert efficiency, we might just upsert and overwrite or ignore keywords merge for now.
-                # To properly merge keywords, we'd need a stored procedure or fetch-modify-save.
-                # Simplified approach: Just insert. If ID exists, we might overwrite. 
-                # Let's try to append keyword if possible, or just overwrite.
-                # Supabase upsert:
-                
+                # Fetch existing records to merge keywords
+                paper_ids = [p['id'] for p in papers_to_upsert]
+                existing = {}
+                try:
+                    result = supabase.table("pubmed_papers").select("id, keywords").in_("id", paper_ids).execute()
+                    for row in (result.data or []):
+                        existing[row['id']] = row.get('keywords') or []
+                except Exception as e:
+                    print(f"Warning: could not fetch existing keywords: {e}")
+
                 for p in papers_to_upsert:
                     try:
-                        # Simple upsert. 
-                        # Ideally: we want to append the keyword if it doesn't exist.
-                        # Doing this one by one is slow but safer for partial updates logic.
-                        # For batch 2000, maybe too slow.
-                        # Let's do batch upsert. If it overwrites, we lose previous keyword tag for this paper if it was different.
-                        # Acceptable trade-off for MVP v1.
+                        if p['id'] in existing:
+                            merged = list(set(existing[p['id']] + p['keywords']))
+                            p['keywords'] = merged
                         supabase.table("pubmed_papers").upsert(p).execute()
                     except Exception as e:
                         print(f"Error upserting {p['id']}: {e}")

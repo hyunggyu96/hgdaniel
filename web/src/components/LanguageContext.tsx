@@ -34,7 +34,13 @@ export const translations = {
         insights_all_topics: '모든 주제',
         insights_loading: '연구 논문 불러오는 중...',
         insights_no_papers: '검색된 논문이 없습니다.',
+        insights_no_papers_hint: '필터를 조정하거나 데이터 수집 스크립트를 실행해 보세요.',
         insights_read: '데이터 보기',
+        insights_error: '논문을 불러오지 못했습니다.',
+        insights_previous: '이전',
+        insights_next: '다음',
+        insights_page_info: '페이지',
+        insights_page_of: '/',
 
         // Company
         company_header: '기업 브리핑',
@@ -94,7 +100,13 @@ export const translations = {
         insights_all_topics: 'All Topics',
         insights_loading: 'Loading research papers...',
         insights_no_papers: 'No papers found.',
+        insights_no_papers_hint: 'Try adjusting your filters or run the data collection script.',
         insights_read: 'Read Data',
+        insights_error: 'Failed to load papers.',
+        insights_previous: 'Previous',
+        insights_next: 'Next',
+        insights_page_info: 'Page',
+        insights_page_of: 'of',
 
         // Company
         company_header: 'Company Brief',

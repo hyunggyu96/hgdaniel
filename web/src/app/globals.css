@@ -142,6 +142,19 @@
   }
 }
 
+/* Tremor Select dropdown fix - solid background + z-index */
+[data-radix-popper-content-wrapper] {
+  z-index: 50 !important;
+}
+
+[role="listbox"],
+[data-radix-popper-content-wrapper] > div {
+  background-color: white !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1) !important;
+}
+
 /* ===== PERFORMANCE: Reduced Motion Support ===== */
 /* Respects user's "Reduce motion" system preference */
 @media (prefers-reduced-motion: reduce) {
