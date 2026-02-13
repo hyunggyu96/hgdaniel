@@ -4,12 +4,16 @@ from oauth2client.service_account import ServiceAccountCredentials
 from supabase import create_client
 import os
 import datetime
+from dotenv import load_dotenv
+
+load_dotenv('.env.local')
+load_dotenv('backend/.env')
 
 # 설정
 SERVICE_ACCOUNT_FILE = os.path.join(os.path.dirname(__file__), 'collector', 'service_account.json')
-GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1IDFVtmhu5EtxSacRqlklZo6V_x9aB0WVZIzkIx5Wkic"
-SUPABASE_URL = "https://jwkdxygcpfdmavxcbcfe.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp3a2R4eWdjcGZkbWF2eGNiY2ZlIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NjQ4NDY2NywiZXhwIjoyMDgyMDYwNjY3fQ.wpTvHzqa2yewcmBDWx-XURlMssAgOLQNr5m626R4_vo"
+GOOGLE_SHEET_URL = os.getenv("GOOGLE_SHEET_URL_MARKET", "")
+SUPABASE_URL = os.getenv("NEXT_PUBLIC_SUPABASE_URL", "")
+SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
 
 def sync_to_new_sheet():
     print("🔄 Supabase → 새 구글시트 동기화 시작")

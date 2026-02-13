@@ -60,3 +60,7 @@ screenshots/
 
 # Scripts
 *.ps1
+
+# DART API cache
+dart_cache/
+company_financials.json

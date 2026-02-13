@@ -8,7 +8,7 @@ import io
 import xml.etree.ElementTree as ET
 
 # Configuration
-DART_API_KEY = "b6611eb17d9950463ef48c1c17ef11d494bcb0da" # Placeholder/Invalid?
+DART_API_KEY = os.environ.get("DART_API_KEY", "")
 
 class DartAPI:
     def __init__(self, api_key: str):
