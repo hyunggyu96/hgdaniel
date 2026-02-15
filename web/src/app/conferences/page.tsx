@@ -619,101 +619,98 @@ export default function ConferencesPage() {
                     </div>
                 )}
 
-                {/* Calendar */}
-                <div className="bg-white rounded-3xl border border-gray-100 shadow-xl ring-1 ring-black/5 overflow-hidden">
-                    {/* Calendar Header */}
-                    <div className="flex items-center justify-between px-6 py-6 border-b border-gray-100 bg-gray-50/50">
-                        <button onClick={prevMonth} className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm">
-                            ←
-                        </button>
-                        <div className="text-center">
-                            <h2 className="text-2xl font-black tracking-tight text-gray-900">
-                                {lang === 'ko' ? `${year}년 ${monthNames[month]}` : `${monthNames[month]} ${year}`}
-                            </h2>
-                            <p className="text-xs text-blue-500 font-bold uppercase tracking-wider mt-1">
-                                {monthEvents.length} Events Scheduled
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <button onClick={goToToday} className="hidden sm:block text-xs font-bold text-gray-500 hover:text-blue-600 px-3 py-2 bg-white rounded-lg border border-gray-200 hover:border-blue-200 transition-all">
-                                {lang === 'ko' ? '오늘' : 'Today'}
+                {/* Grid: Calendar (Left) & Filters (Right) */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    {/* LEFT COLUMN: Calendar (Compact) - Span 7 */}
+                    <div className="lg:col-span-7 bg-white rounded-3xl border border-gray-100 shadow-xl ring-1 ring-black/5 overflow-hidden">
+                        {/* Calendar Header */}
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+                            <button onClick={prevMonth} className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm">
+                                ←
                             </button>
-                            <button onClick={nextMonth} className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm">
-                                →
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-7 border-b border-gray-100 bg-gray-50/30">
-                        {dayNames.map((day, i) => (
-                            <div key={day} className={`text-center py-4 text-[10px] font-bold tracking-widest uppercase ${i === 0 ? 'text-red-400' : i === 6 ? 'text-blue-400' : 'text-gray-400'}`}>
-                                {day}
+                            <div className="text-center">
+                                <h2 className="text-xl font-black tracking-tight text-gray-900">
+                                    {lang === 'ko' ? `${year}년 ${monthNames[month]}` : `${monthNames[month]} ${year}`}
+                                </h2>
                             </div>
-                        ))}
-                    </div>
+                            <div className="flex items-center gap-2">
+                                <button onClick={goToToday} className="hidden sm:block text-[10px] font-bold text-gray-500 hover:text-blue-600 px-2 py-1.5 bg-white rounded-md border border-gray-200 hover:border-blue-200 transition-all">
+                                    {lang === 'ko' ? '오늘' : 'Today'}
+                                </button>
+                                <button onClick={nextMonth} className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm">
+                                    →
+                                </button>
+                            </div>
+                        </div>
 
-                    <div className="grid grid-cols-7 bg-white">
-                        {Array.from({ length: firstDay }).map((_, i) => (
-                            <div key={`empty-${i}`} className="min-h-[120px] bg-gray-50/20 border-b border-r border-gray-50" />
-                        ))}
-                        {Array.from({ length: daysInMonth }).map((_, i) => {
-                            const day = i + 1;
-                            const dayOfWeek = (firstDay + i) % 7;
-                            const events = getEventsForDay(day);
-                            const today = isToday(year, month, day);
-                            return (
-                                <div key={`day-${day}`} className={`min-h-[120px] border-b border-r border-gray-100 p-2 transition-all hover:bg-blue-50/30 flex flex-col gap-1 group relative ${today ? 'bg-blue-50/20' : ''}`}>
-                                    <div className="flex justify-between items-start">
-                                        <span className={`w-7 h-7 flex items-center justify-center rounded-lg text-sm font-bold transition-all ${today
-                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
-                                                : dayOfWeek === 0 ? 'text-red-400' : dayOfWeek === 6 ? 'text-blue-400' : 'text-gray-700'
-                                            }`}>
-                                            {day}
-                                        </span>
-                                    </div>
-                                    <div className="space-y-1 mt-1">
-                                        {events.slice(0, 3).map((event) => {
-                                            const cc = getCountryColor(event.country[lang]);
-                                            const isSel = selectedEvent?.id === event.id;
-                                            return (
-                                                <button
-                                                    key={event.id}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        setSelectedEvent(selectedEvent?.id === event.id ? null : event);
-                                                        window.scrollTo({ top: 100, behavior: 'smooth' });
-                                                    }}
-                                                    className={`w-full text-left text-[10px] sm:text-[11px] font-bold px-1.5 py-1 rounded-md truncate transition-all duration-200 border flex items-center gap-1 leading-tight
-                                                    ${isSel ? 'scale-105 shadow-md z-10' : 'hover:scale-105 hover:shadow-sm hover:z-10'}`}
-                                                    style={isSel
-                                                        ? { backgroundColor: cc.color, color: '#fff', borderColor: cc.color }
-                                                        : { backgroundColor: cc.bgColor, color: cc.color, borderColor: cc.borderColor }
-                                                    }
-                                                >
-                                                    <span className="shrink-0"><FlagIcon country={event.country[lang]} size={10} /></span>
-                                                    <span className="truncate">{event.name[lang].replace(/ 2026.*/, '')}</span>
-                                                </button>
-                                            );
-                                        })}
-                                        {events.length > 3 && (
-                                            <p className="text-[9px] text-gray-400 font-bold px-1 text-center">+{events.length - 3} more</p>
-                                        )}
-                                    </div>
+                        <div className="grid grid-cols-7 border-b border-gray-100 bg-gray-50/30">
+                            {dayNames.map((day, i) => (
+                                <div key={day} className={`text-center py-2 text-[10px] font-bold tracking-widest uppercase ${i === 0 ? 'text-red-400' : i === 6 ? 'text-blue-400' : 'text-gray-400'}`}>
+                                    {day}
                                 </div>
-                            );
-                        })}
-                        {Array.from({ length: (7 - ((firstDay + daysInMonth) % 7)) % 7 }).map((_, i) => (
-                            <div key={`empty-end-${i}`} className="min-h-[120px] bg-gray-50/20 border-b border-r border-gray-50" />
-                        ))}
-                    </div>
-                </div>
+                            ))}
+                        </div>
 
-                {/* 2-Column Grid: Filters (Left) & Upcoming Events (Right) */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-12 items-start">
-                    {/* LEFT COLUMN: Filters (col-span-4) */}
-                    <div className="lg:col-span-4 flex flex-col gap-6 lg:sticky lg:top-24">
+                        <div className="grid grid-cols-7 bg-white">
+                            {Array.from({ length: firstDay }).map((_, i) => (
+                                <div key={`empty-${i}`} className="min-h-[80px] bg-gray-50/20 border-b border-r border-gray-50" />
+                            ))}
+                            {Array.from({ length: daysInMonth }).map((_, i) => {
+                                const day = i + 1;
+                                const dayOfWeek = (firstDay + i) % 7;
+                                const events = getEventsForDay(day);
+                                const today = isToday(year, month, day);
+                                return (
+                                    <div key={`day-${day}`} className={`min-h-[80px] border-b border-r border-gray-100 p-1 transition-all hover:bg-blue-50/30 flex flex-col gap-0.5 group relative ${today ? 'bg-blue-50/20' : ''}`}>
+                                        <div className="flex justify-between items-start">
+                                            <span className={`w-5 h-5 flex items-center justify-center rounded-md text-xs font-bold transition-all ${today
+                                                    ? 'bg-blue-600 text-white shadow-sm'
+                                                    : dayOfWeek === 0 ? 'text-red-400' : dayOfWeek === 6 ? 'text-blue-400' : 'text-gray-700'
+                                                }`}>
+                                                {day}
+                                            </span>
+                                        </div>
+                                        <div className="space-y-0.5 mt-0.5">
+                                            {events.slice(0, 2).map((event) => {
+                                                const cc = getCountryColor(event.country[lang]);
+                                                const isSel = selectedEvent?.id === event.id;
+                                                return (
+                                                    <button
+                                                        key={event.id}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setSelectedEvent(selectedEvent?.id === event.id ? null : event);
+                                                            window.scrollTo({ top: 100, behavior: 'smooth' });
+                                                        }}
+                                                        className={`w-full text-left text-[9px] font-bold px-1 py-0.5 rounded-[4px] truncate transition-all duration-200 border flex items-center gap-1 leading-none
+                                                        ${isSel ? 'scale-105 shadow-md z-10' : 'hover:scale-105 hover:shadow-sm hover:z-10'}`}
+                                                        style={isSel
+                                                            ? { backgroundColor: cc.color, color: '#fff', borderColor: cc.color }
+                                                            : { backgroundColor: cc.bgColor, color: cc.color, borderColor: cc.borderColor }
+                                                        }
+                                                    >
+                                                        <span className="shrink-0"><FlagIcon country={event.country[lang]} size={9} /></span>
+                                                        <span className="truncate">{event.name[lang].replace(/ 2026.*/, '')}</span>
+                                                    </button>
+                                                );
+                                            })}
+                                            {events.length > 2 && (
+                                                <p className="text-[8px] text-gray-400 font-bold px-1 text-center leading-none">+{events.length - 2}</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                            {Array.from({ length: (7 - ((firstDay + daysInMonth) % 7)) % 7 }).map((_, i) => (
+                                <div key={`empty-end-${i}`} className="min-h-[80px] bg-gray-50/20 border-b border-r border-gray-50" />
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* RIGHT COLUMN: Filters - Span 5 */}
+                    <div className="lg:col-span-5 flex flex-col gap-6">
                         {/* Series Filter */}
-                        <div className="bg-white/60 backdrop-blur-xl p-5 rounded-2xl shadow-sm border border-white/50 ring-1 ring-gray-200/50">
+                        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                             <div className="flex items-center gap-2 mb-3">
                                 <Filter className="w-4 h-4 text-gray-400" />
                                 <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">
@@ -746,14 +743,14 @@ export default function ConferencesPage() {
                         </div>
 
                         {/* Country Filter */}
-                        <div className="bg-white/60 backdrop-blur-xl p-5 rounded-2xl shadow-sm border border-white/50 ring-1 ring-gray-200/50">
+                        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                             <div className="flex items-center gap-2 mb-3">
                                 <MapPin className="w-4 h-4 text-gray-400" />
                                 <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">
                                     {lang === 'ko' ? '국가 필터' : 'Filter by Country'}
                                 </h3>
                             </div>
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-wrap gap-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
                                 <button
                                     onClick={() => { setCountryFilter('ALL'); setSelectedEvent(null); }}
                                     className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${countryFilter === 'ALL'
@@ -782,111 +779,102 @@ export default function ConferencesPage() {
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    {/* RIGHT COLUMN: Upcoming Events (col-span-8) */}
-                    <div className="lg:col-span-8 space-y-5">
-                        <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-200/50">
-                            <div className="flex items-center gap-2">
-                                <h3 className="text-lg font-bold text-gray-900 border-l-4 border-blue-600 pl-3">
-                                    {lang === 'ko' ? '다가오는 일정' : 'Upcoming Events'}
-                                </h3>
-                                <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
-                                    Total {upcomingEvents.length}
-                                </span>
-                            </div>
-                            {/* Pagination Controls */}
-                            {totalPages > 1 && (
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={handlePrevPage}
-                                        disabled={currentPage === 1}
-                                        className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
-                                    >
-                                        <ChevronLeft className="w-4 h-4" />
-                                    </button>
-                                    <span className="text-xs font-bold text-gray-500 tabular-nums">
-                                        {currentPage} / {totalPages}
-                                    </span>
-                                    <button
-                                        onClick={handleNextPage}
-                                        disabled={currentPage === totalPages}
-                                        className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
-                                    >
-                                        <ChevronRight className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            )}
+                {/* Bottom Section: Upcoming Events */}
+                <div className="space-y-5 pt-8">
+                    <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-200/50">
+                        <div className="flex items-center gap-2">
+                            <h3 className="text-lg font-bold text-gray-900 border-l-4 border-blue-600 pl-3">
+                                {lang === 'ko' ? '다가오는 일정' : 'Upcoming Events'}
+                            </h3>
+                            <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                                Total {upcomingEvents.length}
+                            </span>
                         </div>
+                        {/* Pagination Controls */}
+                        {totalPages > 1 && (
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={handlePrevPage}
+                                    disabled={currentPage === 1}
+                                    className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                                >
+                                    <ChevronLeft className="w-4 h-4" />
+                                </button>
+                                <span className="text-xs font-bold text-gray-500 tabular-nums">
+                                    {currentPage} / {totalPages}
+                                </span>
+                                <button
+                                    onClick={handleNextPage}
+                                    disabled={currentPage === totalPages}
+                                    className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                                >
+                                    <ChevronRight className="w-4 h-4" />
+                                </button>
+                            </div>
+                        )}
+                    </div>
 
-                        <div className="space-y-3">
-                            {currentUpcomingEvents.map((event) => {
-                                const cc = getCountryColor(event.country[lang]);
-                                const startDate = new Date(event.startDate);
-                                const endDate = new Date(event.endDate);
-                                const isOngoing = new Date(event.startDate) <= new Date() && new Date(event.endDate) >= new Date();
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {currentUpcomingEvents.map((event) => {
+                            const cc = getCountryColor(event.country[lang]);
+                            const startDate = new Date(event.startDate);
+                            // const endDate = new Date(event.endDate);
+                            const isOngoing = new Date(event.startDate) <= new Date() && new Date(event.endDate) >= new Date();
 
-                                return (
+                            return (
+                                <div
+                                    key={event.id}
+                                    onClick={() => { setSelectedEvent(event); window.scrollTo({ top: 100, behavior: 'smooth' }); }}
+                                    className="group bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-lg cursor-pointer transition-all hover:scale-[1.01] flex flex-col relative overflow-hidden h-full"
+                                >
                                     <div
-                                        key={event.id}
-                                        onClick={() => { setSelectedEvent(event); window.scrollTo({ top: 100, behavior: 'smooth' }); }}
-                                        className="group bg-white rounded-2xl p-4 md:p-5 border border-gray-100 shadow-sm hover:shadow-lg cursor-pointer transition-all hover:scale-[1.01] flex flex-col sm:flex-row gap-5 items-stretch relative overflow-hidden"
-                                    >
-                                        <div
-                                            className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-gray-50 to-gray-100 rounded-bl-full -mr-10 -mt-10 opacity-50 group-hover:scale-110 transition-transform duration-500 pointer-events-none"
-                                            style={{ background: `radial-gradient(circle at top right, ${cc.color}15, transparent)` }}
-                                        />
+                                        className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-gray-50 to-gray-100 rounded-bl-full -mr-10 -mt-10 opacity-50 group-hover:scale-110 transition-transform duration-500 pointer-events-none"
+                                        style={{ background: `radial-gradient(circle at top right, ${cc.color}15, transparent)` }}
+                                    />
 
+                                    <div className="flex items-start gap-4 mb-3 relative z-10">
                                         {/* Date Box */}
-                                        <div className="hidden sm:flex flex-col items-center justify-center w-20 shrink-0 bg-gray-50 rounded-xl border border-gray-100 group-hover:border-blue-100 group-hover:bg-blue-50/30 transition-colors">
-                                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">{lang === 'ko' ? `${startDate.getMonth() + 1}월` : MONTH_NAMES_EN[startDate.getMonth()].substring(0, 3)}</span>
-                                            <span className="text-3xl font-black text-gray-900 leading-none my-1">{startDate.getDate()}</span>
-                                            <span className="text-[10px] font-bold text-gray-400">{startDate.getFullYear()}</span>
+                                        <div className="flex flex-col items-center justify-center w-16 h-16 shrink-0 bg-gray-50 rounded-xl border border-gray-100 group-hover:border-blue-100 group-hover:bg-blue-50/30 transition-colors">
+                                            <span className="text-xs font-bold text-gray-500 uppercase">{lang === 'ko' ? `${startDate.getMonth() + 1}월` : MONTH_NAMES_EN[startDate.getMonth()].substring(0, 3)}</span>
+                                            <span className="text-2xl font-black text-gray-900 leading-none">{startDate.getDate()}</span>
                                         </div>
-
-                                        {/* Content */}
-                                        <div className="flex-1 min-w-0 flex flex-col justify-center">
+                                        <div className="min-w-0">
                                             <div className="flex items-center gap-2 mb-1">
-                                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
                                                     {event.series}
                                                 </span>
                                                 {isOngoing && (
-                                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-600 animate-pulse">
+                                                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-600 animate-pulse">
                                                         LIVE
                                                     </span>
                                                 )}
                                             </div>
-                                            <h4 className="text-lg md:text-xl font-bold text-gray-900 group-hover:text-blue-700 transition-colors truncate">
+                                            <h4 className="text-base font-bold text-gray-900 group-hover:text-blue-700 transition-colors line-clamp-2 leading-tight">
                                                 {event.name[lang]}
                                             </h4>
-                                            <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
-                                                <div className="flex items-center gap-1.5">
-                                                    <FlagIcon country={event.country[lang]} size={14} />
-                                                    <span className="font-medium">{event.city[lang]}, {event.country[lang]}</span>
-                                                </div>
-                                                <div className="hidden sm:block w-1 h-1 rounded-full bg-gray-300" />
-                                                <div className="flex items-center gap-1.5 text-gray-500 text-xs sm:text-sm">
-                                                    <CalendarIcon className="w-3.5 h-3.5" />
-                                                    <span>{formatDateRange(event.startDate, event.endDate, lang)}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Action Icon (Mobile Hidden) */}
-                                        <div className="hidden sm:flex items-center justify-center pl-4 border-l border-gray-100">
-                                            <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-sm group-hover:shadow-md">
-                                                <ChevronRight className="w-5 h-5" />
-                                            </div>
                                         </div>
                                     </div>
-                                );
-                            })}
-                        </div>
-                        {/* Bottom Pagination Info */}
-                        <div className="flex justify-center mt-6 pt-4 border-t border-gray-100">
-                            <p className="text-xs text-gray-400">
-                                Showing {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, upcomingEvents.length)} of {upcomingEvents.length} events
-                            </p>
-                        </div>
+
+                                    <div className="mt-auto flex items-center justify-between text-xs text-gray-600 pt-2 border-t border-gray-50">
+                                        <div className="flex items-center gap-1.5">
+                                            <FlagIcon country={event.country[lang]} size={12} />
+                                            <span className="font-medium truncate max-w-[120px]">{event.city[lang]}, {event.country[lang]}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1 text-gray-400">
+                                            <ExternalLink className="w-3 h-3" />
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    {/* Bottom Pagination Info */}
+                    <div className="flex justify-center mt-6 pt-4 border-t border-gray-100">
+                        <p className="text-xs text-gray-400">
+                            Showing {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, upcomingEvents.length)} of {upcomingEvents.length} events
+                        </p>
                     </div>
                 </div>
             </div>
