@@ -371,8 +371,8 @@ function EventBadge({ event, onClick, isSelected, lang }: {
             <div
                 className={`text-[9px] sm:text-[11px] font-semibold px-1.5 py-0.5 rounded-md truncate transition-all duration-200 border
           ${isSelected
-                        ? 'bg-slate-700 text-white border-slate-600 shadow-md scale-[1.02]'
-                        : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 hover:scale-[1.02]'
+                        ? 'bg-blue-600 text-white border-blue-500 shadow-md shadow-blue-600/20 scale-[1.02]'
+                        : 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 hover:scale-[1.02]'
                     }`}
             >
                 {event.name[lang].replace(/ 2026$/, '')} ({cityLabel})
@@ -391,11 +391,11 @@ function EventDetailPanel({ event, onClose, lang }: {
     const statusStyle = isOngoing ? 'bg-emerald-100 text-emerald-700' : isPast ? 'bg-gray-100 text-gray-500' : 'bg-amber-50 text-amber-600';
 
     return (
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:p-6 transition-all duration-300 animate-in fade-in slide-in-from-top-2">
+        <div className="rounded-2xl border border-blue-200 bg-blue-50/60 p-5 sm:p-6 transition-all duration-300 animate-in fade-in slide-in-from-top-2">
             <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
-                        <span className="text-[10px] font-black tracking-wider uppercase px-2.5 py-1 rounded-full bg-slate-200 text-slate-700">
+                        <span className="text-[10px] font-black tracking-wider uppercase px-2.5 py-1 rounded-full bg-blue-100 text-blue-700">
                             {event.series}
                         </span>
                         <span className={`text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full ${statusStyle}`}>
@@ -433,12 +433,12 @@ function EventDetailPanel({ event, onClose, lang }: {
                     </div>
                     {/* Official Website Link */}
                     {event.url && (
-                        <div className="mt-4 pt-3 border-t border-slate-200">
+                        <div className="mt-4 pt-3 border-t border-blue-200/60">
                             <a
                                 href={event.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 text-white text-[12px] font-bold tracking-wide hover:bg-slate-700 transition-all duration-200 shadow-sm hover:shadow-md"
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white text-[12px] font-bold tracking-wide hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md shadow-blue-600/20"
                             >
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -539,7 +539,7 @@ export default function ConferencesPage() {
                 {/* ── Page Header ── */}
                 <div className="mb-8 sm:mb-10">
                     <div className="flex items-center gap-3 mb-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center shadow-lg shadow-slate-500/20">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-500/25">
                             <span className="text-white text-lg">🌍</span>
                         </div>
                         <div>
@@ -621,8 +621,8 @@ export default function ConferencesPage() {
                                     className={`min-h-[80px] sm:min-h-[110px] border-b border-r border-gray-100 p-1 sm:p-1.5 transition-colors duration-150 ${today ? 'bg-blue-50/50' : 'hover:bg-gray-50/50'
                                         }`}>
                                     <div className="flex items-center justify-between mb-1">
-                                        <span className={`text-xs sm:text-sm font-bold w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-lg ${today ? 'bg-slate-800 text-white shadow-md shadow-slate-800/30'
-                                                : dayOfWeek === 0 ? 'text-red-400' : dayOfWeek === 6 ? 'text-blue-400' : 'text-gray-700'
+                                        <span className={`text-xs sm:text-sm font-bold w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-lg ${today ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
+                                            : dayOfWeek === 0 ? 'text-red-400' : dayOfWeek === 6 ? 'text-blue-400' : 'text-gray-700'
                                             }`}>
                                             {day}
                                         </span>
@@ -661,8 +661,8 @@ export default function ConferencesPage() {
                             <button
                                 onClick={() => { setSeriesFilter('ALL'); setSelectedEvent(null); }}
                                 className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide transition-all duration-200 border ${seriesFilter === 'ALL'
-                                        ? 'bg-slate-800 text-white border-slate-800 shadow-md'
-                                        : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                                    ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-600/20'
+                                    : 'bg-white text-blue-600 border-blue-200 hover:border-blue-300 hover:bg-blue-50'
                                     }`}
                             >
                                 ALL ({CONFERENCES.length})
@@ -674,8 +674,8 @@ export default function ConferencesPage() {
                                         key={s}
                                         onClick={() => { setSeriesFilter(isActive ? 'ALL' : s); setSelectedEvent(null); }}
                                         className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide transition-all duration-200 border ${isActive
-                                                ? 'bg-slate-700 text-white border-slate-700 shadow-md'
-                                                : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-100'
+                                            ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-600/20'
+                                            : 'bg-blue-50 text-blue-700 border-blue-200 hover:border-blue-300 hover:bg-blue-100'
                                             }`}
                                     >
                                         {s} {(seriesCounts[s] || 0) > 1 ? `(${seriesCounts[s]})` : ''}
@@ -694,8 +694,8 @@ export default function ConferencesPage() {
                             <button
                                 onClick={() => { setCountryFilter('ALL'); setSelectedEvent(null); }}
                                 className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide transition-all duration-200 border ${countryFilter === 'ALL'
-                                        ? 'bg-slate-800 text-white border-slate-800 shadow-md'
-                                        : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                                    ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-600/20'
+                                    : 'bg-white text-blue-600 border-blue-200 hover:border-blue-300 hover:bg-blue-50'
                                     }`}
                             >
                                 {lang === 'ko' ? '전체' : 'All'}
@@ -709,8 +709,8 @@ export default function ConferencesPage() {
                                         key={c}
                                         onClick={() => { setCountryFilter(isActive ? 'ALL' : c); setSelectedEvent(null); }}
                                         className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide transition-all duration-200 border ${isActive
-                                                ? 'bg-slate-700 text-white border-slate-700 shadow-md'
-                                                : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                                            ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-600/20'
+                                            : 'bg-blue-50 text-blue-700 border-blue-200 hover:border-blue-300 hover:bg-blue-100'
                                             }`}
                                     >
                                         {flag} {c} ({count})
@@ -727,7 +727,7 @@ export default function ConferencesPage() {
                                 {lang === 'ko' ? '필터 적용 중:' : 'Active filters:'}
                             </span>
                             {seriesFilter !== 'ALL' && (
-                                <span className="text-[11px] font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg">
+                                <span className="text-[11px] font-bold text-blue-700 bg-blue-100 px-2.5 py-1 rounded-lg">
                                     {seriesFilter}
                                 </span>
                             )}
@@ -735,7 +735,7 @@ export default function ConferencesPage() {
                                 <span className="text-[11px] text-gray-300 font-bold">+</span>
                             )}
                             {countryFilter !== 'ALL' && (
-                                <span className="text-[11px] font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg">
+                                <span className="text-[11px] font-bold text-blue-700 bg-blue-100 px-2.5 py-1 rounded-lg">
                                     {countryFilter}
                                 </span>
                             )}
@@ -744,7 +744,7 @@ export default function ConferencesPage() {
                             </span>
                             <button
                                 onClick={() => { setSeriesFilter('ALL'); setCountryFilter('ALL'); setSelectedEvent(null); }}
-                                className="text-[11px] text-slate-400 hover:text-slate-600 font-bold transition-colors ml-1 underline"
+                                className="text-[11px] text-blue-400 hover:text-blue-600 font-bold transition-colors ml-1 underline"
                             >
                                 {lang === 'ko' ? '초기화' : 'Clear all'}
                             </button>
@@ -755,7 +755,7 @@ export default function ConferencesPage() {
                 {/* ── Upcoming Events List ── */}
                 <div className="mt-10">
                     <h2 className="text-lg font-black tracking-tight text-gray-900 mb-4 flex items-center gap-2">
-                        <span className="w-1.5 h-6 bg-gradient-to-b from-slate-600 to-slate-400 rounded-full" />
+                        <span className="w-1.5 h-6 bg-gradient-to-b from-blue-500 to-blue-300 rounded-full" />
                         {lang === 'ko' ? '다가오는 컨퍼런스' : 'Upcoming Conferences'}
                     </h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -769,9 +769,9 @@ export default function ConferencesPage() {
                                         setYear(s.getFullYear()); setMonth(s.getMonth());
                                         window.scrollTo({ top: 0, behavior: 'smooth' });
                                     }}
-                                    className="text-left group bg-white rounded-xl border border-gray-100 p-4 hover:border-slate-300 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
+                                    className="text-left group bg-white rounded-xl border border-gray-100 p-4 hover:border-blue-300 hover:shadow-md hover:shadow-blue-500/5 transition-all duration-300 hover:-translate-y-0.5">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <span className="text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                                        <span className="text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full bg-blue-100 text-blue-600">
                                             {event.series}
                                         </span>
                                         {isOngoing && (
@@ -783,7 +783,7 @@ export default function ConferencesPage() {
                                             </span>
                                         )}
                                     </div>
-                                    <h3 className="text-sm font-bold text-gray-900 group-hover:text-slate-600 transition-colors mb-1.5 leading-tight">
+                                    <h3 className="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition-colors mb-1.5 leading-tight">
                                         {event.name[lang]}
                                     </h3>
                                     <div className="flex items-center gap-3 text-xs text-gray-500">
