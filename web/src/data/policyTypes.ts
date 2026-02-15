@@ -3,11 +3,23 @@ export interface LocalizedText {
     en: string;
 }
 
+export type PolicyConfidence = "high" | "medium" | "low";
+
+export interface PolicyReference {
+    id: string;
+    title: string;
+    url: string;
+    accessedOn: string; // YYYY-MM-DD
+    citation?: LocalizedText; // Article/Clause or rationale
+}
+
 export interface CountryPolicyFact {
     id: string;
     label: LocalizedText;
     value: LocalizedText;
     note?: LocalizedText;
+    confidence: PolicyConfidence;
+    references: PolicyReference[];
 }
 
 export interface CountryPolicyRegulation {
@@ -26,6 +38,7 @@ export interface CountryPolicySource {
     id: string;
     title: string;
     url: string;
+    accessedOn?: string;
 }
 
 export interface CountryPolicyProfile {

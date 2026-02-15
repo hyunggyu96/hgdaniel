@@ -6,7 +6,7 @@ import { Badge, Card, Text, Title } from "@tremor/react";
 import { useLanguage } from "@/components/LanguageContext";
 import { koreaPolicyProfile } from "@/data/korea_policy_profile";
 import { vietnamPolicyProfile } from "@/data/vietnam_policy_profile";
-import type { LocalizedText } from "@/data/policyTypes";
+import type { LocalizedText, PolicyConfidence } from "@/data/policyTypes";
 
 interface Country {
     id: string;
@@ -33,7 +33,9 @@ const COUNTRIES: Country[] = [
 const SUPPORTED_COUNTRIES = new Set(["kr", "vn"]);
 
 const getLocalizedText = (language: "ko" | "en", text: LocalizedText): string => {
-    return language === "ko" ? text.ko : text.en;
+    if (language === "en") return text.en;
+    // Guardrail: if Korean text is corrupted/non-Hangul, fall back to English for readability.
+    return /[가-힣]/.test(text.ko) ? text.ko : text.en;
 };
 
 const formatIsoDate = (dateStr?: string): string => {
@@ -41,6 +43,12 @@ const formatIsoDate = (dateStr?: string): string => {
     const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr);
     if (!match) return dateStr;
     return `${match[1]}.${match[2]}.${match[3]}`;
+};
+
+const confidenceBadge = (level: PolicyConfidence): { label: string; color: "emerald" | "amber" | "rose" } => {
+    if (level === "high") return { label: "HIGH", color: "emerald" };
+    if (level === "medium") return { label: "MEDIUM", color: "amber" };
+    return { label: "LOW", color: "rose" };
 };
 
 export default function PolicyPage() {
@@ -140,9 +148,14 @@ export default function PolicyPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {koreaPolicyProfile.facts.map((fact) => (
                                 <Card key={fact.id} className="border border-gray-200">
-                                    <Text className="text-xs uppercase tracking-wide text-gray-500">
-                                        {getLocalizedText(language, fact.label)}
-                                    </Text>
+                                    <div className="flex items-center justify-between gap-2">
+                                        <Text className="text-xs uppercase tracking-wide text-gray-500">
+                                            {getLocalizedText(language, fact.label)}
+                                        </Text>
+                                        <Badge color={confidenceBadge(fact.confidence).color}>
+                                            {`Confidence ${confidenceBadge(fact.confidence).label}`}
+                                        </Badge>
+                                    </div>
                                     <p className="mt-2 text-sm text-gray-900 leading-6 whitespace-pre-line">
                                         {getLocalizedText(language, fact.value)}
                                     </p>
@@ -151,6 +164,23 @@ export default function PolicyPage() {
                                             {getLocalizedText(language, fact.note)}
                                         </p>
                                     )}
+                                    <div className="mt-4 pt-3 border-t border-gray-100 space-y-2">
+                                        <Text className="text-[11px] uppercase tracking-wide text-gray-500">References</Text>
+                                        {fact.references.map((ref) => (
+                                            <div key={ref.id} className="text-xs leading-5 text-gray-600">
+                                                <a
+                                                    href={ref.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-600 hover:text-blue-700 break-all"
+                                                >
+                                                    {ref.title}
+                                                </a>
+                                                <p>{`Verified: ${formatIsoDate(ref.accessedOn)}`}</p>
+                                                {ref.citation && <p>{getLocalizedText(language, ref.citation)}</p>}
+                                            </div>
+                                        ))}
+                                    </div>
                                 </Card>
                             ))}
                         </div>
@@ -193,15 +223,19 @@ export default function PolicyPage() {
                                 <h3 className="text-base font-semibold text-gray-900 mb-3">Official Sources</h3>
                                 <div className="space-y-2">
                                     {koreaPolicyProfile.sources.map((source) => (
-                                        <a
-                                            key={source.id}
-                                            href={source.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="block text-sm text-blue-600 hover:text-blue-700 break-all"
-                                        >
-                                            {source.title}
-                                        </a>
+                                        <div key={source.id} className="space-y-1">
+                                            <a
+                                                href={source.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="block text-sm text-blue-600 hover:text-blue-700 break-all"
+                                            >
+                                                {source.title}
+                                            </a>
+                                            {source.accessedOn && (
+                                                <p className="text-xs text-gray-500">{`Verified: ${formatIsoDate(source.accessedOn)}`}</p>
+                                            )}
+                                        </div>
                                     ))}
                                 </div>
                             </Card>
@@ -252,9 +286,14 @@ export default function PolicyPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {vietnamPolicyProfile.facts.map((fact) => (
                                 <Card key={fact.id} className="border border-gray-200">
-                                    <Text className="text-xs uppercase tracking-wide text-gray-500">
-                                        {getLocalizedText(language, fact.label)}
-                                    </Text>
+                                    <div className="flex items-center justify-between gap-2">
+                                        <Text className="text-xs uppercase tracking-wide text-gray-500">
+                                            {getLocalizedText(language, fact.label)}
+                                        </Text>
+                                        <Badge color={confidenceBadge(fact.confidence).color}>
+                                            {`Confidence ${confidenceBadge(fact.confidence).label}`}
+                                        </Badge>
+                                    </div>
                                     <p className="mt-2 text-sm text-gray-900 leading-6 whitespace-pre-line">
                                         {getLocalizedText(language, fact.value)}
                                     </p>
@@ -263,6 +302,23 @@ export default function PolicyPage() {
                                             {getLocalizedText(language, fact.note)}
                                         </p>
                                     )}
+                                    <div className="mt-4 pt-3 border-t border-gray-100 space-y-2">
+                                        <Text className="text-[11px] uppercase tracking-wide text-gray-500">References</Text>
+                                        {fact.references.map((ref) => (
+                                            <div key={ref.id} className="text-xs leading-5 text-gray-600">
+                                                <a
+                                                    href={ref.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-600 hover:text-blue-700 break-all"
+                                                >
+                                                    {ref.title}
+                                                </a>
+                                                <p>{`Verified: ${formatIsoDate(ref.accessedOn)}`}</p>
+                                                {ref.citation && <p>{getLocalizedText(language, ref.citation)}</p>}
+                                            </div>
+                                        ))}
+                                    </div>
                                 </Card>
                             ))}
                         </div>
@@ -305,15 +361,19 @@ export default function PolicyPage() {
                                 <h3 className="text-base font-semibold text-gray-900 mb-3">Official Sources</h3>
                                 <div className="space-y-2">
                                     {vietnamPolicyProfile.sources.map((source) => (
-                                        <a
-                                            key={source.id}
-                                            href={source.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="block text-sm text-blue-600 hover:text-blue-700 break-all"
-                                        >
-                                            {source.title}
-                                        </a>
+                                        <div key={source.id} className="space-y-1">
+                                            <a
+                                                href={source.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="block text-sm text-blue-600 hover:text-blue-700 break-all"
+                                            >
+                                                {source.title}
+                                            </a>
+                                            {source.accessedOn && (
+                                                <p className="text-xs text-gray-500">{`Verified: ${formatIsoDate(source.accessedOn)}`}</p>
+                                            )}
+                                        </div>
                                     ))}
                                 </div>
                             </Card>
