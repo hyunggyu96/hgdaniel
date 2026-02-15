@@ -179,7 +179,7 @@ const CONFERENCES: ConferenceEvent[] = [
         venue: 'NECC', confirmed: true,
     },
     {
-        id: 'ceswam-2026', series: 'CeSWAM',
+        id: 'ceswam-2026', series: 'SWAM',
         name: { ko: 'CeSWAM 2026', en: 'CeSWAM 2026' },
         startDate: '2026-04-17', endDate: '2026-04-19',
         city: { ko: '스마랑', en: 'Semarang' }, country: { ko: '인도네시아', en: 'Indonesia' },
@@ -193,7 +193,7 @@ const CONFERENCES: ConferenceEvent[] = [
         venue: 'SNIEC', confirmed: true,
     },
     {
-        id: 'weswam-2026', series: 'WeSWAM',
+        id: 'weswam-2026', series: 'SWAM',
         name: { ko: 'WeSWAM 2026', en: 'WeSWAM 2026' },
         startDate: '2026-06-12', endDate: '2026-06-14',
         city: { ko: '반둥', en: 'Bandung' }, country: { ko: '인도네시아', en: 'Indonesia' },
@@ -214,7 +214,7 @@ const CONFERENCES: ConferenceEvent[] = [
         venue: 'Sheraton HK Hotel', confirmed: true,
     },
     {
-        id: 'iswam-bali-2026', series: 'i-SWAM',
+        id: 'iswam-bali-2026', series: 'SWAM',
         name: { ko: '8th i-SWAM Bali 2026', en: '8th i-SWAM Bali 2026' },
         startDate: '2026-07-10', endDate: '2026-07-12',
         city: { ko: '발리', en: 'Bali' }, country: { ko: '인도네시아', en: 'Indonesia' },
@@ -235,7 +235,7 @@ const CONFERENCES: ConferenceEvent[] = [
         venue: 'Marina Bay Sands', confirmed: true,
     },
     {
-        id: 'easwam-2026', series: 'EaSWAM',
+        id: 'easwam-2026', series: 'SWAM',
         name: { ko: 'EaSWAM 2026', en: 'EaSWAM 2026' },
         startDate: '2026-09-25', endDate: '2026-09-27',
         city: { ko: '수라바야', en: 'Surabaya' }, country: { ko: '인도네시아', en: 'Indonesia' },
@@ -277,7 +277,7 @@ const CONFERENCES: ConferenceEvent[] = [
         venue: 'Centara Grand (TBD)', confirmed: false,
     },
     {
-        id: 'iswam-world-2026', series: 'i-SWAM',
+        id: 'iswam-world-2026', series: 'SWAM',
         name: { ko: '17th i-SWAM World Congress 2026', en: '17th i-SWAM World Congress 2026' },
         startDate: '2026-12-04', endDate: '2026-12-06',
         city: { ko: '탕게랑', en: 'Tangerang' }, country: { ko: '인도네시아', en: 'Indonesia' },
@@ -350,7 +350,7 @@ function EventBadge({ event, onClick, isSelected, lang }: {
                         : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 hover:scale-[1.02]'
                     }`}
             >
-                {event.series} ({cityLabel})
+                {event.name[lang].replace(/ 2026$/, '')} ({cityLabel})
             </div>
         </button>
     );
@@ -574,7 +574,7 @@ export default function ConferencesPage() {
                                         }`}>
                                     <div className="flex items-center justify-between mb-1">
                                         <span className={`text-xs sm:text-sm font-bold w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-lg ${today ? 'bg-slate-800 text-white shadow-md shadow-slate-800/30'
-                                                : dayOfWeek === 0 ? 'text-red-400' : dayOfWeek === 6 ? 'text-blue-400' : 'text-gray-700'
+                                            : dayOfWeek === 0 ? 'text-red-400' : dayOfWeek === 6 ? 'text-blue-400' : 'text-gray-700'
                                             }`}>
                                             {day}
                                         </span>
@@ -617,8 +617,8 @@ export default function ConferencesPage() {
                             <button
                                 onClick={() => { setSeriesFilter('ALL'); setSelectedEvent(null); }}
                                 className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide transition-all duration-200 border ${seriesFilter === 'ALL'
-                                        ? 'bg-slate-800 text-white border-slate-800 shadow-md'
-                                        : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                                    ? 'bg-slate-800 text-white border-slate-800 shadow-md'
+                                    : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                                     }`}
                             >
                                 ALL ({CONFERENCES.length})
@@ -630,8 +630,8 @@ export default function ConferencesPage() {
                                         key={s}
                                         onClick={() => { setSeriesFilter(isActive ? 'ALL' : s); setSelectedEvent(null); }}
                                         className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide transition-all duration-200 border ${isActive
-                                                ? 'bg-slate-700 text-white border-slate-700 shadow-md'
-                                                : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-100'
+                                            ? 'bg-slate-700 text-white border-slate-700 shadow-md'
+                                            : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-100'
                                             }`}
                                     >
                                         {s} {(seriesCounts[s] || 0) > 1 ? `(${seriesCounts[s]})` : ''}
@@ -650,8 +650,8 @@ export default function ConferencesPage() {
                             <button
                                 onClick={() => { setCountryFilter('ALL'); setSelectedEvent(null); }}
                                 className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide transition-all duration-200 border ${countryFilter === 'ALL'
-                                        ? 'bg-slate-800 text-white border-slate-800 shadow-md'
-                                        : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                                    ? 'bg-slate-800 text-white border-slate-800 shadow-md'
+                                    : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                                     }`}
                             >
                                 {lang === 'ko' ? '전체' : 'All'}
@@ -665,8 +665,8 @@ export default function ConferencesPage() {
                                         key={c}
                                         onClick={() => { setCountryFilter(isActive ? 'ALL' : c); setSelectedEvent(null); }}
                                         className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide transition-all duration-200 border ${isActive
-                                                ? 'bg-slate-700 text-white border-slate-700 shadow-md'
-                                                : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                                            ? 'bg-slate-700 text-white border-slate-700 shadow-md'
+                                            : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                                             }`}
                                     >
                                         {flag} {c} ({count})
