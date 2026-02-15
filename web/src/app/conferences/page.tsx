@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useLanguage } from '@/components/LanguageContext';
-import { Globe, Calendar as CalendarIcon, MapPin, ExternalLink, X, Filter, ChevronLeft, ChevronRight } from "lucide-react";
+import { Globe, Calendar as CalendarIcon, MapPin, ExternalLink, X, Filter } from "lucide-react";
 
 // ─── Types ───
 interface ConferenceEvent {
@@ -509,10 +509,7 @@ export default function ConferencesPage() {
     const [seriesFilter, setSeriesFilter] = useState<string>('ALL');
     const [countryFilter, setCountryFilter] = useState<string>('ALL');
 
-    // Pagination for Upcoming Events
-    const [itemsPerPage] = useState(6);
-    const [currentPage, setCurrentPage] = useState(1);
-
+    // Pagination Removed as per user request
     const monthNames = lang === 'ko' ? MONTH_NAMES_KO : MONTH_NAMES_EN;
     const dayNames = lang === 'ko' ? DAY_NAMES_KO : DAY_NAMES_EN;
     const countries = lang === 'ko' ? ALL_COUNTRIES_KO : ALL_COUNTRIES_EN;
@@ -535,21 +532,6 @@ export default function ConferencesPage() {
             .filter((c) => new Date(c.endDate) >= today)
             .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
     }, [filteredConferences]);
-
-    // Pagination Logic
-    const totalPages = Math.ceil(upcomingEvents.length / itemsPerPage);
-    const currentUpcomingEvents = upcomingEvents.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    );
-
-    const handlePrevPage = () => {
-        setCurrentPage((prev) => Math.max(prev - 1, 1));
-    };
-
-    const handleNextPage = () => {
-        setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-    };
 
 
     const daysInMonth = getDaysInMonth(year, month);
@@ -781,9 +763,9 @@ export default function ConferencesPage() {
                     </div>
                 </div>
 
-                {/* Bottom Section: Upcoming Events */}
+                {/* Bottom Section: Upcoming Events (List View) */}
                 <div className="space-y-5 pt-8">
-                    <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-200/50">
+                    <div className="flex items-center justify-between mb-2 pb-2 border-b border-gray-200/50">
                         <div className="flex items-center gap-2">
                             <h3 className="text-lg font-bold text-gray-900 border-l-4 border-blue-600 pl-3">
                                 {lang === 'ko' ? '다가오는 일정' : 'Upcoming Events'}
@@ -792,89 +774,67 @@ export default function ConferencesPage() {
                                 Total {upcomingEvents.length}
                             </span>
                         </div>
-                        {/* Pagination Controls */}
-                        {totalPages > 1 && (
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={handlePrevPage}
-                                    disabled={currentPage === 1}
-                                    className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
-                                >
-                                    <ChevronLeft className="w-4 h-4" />
-                                </button>
-                                <span className="text-xs font-bold text-gray-500 tabular-nums">
-                                    {currentPage} / {totalPages}
-                                </span>
-                                <button
-                                    onClick={handleNextPage}
-                                    disabled={currentPage === totalPages}
-                                    className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
-                                >
-                                    <ChevronRight className="w-4 h-4" />
-                                </button>
-                            </div>
-                        )}
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {currentUpcomingEvents.map((event) => {
+                    <div className="flex flex-col gap-3">
+                        {upcomingEvents.map((event) => {
                             const cc = getCountryColor(event.country[lang]);
                             const startDate = new Date(event.startDate);
-                            // const endDate = new Date(event.endDate);
                             const isOngoing = new Date(event.startDate) <= new Date() && new Date(event.endDate) >= new Date();
 
                             return (
                                 <div
                                     key={event.id}
                                     onClick={() => { setSelectedEvent(event); window.scrollTo({ top: 100, behavior: 'smooth' }); }}
-                                    className="group bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-lg cursor-pointer transition-all hover:scale-[1.01] flex flex-col relative overflow-hidden h-full"
+                                    className="group bg-white rounded-xl p-3 border border-gray-100 shadow-sm hover:shadow-md cursor-pointer transition-all hover:scale-[1.005] flex items-center justify-between gap-4 relative overflow-hidden"
                                 >
                                     <div
-                                        className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-gray-50 to-gray-100 rounded-bl-full -mr-10 -mt-10 opacity-50 group-hover:scale-110 transition-transform duration-500 pointer-events-none"
-                                        style={{ background: `radial-gradient(circle at top right, ${cc.color}15, transparent)` }}
+                                        className="absolute left-0 top-0 bottom-0 w-1 transition-all group-hover:w-1.5"
+                                        style={{ backgroundColor: cc.color }}
                                     />
 
-                                    <div className="flex items-start gap-4 mb-3 relative z-10">
-                                        {/* Date Box */}
-                                        <div className="flex flex-col items-center justify-center w-16 h-16 shrink-0 bg-gray-50 rounded-xl border border-gray-100 group-hover:border-blue-100 group-hover:bg-blue-50/30 transition-colors">
-                                            <span className="text-xs font-bold text-gray-500 uppercase">{lang === 'ko' ? `${startDate.getMonth() + 1}월` : MONTH_NAMES_EN[startDate.getMonth()].substring(0, 3)}</span>
-                                            <span className="text-2xl font-black text-gray-900 leading-none">{startDate.getDate()}</span>
+                                    <div className="flex items-center gap-4 md:gap-6 pl-2 flex-1 min-w-0">
+                                        {/* Date */}
+                                        <div className="flex flex-col items-center justify-center w-12 shrink-0">
+                                            <span className="text-[10px] font-bold text-gray-400 uppercase leading-none">{lang === 'ko' ? `${startDate.getMonth() + 1}월` : MONTH_NAMES_EN[startDate.getMonth()].substring(0, 3)}</span>
+                                            <span className="text-xl font-bold text-gray-900 leading-tight">{startDate.getDate()}</span>
                                         </div>
-                                        <div className="min-w-0">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-                                                    {event.series}
-                                                </span>
+
+                                        {/* Info */}
+                                        <div className="min-w-0 flex flex-col md:flex-row md:items-center gap-1 md:gap-4 flex-1">
+                                            <div className="flex items-center gap-2 shrink-0">
                                                 {isOngoing && (
-                                                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-600 animate-pulse">
+                                                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-600 animate-pulse uppercase">
                                                         LIVE
                                                     </span>
                                                 )}
+                                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                                                    {event.series}
+                                                </span>
                                             </div>
-                                            <h4 className="text-base font-bold text-gray-900 group-hover:text-blue-700 transition-colors line-clamp-2 leading-tight">
+                                            <h4 className="text-sm md:text-base font-bold text-gray-900 group-hover:text-blue-700 transition-colors truncate">
                                                 {event.name[lang]}
                                             </h4>
                                         </div>
                                     </div>
 
-                                    <div className="mt-auto flex items-center justify-between text-xs text-gray-600 pt-2 border-t border-gray-50">
-                                        <div className="flex items-center gap-1.5">
-                                            <FlagIcon country={event.country[lang]} size={12} />
-                                            <span className="font-medium truncate max-w-[120px]">{event.city[lang]}, {event.country[lang]}</span>
+                                    <div className="flex items-center gap-4 pl-4 border-l border-gray-100 shrink-0">
+                                        <div className="hidden md:flex flex-col items-end text-right">
+                                            <div className="flex items-center gap-1.5">
+                                                <FlagIcon country={event.country[lang]} size={14} />
+                                                <span className="text-xs font-bold text-gray-700 truncate max-w-[120px]">{event.city[lang]}, {event.country[lang]}</span>
+                                            </div>
+                                            <span className="text-[10px] text-gray-400 font-medium mt-0.5">
+                                                {formatDateRange(event.startDate, event.endDate, lang)}
+                                            </span>
                                         </div>
-                                        <div className="flex items-center gap-1 text-gray-400">
-                                            <ExternalLink className="w-3 h-3" />
+                                        <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+                                            <ExternalLink className="w-3.5 h-3.5" />
                                         </div>
                                     </div>
                                 </div>
                             );
                         })}
-                    </div>
-                    {/* Bottom Pagination Info */}
-                    <div className="flex justify-center mt-6 pt-4 border-t border-gray-100">
-                        <p className="text-xs text-gray-400">
-                            Showing {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, upcomingEvents.length)} of {upcomingEvents.length} events
-                        </p>
                     </div>
                 </div>
             </div>
