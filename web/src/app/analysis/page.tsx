@@ -7,7 +7,7 @@ import { API_ENDPOINTS } from '@/lib/apiConfig';
 import { COMPANY_OVERVIEWS } from '@/data/companyOverviews';
 import { isGlobalCompany } from '@/data/companyCategories';
 import CompetitorTable from '@/components/CompetitorTable';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 // Safely require MFDS Data (might be missing initially)
 // Safely require MFDS Data (prioritize filtered small set)
@@ -410,7 +410,7 @@ export default function AnalysisPage() {
                                     return (
                                         <div className="mb-6 pb-4 border-b border-gray-100">
                                             <ResponsiveContainer width="100%" height={220}>
-                                                <BarChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
+                                                <ComposedChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
                                                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                                                     <XAxis dataKey="year" tick={{ fontSize: 12, fill: '#6b7280' }} />
                                                     <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} tickFormatter={(v) => v >= 10000 ? `${(v / 10000).toFixed(1)}조` : `${v.toLocaleString()}억`} width={60} />
@@ -429,7 +429,9 @@ export default function AnalysisPage() {
                                                     <Legend wrapperStyle={{ fontSize: 12 }} />
                                                     <Bar dataKey="매출액" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                                                     <Bar dataKey="영업이익" fill="#10b981" radius={[4, 4, 0, 0]} />
-                                                </BarChart>
+                                                    <Line type="monotone" dataKey="매출액" stroke="#1d4ed8" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                                                    <Line type="monotone" dataKey="영업이익" stroke="#047857" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                                                </ComposedChart>
                                             </ResponsiveContainer>
                                         </div>
                                     );
