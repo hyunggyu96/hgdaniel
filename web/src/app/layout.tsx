@@ -66,7 +66,7 @@ export default function RootLayout({
                   {/* Right: Actions */}
                   <div className="flex items-center gap-4 shrink-0">
                     <LanguageSwitcher />
-                    <div className="hidden lg:block">
+                    <div>
                       <HeaderStatus />
                     </div>
                     <LoginButton />

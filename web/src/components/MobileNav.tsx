@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams, usePathname } from 'next/navigation';
-import { Home, Menu, Star, X, ChevronRight } from 'lucide-react';
+import { Home, Menu, Star, X, ChevronRight, MessageSquarePlus } from 'lucide-react';
 import { CATEGORIES } from '@/lib/constants';
+import KeywordSuggestionModal from './KeywordSuggestionModal';
 
 export default function MobileNav() {
     const [isOpen, setIsOpen] = useState(false);
+    const [isSuggestOpen, setIsSuggestOpen] = useState(false);
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const selectedCategory = searchParams?.get('category');
@@ -106,10 +108,33 @@ export default function MobileNav() {
                                     {selectedCategory === cat && <ChevronRight className="w-4 h-4" />}
                                 </Link>
                             ))}
+
+                            <div className="h-px bg-gray-100 my-4" />
+
+                            {/* Keyword Suggestion Button for Mobile */}
+                            <button
+                                onClick={() => {
+                                    setIsOpen(false);
+                                    setIsSuggestOpen(true);
+                                }}
+                                className="w-full flex items-center justify-between px-4 py-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition-all group"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <MessageSquarePlus className="w-4 h-4 text-blue-400" />
+                                    <span className="font-bold text-sm text-foreground/80 uppercase tracking-wide">Keyword Suggestion</span>
+                                </div>
+                                <ChevronRight className="w-4 h-4 text-gray-400 group-hover:translate-x-1 transition-transform" />
+                            </button>
+
                         </div>
                     </div>
                 </div>
             )}
+
+            <KeywordSuggestionModal
+                isOpen={isSuggestOpen}
+                onClose={() => setIsSuggestOpen(false)}
+            />
         </>
     );
 }
