@@ -42,11 +42,11 @@ function FlagIcon({ country, size = 16 }: { country: string; size?: number }) {
     if (!code) return <span>🌐</span>;
     return (
         <img
-            src={`https://flagcdn.com/w${size * 2}/${code}.png`}
+            src={`https://flagcdn.com/w40/${code}.png`}
             width={size}
             height={Math.round(size * 0.75)}
             alt={country}
-            className="inline-block rounded-[2px] object-cover"
+            className="inline-block rounded-[2px] object-cover bg-gray-100"
             style={{ verticalAlign: 'middle', boxShadow: '0 0 0 0.5px rgba(0,0,0,0.1)' }}
             loading="lazy"
         />
