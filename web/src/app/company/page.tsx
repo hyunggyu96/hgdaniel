@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, Text, Badge } from "@tremor/react";
+import { Card, Text } from "@tremor/react";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { API_ENDPOINTS } from '@/lib/apiConfig';
@@ -49,17 +49,18 @@ const allCompanies: { id: number; name: string; status: CompanyStatus }[] = [
 ];
 
 const StatusBadge = ({ status }: { status: CompanyStatus }) => {
+    const commonClasses = "absolute top-3 left-3 text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wide uppercase";
     switch (status) {
         case 'KOSPI':
-            return <Badge color="blue" size="xs">KOSPI</Badge>;
+            return <span className={`${commonClasses} bg-blue-100 text-blue-700 border border-blue-200`}>KOSPI</span>;
         case 'KOSDAQ':
-            return <Badge color="emerald" size="xs">KOSDAQ</Badge>;
+            return <span className={`${commonClasses} bg-teal-100 text-teal-700 border border-teal-200`}>KOSDAQ</span>;
         case 'Unlisted':
-            return <Badge color="slate" size="xs">비상장</Badge>;
+            return <span className={`${commonClasses} bg-gray-100 text-gray-500 border border-gray-200`}>비상장</span>;
         case 'Global_Listed':
-            return <Badge color="violet" size="xs">Listed</Badge>;
+            return <span className={`${commonClasses} bg-violet-100 text-violet-700 border border-violet-200`}>Listed</span>;
         case 'Global_Private':
-            return <Badge color="slate" size="xs">Private</Badge>;
+            return <span className={`${commonClasses} bg-gray-100 text-gray-500 border border-gray-200`}>Private</span>;
         default:
             return null;
     }
@@ -170,12 +171,11 @@ export default function CompanyPage() {
                                     </div>
                                 )}
 
-                                <div className="flex flex-col items-center gap-2 mt-4">
-                                    <Text className={`text-lg font-medium ${isHighlight ? 'text-purple-700 font-bold' : 'text-foreground'}`}>
-                                        {item.name}
-                                    </Text>
-                                    <StatusBadge status={item.status} />
-                                </div>
+                                <StatusBadge status={item.status} />
+
+                                <Text className={`text-lg font-medium ${isHighlight ? 'text-purple-700 font-bold' : 'text-foreground'}`}>
+                                    {item.name}
+                                </Text>
                             </Card>
                         );
                     })}
