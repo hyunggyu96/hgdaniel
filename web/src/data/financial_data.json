@@ -1521,7 +1521,7 @@
                 "Q4": null
             }
         },
-        "stock_code": "216280"
+        "stock_code": "336570"
     },
     "동방메디컬": {
         "financial_history": {
@@ -2308,20 +2308,20 @@
     },
     "바임글로벌": {
         "financial_history": {
-            "2023": {
-                "revenue": "28730000000",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
-                "currency": "KRW",
-                "original_revenue": 28730000000,
-                "data_type": "manual"
-            },
             "2022": {
                 "revenue": "14070000000",
                 "operating_profit": "N/A",
                 "rd_cost": "N/A",
                 "currency": "KRW",
                 "original_revenue": 14070000000,
+                "data_type": "manual"
+            },
+            "2023": {
+                "revenue": "28730000000",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "currency": "KRW",
+                "original_revenue": 28730000000,
                 "data_type": "manual"
             }
         }

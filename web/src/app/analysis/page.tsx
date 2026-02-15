@@ -105,13 +105,13 @@ export default function AnalysisPage() {
             "클래시스": { code: "214150", price: "63,900", change: "+600 (+0.9%)", cap: "4조 1,700억" },
             "케어젠": { code: "214370", price: "101,800", change: "-500 (-0.5%)", cap: "4조 9,800억" },
             "원텍": { code: "336570", price: "8,710", change: "+10 (+0.1%)", cap: "7,836억" },
-            "동방메디컬": { code: "365530", price: "7,580", change: "+110 (+1.5%)", cap: "1,607억" },
+            "동방메디컬": { code: "240550", price: "7,580", change: "+110 (+1.5%)", cap: "1,607억" },
             "제이시스메디칼": { code: "287410", price: "12,900", change: "0 (0.0%)", cap: "9,764억" },
-            "바이오비쥬": { code: "394200", price: "12,780", change: "+80 (+0.6%)", cap: "1,876억" },
+            "바이오비쥬": { code: "489460", price: "12,780", change: "+80 (+0.6%)", cap: "1,876억" },
             "바이오플러스": { code: "099430", price: "5,300", change: "-50 (-0.9%)", cap: "3,267억" },
             "비올": { code: "335890", price: "12,500", change: "+100 (+0.8%)", cap: "7,302억" },
             "하이로닉": { code: "149980", price: "5,090", change: "-10 (-0.2%)", cap: "946억" },
-            "레이저옵텍": { code: "195500", price: "6,320", change: "+20 (+0.3%)", cap: "775억" },
+            "레이저옵텍": { code: "199550", price: "6,320", change: "+20 (+0.3%)", cap: "775억" },
             "유바이오로직스": { code: "206650", price: "11,810", change: "+110 (+0.9%)", cap: "4,330억" },
             "바임글로벌": { code: "000000", price: "-", change: "-", cap: "-" },
             "엑소코바이오": { code: "305000", price: "-", change: "-", cap: "-" },
@@ -427,10 +427,8 @@ export default function AnalysisPage() {
                                                         contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e5e7eb' }}
                                                     />
                                                     <Legend wrapperStyle={{ fontSize: 12 }} />
-                                                    <Bar dataKey="매출액" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                                                    <Bar dataKey="영업이익" fill="#10b981" radius={[4, 4, 0, 0]} />
-                                                    <Line type="monotone" dataKey="매출액" stroke="#1d4ed8" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
-                                                    <Line type="monotone" dataKey="영업이익" stroke="#047857" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                                                    <Bar dataKey="매출액" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={36} />
+                                                    <Line type="monotone" dataKey="영업이익" stroke="#047857" strokeWidth={2.5} dot={{ r: 3.5 }} activeDot={{ r: 5 }} />
                                                 </ComposedChart>
                                             </ResponsiveContainer>
                                         </div>
