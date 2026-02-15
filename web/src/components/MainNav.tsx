@@ -13,7 +13,6 @@ export default function MainNav() {
         { label: t('nav_news'), href: '/' },
         { label: t('nav_insights'), href: '/insights' },
         { label: t('nav_company'), href: '/company' },
-        { label: t('nav_revenue'), href: '/revenue' },
         { label: t('nav_policy'), href: '/policy' },
         { label: t('nav_conferences'), href: '/conferences' },
         { label: t('nav_about'), href: '/about' },

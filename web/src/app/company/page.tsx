@@ -6,6 +6,31 @@ import { API_ENDPOINTS } from '@/lib/apiConfig';
 import { useLanguage } from "@/components/LanguageContext";
 import { Building2, Globe, TrendingUp, Search, BarChart3, PieChart } from "lucide-react";
 
+const financialData: Record<string, any> = require('@/data/financial_data.json');
+
+const REVENUE_YEARS = ['2025', '2024', '2023', '2022'] as const;
+
+function getLatestRevenue(companyName: string): { value: string; year: string } | null {
+    const data = financialData[companyName];
+    if (!data?.financial_history) return null;
+    for (const y of REVENUE_YEARS) {
+        const rev = data.financial_history[y]?.revenue;
+        if (rev && rev !== 'N/A' && rev !== '-' && rev !== '') {
+            const num = parseFloat(rev);
+            if (isNaN(num)) continue;
+            const eok = Math.round(num / 1e8);
+            if (eok === 0) continue;
+            const jo = Math.floor(eok / 10000);
+            const remainder = eok % 10000;
+            let formatted = '';
+            if (jo > 0) formatted += `${jo}조 `;
+            if (remainder > 0) formatted += `${remainder.toLocaleString()}억`;
+            return { value: formatted.trim(), year: y };
+        }
+    }
+    return null;
+}
+
 type CompanyStatus = 'KOSPI' | 'KOSDAQ' | 'Unlisted' | 'Global_Listed' | 'Global_Private';
 type CompanyCategory = 'korean' | 'global';
 
@@ -201,6 +226,7 @@ export default function CompanyPage() {
                         const rank = rankings[companyNameKo];
                         const isHighlight = rank && rank <= 3;
                         const displayName = item.name[lang];
+                        const revenue = getLatestRevenue(companyNameKo);
 
                         return (
                             <div
@@ -237,6 +263,17 @@ export default function CompanyPage() {
                                     <div className="flex justify-center">
                                         <StatusBadge status={item.status} lang={lang} />
                                     </div>
+                                    {revenue ? (
+                                        <div className="flex items-center justify-center gap-1 pt-1">
+                                            <TrendingUp className="w-3 h-3 text-emerald-500" />
+                                            <span className="text-xs font-bold text-emerald-600">{revenue.value}</span>
+                                            <span className="text-[10px] text-gray-400">({revenue.year})</span>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center justify-center gap-1 pt-1">
+                                            <span className="text-[10px] text-gray-300">{lang === 'ko' ? '매출 미공시' : 'N/A'}</span>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {isHighlight && (
