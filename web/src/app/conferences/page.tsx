@@ -37,6 +37,62 @@ const COUNTRY_FLAGS: Record<string, string> = {
     '인도': '🇮🇳', 'India': '🇮🇳',
 };
 
+// ─── Country Colors (based on national flag primary color) ───
+const COUNTRY_COLORS: Record<string, { color: string; bgColor: string; borderColor: string }> = {
+    // 🇫🇷 France – French Blue
+    '프랑스': { color: '#0055A4', bgColor: '#EBF2FA', borderColor: '#A8C8E8' },
+    'France': { color: '#0055A4', bgColor: '#EBF2FA', borderColor: '#A8C8E8' },
+    // 🇧🇷 Brazil – Green
+    '브라질': { color: '#009B3A', bgColor: '#E6F7ED', borderColor: '#8DD4A8' },
+    'Brazil': { color: '#009B3A', bgColor: '#E6F7ED', borderColor: '#8DD4A8' },
+    // 🇹🇭 Thailand – Royal Navy
+    '태국': { color: '#241D4F', bgColor: '#EDEAF5', borderColor: '#B5AFD6' },
+    'Thailand': { color: '#241D4F', bgColor: '#EDEAF5', borderColor: '#B5AFD6' },
+    // 🇨🇳 China – Chinese Red
+    '중국': { color: '#DE2910', bgColor: '#FDE8E6', borderColor: '#F5ACA5' },
+    'China': { color: '#DE2910', bgColor: '#FDE8E6', borderColor: '#F5ACA5' },
+    // 🇺🇸 USA – Old Glory Blue
+    '미국': { color: '#002868', bgColor: '#E6EBF5', borderColor: '#99ABD1' },
+    'USA': { color: '#002868', bgColor: '#E6EBF5', borderColor: '#99ABD1' },
+    // 🇲🇨 Monaco – Monaco Red
+    '모나코': { color: '#CE1126', bgColor: '#FCEBEE', borderColor: '#F0A8B1' },
+    'Monaco': { color: '#CE1126', bgColor: '#FCEBEE', borderColor: '#F0A8B1' },
+    // 🇹🇼 Taiwan – KMT Blue
+    '대만': { color: '#0048B0', bgColor: '#E8EEF9', borderColor: '#99B4E0' },
+    'Taiwan': { color: '#0048B0', bgColor: '#E8EEF9', borderColor: '#99B4E0' },
+    // 🇰🇷 South Korea – Taegeuk Blue
+    '한국': { color: '#003478', bgColor: '#E6EDF7', borderColor: '#8FAEDB' },
+    'South Korea': { color: '#003478', bgColor: '#E6EDF7', borderColor: '#8FAEDB' },
+    // 🇯🇵 Japan – Hinomaru Crimson
+    '일본': { color: '#BC002D', bgColor: '#FCEAEF', borderColor: '#EEA0B5' },
+    'Japan': { color: '#BC002D', bgColor: '#FCEAEF', borderColor: '#EEA0B5' },
+    // 🇦🇪 UAE – Emerald Green
+    'UAE': { color: '#00732F', bgColor: '#E6F3EC', borderColor: '#8DD4B3' },
+    // 🇨🇴 Colombia – Gold
+    '콜롬비아': { color: '#8B6914', bgColor: '#FDF5E1', borderColor: '#E2C872' },
+    'Colombia': { color: '#8B6914', bgColor: '#FDF5E1', borderColor: '#E2C872' },
+    // 🇻🇳 Vietnam – Vietnamese Red
+    '베트남': { color: '#DA251D', bgColor: '#FDE9E8', borderColor: '#F3AAA6' },
+    'Vietnam': { color: '#DA251D', bgColor: '#FDE9E8', borderColor: '#F3AAA6' },
+    // 🇮🇩 Indonesia – Merah (Warm Red)
+    '인도네시아': { color: '#CE1126', bgColor: '#FCEBED', borderColor: '#F0A8B1' },
+    'Indonesia': { color: '#CE1126', bgColor: '#FCEBED', borderColor: '#F0A8B1' },
+    // 🇭🇰 Hong Kong – Bauhinia Purple-Red
+    '홍콩': { color: '#9B1B30', bgColor: '#F8E9EC', borderColor: '#D9A0AE' },
+    'Hong Kong': { color: '#9B1B30', bgColor: '#F8E9EC', borderColor: '#D9A0AE' },
+    // 🇸🇬 Singapore – Lion Red
+    '싱가포르': { color: '#EF3340', bgColor: '#FDECEE', borderColor: '#F9B0B6' },
+    'Singapore': { color: '#EF3340', bgColor: '#FDECEE', borderColor: '#F9B0B6' },
+    // 🇮🇳 India – Saffron
+    '인도': { color: '#D96B00', bgColor: '#FFF3E6', borderColor: '#F5C88A' },
+    'India': { color: '#D96B00', bgColor: '#FFF3E6', borderColor: '#F5C88A' },
+};
+
+const DEFAULT_COUNTRY_COLOR = { color: '#3B82F6', bgColor: '#EFF6FF', borderColor: '#BFDBFE' };
+function getCountryColor(country: string) {
+    return COUNTRY_COLORS[country] || DEFAULT_COUNTRY_COLOR;
+}
+
 // ─── 2026 Conference Data ───
 const CONFERENCES: ConferenceEvent[] = [
     // ── IMCAS ──
@@ -361,6 +417,7 @@ function EventBadge({ event, onClick, isSelected, lang }: {
     event: ConferenceEvent; onClick: () => void; isSelected: boolean; lang: 'ko' | 'en';
 }) {
     const cityLabel = event.city[lang];
+    const cc = getCountryColor(event.country[lang]);
 
     return (
         <button
@@ -369,11 +426,11 @@ function EventBadge({ event, onClick, isSelected, lang }: {
             title={`${event.name[lang]} — ${cityLabel}, ${event.country[lang]}`}
         >
             <div
-                className={`text-[9px] sm:text-[11px] font-semibold px-1.5 py-0.5 rounded-md truncate transition-all duration-200 border
-          ${isSelected
-                        ? 'bg-blue-600 text-white border-blue-500 shadow-md shadow-blue-600/20 scale-[1.02]'
-                        : 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 hover:scale-[1.02]'
-                    }`}
+                className={`text-[9px] sm:text-[11px] font-semibold px-1.5 py-0.5 rounded-md truncate transition-all duration-200 border ${isSelected ? 'shadow-md scale-[1.02]' : 'hover:scale-[1.02]'}`}
+                style={isSelected
+                    ? { backgroundColor: cc.color, color: '#fff', borderColor: cc.color }
+                    : { backgroundColor: cc.bgColor, color: cc.color, borderColor: cc.borderColor }
+                }
             >
                 {event.name[lang].replace(/ 2026$/, '')} ({cityLabel})
             </div>
@@ -386,20 +443,28 @@ function EventDetailPanel({ event, onClose, lang }: {
 }) {
     const isPast = new Date(event.endDate) < new Date();
     const isOngoing = new Date(event.startDate) <= new Date() && new Date(event.endDate) >= new Date();
+    const cc = getCountryColor(event.country[lang]);
 
     const statusLabel = isOngoing ? { ko: '진행 중', en: 'LIVE' } : isPast ? { ko: '종료', en: 'ENDED' } : { ko: '예정', en: 'UPCOMING' };
     const statusStyle = isOngoing ? 'bg-emerald-100 text-emerald-700' : isPast ? 'bg-gray-100 text-gray-500' : 'bg-amber-50 text-amber-600';
+    const flag = COUNTRY_FLAGS[event.country[lang]] || '🌐';
 
     return (
-        <div className="rounded-2xl border border-blue-200 bg-blue-50/60 p-5 sm:p-6 transition-all duration-300 animate-in fade-in slide-in-from-top-2">
+        <div className="rounded-2xl p-5 sm:p-6 transition-all duration-300"
+            style={{ backgroundColor: cc.bgColor, borderWidth: '2px', borderStyle: 'solid', borderColor: cc.borderColor }}>
             <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
-                        <span className="text-[10px] font-black tracking-wider uppercase px-2.5 py-1 rounded-full bg-blue-100 text-blue-700">
+                        <span className="text-[10px] font-black tracking-wider uppercase px-2.5 py-1 rounded-full"
+                            style={{ backgroundColor: cc.color + '18', color: cc.color }}>
                             {event.series}
                         </span>
                         <span className={`text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full ${statusStyle}`}>
                             {statusLabel[lang]}
+                        </span>
+                        <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-white/70"
+                            style={{ color: cc.color }}>
+                            {flag} {event.country[lang]}
                         </span>
                         {!event.confirmed && (
                             <span className="text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full bg-orange-50 text-orange-500">
@@ -433,12 +498,13 @@ function EventDetailPanel({ event, onClose, lang }: {
                     </div>
                     {/* Official Website Link */}
                     {event.url && (
-                        <div className="mt-4 pt-3 border-t border-blue-200/60">
+                        <div className="mt-4 pt-3" style={{ borderTop: `1px solid ${cc.borderColor}` }}>
                             <a
                                 href={event.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white text-[12px] font-bold tracking-wide hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md shadow-blue-600/20"
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-white text-[12px] font-bold tracking-wide transition-all duration-200 shadow-sm hover:shadow-md hover:brightness-110"
+                                style={{ backgroundColor: cc.color }}
                             >
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -449,7 +515,7 @@ function EventDetailPanel({ event, onClose, lang }: {
                     )}
                 </div>
                 <button onClick={onClose} aria-label="Close"
-                    className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100 shrink-0">
+                    className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-white/50 shrink-0">
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -761,6 +827,8 @@ export default function ConferencesPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         {upcomingEvents.map((event) => {
                             const isOngoing = new Date(event.startDate) <= new Date() && new Date(event.endDate) >= new Date();
+                            const cc = getCountryColor(event.country[lang]);
+                            const flag = COUNTRY_FLAGS[event.country[lang]] || '🌐';
                             return (
                                 <button key={event.id}
                                     onClick={() => {
@@ -769,10 +837,16 @@ export default function ConferencesPage() {
                                         setYear(s.getFullYear()); setMonth(s.getMonth());
                                         window.scrollTo({ top: 0, behavior: 'smooth' });
                                     }}
-                                    className="text-left group bg-white rounded-xl border border-gray-100 p-4 hover:border-blue-300 hover:shadow-md hover:shadow-blue-500/5 transition-all duration-300 hover:-translate-y-0.5">
+                                    className="text-left group bg-white rounded-xl p-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+                                    style={{ borderWidth: '1.5px', borderStyle: 'solid', borderColor: cc.borderColor + '80' }}>
                                     <div className="flex items-center gap-2 mb-2">
-                                        <span className="text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full bg-blue-100 text-blue-600">
+                                        <span className="text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full"
+                                            style={{ backgroundColor: cc.bgColor, color: cc.color }}>
                                             {event.series}
+                                        </span>
+                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                                            style={{ backgroundColor: cc.bgColor, color: cc.color }}>
+                                            {flag}
                                         </span>
                                         {isOngoing && (
                                             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">LIVE</span>
@@ -783,7 +857,8 @@ export default function ConferencesPage() {
                                             </span>
                                         )}
                                     </div>
-                                    <h3 className="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition-colors mb-1.5 leading-tight">
+                                    <h3 className="text-sm font-bold text-gray-900 transition-colors mb-1.5 leading-tight"
+                                        style={{ ['--tw-group-hover-color' as string]: cc.color }}>
                                         {event.name[lang]}
                                     </h3>
                                     <div className="flex items-center gap-3 text-xs text-gray-500">
@@ -792,6 +867,7 @@ export default function ConferencesPage() {
                                     <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
                                         <span>📍 {event.city[lang]}, {event.country[lang]}</span>
                                     </div>
+                                    <div className="w-full h-0.5 rounded-full mt-3 opacity-40" style={{ backgroundColor: cc.color }} />
                                 </button>
                             );
                         })}
