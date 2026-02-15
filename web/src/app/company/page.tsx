@@ -1,50 +1,69 @@
 'use client';
 
-import { Card, Text } from "@tremor/react";
+import { Card, Text, Badge } from "@tremor/react";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { API_ENDPOINTS } from '@/lib/apiConfig';
 import { useLanguage } from "@/components/LanguageContext";
 import { COMPANY_CATEGORIES, getCompanyCategory } from "@/data/companyCategories";
 
-const allCompanies: { id: number; name: string }[] = [
-    { id: 1, name: "한스바이오메드" },
-    { id: 2, name: "엘앤씨바이오" },
-    { id: 3, name: "제테마" },
-    { id: 4, name: "한국비엔씨" },
-    { id: 5, name: "종근당바이오" },
-    { id: 6, name: "휴온스" },
-    { id: 7, name: "휴온스글로벌" },
-    { id: 8, name: "휴메딕스" },
-    { id: 9, name: "휴젤" },
-    { id: 10, name: "메디톡스" },
-    { id: 11, name: "대웅제약" },
-    { id: 12, name: "파마리서치" },
-    { id: 13, name: "클래시스" },
-    { id: 14, name: "케어젠" },
-    { id: 15, name: "원텍" },
-    { id: 16, name: "동방메디컬" },
-    { id: 17, name: "제이시스메디칼" },
-    { id: 18, name: "바이오비쥬" },
-    { id: 19, name: "바이오플러스" },
-    { id: 20, name: "비올" },
-    { id: 21, name: "하이로닉" },
-    { id: 22, name: "레이저옵텍" },
-    { id: 23, name: "유바이오로직스" },
-    { id: 24, name: "바임글로벌" },
-    { id: 25, name: "엑소코바이오" },
-    { id: 26, name: "알에프바이오" },
-    { id: 27, name: "차메디텍" },
-    { id: 28, name: "JW중외제약" },
-    { id: 29, name: "동국제약" },
-    { id: 30, name: "리젠바이오텍" },
-    { id: 31, name: "울트라브이" },
-    { id: 32, name: "제노스" },
-    { id: 33, name: "멀츠" },
-    { id: 34, name: "앨러간" },
-    { id: 35, name: "갈더마" },
-    { id: 36, name: "테옥산" }
+type CompanyStatus = 'KOSPI' | 'KOSDAQ' | 'Unlisted' | 'Global_Listed' | 'Global_Private';
+
+const allCompanies: { id: number; name: string; status: CompanyStatus }[] = [
+    { id: 1, name: "한스바이오메드", status: 'KOSDAQ' },
+    { id: 2, name: "엘앤씨바이오", status: 'KOSDAQ' },
+    { id: 3, name: "제테마", status: 'KOSDAQ' },
+    { id: 4, name: "한국비엔씨", status: 'KOSDAQ' },
+    { id: 5, name: "종근당바이오", status: 'KOSPI' },
+    { id: 6, name: "휴온스", status: 'KOSDAQ' },
+    { id: 7, name: "휴온스글로벌", status: 'KOSDAQ' },
+    { id: 8, name: "휴메딕스", status: 'KOSDAQ' },
+    { id: 9, name: "휴젤", status: 'KOSDAQ' },
+    { id: 10, name: "메디톡스", status: 'KOSDAQ' },
+    { id: 11, name: "대웅제약", status: 'KOSPI' },
+    { id: 12, name: "파마리서치", status: 'KOSDAQ' },
+    { id: 13, name: "클래시스", status: 'KOSDAQ' },
+    { id: 14, name: "케어젠", status: 'KOSDAQ' },
+    { id: 15, name: "원텍", status: 'KOSDAQ' },
+    { id: 16, name: "동방메디컬", status: 'Unlisted' },
+    { id: 17, name: "제이시스메디칼", status: 'Unlisted' },
+    { id: 18, name: "바이오비쥬", status: 'Unlisted' },
+    { id: 19, name: "바이오플러스", status: 'KOSDAQ' },
+    { id: 20, name: "비올", status: 'KOSDAQ' },
+    { id: 21, name: "하이로닉", status: 'KOSDAQ' },
+    { id: 22, name: "레이저옵텍", status: 'KOSDAQ' },
+    { id: 23, name: "유바이오로직스", status: 'KOSDAQ' },
+    { id: 24, name: "바임글로벌", status: 'Unlisted' },
+    { id: 25, name: "엑소코바이오", status: 'Unlisted' },
+    { id: 26, name: "알에프바이오", status: 'Unlisted' },
+    { id: 27, name: "차메디텍", status: 'Unlisted' },
+    { id: 28, name: "JW중외제약", status: 'KOSPI' },
+    { id: 29, name: "동국제약", status: 'KOSDAQ' },
+    { id: 30, name: "리젠바이오텍", status: 'Unlisted' },
+    { id: 31, name: "울트라브이", status: 'Unlisted' },
+    { id: 32, name: "제노스", status: 'Unlisted' },
+    { id: 33, name: "멀츠", status: 'Global_Private' },
+    { id: 34, name: "앨러간", status: 'Global_Listed' },
+    { id: 35, name: "갈더마", status: 'Global_Listed' },
+    { id: 36, name: "테옥산", status: 'Global_Private' }
 ];
+
+const StatusBadge = ({ status }: { status: CompanyStatus }) => {
+    switch (status) {
+        case 'KOSPI':
+            return <Badge color="blue" size="xs">KOSPI</Badge>;
+        case 'KOSDAQ':
+            return <Badge color="emerald" size="xs">KOSDAQ</Badge>;
+        case 'Unlisted':
+            return <Badge color="slate" size="xs">비상장</Badge>;
+        case 'Global_Listed':
+            return <Badge color="violet" size="xs">Listed</Badge>;
+        case 'Global_Private':
+            return <Badge color="slate" size="xs">Private</Badge>;
+        default:
+            return null;
+    }
+};
 
 export default function CompanyPage() {
     const router = useRouter();
@@ -144,14 +163,19 @@ export default function CompanyPage() {
 
                                 {/* Global Badge */}
                                 {isGlobal && (
-                                    <div className="absolute top-2 right-2 bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full font-semibold">
-                                        Global
+                                    <div className="absolute top-2 right-2 flex gap-1">
+                                        <div className="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full font-semibold">
+                                            Global
+                                        </div>
                                     </div>
                                 )}
 
-                                <Text className={`text-lg font-medium ${isHighlight ? 'text-purple-700 font-bold' : 'text-foreground'}`}>
-                                    {item.name}
-                                </Text>
+                                <div className="flex flex-col items-center gap-2 mt-4">
+                                    <Text className={`text-lg font-medium ${isHighlight ? 'text-purple-700 font-bold' : 'text-foreground'}`}>
+                                        {item.name}
+                                    </Text>
+                                    <StatusBadge status={item.status} />
+                                </div>
                             </Card>
                         );
                     })}
