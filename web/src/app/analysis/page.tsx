@@ -7,7 +7,7 @@ import { API_ENDPOINTS } from '@/lib/apiConfig';
 import { COMPANY_OVERVIEWS } from '@/data/companyOverviews';
 import { isGlobalCompany } from '@/data/companyCategories';
 import CompetitorTable from '@/components/CompetitorTable';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 // Safely require MFDS Data (might be missing initially)
 // Safely require MFDS Data (prioritize filtered small set)
@@ -105,13 +105,13 @@ export default function AnalysisPage() {
             "클래시스": { code: "214150", price: "63,900", change: "+600 (+0.9%)", cap: "4조 1,700억" },
             "케어젠": { code: "214370", price: "101,800", change: "-500 (-0.5%)", cap: "4조 9,800억" },
             "원텍": { code: "336570", price: "8,710", change: "+10 (+0.1%)", cap: "7,836억" },
-            "동방메디컬": { code: "365530", price: "7,580", change: "+110 (+1.5%)", cap: "1,607억" },
+            "동방메디컬": { code: "240550", price: "7,580", change: "+110 (+1.5%)", cap: "1,607억" },
             "제이시스메디칼": { code: "287410", price: "12,900", change: "0 (0.0%)", cap: "9,764억" },
-            "바이오비쥬": { code: "394200", price: "12,780", change: "+80 (+0.6%)", cap: "1,876억" },
+            "바이오비쥬": { code: "489460", price: "12,780", change: "+80 (+0.6%)", cap: "1,876억" },
             "바이오플러스": { code: "099430", price: "5,300", change: "-50 (-0.9%)", cap: "3,267억" },
             "비올": { code: "335890", price: "12,500", change: "+100 (+0.8%)", cap: "7,302억" },
             "하이로닉": { code: "149980", price: "5,090", change: "-10 (-0.2%)", cap: "946억" },
-            "레이저옵텍": { code: "195500", price: "6,320", change: "+20 (+0.3%)", cap: "775억" },
+            "레이저옵텍": { code: "199550", price: "6,320", change: "+20 (+0.3%)", cap: "775억" },
             "유바이오로직스": { code: "206650", price: "11,810", change: "+110 (+0.9%)", cap: "4,330억" },
             "바임글로벌": { code: "000000", price: "-", change: "-", cap: "-" },
             "엑소코바이오": { code: "305000", price: "-", change: "-", cap: "-" },
@@ -387,6 +387,53 @@ export default function AnalysisPage() {
 
                             {result.financial_history && Object.keys(result.financial_history).length > 0 ? (
                                 <>
+                                {/* Revenue Chart */}
+                                {(() => {
+                                    const chartData = YEARS.map(year => {
+                                        const yearData = result.financial_history[year];
+                                        const rev = yearData?.revenue;
+                                        const op = yearData?.operating_profit;
+                                        const parseEok = (v: string | undefined) => {
+                                            if (!v || v === 'N/A' || v === '-') return 0;
+                                            const n = parseFloat(v);
+                                            return isNaN(n) ? 0 : Math.round(n / 1e8);
+                                        };
+                                        return {
+                                            year,
+                                            매출액: parseEok(rev),
+                                            영업이익: parseEok(op),
+                                        };
+                                    });
+                                    const hasData = chartData.some(d => d.매출액 > 0 || d.영업이익 > 0);
+                                    if (!hasData) return null;
+
+                                    return (
+                                        <div className="mb-6 pb-4 border-b border-gray-100">
+                                            <ResponsiveContainer width="100%" height={220}>
+                                                <ComposedChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
+                                                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                                    <XAxis dataKey="year" tick={{ fontSize: 12, fill: '#6b7280' }} />
+                                                    <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} tickFormatter={(v) => v >= 10000 ? `${(v / 10000).toFixed(1)}조` : `${v.toLocaleString()}억`} width={60} />
+                                                    <Tooltip
+                                                        formatter={(value: number, name: string) => {
+                                                            if (value === 0) return ['-', name];
+                                                            const jo = Math.floor(value / 10000);
+                                                            const eok = value % 10000;
+                                                            let formatted = '';
+                                                            if (jo > 0) formatted += `${jo}조 `;
+                                                            if (eok > 0) formatted += `${eok.toLocaleString()}억`;
+                                                            return [formatted.trim() || '0', name];
+                                                        }}
+                                                        contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e5e7eb' }}
+                                                    />
+                                                    <Legend wrapperStyle={{ fontSize: 12 }} />
+                                                    <Bar dataKey="매출액" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={36} />
+                                                    <Line type="monotone" dataKey="영업이익" stroke="#047857" strokeWidth={2.5} dot={{ r: 3.5 }} activeDot={{ r: 5 }} />
+                                                </ComposedChart>
+                                            </ResponsiveContainer>
+                                        </div>
+                                    );
+                                })()}
                                 <div className="overflow-x-auto">
                                     <table className="min-w-full divide-y divide-gray-200">
                                         <thead>
