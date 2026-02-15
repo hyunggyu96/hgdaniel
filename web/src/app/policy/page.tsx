@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Scale, Globe, FileText, ExternalLink, AlertTriangle, CheckCircle2, ChevronRight } from "lucide-react";
+import {
+    Scale, Globe, FileText, ExternalLink, AlertTriangle, CheckCircle2, ChevronRight,
+    Stethoscope, Syringe, Sparkles, LayoutGrid
+} from "lucide-react";
 import { useLanguage } from "@/components/LanguageContext";
 import { koreaPolicyProfile } from "@/data/korea_policy_profile";
 import { vietnamPolicyProfile } from "@/data/vietnam_policy_profile";
 import { thailandPolicyProfile } from "@/data/thailand_policy_profile";
-import type { LocalizedText, PolicyConfidence } from "@/data/policyTypes";
+import type { LocalizedText, PolicyConfidence, PolicyCategory, CountryPolicyFact } from "@/data/policyTypes";
 
 interface Country {
     id: string;
@@ -18,17 +21,9 @@ interface Country {
 const COUNTRIES: Country[] = [
     { id: "kr", nameEn: "South Korea", nameKo: "South Korea" },
     { id: "vn", nameEn: "Vietnam", nameKo: "Vietnam" },
-    { id: "kh", nameEn: "Cambodia", nameKo: "Cambodia" },
     { id: "th", nameEn: "Thailand", nameKo: "Thailand" },
-    { id: "la", nameEn: "Laos", nameKo: "Laos" },
-    { id: "mm", nameEn: "Myanmar", nameKo: "Myanmar" },
-    { id: "bd", nameEn: "Bangladesh", nameKo: "Bangladesh" },
-    { id: "in", nameEn: "India", nameKo: "India" },
-    { id: "my", nameEn: "Malaysia", nameKo: "Malaysia" },
-    { id: "sg", nameEn: "Singapore", nameKo: "Singapore" },
-    { id: "id", nameEn: "Indonesia", nameKo: "Indonesia" },
-    { id: "ph", nameEn: "Philippines", nameKo: "Philippines" },
-    { id: "tw", nameEn: "Taiwan", nameKo: "Taiwan" },
+    { id: "kh", nameEn: "Cambodia", nameKo: "Cambodia" },
+    // ... other countries
 ];
 
 const SUPPORTED_COUNTRIES = new Set(["kr", "vn", "th"]);
@@ -47,9 +42,9 @@ const formatIsoDate = (dateStr?: string): string => {
 
 const ConfidenceIndicator = ({ level }: { level: PolicyConfidence }) => {
     const config = {
-        high: { color: "bg-emerald-500", label: "High Confidence", bg: "bg-emerald-50 text-emerald-700 border-emerald-200" },
-        medium: { color: "bg-amber-500", label: "Medium Confidence", bg: "bg-amber-50 text-amber-700 border-amber-200" },
-        low: { color: "bg-rose-500", label: "Low Confidence", bg: "bg-rose-50 text-rose-700 border-rose-200" },
+        high: { color: "bg-emerald-500", label: "High", bg: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+        medium: { color: "bg-amber-500", label: "Medium", bg: "bg-amber-50 text-amber-700 border-amber-200" },
+        low: { color: "bg-rose-500", label: "Low", bg: "bg-rose-50 text-rose-700 border-rose-200" },
     }[level];
 
     return (
@@ -70,10 +65,55 @@ const DetailView = ({
     profile: any;
     language: "ko" | "en";
 }) => {
+    // 탭 상태 관리
+    const [activeTab, setActiveTab] = useState<PolicyCategory>("device");
+
+    // Dynamic Tab Generation
+    const availableCategories = new Set<PolicyCategory>();
+    profile.facts.forEach((f: CountryPolicyFact) => {
+        if (f.category && f.category !== 'common') {
+            availableCategories.add(f.category);
+        } else if (!f.category) {
+            availableCategories.add('device'); // Default
+        }
+    });
+
+    // Sort categories: device -> drug -> cosmetic
+    const sortedTabs: PolicyCategory[] = [];
+    if (availableCategories.has('device')) sortedTabs.push('device');
+    if (availableCategories.has('drug')) sortedTabs.push('drug');
+    if (availableCategories.has('cosmetic')) sortedTabs.push('cosmetic');
+
+    // 만약 분류가 1개뿐이면 탭 숨기기? -> 아니면 그냥 보여주기.
+    // 사용자가 "나누어서 보여줘" 했으니 1개라도 명시적으로 보여주는게 나음 (Device)
+
     const country = COUNTRIES.find(c => c.id === countryId);
     if (!country) return null;
 
     const countryName = language === 'ko' ? country.nameKo : country.nameEn;
+
+    // Filter Facts
+    const commonFacts = profile.facts.filter((f: CountryPolicyFact) => f.category === 'common');
+    const tabFacts = profile.facts.filter((f: CountryPolicyFact) => {
+        const cat = f.category || 'device';
+        return cat === activeTab;
+    });
+
+    const getTabIcon = (cat: PolicyCategory) => {
+        switch (cat) {
+            case 'drug': return <Syringe className="w-4 h-4" />;
+            case 'cosmetic': return <Sparkles className="w-4 h-4" />;
+            case 'device': default: return <Stethoscope className="w-4 h-4" />;
+        }
+    };
+
+    const getTabLabel = (cat: PolicyCategory) => {
+        switch (cat) {
+            case 'drug': return language === 'ko' ? "의약품 (Drugs)" : "Drugs";
+            case 'cosmetic': return language === 'ko' ? "화장품 (Cosmetics)" : "Cosmetics";
+            case 'device': default: return language === 'ko' ? "의료기기 (Medical Devices)" : "Medical Devices";
+        }
+    };
 
     return (
         <div className="space-y-6 animate-fade-in bg-white rounded-3xl p-6 md:p-8 border border-gray-100 shadow-sm">
@@ -92,7 +132,7 @@ const DetailView = ({
                         </div>
                     </div>
                     <p className="text-gray-500 text-sm md:text-base font-light">
-                        Operational regulatory snapshot and key legal instruments.
+                        Operational regulatory snapshot & key legal instruments.
                     </p>
                     <div className="flex items-center gap-3 text-xs text-gray-400 pt-1 font-mono">
                         <span className="flex items-center gap-1.5">
@@ -103,7 +143,7 @@ const DetailView = ({
                 </div>
             </div>
 
-            {/* Compliance Notes */}
+            {/* Compliance Notes (Critical - Always Top) */}
             {profile.disclaimers && profile.disclaimers.length > 0 && (
                 <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100">
                     <h3 className="text-sm font-bold text-amber-900 mb-3 flex items-center gap-2">
@@ -121,57 +161,59 @@ const DetailView = ({
                 </div>
             )}
 
-            {/* Facts Grid */}
-            <div className="space-y-4">
-                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2 pl-1">
-                    <div className="w-1 h-5 bg-blue-600 rounded-full"></div>
-                    Regulatory Overview
-                </h3>
-                <div className="grid grid-cols-1 gap-4">
-                    {profile.facts.map((fact: any) => (
-                        <div key={fact.id} className="group relative bg-gray-50/50 rounded-xl p-5 border border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all duration-300">
-                            <div className="flex justify-between items-start mb-2">
-                                <span className="text-xs font-bold uppercase tracking-wider text-gray-500 group-hover:text-blue-600 transition-colors">
-                                    {getLocalizedText(language, fact.label)}
-                                </span>
-                                <ConfidenceIndicator level={fact.confidence} />
-                            </div>
+            {/* Common Facts (If any) */}
+            {commonFacts.length > 0 && (
+                <div className="space-y-4">
+                    <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider pl-1">
+                        General Requirements
+                    </h3>
+                    <div className="grid grid-cols-1 gap-4">
+                        {commonFacts.map((fact: CountryPolicyFact) => (
+                            <FactCard key={fact.id} fact={fact} language={language} />
+                        ))}
+                    </div>
+                </div>
+            )}
 
-                            <p className="text-sm md:text-base text-gray-800 font-medium leading-relaxed whitespace-pre-line mb-3">
-                                {getLocalizedText(language, fact.value)}
-                            </p>
+            {/* Category Tabs */}
+            {sortedTabs.length > 0 && (
+                <div className="space-y-6">
+                    <div className="flex items-center gap-2 border-b border-gray-100">
+                        {sortedTabs.map((tab) => (
+                            <button
+                                key={tab}
+                                onClick={() => setActiveTab(tab)}
+                                className={`flex items-center gap-2 px-4 py-3 text-sm font-bold border-b-2 transition-all ${activeTab === tab
+                                        ? "border-blue-600 text-blue-600 bg-blue-50/50"
+                                        : "border-transparent text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                                    } rounded-t-lg`}
+                            >
+                                {getTabIcon(tab)}
+                                {getTabLabel(tab)}
+                            </button>
+                        ))}
+                    </div>
 
-                            {fact.note && (
-                                <div className="mb-3 p-2.5 bg-white rounded-lg text-xs list-disc list-inside text-gray-500 leading-normal border border-gray-200/50">
-                                    {getLocalizedText(language, fact.note)}
-                                </div>
-                            )}
-
-                            {fact.references && fact.references.length > 0 && (
-                                <div className="space-y-1 pt-2 border-t border-gray-100">
-                                    {fact.references.map((ref: any) => (
-                                        <a
-                                            key={ref.id}
-                                            href={ref.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex items-center gap-1.5 text-[11px] text-gray-400 hover:text-blue-600 transition-colors"
-                                        >
-                                            <ExternalLink className="w-3 h-3" />
-                                            <span className="truncate hover:underline decoration-1 underline-offset-2">
-                                                {ref.title}
-                                            </span>
-                                        </a>
-                                    ))}
+                    {/* Tab Content */}
+                    <div className="space-y-4 animate-fade-in">
+                        <div className="grid grid-cols-1 gap-4">
+                            {tabFacts.length > 0 ? (
+                                tabFacts.map((fact: CountryPolicyFact) => (
+                                    <FactCard key={fact.id} fact={fact} language={language} />
+                                ))
+                            ) : (
+                                <div className="text-center py-8 text-gray-400 text-sm">
+                                    No specific data for this category.
                                 </div>
                             )}
                         </div>
-                    ))}
+                    </div>
                 </div>
-            </div>
+            )}
+
 
             {/* Key Legal Instruments */}
-            <div className="space-y-4 pt-4">
+            <div className="space-y-4 pt-6 border-t border-gray-100">
                 <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2 pl-1">
                     <div className="w-1 h-5 bg-indigo-600 rounded-full"></div>
                     Key Legal Instruments
@@ -214,11 +256,51 @@ const DetailView = ({
                     ))}
                 </div>
             </div>
-
-
         </div>
     );
 };
+
+// Extracted Fact Card for reusability
+const FactCard = ({ fact, language }: { fact: CountryPolicyFact; language: "ko" | "en" }) => (
+    <div className="group relative bg-gray-50/50 rounded-xl p-5 border border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all duration-300">
+        <div className="flex justify-between items-start mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-500 group-hover:text-blue-600 transition-colors">
+                {getLocalizedText(language, fact.label)}
+            </span>
+            <ConfidenceIndicator level={fact.confidence} />
+        </div>
+
+        <p className="text-sm md:text-base text-gray-800 font-medium leading-relaxed whitespace-pre-line mb-3">
+            {getLocalizedText(language, fact.value)}
+        </p>
+
+        {fact.note && (
+            <div className="mb-3 p-2.5 bg-white rounded-lg text-xs list-disc list-inside text-gray-500 leading-normal border border-gray-200/50">
+                {getLocalizedText(language, fact.note)}
+            </div>
+        )}
+
+        {fact.references && fact.references.length > 0 && (
+            <div className="space-y-1 pt-2 border-t border-gray-100">
+                {fact.references.map((ref: any) => (
+                    <a
+                        key={ref.id}
+                        href={ref.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 text-[11px] text-gray-400 hover:text-blue-600 transition-colors"
+                    >
+                        <ExternalLink className="w-3 h-3" />
+                        <span className="truncate hover:underline decoration-1 underline-offset-2">
+                            {ref.title}
+                        </span>
+                    </a>
+                ))}
+            </div>
+        )}
+    </div>
+);
+
 
 // ─── Main Page ───
 export default function PolicyPage() {
@@ -227,13 +309,8 @@ export default function PolicyPage() {
     const searchParams = useSearchParams();
 
     const countryParam = searchParams?.get("country") ?? null;
-    const initialCountry = SUPPORTED_COUNTRIES.has("kr") ? "kr" : null; // Default to KR if available
 
-    // If no param, we can default to KR or let user select.
     // User requested "Master-Detail" interaction.
-    // Let's optimize UX: Default to first supported country (KR) if none selected?
-    // Or keep null and show prompt?
-    // Let's use the first supported country as default if 'kr' exists.
     const [selectedCountry, setSelectedCountry] = useState<string | null>(countryParam || 'kr');
 
     useEffect(() => {

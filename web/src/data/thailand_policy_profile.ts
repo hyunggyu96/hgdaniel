@@ -19,10 +19,28 @@ const REF = {
         url: "https://drug.fda.moph.go.th",
         accessedOn: "2026-02-15",
     },
+    cosmetic_act: {
+        id: "th-cosmetic-act",
+        title: "Cosmetic Act B.E. 2558 (2015)",
+        url: "https://cosmetic.fda.moph.go.th",
+        accessedOn: "2026-02-15",
+    },
     md_div: {
         id: "th-md-div",
         title: "Medical Device Control Division (Thai FDA)",
         url: "https://medical.fda.moph.go.th",
+        accessedOn: "2026-02-15",
+    },
+    drug_div: {
+        id: "th-drug-div",
+        title: "Drug Control Division (Thai FDA)",
+        url: "https://drug.fda.moph.go.th",
+        accessedOn: "2026-02-15",
+    },
+    cosmetic_div: {
+        id: "th-cosmetic-div",
+        title: "Cosmetic Control Group (Thai FDA)",
+        url: "https://cosmetic.fda.moph.go.th",
         accessedOn: "2026-02-15",
     },
     amdd: {
@@ -42,80 +60,142 @@ export const thailandPolicyProfile: CountryPolicyProfile = {
     lastUpdated: "2026-02-15",
     sourceLastCheckedAt: "2026-02-15",
     facts: [
+        // ─── Common / General ───
         {
-            id: "th_01_classification",
-            label: { ko: "1) 의료기기 등급 및 경로", en: "1) Medical Device Classification & Pathway" },
+            id: "th_00_aesthetic_product_cat",
+            category: "common",
+            label: { ko: "⚠️ 미용 제품 분류 기준 (Classification Criteria)", en: "⚠️ Aesthetic Product Classification Criteria" },
             value: {
-                ko: "위험도에 따라 Class 1(Listing), Class 2-3(Notification), Class 4(License)로 분류됩니다. AMDD(아세안 의료기기 지침)를 따릅니다.",
-                en: "Classified into Class 1 (Listing), Class 2-3 (Notification), and Class 4 (License) based on risk, following AMDD harmonization.",
-            },
-            confidence: "high",
-            references: [REF.md_act, REF.md_div],
-        },
-        {
-            id: "th_02_aesthetic_products",
-            label: { ko: "2) 미용 제품 분류 (중요)", en: "2) Aesthetic Product Classification (Critical)" },
-            value: {
-                ko: "히알루론산 필러(Dermal Fillers)는 '의료기기 Class 4(License)'로 분류되나, 보툴리눔 톡신(Botulinum Toxin)은 '전문의약품(Biological Drug)'으로 분류되어 의약품 등록 절차를 따릅니다.",
-                en: "Hyaluronic Acid Dermal Fillers are 'Medical Devices Class 4 (License)', whereas Botulinum Toxin is regulated as a 'Biological Drug' requiring Drug Registration.",
+                ko: "• 필러(Fillers): 의료기기 (Class 4)\n• 톡신(Toxins): 전문의약품 (Biological Drug)\n• 기능성 화장품: 화장품 (Notification)",
+                en: "• Fillers: Medical Device (Class 4)\n• Toxins: Prescription Drug (Biological)\n• Functional Cosmetics: Cosmetic (Notification)",
             },
             note: {
-                ko: "제품 카테고리에 따라 적용 법령(Device Act vs Drug Act)이 완전히 다르므로 주의가 필요합니다.",
-                en: "Applicable laws (Device Act vs Drug Act) differ completely by product category; caution required.",
+                ko: "제품의 성격(작용기전)에 따라 적용 법령이 완전히 다르므로 초기 분류가 가장 중요합니다.",
+                en: "Applicable laws differ completely by mechanism of action; initial classification is critical.",
             },
             confidence: "high",
-            references: [REF.md_act, REF.drug_act],
-        },
-        {
-            id: "th_03_registration_dossier",
-            label: { ko: "3) 기술문서 요건 (CSDT)", en: "3) Technical Dossier (CSDT)" },
-            value: {
-                ko: "모든 등급(Class 1-4)에 대해 ASEAN CSDT(Common Submission Dossier Template) 형식의 기술문서 제출이 의무화되었습니다.",
-                en: "Submission of technical dossiers in ASEAN CSDT format is mandatory for all classes (Class 1-4).",
-            },
-            confidence: "high",
-            references: [REF.md_div, REF.amdd],
+            references: [REF.md_act, REF.drug_act, REF.cosmetic_act],
         },
         {
             id: "th_04_applicant_eligibility",
-            label: { ko: "4) 신청 자격 (License Holder)", en: "4) Applicant Eligibility" },
+            category: "common",
+            label: { ko: "현지 대리인 자격 (Local License Holder)", en: "Local License Holder Requirement" },
             value: {
                 ko: "태국 내 사업자 등록이 된 현지 법인(수입업 허가 보유)만이 등록 신청 및 라이선스 보유가 가능합니다.",
                 en: "Only a local entity with a valid Import License in Thailand can apply for and hold the product registration license.",
             },
             confidence: "high",
-            references: [REF.md_act],
+            references: [REF.md_act, REF.drug_act],
         },
+
+        // ─── Medical Device (Fillers, Threads, Energy Devices) ───
         {
-            id: "th_05_grouping",
-            label: { ko: "5) 제품 그룹핑 (Grouping)", en: "5) Product Grouping" },
+            id: "th_01_classification",
+            category: "device",
+            label: { ko: "의료기기 등급 및 경로 (Device Classification)", en: "Device Classification & Pathway" },
             value: {
-                ko: "Single, Family, System, Set, IVD Test Kit, IVD Cluster 등 6가지 그룹핑 등록이 가능합니다. (조건 충족 시)",
-                en: "Registration allowed as Single, Family, System, Set, IVD Test Kit, or IVD Cluster (if conditions met).",
+                ko: "위험도에 따라 Class 1(Listing), Class 2-3(Notification), Class 4(License)로 분류됩니다. 필러는 Class 4(License)입니다.",
+                en: "Classified into Class 1 (Listing), Class 2-3 (Notification), Class 4 (License). Dermal Fillers are Class 4 (License).",
             },
             confidence: "high",
-            references: [REF.md_div],
+            references: [REF.md_act, REF.md_div],
         },
         {
-            id: "th_06_validity",
-            label: { ko: "6) 유효기간", en: "6) Validity Period" },
+            id: "th_03_registration_dossier",
+            category: "device",
+            label: { ko: "기술문서 요건 (CSDT)", en: "Technical Dossier (CSDT)" },
             value: {
-                ko: "의료기기 등록 증명서(Listing/Notification/License)의 유효기간은 5년입니다.",
-                en: "Medical device registration certificates (Listing/Notification/License) are valid for 5 years.",
+                ko: "모든 등급(Class 1-4)에 대해 ASEAN CSDT(Common Submission Dossier Template) 형식의 기술문서 제출이 의무화되었습니다.",
+                en: "Submission of technical dossiers in ASEAN CSDT format is mandatory for all classes.",
             },
             confidence: "high",
-            references: [REF.md_act],
+            references: [REF.md_div, REF.amdd],
         },
         {
-            id: "th_07_specialized_review",
-            label: { ko: "7) 전문가 검토 (Specialized Listing)", en: "7) Specialized Review" },
+            id: "th_dev_lead_time",
+            category: "device",
+            label: { ko: "심사 소요 기간 (Device Timeline)", en: "Device Review Timeline" },
             value: {
-                ko: "일부 고위험 제품은 전문가 검토(Expert Review)가 필요하여 비용과 기간이 추가될 수 있습니다.",
-                en: "Certain high-risk products require Expert Review, which may incur additional costs and time.",
+                ko: "• Class 4 (License): 약 9-12개월 (전문가 검토 포함 시)\n• Class 2-3 (Notification): 약 4-6개월",
+                en: "• Class 4 (License): ~9-12 months (w/ expert review)\n• Class 2-3 (Notification): ~4-6 months",
             },
             confidence: "medium",
             references: [REF.md_div],
-        }
+        },
+
+        // ─── Drugs (Botulinum Toxin) ───
+        {
+            id: "th_drug_01_pathway",
+            category: "drug",
+            label: { ko: "의약품 등록 경로 (Biological Drug)", en: "Drug Registration Pathway" },
+            value: {
+                ko: "보툴리눔 톡신은 '신약(New Drug)' 또는 '생물학적 제제'로 분류되어 엄격한 등록 절차(Or Yor)를 거칩니다.",
+                en: "Botulinum Toxin is classified as a 'New Drug' or 'Biological Product', subject to strict registration (Or Yor).",
+            },
+            confidence: "high",
+            references: [REF.drug_act],
+        },
+        {
+            id: "th_drug_02_requirements",
+            category: "drug",
+            label: { ko: "제출 자료 요건 (ACTD/ICH-CTD)", en: "Dossier Requirements (ACTD/CTD)" },
+            value: {
+                ko: "ACTD(ASEAN CTD) 또는 ICH-CTD 양식을 따르며, 임상시험 자료(Phase 1-3)와 PIC/S GMP 인증이 필수입니다.",
+                en: "Must follow ACTD or ICH-CTD format. Clinical data (Phase 1-3) and PIC/S GMP certification are mandatory.",
+            },
+            confidence: "high",
+            references: [REF.drug_act],
+        },
+        {
+            id: "th_drug_03_timeline",
+            category: "drug",
+            label: { ko: "심사 소요 기간 (Drug Timeline)", en: "Drug Review Timeline" },
+            value: {
+                ko: "일반적으로 12개월~24개월 이상 소요되며, 신약의 경우 더 오래 걸릴 수 있습니다.",
+                en: "Typically 12-24+ months; new drugs may take longer depending on complexity.",
+            },
+            confidence: "medium",
+            references: [REF.drug_div],
+        },
+
+        // ─── Cosmetics (Skin Boosters, Whitening) ───
+        {
+            id: "th_cos_01_notification",
+            category: "cosmetic",
+            label: { ko: "화장품 통지 절차 (Product Notification)", en: "Cosmetic Product Notification" },
+            value: {
+                ko: "화장품은 사전 허가가 아닌 '통지(Notification/Jor Jaeng)' 절차를 따르며, 온라인(E-submission)으로 진행됩니다.",
+                en: "Cosmetics follow a 'Notification (Jor Jaeng)' procedure via E-submission, rather than pre-market approval.",
+            },
+            confidence: "high",
+            references: [REF.cosmetic_act],
+        },
+        {
+            id: "th_cos_02_requirements",
+            category: "cosmetic",
+            label: { ko: "주요 요건 및 제한 (Requirements)", en: "Key Requirements & Restrictions" },
+            value: {
+                ko: "ASEAN Cosmetic Directive를 따르며, 금지/제한 원료(색소, 보존제 등) 준수가 필수입니다. 주사제(Injectable) 형태는 화장품으로 등록 불가합니다.",
+                en: "Must comply with ASEAN Cosmetic Directive. Injectable forms cannot be registered as cosmetics.",
+            },
+            note: {
+                ko: "스킨부스터 중 '주사' 용도는 의료기기/의약품으로, '도포' 용도는 화장품으로 분류될 수 있습니다.",
+                en: "Skin boosters for 'injection' are Devices/Drugs; 'topical' use may be Cosmetics.",
+            },
+            confidence: "high",
+            references: [REF.cosmetic_act, REF.cosmetic_div],
+        },
+        {
+            id: "th_cos_03_timeline",
+            category: "cosmetic",
+            label: { ko: "심사 소요 기간 (Cosmetic Timeline)", en: "Cosmetic Review Timeline" },
+            value: {
+                ko: "통상의 경우 업무일 기준 3~5일 내로 매우 빠르게 처리됩니다.",
+                en: "Typically processed very quickly within 3-5 working days.",
+            },
+            confidence: "high",
+            references: [REF.cosmetic_div],
+        },
     ],
     keyRegulations: [
         {
@@ -147,22 +227,25 @@ export const thailandPolicyProfile: CountryPolicyProfile = {
             },
         },
         {
-            id: "th-fda-portal",
-            documentNo: "E-Submission",
-            title: "Thai FDA E-Submission Portal",
-            kind: "Portal",
-            authority: "Thai FDA",
-            sourceUrl: "https://privus.fda.moph.go.th/",
+            id: "th-cosmetic-act-2558",
+            documentNo: "B.E. 2558 (2015)",
+            title: "Cosmetic Act B.E. 2558",
+            kind: "Law",
+            authority: "Ministry of Public Health",
+            issuedDate: "2015",
+            effectiveDate: "2015",
+            sourceUrl: "https://cosmetic.fda.moph.go.th",
             summary: {
-                ko: "의료기기 및 의약품 전자 등록 시스템 (SKYNET 등).",
-                en: "Electronic submission system for devices and drugs (SKYNET, etc.).",
+                ko: "화장품 제조, 수입, 판매 및 통지(Notification) 절차를 규정.",
+                en: "Regulates cosmetic manufacturing, import, sales, and notification procedures.",
             },
         }
     ],
     sources: [
         { id: "src-th-fda", title: "Thai FDA Official Website", url: REF.fda.url, accessedOn: REF.fda.accessedOn },
         { id: "src-md-div", title: "Medical Device Control Division", url: REF.md_div.url, accessedOn: REF.md_div.accessedOn },
-        { id: "src-drug-div", title: "Drug Control Division", url: REF.drug_act.url, accessedOn: REF.drug_act.accessedOn },
+        { id: "src-drug-div", title: "Drug Control Division", url: REF.drug_div.url, accessedOn: REF.drug_div.accessedOn },
+        { id: "src-cos-div", title: "Cosmetic Control Group", url: REF.cosmetic_div.url, accessedOn: REF.cosmetic_div.accessedOn },
     ],
     disclaimers: [
         { ko: "태국 규제는 제품별 분류(기기/의약품/화장품)가 매우 엄격하므로 초기 분류 확인이 필수입니다.", en: "Strict product classification (Device/Drug/Cosmetic) requires mandatory initial verification." },

@@ -13,8 +13,11 @@ export interface PolicyReference {
     citation?: LocalizedText; // Article/Clause or rationale
 }
 
+export type PolicyCategory = "common" | "device" | "drug" | "cosmetic";
+
 export interface CountryPolicyFact {
     id: string;
+    category?: PolicyCategory;
     label: LocalizedText;
     value: LocalizedText;
     note?: LocalizedText;
