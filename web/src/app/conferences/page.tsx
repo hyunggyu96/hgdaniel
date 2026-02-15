@@ -17,25 +17,41 @@ interface ConferenceEvent {
     url: string;
 }
 
-// ─── Country Flag Emojis ───
-const COUNTRY_FLAGS: Record<string, string> = {
-    '프랑스': '🇫🇷', 'France': '🇫🇷',
-    '브라질': '🇧🇷', 'Brazil': '🇧🇷',
-    '태국': '🇹🇭', 'Thailand': '🇹🇭',
-    '중국': '🇨🇳', 'China': '🇨🇳',
-    '미국': '🇺🇸', 'USA': '🇺🇸',
-    '모나코': '🇲🇨', 'Monaco': '🇲🇨',
-    '대만': '🇹🇼', 'Taiwan': '🇹🇼',
-    '한국': '🇰🇷', 'South Korea': '🇰🇷',
-    '일본': '🇯🇵', 'Japan': '🇯🇵',
-    'UAE': '🇦🇪',
-    '콜롬비아': '🇨🇴', 'Colombia': '🇨🇴',
-    '베트남': '🇻🇳', 'Vietnam': '🇻🇳',
-    '인도네시아': '🇮🇩', 'Indonesia': '🇮🇩',
-    '홍콩': '🇭🇰', 'Hong Kong': '🇭🇰',
-    '싱가포르': '🇸🇬', 'Singapore': '🇸🇬',
-    '인도': '🇮🇳', 'India': '🇮🇳',
+// ─── Country Flag ISO Codes ───
+const COUNTRY_CODES: Record<string, string> = {
+    '프랑스': 'fr', 'France': 'fr',
+    '브라질': 'br', 'Brazil': 'br',
+    '태국': 'th', 'Thailand': 'th',
+    '중국': 'cn', 'China': 'cn',
+    '미국': 'us', 'USA': 'us',
+    '모나코': 'mc', 'Monaco': 'mc',
+    '대만': 'tw', 'Taiwan': 'tw',
+    '한국': 'kr', 'South Korea': 'kr',
+    '일본': 'jp', 'Japan': 'jp',
+    'UAE': 'ae',
+    '콜롬비아': 'co', 'Colombia': 'co',
+    '베트남': 'vn', 'Vietnam': 'vn',
+    '인도네시아': 'id', 'Indonesia': 'id',
+    '홍콩': 'hk', 'Hong Kong': 'hk',
+    '싱가포르': 'sg', 'Singapore': 'sg',
+    '인도': 'in', 'India': 'in',
 };
+
+function FlagIcon({ country, size = 16 }: { country: string; size?: number }) {
+    const code = COUNTRY_CODES[country];
+    if (!code) return <span>🌐</span>;
+    return (
+        <img
+            src={`https://flagcdn.com/w${size * 2}/${code}.png`}
+            width={size}
+            height={Math.round(size * 0.75)}
+            alt={country}
+            className="inline-block rounded-[2px] object-cover"
+            style={{ verticalAlign: 'middle', boxShadow: '0 0 0 0.5px rgba(0,0,0,0.1)' }}
+            loading="lazy"
+        />
+    );
+}
 
 // ─── Country Colors (based on national flag primary color) ───
 const COUNTRY_COLORS: Record<string, { color: string; bgColor: string; borderColor: string }> = {
@@ -418,7 +434,6 @@ function EventBadge({ event, onClick, isSelected, lang }: {
 }) {
     const cityLabel = event.city[lang];
     const cc = getCountryColor(event.country[lang]);
-    const flag = COUNTRY_FLAGS[event.country[lang]] || '🌐';
 
     return (
         <button
@@ -427,13 +442,14 @@ function EventBadge({ event, onClick, isSelected, lang }: {
             title={`${event.name[lang]} — ${cityLabel}, ${event.country[lang]}`}
         >
             <div
-                className={`text-[9px] sm:text-[11px] font-semibold px-1.5 py-0.5 rounded-md truncate transition-all duration-200 border ${isSelected ? 'shadow-md scale-[1.02]' : 'hover:scale-[1.02]'}`}
+                className={`text-[9px] sm:text-[11px] font-semibold px-1.5 py-0.5 rounded-md truncate transition-all duration-200 border flex items-center gap-1 ${isSelected ? 'shadow-md scale-[1.02]' : 'hover:scale-[1.02]'}`}
                 style={isSelected
                     ? { backgroundColor: cc.color, color: '#fff', borderColor: cc.color }
                     : { backgroundColor: cc.bgColor, color: cc.color, borderColor: cc.borderColor }
                 }
             >
-                {flag} {event.name[lang].replace(/ 2026$/, '')} ({cityLabel})
+                <FlagIcon country={event.country[lang]} size={12} />
+                <span className="truncate">{event.name[lang].replace(/ 2026$/, '')} ({cityLabel})</span>
             </div>
         </button>
     );
@@ -448,7 +464,6 @@ function EventDetailPanel({ event, onClose, lang }: {
 
     const statusLabel = isOngoing ? { ko: '진행 중', en: 'LIVE' } : isPast ? { ko: '종료', en: 'ENDED' } : { ko: '예정', en: 'UPCOMING' };
     const statusStyle = isOngoing ? 'bg-emerald-100 text-emerald-700' : isPast ? 'bg-gray-100 text-gray-500' : 'bg-amber-50 text-amber-600';
-    const flag = COUNTRY_FLAGS[event.country[lang]] || '🌐';
 
     return (
         <div className="rounded-2xl p-5 sm:p-6 transition-all duration-300"
@@ -463,9 +478,9 @@ function EventDetailPanel({ event, onClose, lang }: {
                         <span className={`text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full ${statusStyle}`}>
                             {statusLabel[lang]}
                         </span>
-                        <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-white/70"
+                        <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-white/70 inline-flex items-center gap-1"
                             style={{ color: cc.color }}>
-                            {flag} {event.country[lang]}
+                            <FlagIcon country={event.country[lang]} size={14} /> {event.country[lang]}
                         </span>
                         {!event.confirmed && (
                             <span className="text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full bg-orange-50 text-orange-500">
@@ -770,19 +785,18 @@ export default function ConferencesPage() {
                             {countries.map((c) => {
                                 const isActive = countryFilter === c;
                                 const count = CONFERENCES.filter((conf) => conf.country[lang] === c).length;
-                                const flag = COUNTRY_FLAGS[c] || '🌐';
                                 const cc = getCountryColor(c);
                                 return (
                                     <button
                                         key={c}
                                         onClick={() => { setCountryFilter(isActive ? 'ALL' : c); setSelectedEvent(null); }}
-                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide transition-all duration-200 border ${isActive ? 'shadow-md scale-[1.02]' : 'hover:scale-[1.02]'}`}
+                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide transition-all duration-200 border inline-flex items-center gap-1.5 ${isActive ? 'shadow-md scale-[1.02]' : 'hover:scale-[1.02]'}`}
                                         style={isActive
                                             ? { backgroundColor: cc.color, color: '#fff', borderColor: cc.color }
                                             : { backgroundColor: cc.bgColor, color: cc.color, borderColor: cc.borderColor }
                                         }
                                     >
-                                        {flag} {c} ({count})
+                                        <FlagIcon country={c} size={14} /> {c} ({count})
                                     </button>
                                 );
                             })}
@@ -831,7 +845,6 @@ export default function ConferencesPage() {
                         {upcomingEvents.map((event) => {
                             const isOngoing = new Date(event.startDate) <= new Date() && new Date(event.endDate) >= new Date();
                             const cc = getCountryColor(event.country[lang]);
-                            const flag = COUNTRY_FLAGS[event.country[lang]] || '🌐';
                             return (
                                 <button key={event.id}
                                     onClick={() => {
@@ -847,9 +860,9 @@ export default function ConferencesPage() {
                                             style={{ backgroundColor: cc.bgColor, color: cc.color }}>
                                             {event.series}
                                         </span>
-                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                                            style={{ backgroundColor: cc.bgColor, color: cc.color }}>
-                                            {flag}
+                                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-full"
+                                            style={{ backgroundColor: cc.bgColor }}>
+                                            <FlagIcon country={event.country[lang]} size={14} />
                                         </span>
                                         {isOngoing && (
                                             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">LIVE</span>
@@ -862,7 +875,7 @@ export default function ConferencesPage() {
                                     </div>
                                     <h3 className="text-sm font-bold text-gray-900 transition-colors mb-1.5 leading-tight"
                                         style={{ ['--tw-group-hover-color' as string]: cc.color }}>
-                                        {flag} {event.name[lang]}
+                                        <span className="inline-flex mr-1.5 translate-y-0.5"><FlagIcon country={event.country[lang]} size={16} /></span>{event.name[lang]}
                                     </h3>
                                     <div className="flex items-center gap-3 text-xs text-gray-500">
                                         <span>📅 {formatDateRange(event.startDate, event.endDate, lang)}</span>
