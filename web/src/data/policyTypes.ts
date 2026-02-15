@@ -14,7 +14,7 @@ export interface CountryPolicyRegulation {
     id: string;
     documentNo: string;
     title: string;
-    kind: "Decree" | "Circular" | "Portal";
+    kind: "Law" | "Decree" | "Circular" | "Notice" | "Portal";
     authority: string;
     issuedDate?: string;
     effectiveDate?: string;

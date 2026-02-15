@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Badge, Card, Text, Title } from "@tremor/react";
 import { useLanguage } from "@/components/LanguageContext";
-import koreaRegulations from "@/data/korea_regulations.json";
+import { koreaPolicyProfile } from "@/data/korea_policy_profile";
 import { vietnamPolicyProfile } from "@/data/vietnam_policy_profile";
 import type { LocalizedText } from "@/data/policyTypes";
 
@@ -12,14 +12,6 @@ interface Country {
     id: string;
     nameEn: string;
     nameKo: string;
-}
-
-interface Regulation {
-    title: string;
-    date: string;
-    link: string;
-    type: string;
-    id: string;
 }
 
 const COUNTRIES: Country[] = [
@@ -44,21 +36,11 @@ const getLocalizedText = (language: "ko" | "en", text: LocalizedText): string =>
     return language === "ko" ? text.ko : text.en;
 };
 
-const formatCompactDate = (dateStr: string): string => {
-    if (!/^\d{8}$/.test(dateStr)) return dateStr;
-    return `${dateStr.substring(0, 4)}.${dateStr.substring(4, 6)}.${dateStr.substring(6, 8)}`;
-};
-
 const formatIsoDate = (dateStr?: string): string => {
     if (!dateStr) return "-";
     const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr);
     if (!match) return dateStr;
     return `${match[1]}.${match[2]}.${match[3]}`;
-};
-
-const toLawGoKrUrl = (link: string): string => {
-    if (link.startsWith("http://") || link.startsWith("https://")) return link;
-    return `https://www.law.go.kr${link}`;
 };
 
 export default function PolicyPage() {
@@ -85,10 +67,6 @@ export default function PolicyPage() {
     const handleBackClick = () => {
         router.push("/policy");
     };
-
-    const validRegulations = useMemo(() => {
-        return (koreaRegulations as Regulation[]).filter((item) => item.title?.trim());
-    }, []);
 
     return (
         <main className="min-h-screen bg-gray-50 p-6 md:p-12">
@@ -149,36 +127,94 @@ export default function PolicyPage() {
                             <div>
                                 <h2 className="text-2xl font-bold text-gray-900">South Korea Regulations</h2>
                                 <p className="text-sm text-gray-500">
-                                    {`Medical Device & Cosmetics Laws & Rules (${validRegulations.length} items)`}
+                                    {`Operational regulatory snapshot (${koreaPolicyProfile.facts.length} fields)`}
                                 </p>
                             </div>
                         </div>
 
+                        <div className="text-xs text-gray-500 space-y-1">
+                            <p>{`Last updated: ${formatIsoDate(koreaPolicyProfile.lastUpdated)}`}</p>
+                            <p>{`Sources checked: ${formatIsoDate(koreaPolicyProfile.sourceLastCheckedAt)}`}</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {koreaPolicyProfile.facts.map((fact) => (
+                                <Card key={fact.id} className="border border-gray-200">
+                                    <Text className="text-xs uppercase tracking-wide text-gray-500">
+                                        {getLocalizedText(language, fact.label)}
+                                    </Text>
+                                    <p className="mt-2 text-sm text-gray-900 leading-6 whitespace-pre-line">
+                                        {getLocalizedText(language, fact.value)}
+                                    </p>
+                                    {fact.note && (
+                                        <p className="mt-3 text-xs text-gray-500 leading-5">
+                                            {getLocalizedText(language, fact.note)}
+                                        </p>
+                                    )}
+                                </Card>
+                            ))}
+                        </div>
+
                         <div className="space-y-3">
-                            {validRegulations.map((regulation) => (
-                                <Card
-                                    key={regulation.id}
-                                    className="hover:shadow-md transition-all cursor-pointer border border-gray-200"
-                                    onClick={() => window.open(toLawGoKrUrl(regulation.link), "_blank", "noopener,noreferrer")}
-                                >
-                                    <div className="flex items-start justify-between gap-4">
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <Badge color={regulation.type === "Law" ? "blue" : "green"}>
-                                                    {regulation.type === "Law" ? "Law" : "Rule"}
-                                                </Badge>
-                                                <Text className="text-xs text-gray-400">
-                                                    {formatCompactDate(regulation.date)}
-                                                </Text>
+                            <h3 className="text-lg font-semibold text-gray-900">Key Legal Instruments</h3>
+                            {koreaPolicyProfile.keyRegulations.map((item) => (
+                                <Card key={item.id} className="border border-gray-200">
+                                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                                        <div className="space-y-2">
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                <Badge color={item.kind === "Portal" ? "green" : "blue"}>{item.kind}</Badge>
+                                                <Text className="text-xs text-gray-500">{item.documentNo}</Text>
                                             </div>
-                                            <h3 className="text-base font-semibold text-gray-900 hover:text-blue-600 transition-colors">
-                                                {regulation.title}
-                                            </h3>
+                                            <h4 className="text-base font-semibold text-gray-900">{item.title}</h4>
+                                            <Text className="text-xs text-gray-500">{item.authority}</Text>
+                                            <p className="text-sm text-gray-700 leading-6">
+                                                {getLocalizedText(language, item.summary)}
+                                            </p>
+                                            <div className="flex flex-wrap gap-3 text-xs text-gray-500">
+                                                {item.issuedDate && <span>{`Issued: ${formatIsoDate(item.issuedDate)}`}</span>}
+                                                {item.effectiveDate && <span>{`Effective: ${formatIsoDate(item.effectiveDate)}`}</span>}
+                                            </div>
                                         </div>
-                                        <div className="text-gray-400 hover:text-blue-600 transition-colors">Open</div>
+                                        <a
+                                            href={item.sourceUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-sm font-medium text-blue-600 hover:text-blue-700"
+                                        >
+                                            Official source
+                                        </a>
                                     </div>
                                 </Card>
                             ))}
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <Card className="border border-gray-200">
+                                <h3 className="text-base font-semibold text-gray-900 mb-3">Official Sources</h3>
+                                <div className="space-y-2">
+                                    {koreaPolicyProfile.sources.map((source) => (
+                                        <a
+                                            key={source.id}
+                                            href={source.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="block text-sm text-blue-600 hover:text-blue-700 break-all"
+                                        >
+                                            {source.title}
+                                        </a>
+                                    ))}
+                                </div>
+                            </Card>
+                            <Card className="border border-gray-200">
+                                <h3 className="text-base font-semibold text-gray-900 mb-3">Compliance Notes</h3>
+                                <div className="space-y-2">
+                                    {koreaPolicyProfile.disclaimers.map((note, index) => (
+                                        <p key={index} className="text-sm text-gray-700 leading-6">
+                                            {getLocalizedText(language, note)}
+                                        </p>
+                                    ))}
+                                </div>
+                            </Card>
                         </div>
                     </div>
                 )}
