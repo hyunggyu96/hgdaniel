@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useLanguage } from '@/components/LanguageContext';
 import { Globe, Calendar as CalendarIcon, MapPin, ExternalLink, X, Filter } from "lucide-react";
 
@@ -498,6 +498,99 @@ function EventDetailPanel({ event, onClose, lang }: {
     );
 }
 
+function EmbeddedEventDetailPanel({ event, lang }: {
+    event: ConferenceEvent; lang: 'ko' | 'en';
+}) {
+    const isPast = new Date(event.endDate) < new Date();
+    const isOngoing = new Date(event.startDate) <= new Date() && new Date(event.endDate) >= new Date();
+    const cc = getCountryColor(event.country[lang]);
+
+    const statusLabel = isOngoing ? { ko: '진행 중', en: 'LIVE' } : isPast ? { ko: '종료', en: 'ENDED' } : { ko: '예정', en: 'UPCOMING' };
+    const statusStyle = isOngoing ? 'bg-emerald-100 text-emerald-700' : isPast ? 'bg-gray-100 text-gray-500' : 'bg-amber-50 text-amber-600';
+
+    return (
+        <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg border border-gray-200 ring-1 ring-black/5 p-6 animate-fade-in h-fit sticky top-24">
+            <div
+                className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/20 to-purple-500/20 blur-3xl rounded-full -translate-y-1/3 translate-x-1/3 pointer-events-none"
+                style={{ background: `radial-gradient(circle, ${cc.color}20 0%, transparent 70%)` }}
+            />
+
+            <div className="relative z-10 w-full min-w-0">
+                {/* Header: Tags */}
+                <div className="flex items-start justify-between mb-3 w-full">
+                    <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[10px] font-black tracking-wider uppercase px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                            {event.series}
+                        </span>
+                        <span className={`text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full ${statusStyle}`}>
+                            {statusLabel[lang]}
+                        </span>
+                        {!event.confirmed && (
+                            <span className="text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full bg-orange-50 text-orange-500 border border-orange-100">
+                                {lang === 'ko' ? '미확정' : 'TBC'}
+                            </span>
+                        )}
+                    </div>
+                </div>
+
+                {/* Title & Website Button Row */}
+                <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 mb-6 w-full">
+                    <h3 className="text-2xl font-bold text-gray-900 leading-tight break-words">
+                        {event.name[lang]}
+                    </h3>
+
+                    {event.url && (
+                        <a
+                            href={event.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-white text-[10px] font-bold uppercase tracking-wide transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 shrink-0 self-start xl:self-auto"
+                            style={{ backgroundColor: cc.color }}
+                        >
+                            {lang === 'ko' ? '공식 웹사이트' : 'Official Website'}
+                            <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                    )}
+                </div>
+
+                {/* Details Grid */}
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 xl:gap-8 pt-4 border-t border-gray-100 w-full">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
+                            <CalendarIcon className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{lang === 'ko' ? '일정' : 'Date'}</p>
+                            <p className="text-sm font-semibold text-gray-800">{formatDateRange(event.startDate, event.endDate, lang)}</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center text-purple-600 shrink-0">
+                            <Globe className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{lang === 'ko' ? '위치' : 'Location'}</p>
+                            <div className="flex items-center gap-1.5">
+                                <FlagIcon country={event.country[lang]} size={16} />
+                                <p className="text-sm font-semibold text-gray-800">{event.city[lang]}, {event.country[lang]}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
+                            <MapPin className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{lang === 'ko' ? '장소' : 'Venue'}</p>
+                            <p className="text-sm font-semibold text-gray-800 break-words">{event.venue}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 // ─── Main Page ───
 export default function ConferencesPage() {
     const { language } = useLanguage();
@@ -533,6 +626,18 @@ export default function ConferencesPage() {
             .filter((c) => new Date(c.endDate) >= today)
             .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
     }, [filteredConferences]);
+
+    // Master-Detail View State for Upcoming Events
+    const [focusedEvent, setFocusedEvent] = useState<ConferenceEvent | null>(null);
+
+    // Initialize focused event when list changes
+    useEffect(() => {
+        if (upcomingEvents.length > 0) {
+            setFocusedEvent(upcomingEvents[0]);
+        } else {
+            setFocusedEvent(null);
+        }
+    }, [upcomingEvents]);
 
 
     const daysInMonth = getDaysInMonth(year, month);
@@ -764,9 +869,9 @@ export default function ConferencesPage() {
                     </div>
                 </div>
 
-                {/* Bottom Section: Upcoming Events (List View) */}
-                <div className="space-y-5 pt-8">
-                    <div className="flex items-center justify-between mb-2 pb-2 border-b border-gray-200/50">
+                {/* Bottom Section: Upcoming Events (Master-Detail View) */}
+                <div className="pt-8 space-y-5">
+                    <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                             <h3 className="text-lg font-bold text-gray-900 border-l-4 border-blue-600 pl-3">
                                 {lang === 'ko' ? '다가오는 일정' : 'Upcoming Events'}
@@ -777,65 +882,65 @@ export default function ConferencesPage() {
                         </div>
                     </div>
 
-                    <div className="flex flex-col gap-3">
-                        {upcomingEvents.map((event) => {
-                            const cc = getCountryColor(event.country[lang]);
-                            const startDate = new Date(event.startDate);
-                            const isOngoing = new Date(event.startDate) <= new Date() && new Date(event.endDate) >= new Date();
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                        {/* Left List */}
+                        <div className="lg:col-span-6 flex flex-col gap-3 h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                            {upcomingEvents.map((event) => {
+                                const cc = getCountryColor(event.country[lang]);
+                                const startDate = new Date(event.startDate);
+                                const isOngoing = new Date(event.startDate) <= new Date() && new Date(event.endDate) >= new Date();
+                                const isFocused = focusedEvent?.id === event.id;
 
-                            return (
-                                <div
-                                    key={event.id}
-                                    onClick={() => { setSelectedEvent(event); window.scrollTo({ top: 100, behavior: 'smooth' }); }}
-                                    className="group bg-white rounded-xl p-3 border border-gray-100 shadow-sm hover:shadow-md cursor-pointer transition-all hover:scale-[1.005] flex items-center justify-between gap-4 relative overflow-hidden"
-                                >
+                                return (
                                     <div
-                                        className="absolute left-0 top-0 bottom-0 w-1 transition-all group-hover:w-1.5"
-                                        style={{ backgroundColor: cc.color }}
-                                    />
+                                        key={event.id}
+                                        onClick={() => setFocusedEvent(event)}
+                                        className={`group bg-white rounded-xl p-3 border shadow-sm cursor-pointer transition-all relative overflow-hidden flex items-center justify-between gap-3
+                                             ${isFocused
+                                                ? 'border-blue-500 ring-2 ring-blue-100 shadow-md scale-[1.01]'
+                                                : 'border-gray-100 hover:border-blue-200 hover:shadow-md hover:scale-[1.005]'
+                                            }`}
+                                    >
+                                        <div
+                                            className="absolute left-0 top-0 bottom-0 w-1 transition-all"
+                                            style={{ backgroundColor: cc.color }}
+                                        />
 
-                                    <div className="flex items-center gap-4 md:gap-6 pl-2 flex-1 min-w-0">
-                                        {/* Date */}
-                                        <div className="flex flex-col items-center justify-center w-12 shrink-0">
-                                            <span className="text-[10px] font-bold text-gray-400 uppercase leading-none">{lang === 'ko' ? `${startDate.getMonth() + 1}월` : MONTH_NAMES_EN[startDate.getMonth()].substring(0, 3)}</span>
-                                            <span className="text-xl font-bold text-gray-900 leading-tight">{startDate.getDate()}</span>
-                                        </div>
+                                        <div className="flex items-center gap-4 pl-3 flex-1 min-w-0">
+                                            <div className="flex flex-col items-center justify-center w-10 shrink-0">
+                                                <span className="text-[10px] font-bold text-gray-400 uppercase leading-none">{lang === 'ko' ? `${startDate.getMonth() + 1}월` : MONTH_NAMES_EN[startDate.getMonth()].substring(0, 3)}</span>
+                                                <span className="text-lg font-bold text-gray-900 leading-tight">{startDate.getDate()}</span>
+                                            </div>
 
-                                        {/* Info */}
-                                        <div className="min-w-0 flex flex-col md:flex-row md:items-center gap-1 md:gap-4 flex-1">
-                                            <div className="flex items-center gap-2 shrink-0">
-                                                {isOngoing && (
-                                                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-600 animate-pulse uppercase">
-                                                        LIVE
+                                            <div className="min-w-0 flex flex-col gap-0.5">
+                                                <div className="flex items-center gap-2">
+                                                    {isOngoing && (
+                                                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-600 animate-pulse uppercase">LIVE</span>
+                                                    )}
+                                                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                                                        {event.series}
                                                     </span>
-                                                )}
-                                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-                                                    {event.series}
-                                                </span>
+                                                </div>
+                                                <h4 className={`text-sm font-bold transition-colors truncate ${isFocused ? 'text-blue-700' : 'text-gray-900 group-hover:text-blue-700'}`}>
+                                                    {event.name[lang]}
+                                                </h4>
                                             </div>
-                                            <h4 className="text-sm md:text-base font-bold text-gray-900 group-hover:text-blue-700 transition-colors truncate">
-                                                {event.name[lang]}
-                                            </h4>
                                         </div>
                                     </div>
+                                );
+                            })}
+                        </div>
 
-                                    <div className="flex items-center gap-4 pl-4 border-l border-gray-100 shrink-0">
-                                        <div className="hidden md:flex flex-col items-end text-right">
-                                            <div className="flex items-center gap-1.5">
-                                                <FlagIcon country={event.country[lang]} size={14} />
-                                                <span className="text-xs font-bold text-gray-700 truncate max-w-[120px]">{event.city[lang]}, {event.country[lang]}</span>
-                                            </div>
-                                            <span className="text-[10px] text-gray-400 font-medium mt-0.5">
-                                                {formatDateRange(event.startDate, event.endDate, lang)}
-                                            </span>
-                                        </div>
-                                        <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
-                                            <ExternalLink className="w-3.5 h-3.5" />
-                                        </div>
-                                    </div>
+                        {/* Right Detail Panel (Sticky) */}
+                        <div className="hidden lg:block lg:col-span-6 lg:sticky lg:top-24">
+                            {focusedEvent ? (
+                                <EmbeddedEventDetailPanel event={focusedEvent} lang={lang} />
+                            ) : (
+                                <div className="h-64 flex items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50/50 text-gray-400">
+                                    {lang === 'ko' ? '일정을 선택하세요' : 'Select an event'}
                                 </div>
-                            );
-                        })}
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
