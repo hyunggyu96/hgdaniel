@@ -30,7 +30,7 @@ KEYWORDS = [
     'CaHA'
 ]
 
-TARGET_COUNT = 2000
+TARGET_COUNT = 5000
 
 # Setup Entrez
 Entrez.email = PUBMED_EMAIL
@@ -52,17 +52,41 @@ def fetch_pubmed_ids(keyword: str, max_results: int = 100) -> List[str]:
         print(f"Error searching '{keyword}': {e}")
         return []
 
+def filter_new_pmids(supabase: Client, pmids: List[str]) -> List[str]:
+    """Remove PMIDs that already exist in the database."""
+    existing_ids = set()
+    chunk_size = 500
+    for i in range(0, len(pmids), chunk_size):
+        chunk = pmids[i:i+chunk_size]
+        try:
+            result = supabase.table("pubmed_papers").select("id").in_("id", chunk).execute()
+            for row in (result.data or []):
+                existing_ids.add(row['id'])
+        except Exception as e:
+            print(f"Warning: could not check existing IDs: {e}")
+    new_pmids = [pid for pid in pmids if pid not in existing_ids]
+    return new_pmids
+
 def fetch_details_and_save(supabase: Client, keyword: str, pmids: List[str]):
     if not pmids:
         return
 
-    chunk_size = 100 # PubMed efetch max recommendation
-    total = len(pmids)
-    
-    print(f"Fetching details for {total} papers for '{keyword}'...")
+    # Skip already collected papers
+    new_pmids = filter_new_pmids(supabase, pmids)
+    skipped = len(pmids) - len(new_pmids)
+    print(f"Found {len(pmids)} total, {skipped} already in DB, {len(new_pmids)} new papers to fetch.")
+
+    if not new_pmids:
+        print(f"No new papers for '{keyword}'. Skipping.")
+        return
+
+    chunk_size = 100
+    total = len(new_pmids)
+
+    print(f"Fetching details for {total} new papers for '{keyword}'...")
 
     for i in range(0, total, chunk_size):
-        chunk = pmids[i:i+chunk_size]
+        chunk = new_pmids[i:i+chunk_size]
         try:
             handle = Entrez.efetch(db="pubmed", id=",".join(chunk), retmode="xml")
             records = Entrez.read(handle)
@@ -143,23 +167,10 @@ def fetch_details_and_save(supabase: Client, keyword: str, pmids: List[str]):
                 }
                 papers_to_upsert.append(paper)
 
-            # Upsert to Supabase, merging keywords with existing records
+            # Insert new papers to Supabase
             if papers_to_upsert:
-                # Fetch existing records to merge keywords
-                paper_ids = [p['id'] for p in papers_to_upsert]
-                existing = {}
-                try:
-                    result = supabase.table("pubmed_papers").select("id, keywords").in_("id", paper_ids).execute()
-                    for row in (result.data or []):
-                        existing[row['id']] = row.get('keywords') or []
-                except Exception as e:
-                    print(f"Warning: could not fetch existing keywords: {e}")
-
                 for p in papers_to_upsert:
                     try:
-                        if p['id'] in existing:
-                            merged = list(set(existing[p['id']] + p['keywords']))
-                            p['keywords'] = merged
                         supabase.table("pubmed_papers").upsert(p).execute()
                     except Exception as e:
                         print(f"Error upserting {p['id']}: {e}")
