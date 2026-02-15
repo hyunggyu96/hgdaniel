@@ -14,16 +14,8 @@ interface ConferenceEvent {
     country: { ko: string; en: string };
     venue: string;
     confirmed: boolean;
+    url: string;
 }
-
-// ─── Unified Color (clean slate-blue) ───
-const UNIFIED_STYLE = {
-    color: '#334155',
-    bgColor: '#f1f5f9',
-    borderColor: '#94a3b8',
-    activeBg: '#1e293b',
-    activeText: '#ffffff',
-};
 
 // ─── Country Flag Emojis ───
 const COUNTRY_FLAGS: Record<string, string> = {
@@ -54,6 +46,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-01-29', endDate: '2026-01-31',
         city: { ko: '파리', en: 'Paris' }, country: { ko: '프랑스', en: 'France' },
         venue: 'Palais des Congrès de Paris', confirmed: true,
+        url: 'https://www.imcas.com/en/imcas-world-congress-2026',
     },
     {
         id: 'imcas-americas-2026', series: 'IMCAS',
@@ -61,6 +54,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-03-13', endDate: '2026-03-15',
         city: { ko: '상파울루', en: 'São Paulo' }, country: { ko: '브라질', en: 'Brazil' },
         venue: 'The World Trade Center São Paulo', confirmed: true,
+        url: 'https://www.imcas.com/en/imcas-americas-2026',
     },
     {
         id: 'imcas-asia-2026', series: 'IMCAS',
@@ -68,6 +62,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-06-19', endDate: '2026-06-21',
         city: { ko: '방콕', en: 'Bangkok' }, country: { ko: '태국', en: 'Thailand' },
         venue: 'The Athenee Hotel', confirmed: true,
+        url: 'https://www.imcas.com/en/imcas-asia-2026',
     },
     {
         id: 'imcas-china-2026', series: 'IMCAS',
@@ -75,6 +70,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-08-27', endDate: '2026-08-29',
         city: { ko: '상하이', en: 'Shanghai' }, country: { ko: '중국', en: 'China' },
         venue: 'W Hotel - The Bund', confirmed: true,
+        url: 'https://www.imcas.com/en/imcas-china-2026',
     },
 
     // ── AMWC ──
@@ -84,6 +80,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-02-14', endDate: '2026-02-16',
         city: { ko: '마이애미', en: 'Miami' }, country: { ko: '미국', en: 'USA' },
         venue: 'JW Marriott Miami Turnberry Resort', confirmed: true,
+        url: 'https://www.amwcamericas.com',
     },
     {
         id: 'amwc-monaco-2026', series: 'AMWC',
@@ -91,6 +88,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-03-26', endDate: '2026-03-28',
         city: { ko: '몬테카를로', en: 'Monte Carlo' }, country: { ko: '모나코', en: 'Monaco' },
         venue: 'Grimaldi Forum', confirmed: true,
+        url: 'https://www.amwc-conference.com',
     },
     {
         id: 'amwc-asia-2026', series: 'AMWC',
@@ -98,13 +96,15 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-05-01', endDate: '2026-05-03',
         city: { ko: '타이베이', en: 'Taipei' }, country: { ko: '대만', en: 'Taiwan' },
         venue: 'Taipei Intl Convention Center (TICC)', confirmed: true,
+        url: 'https://www.amwc-asia.com',
     },
     {
         id: 'amwc-brazil-2026', series: 'AMWC',
         name: { ko: 'AMWC Brazil', en: 'AMWC Brazil' },
         startDate: '2026-06-17', endDate: '2026-06-19',
         city: { ko: '상파울루', en: 'São Paulo' }, country: { ko: '브라질', en: 'Brazil' },
-        venue: 'TBD', confirmed: true,
+        venue: 'Centro de Convenções Frei Caneca', confirmed: true,
+        url: 'https://www.amwcbrazil.com.br',
     },
     {
         id: 'amwc-korea-2026', series: 'AMWC',
@@ -112,6 +112,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-06-19', endDate: '2026-06-20',
         city: { ko: '서울', en: 'Seoul' }, country: { ko: '한국', en: 'South Korea' },
         venue: '인터컨티넨탈 그랜드 서울 파르나스', confirmed: true,
+        url: 'https://www.amwc-korea.com',
     },
     {
         id: 'amwc-japan-2026', series: 'AMWC',
@@ -119,6 +120,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-09-12', endDate: '2026-09-13',
         city: { ko: '도쿄', en: 'Tokyo' }, country: { ko: '일본', en: 'Japan' },
         venue: 'The Prince Park Tower Tokyo', confirmed: true,
+        url: 'https://www.amwc-japan.com',
     },
     {
         id: 'amwc-china-2026', series: 'AMWC',
@@ -126,6 +128,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-10-16', endDate: '2026-10-18',
         city: { ko: '청두', en: 'Chengdu' }, country: { ko: '중국', en: 'China' },
         venue: 'Wuzhouqing Ctr', confirmed: true,
+        url: 'https://www.amwcchina.com',
     },
     {
         id: 'amwc-dubai-2026', series: 'AMWC',
@@ -133,6 +136,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-10-21', endDate: '2026-10-23',
         city: { ko: '두바이', en: 'Dubai' }, country: { ko: 'UAE', en: 'UAE' },
         venue: 'TBD', confirmed: true,
+        url: 'https://www.amwc-dubai.com',
     },
     {
         id: 'amwc-latam-2026', series: 'AMWC',
@@ -140,13 +144,15 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-10-29', endDate: '2026-10-31',
         city: { ko: '메델린', en: 'Medellín' }, country: { ko: '콜롬비아', en: 'Colombia' },
         venue: 'TBD', confirmed: true,
+        url: 'https://www.amwc-la.com',
     },
     {
         id: 'amwc-sea-2026', series: 'AMWC',
         name: { ko: 'AMWC Southeast Asia', en: 'AMWC Southeast Asia' },
         startDate: '2026-11-26', endDate: '2026-11-28',
         city: { ko: '방콕', en: 'Bangkok' }, country: { ko: '태국', en: 'Thailand' },
-        venue: 'InterContinental Hotel, Bangkok', confirmed: true,
+        venue: 'The Athenee Hotel, Bangkok', confirmed: true,
+        url: 'https://www.amwc-southeastasia.com',
     },
 
     // ── Individual Conferences ──
@@ -156,6 +162,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-03-19', endDate: '2026-03-22',
         city: { ko: '서울', en: 'Seoul' }, country: { ko: '한국', en: 'South Korea' },
         venue: 'COEX', confirmed: true,
+        url: 'https://kimes.kr/en',
     },
     {
         id: 'dubai-derma-2026', series: 'Dubai Derma',
@@ -163,6 +170,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-03-31', endDate: '2026-04-02',
         city: { ko: '두바이', en: 'Dubai' }, country: { ko: 'UAE', en: 'UAE' },
         venue: 'Dubai World Trade Centre', confirmed: true,
+        url: 'https://www.dubaiderma.com',
     },
     {
         id: 'aps-korea-2026', series: 'APS Korea',
@@ -170,6 +178,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-04-04', endDate: '2026-04-05',
         city: { ko: '서울', en: 'Seoul' }, country: { ko: '한국', en: 'South Korea' },
         venue: 'COEX (TBD)', confirmed: false,
+        url: 'https://www.apskorea.or.kr',
     },
     {
         id: 'idax-2026', series: 'IDAX',
@@ -177,6 +186,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-04-09', endDate: '2026-04-11',
         city: { ko: '하노이', en: 'Hanoi' }, country: { ko: '베트남', en: 'Vietnam' },
         venue: 'NECC', confirmed: true,
+        url: 'https://www.idaxexpo.com',
     },
     {
         id: 'ceswam-2026', series: 'SWAM',
@@ -184,6 +194,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-04-17', endDate: '2026-04-19',
         city: { ko: '스마랑', en: 'Semarang' }, country: { ko: '인도네시아', en: 'Indonesia' },
         venue: 'Padma Hotel', confirmed: true,
+        url: 'https://swam.id',
     },
     {
         id: 'cbe-2026', series: 'CBE',
@@ -191,6 +202,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-05-12', endDate: '2026-05-14',
         city: { ko: '상하이', en: 'Shanghai' }, country: { ko: '중국', en: 'China' },
         venue: 'SNIEC', confirmed: true,
+        url: 'https://www.chinabeautyexpo.com',
     },
     {
         id: 'weswam-2026', series: 'SWAM',
@@ -198,6 +210,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-06-12', endDate: '2026-06-14',
         city: { ko: '반둥', en: 'Bandung' }, country: { ko: '인도네시아', en: 'Indonesia' },
         venue: 'El Hotel', confirmed: true,
+        url: 'https://swam.id',
     },
     {
         id: 'korea-derma-2026', series: 'Korea Derma',
@@ -205,6 +218,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-06-15', endDate: '2026-06-17',
         city: { ko: '서울', en: 'Seoul' }, country: { ko: '한국', en: 'South Korea' },
         venue: 'The-K Hotel (TBD)', confirmed: false,
+        url: 'https://www.koderma.co.kr',
     },
     {
         id: 'hksdv-2026', series: 'HKSDV',
@@ -212,6 +226,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-07-04', endDate: '2026-07-05',
         city: { ko: '홍콩', en: 'Hong Kong' }, country: { ko: '홍콩', en: 'Hong Kong' },
         venue: 'Sheraton HK Hotel', confirmed: true,
+        url: 'https://www.hksdv.org',
     },
     {
         id: 'iswam-bali-2026', series: 'SWAM',
@@ -219,13 +234,15 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-07-10', endDate: '2026-07-12',
         city: { ko: '발리', en: 'Bali' }, country: { ko: '인도네시아', en: 'Indonesia' },
         venue: 'The Trans Resort Bali', confirmed: true,
+        url: 'https://www.internationalswam.com',
     },
     {
-        id: 'vietbeauty-2026', series: 'Vietbeauty & Cosmobeauté',
+        id: 'vietbeauty-2026', series: 'Vietbeauty',
         name: { ko: 'Vietbeauty & Cosmobeauté 2026', en: 'Vietbeauty & Cosmobeauté 2026' },
         startDate: '2026-07-23', endDate: '2026-07-26',
         city: { ko: '호찌민', en: 'Ho Chi Minh City' }, country: { ko: '베트남', en: 'Vietnam' },
         venue: 'SECC', confirmed: true,
+        url: 'https://www.vietbeautyshow.com',
     },
     {
         id: 'medical-fair-asia-2026', series: 'Medical Fair Asia',
@@ -233,6 +250,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-09-09', endDate: '2026-09-11',
         city: { ko: '싱가포르', en: 'Singapore' }, country: { ko: '싱가포르', en: 'Singapore' },
         venue: 'Marina Bay Sands', confirmed: true,
+        url: 'https://www.medicalfair-asia.com',
     },
     {
         id: 'easwam-2026', series: 'SWAM',
@@ -240,6 +258,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-09-25', endDate: '2026-09-27',
         city: { ko: '수라바야', en: 'Surabaya' }, country: { ko: '인도네시아', en: 'Indonesia' },
         venue: 'Dyandra Convention Ctr', confirmed: true,
+        url: 'https://swam.id',
     },
     {
         id: 'medical-japan-2026', series: 'Medical Japan',
@@ -247,6 +266,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-10-07', endDate: '2026-10-09',
         city: { ko: '도쿄', en: 'Tokyo' }, country: { ko: '일본', en: 'Japan' },
         venue: 'Makuhari Messe', confirmed: true,
+        url: 'https://www.medical-jpn.jp/tokyo/en-gb.html',
     },
     {
         id: 'dasil-2026', series: 'DASIL',
@@ -254,6 +274,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-10-28', endDate: '2026-10-31',
         city: { ko: '코치', en: 'Kochi' }, country: { ko: '인도', en: 'India' },
         venue: 'TBD', confirmed: false,
+        url: 'https://www.dasil.org',
     },
     {
         id: 'cosmoprof-asia-2026', series: 'Cosmoprof Asia',
@@ -261,6 +282,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-11-10', endDate: '2026-11-13',
         city: { ko: '홍콩', en: 'Hong Kong' }, country: { ko: '홍콩', en: 'Hong Kong' },
         venue: 'HKCEC & AsiaWorld', confirmed: true,
+        url: 'https://www.cosmoprof-asia.com',
     },
     {
         id: 'prs-korea-2026', series: 'PRS Korea',
@@ -268,6 +290,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-11-05', endDate: '2026-11-07',
         city: { ko: '서울', en: 'Seoul' }, country: { ko: '한국', en: 'South Korea' },
         venue: 'Grand InterContinental (TBD)', confirmed: false,
+        url: 'https://www.prskorea.org',
     },
     {
         id: 'icad-bangkok-2026', series: 'ICAD Bangkok',
@@ -275,6 +298,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-11-20', endDate: '2026-11-22',
         city: { ko: '방콕', en: 'Bangkok' }, country: { ko: '태국', en: 'Thailand' },
         venue: 'Centara Grand (TBD)', confirmed: false,
+        url: 'https://www.icadbangkok.com',
     },
     {
         id: 'iswam-world-2026', series: 'SWAM',
@@ -282,6 +306,7 @@ const CONFERENCES: ConferenceEvent[] = [
         startDate: '2026-12-04', endDate: '2026-12-06',
         city: { ko: '탕게랑', en: 'Tangerang' }, country: { ko: '인도네시아', en: 'Indonesia' },
         venue: 'ICE BSD City', confirmed: true,
+        url: 'https://www.internationalswam.com',
     },
 ];
 
@@ -406,6 +431,22 @@ function EventDetailPanel({ event, onClose, lang }: {
                             </div>
                         </div>
                     </div>
+                    {/* Official Website Link */}
+                    {event.url && (
+                        <div className="mt-4 pt-3 border-t border-slate-200">
+                            <a
+                                href={event.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 text-white text-[12px] font-bold tracking-wide hover:bg-slate-700 transition-all duration-200 shadow-sm hover:shadow-md"
+                            >
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                                {lang === 'ko' ? '공식 웹사이트 방문' : 'Visit Official Website'}
+                            </a>
+                        </div>
+                    )}
                 </div>
                 <button onClick={onClose} aria-label="Close"
                     className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100 shrink-0">
@@ -512,6 +553,13 @@ export default function ConferencesPage() {
                     </div>
                 </div>
 
+                {/* ── Selected Event Detail (ABOVE calendar) ── */}
+                {selectedEvent && (
+                    <div className="mb-5">
+                        <EventDetailPanel event={selectedEvent} onClose={() => setSelectedEvent(null)} lang={lang} />
+                    </div>
+                )}
+
                 {/* ── Calendar ── */}
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                     {/* Month Navigation */}
@@ -574,7 +622,7 @@ export default function ConferencesPage() {
                                         }`}>
                                     <div className="flex items-center justify-between mb-1">
                                         <span className={`text-xs sm:text-sm font-bold w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-lg ${today ? 'bg-slate-800 text-white shadow-md shadow-slate-800/30'
-                                            : dayOfWeek === 0 ? 'text-red-400' : dayOfWeek === 6 ? 'text-blue-400' : 'text-gray-700'
+                                                : dayOfWeek === 0 ? 'text-red-400' : dayOfWeek === 6 ? 'text-blue-400' : 'text-gray-700'
                                             }`}>
                                             {day}
                                         </span>
@@ -582,7 +630,10 @@ export default function ConferencesPage() {
                                     <div className="space-y-0.5">
                                         {events.slice(0, 3).map((event) => (
                                             <EventBadge key={event.id} event={event} lang={lang}
-                                                onClick={() => setSelectedEvent(selectedEvent?.id === event.id ? null : event)}
+                                                onClick={() => {
+                                                    setSelectedEvent(selectedEvent?.id === event.id ? null : event);
+                                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                                }}
                                                 isSelected={selectedEvent?.id === event.id} />
                                         ))}
                                         {events.length > 3 && (
@@ -599,13 +650,6 @@ export default function ConferencesPage() {
                     </div>
                 </div>
 
-                {/* ── Selected Event Detail (below calendar) ── */}
-                {selectedEvent && (
-                    <div className="mt-5">
-                        <EventDetailPanel event={selectedEvent} onClose={() => setSelectedEvent(null)} lang={lang} />
-                    </div>
-                )}
-
                 {/* ── Filters (below calendar) ── */}
                 <div className="mt-6 space-y-4 bg-white rounded-2xl border border-gray-200 p-5 sm:p-6">
                     {/* Series filter */}
@@ -617,8 +661,8 @@ export default function ConferencesPage() {
                             <button
                                 onClick={() => { setSeriesFilter('ALL'); setSelectedEvent(null); }}
                                 className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide transition-all duration-200 border ${seriesFilter === 'ALL'
-                                    ? 'bg-slate-800 text-white border-slate-800 shadow-md'
-                                    : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                                        ? 'bg-slate-800 text-white border-slate-800 shadow-md'
+                                        : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                                     }`}
                             >
                                 ALL ({CONFERENCES.length})
@@ -630,8 +674,8 @@ export default function ConferencesPage() {
                                         key={s}
                                         onClick={() => { setSeriesFilter(isActive ? 'ALL' : s); setSelectedEvent(null); }}
                                         className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide transition-all duration-200 border ${isActive
-                                            ? 'bg-slate-700 text-white border-slate-700 shadow-md'
-                                            : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-100'
+                                                ? 'bg-slate-700 text-white border-slate-700 shadow-md'
+                                                : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-100'
                                             }`}
                                     >
                                         {s} {(seriesCounts[s] || 0) > 1 ? `(${seriesCounts[s]})` : ''}
@@ -650,8 +694,8 @@ export default function ConferencesPage() {
                             <button
                                 onClick={() => { setCountryFilter('ALL'); setSelectedEvent(null); }}
                                 className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide transition-all duration-200 border ${countryFilter === 'ALL'
-                                    ? 'bg-slate-800 text-white border-slate-800 shadow-md'
-                                    : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                                        ? 'bg-slate-800 text-white border-slate-800 shadow-md'
+                                        : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                                     }`}
                             >
                                 {lang === 'ko' ? '전체' : 'All'}
@@ -665,8 +709,8 @@ export default function ConferencesPage() {
                                         key={c}
                                         onClick={() => { setCountryFilter(isActive ? 'ALL' : c); setSelectedEvent(null); }}
                                         className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide transition-all duration-200 border ${isActive
-                                            ? 'bg-slate-700 text-white border-slate-700 shadow-md'
-                                            : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                                                ? 'bg-slate-700 text-white border-slate-700 shadow-md'
+                                                : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                                             }`}
                                     >
                                         {flag} {c} ({count})
