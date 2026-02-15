@@ -410,7 +410,7 @@ function EventDetailPanel({ event, onClose, lang }: {
     const statusStyle = isOngoing ? 'bg-emerald-100 text-emerald-700' : isPast ? 'bg-gray-100 text-gray-500' : 'bg-amber-50 text-amber-600';
 
     return (
-        <div className="relative overflow-hidden rounded-2xl bg-white shadow-xl border border-gray-200 ring-1 ring-black/5 p-6 md:p-8 animate-fade-in-down">
+        <div className="relative overflow-hidden rounded-2xl bg-white shadow-xl border border-gray-200 ring-1 ring-black/5 p-6 md:p-8 animate-fade-in-down mb-8">
             <div
                 className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/20 to-purple-500/20 blur-3xl rounded-full -translate-y-1/3 translate-x-1/3 pointer-events-none"
                 style={{ background: `radial-gradient(circle, ${cc.color}20 0%, transparent 70%)` }}
@@ -525,6 +525,13 @@ export default function ConferencesPage() {
         return result;
     }, [seriesFilter, countryFilter, lang]);
 
+    const upcomingEvents = useMemo(() => {
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        return filteredConferences
+            .filter((c) => new Date(c.endDate) >= today)
+            .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+    }, [filteredConferences]);
+
     const daysInMonth = getDaysInMonth(year, month);
     const firstDay = getFirstDayOfMonth(year, month);
     const monthEvents = useMemo(() => {
@@ -552,11 +559,6 @@ export default function ConferencesPage() {
         setMonth(now.getMonth());
         setSelectedEvent(null);
     }
-    const seriesCounts = useMemo(() => {
-        const counts: Record<string, number> = {};
-        CONFERENCES.forEach((c) => { counts[c.series] = (counts[c.series] || 0) + 1; });
-        return counts;
-    }, []);
 
     return (
         <main className="min-h-screen bg-gray-50/50 p-6 md:p-12 pb-24">
@@ -587,78 +589,6 @@ export default function ConferencesPage() {
                                     {ALL_COUNTRIES_EN.length} Countries
                                 </span>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Filters Section */}
-                <div className="space-y-4">
-                    {/* Series Filter */}
-                    <div className="bg-white/80 backdrop-blur-xl p-4 rounded-2xl shadow-sm border border-white/50 ring-1 ring-gray-200/50">
-                        <div className="flex items-center gap-2 mb-3 px-1">
-                            <Filter className="w-4 h-4 text-gray-400" />
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">
-                                {lang === 'ko' ? '시리즈 필터' : 'Filter by Series'}
-                            </h3>
-                        </div>
-                        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                            <button
-                                onClick={() => { setSeriesFilter('ALL'); setSelectedEvent(null); }}
-                                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${seriesFilter === 'ALL'
-                                    ? 'bg-slate-800 text-white shadow-md scale-105'
-                                    : 'bg-white text-gray-600 border border-gray-200 hover:border-blue-300'
-                                    }`}
-                            >
-                                ALL
-                            </button>
-                            {ALL_SERIES.map((s) => (
-                                <button
-                                    key={s}
-                                    onClick={() => { setSeriesFilter(seriesFilter === s ? 'ALL' : s); setSelectedEvent(null); }}
-                                    className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${seriesFilter === s
-                                        ? 'bg-blue-600 text-white shadow-md scale-105 border-transparent'
-                                        : 'bg-white text-gray-600 border border-gray-200 hover:border-blue-300 hover:text-blue-600'
-                                        }`}
-                                >
-                                    {s}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Country Filter - Only if user wants to drill down further, or keep it simple */}
-                    <div className="bg-white/80 backdrop-blur-xl p-4 rounded-2xl shadow-sm border border-white/50 ring-1 ring-gray-200/50">
-                        <div className="flex items-center gap-2 mb-3 px-1">
-                            <MapPin className="w-4 h-4 text-gray-400" />
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">
-                                {lang === 'ko' ? '국가 필터' : 'Filter by Country'}
-                            </h3>
-                        </div>
-                        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                            <button
-                                onClick={() => { setCountryFilter('ALL'); setSelectedEvent(null); }}
-                                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${countryFilter === 'ALL'
-                                    ? 'bg-slate-800 text-white shadow-md scale-105'
-                                    : 'bg-white text-gray-600 border border-gray-200 hover:border-blue-300'
-                                    }`}
-                            >
-                                {lang === 'ko' ? '전체' : 'All'}
-                            </button>
-                            {countries.map((c) => {
-                                const isActive = countryFilter === c;
-                                return (
-                                    <button
-                                        key={c}
-                                        onClick={() => { setCountryFilter(isActive ? 'ALL' : c); setSelectedEvent(null); }}
-                                        className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${isActive
-                                            ? 'bg-blue-600 text-white shadow-md scale-105 border-transparent'
-                                            : 'bg-white text-gray-600 border border-gray-200 hover:border-blue-300 hover:text-blue-600'
-                                            }`}
-                                    >
-                                        <FlagIcon country={c} size={14} /> {c}
-                                    </button>
-                                );
-                            })}
                         </div>
                     </div>
                 </div>
@@ -755,6 +685,118 @@ export default function ConferencesPage() {
                         {Array.from({ length: (7 - ((firstDay + daysInMonth) % 7)) % 7 }).map((_, i) => (
                             <div key={`empty-end-${i}`} className="min-h-[120px] bg-gray-50/20 border-b border-r border-gray-50" />
                         ))}
+                    </div>
+                </div>
+
+                {/* 2-Column Grid: Filters & Upcoming Events */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-12">
+                    {/* LEFT COLUMN: Upcoming Events */}
+                    <div className="lg:col-span-4 space-y-4">
+                        <div className="flex items-center gap-2 mb-4">
+                            <h3 className="text-lg font-bold text-gray-900 border-l-4 border-blue-600 pl-3">
+                                {lang === 'ko' ? '다가오는 일정' : 'Upcoming Events'}
+                            </h3>
+                        </div>
+                        <div className="space-y-3">
+                            {upcomingEvents.slice(0, 5).map((event) => {
+                                const cc = getCountryColor(event.country[lang]);
+                                const startDate = new Date(event.startDate);
+                                return (
+                                    <div
+                                        key={event.id}
+                                        onClick={() => { setSelectedEvent(event); window.scrollTo({ top: 100, behavior: 'smooth' }); }}
+                                        className="group bg-white rounded-xl p-3 border border-gray-100 shadow-sm hover:shadow-md cursor-pointer transition-all hover:scale-[1.02] flex items-center gap-3"
+                                    >
+                                        <div className="w-12 h-12 rounded-lg bg-gray-50 flex flex-col items-center justify-center shrink-0 border border-gray-100">
+                                            <span className="text-[10px] font-bold text-gray-500 uppercase">{lang === 'ko' ? `${startDate.getMonth() + 1}월` : MONTH_NAMES_EN[startDate.getMonth()].substring(0, 3)}</span>
+                                            <span className="text-xl font-bold text-gray-900 leading-none">{startDate.getDate()}</span>
+                                        </div>
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-bold text-gray-900 truncate group-hover:text-blue-600 transition-colors">
+                                                {event.name[lang]}
+                                            </p>
+                                            <div className="flex items-center gap-1.5 mt-0.5">
+                                                <FlagIcon country={event.country[lang]} size={12} />
+                                                <span className="text-xs text-gray-500 truncate">{event.city[lang]}, {event.country[lang]}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* RIGHT COLUMN: Filters */}
+                    <div className="lg:col-span-8 flex flex-col gap-6 ">
+                        {/* Series Filter */}
+                        <div className="bg-white/60 backdrop-blur-xl p-5 rounded-2xl shadow-sm border border-white/50 ring-1 ring-gray-200/50">
+                            <div className="flex items-center gap-2 mb-3">
+                                <Filter className="w-4 h-4 text-gray-400" />
+                                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                                    {lang === 'ko' ? '시리즈 필터' : 'Filter by Series'}
+                                </h3>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                <button
+                                    onClick={() => { setSeriesFilter('ALL'); setSelectedEvent(null); }}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${seriesFilter === 'ALL'
+                                        ? 'bg-slate-800 text-white shadow-md border-transparent'
+                                        : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300'
+                                        }`}
+                                >
+                                    ALL
+                                </button>
+                                {ALL_SERIES.map((s) => (
+                                    <button
+                                        key={s}
+                                        onClick={() => { setSeriesFilter(seriesFilter === s ? 'ALL' : s); setSelectedEvent(null); }}
+                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${seriesFilter === s
+                                            ? 'bg-blue-600 text-white shadow-md border-transparent'
+                                            : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:text-blue-600'
+                                            }`}
+                                    >
+                                        {s}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Country Filter */}
+                        <div className="bg-white/60 backdrop-blur-xl p-5 rounded-2xl shadow-sm border border-white/50 ring-1 ring-gray-200/50">
+                            <div className="flex items-center gap-2 mb-3">
+                                <MapPin className="w-4 h-4 text-gray-400" />
+                                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                                    {lang === 'ko' ? '국가 필터' : 'Filter by Country'}
+                                </h3>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                <button
+                                    onClick={() => { setCountryFilter('ALL'); setSelectedEvent(null); }}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${countryFilter === 'ALL'
+                                        ? 'bg-slate-800 text-white shadow-md border-transparent'
+                                        : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300'
+                                        }`}
+                                >
+                                    {lang === 'ko' ? '전체' : 'All'}
+                                </button>
+                                {countries.map((c) => {
+                                    const isActive = countryFilter === c;
+                                    const cc = getCountryColor(c);
+                                    return (
+                                        <button
+                                            key={c}
+                                            onClick={() => { setCountryFilter(isActive ? 'ALL' : c); setSelectedEvent(null); }}
+                                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border ${isActive
+                                                ? 'bg-blue-600 text-white shadow-md border-transparent'
+                                                : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:text-blue-600 hover:scale-[1.02]'
+                                                }`}
+                                        >
+                                            <FlagIcon country={c} size={14} /> {c}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
