@@ -5,50 +5,57 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { API_ENDPOINTS } from '@/lib/apiConfig';
 import { useLanguage } from "@/components/LanguageContext";
-import { COMPANY_CATEGORIES, getCompanyCategory } from "@/data/companyCategories";
 
 type CompanyStatus = 'KOSPI' | 'KOSDAQ' | 'Unlisted' | 'Global_Listed' | 'Global_Private';
+type CompanyCategory = 'korean' | 'global';
 
-const allCompanies: { id: number; name: string; status: CompanyStatus }[] = [
-    { id: 1, name: "한스바이오메드", status: 'KOSDAQ' },
-    { id: 2, name: "엘앤씨바이오", status: 'KOSDAQ' },
-    { id: 3, name: "제테마", status: 'KOSDAQ' },
-    { id: 4, name: "한국비엔씨", status: 'KOSDAQ' },
-    { id: 5, name: "종근당바이오", status: 'KOSPI' },
-    { id: 6, name: "휴온스", status: 'KOSDAQ' },
-    { id: 7, name: "휴온스글로벌", status: 'KOSDAQ' },
-    { id: 8, name: "휴메딕스", status: 'KOSDAQ' },
-    { id: 9, name: "휴젤", status: 'KOSDAQ' },
-    { id: 10, name: "메디톡스", status: 'KOSDAQ' },
-    { id: 11, name: "대웅제약", status: 'KOSPI' },
-    { id: 12, name: "파마리서치", status: 'KOSDAQ' },
-    { id: 13, name: "클래시스", status: 'KOSDAQ' },
-    { id: 14, name: "케어젠", status: 'KOSDAQ' },
-    { id: 15, name: "원텍", status: 'KOSDAQ' },
-    { id: 16, name: "동방메디컬", status: 'Unlisted' },
-    { id: 17, name: "제이시스메디칼", status: 'Unlisted' },
-    { id: 18, name: "바이오비쥬", status: 'Unlisted' },
-    { id: 19, name: "바이오플러스", status: 'KOSDAQ' },
-    { id: 20, name: "비올", status: 'KOSDAQ' },
-    { id: 21, name: "하이로닉", status: 'KOSDAQ' },
-    { id: 22, name: "레이저옵텍", status: 'KOSDAQ' },
-    { id: 23, name: "유바이오로직스", status: 'KOSDAQ' },
-    { id: 24, name: "바임글로벌", status: 'Unlisted' },
-    { id: 25, name: "엑소코바이오", status: 'Unlisted' },
-    { id: 26, name: "알에프바이오", status: 'Unlisted' },
-    { id: 27, name: "차메디텍", status: 'Unlisted' },
-    { id: 28, name: "JW중외제약", status: 'KOSPI' },
-    { id: 29, name: "동국제약", status: 'KOSDAQ' },
-    { id: 30, name: "리젠바이오텍", status: 'Unlisted' },
-    { id: 31, name: "울트라브이", status: 'Unlisted' },
-    { id: 32, name: "제노스", status: 'Unlisted' },
-    { id: 33, name: "멀츠", status: 'Global_Private' },
-    { id: 34, name: "앨러간", status: 'Global_Listed' },
-    { id: 35, name: "갈더마", status: 'Global_Listed' },
-    { id: 36, name: "테옥산", status: 'Global_Private' }
+interface CompanyData {
+    id: number;
+    name: { ko: string; en: string };
+    status: CompanyStatus;
+    category: CompanyCategory;
+}
+
+const allCompanies: CompanyData[] = [
+    { id: 1, name: { ko: "한스바이오메드", en: "HansBiomed" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 2, name: { ko: "엘앤씨바이오", en: "L&C Bio" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 3, name: { ko: "제테마", en: "Jetema" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 4, name: { ko: "한국비엔씨", en: "BNC Korea" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 5, name: { ko: "종근당바이오", en: "Chong Kun Dang Bio" }, status: 'KOSPI', category: 'korean' },
+    { id: 6, name: { ko: "휴온스", en: "Huons" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 7, name: { ko: "휴온스글로벌", en: "Huons Global" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 8, name: { ko: "휴메딕스", en: "Humedix" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 9, name: { ko: "휴젤", en: "Hugel" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 10, name: { ko: "메디톡스", en: "Medytox" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 11, name: { ko: "대웅제약", en: "Daewoong Pharma" }, status: 'KOSPI', category: 'korean' },
+    { id: 12, name: { ko: "파마리서치", en: "PharmaResearch" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 13, name: { ko: "클래시스", en: "Classys" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 14, name: { ko: "케어젠", en: "Caregen" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 15, name: { ko: "원텍", en: "Wontech" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 16, name: { ko: "동방메디컬", en: "Dongbang Medical" }, status: 'Unlisted', category: 'korean' },
+    { id: 17, name: { ko: "제이시스메디칼", en: "Jeisys Medical" }, status: 'Unlisted', category: 'korean' },
+    { id: 18, name: { ko: "바이오비쥬", en: "BioBijou" }, status: 'Unlisted', category: 'korean' },
+    { id: 19, name: { ko: "바이오플러스", en: "BioPlus" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 20, name: { ko: "비올", en: "Viol" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 21, name: { ko: "하이로닉", en: "Hironic" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 22, name: { ko: "레이저옵텍", en: "Laseroptek" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 23, name: { ko: "유바이오로직스", en: "EuBiologics" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 24, name: { ko: "바임글로벌", en: "Vaim Global" }, status: 'Unlisted', category: 'korean' },
+    { id: 25, name: { ko: "엑소코바이오", en: "ExoCoBio" }, status: 'Unlisted', category: 'korean' },
+    { id: 26, name: { ko: "알에프바이오", en: "RFBio" }, status: 'Unlisted', category: 'korean' },
+    { id: 27, name: { ko: "차메디텍", en: "Cha Meditech" }, status: 'Unlisted', category: 'korean' },
+    { id: 28, name: { ko: "JW중외제약", en: "JW Pharmaceutical" }, status: 'KOSPI', category: 'korean' },
+    { id: 29, name: { ko: "동국제약", en: "Dongkook Pharmaceutical" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 30, name: { ko: "리젠바이오텍", en: "Regen Biotech" }, status: 'Unlisted', category: 'korean' },
+    { id: 31, name: { ko: "울트라브이", en: "Ultra V" }, status: 'Unlisted', category: 'korean' },
+    { id: 32, name: { ko: "제노스", en: "Genoss" }, status: 'Unlisted', category: 'korean' },
+    { id: 33, name: { ko: "멀츠", en: "Merz Aesthetics" }, status: 'Global_Private', category: 'global' },
+    { id: 34, name: { ko: "앨러간", en: "Allergan Aesthetics" }, status: 'Global_Listed', category: 'global' },
+    { id: 35, name: { ko: "갈더마", en: "Galderma" }, status: 'Global_Listed', category: 'global' },
+    { id: 36, name: { ko: "테옥산", en: "Teoxane" }, status: 'Global_Private', category: 'global' }
 ];
 
-const StatusBadge = ({ status }: { status: CompanyStatus }) => {
+const StatusBadge = ({ status, lang }: { status: CompanyStatus; lang: string }) => {
     const commonClasses = "absolute top-3 left-3 text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wide uppercase";
     switch (status) {
         case 'KOSPI':
@@ -56,7 +63,7 @@ const StatusBadge = ({ status }: { status: CompanyStatus }) => {
         case 'KOSDAQ':
             return <span className={`${commonClasses} bg-teal-100 text-teal-700 border border-teal-200`}>KOSDAQ</span>;
         case 'Unlisted':
-            return <span className={`${commonClasses} bg-gray-100 text-gray-500 border border-gray-200`}>비상장</span>;
+            return <span className={`${commonClasses} bg-gray-100 text-gray-500 border border-gray-200`}>{lang === 'ko' ? '비상장' : 'Unlisted'}</span>;
         case 'Global_Listed':
             return <span className={`${commonClasses} bg-violet-100 text-violet-700 border border-violet-200`}>Listed</span>;
         case 'Global_Private':
@@ -69,7 +76,8 @@ const StatusBadge = ({ status }: { status: CompanyStatus }) => {
 export default function CompanyPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { t } = useLanguage();
+    const { language, t } = useLanguage();
+    const lang = language as 'ko' | 'en';
     const [rankings, setRankings] = useState<Record<string, number>>({});
 
     // Initialize state from URL param, default to 'korean'
@@ -102,8 +110,12 @@ export default function CompanyPage() {
 
     // Filter companies by category
     const filteredCompanies = allCompanies
-        .filter(company => getCompanyCategory(company.name) === activeCategory)
-        .sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+        .filter(company => company.category === activeCategory)
+        .sort((a, b) => a.name[lang].localeCompare(b.name[lang], lang === 'ko' ? 'ko' : 'en'));
+
+    // Count for tabs
+    const koreanCount = allCompanies.filter(c => c.category === 'korean').length;
+    const globalCount = allCompanies.filter(c => c.category === 'global').length;
 
     return (
         <main className="min-h-screen bg-gray-50 p-6 md:p-12">
@@ -127,7 +139,7 @@ export default function CompanyPage() {
                             : 'border-transparent text-gray-500 hover:text-gray-700'
                             }`}
                     >
-                        🇰🇷 한국 기업 ({COMPANY_CATEGORIES.korean.length})
+                        {lang === 'ko' ? `🇰🇷 한국 기업 (${koreanCount})` : `🇰🇷 Korean Companies (${koreanCount})`}
                     </button>
                     <button
                         onClick={() => handleCategoryChange('global')}
@@ -136,16 +148,20 @@ export default function CompanyPage() {
                             : 'border-transparent text-gray-500 hover:text-gray-700'
                             }`}
                     >
-                        🌍 글로벌 기업 ({COMPANY_CATEGORIES.global.length})
+                        {lang === 'ko' ? `🌍 글로벌 기업 (${globalCount})` : `🌍 Global Companies (${globalCount})`}
                     </button>
                 </div>
 
                 {/* Company Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                     {filteredCompanies.map((item) => {
-                        const rank = rankings[item.name];
+                        // Use Korean name for routing and ranking key to maintain consistent API logic
+                        const companyNameKo = item.name.ko;
+                        const rank = rankings[companyNameKo];
                         const isHighlight = rank && rank <= 3;
                         const isGlobal = activeCategory === 'global';
+                        // Use language-specific name for display
+                        const displayName = item.name[lang];
 
                         return (
                             <Card
@@ -155,7 +171,7 @@ export default function CompanyPage() {
                                 ${isHighlight ? 'border border-purple-200 shadow-[0_0_15px_rgba(168,85,247,0.3)]' : 'border border-gray-200 shadow-sm'}
                                 ${isGlobal ? 'bg-gradient-to-br from-blue-50 to-indigo-50' : ''}
                             `}
-                                onClick={() => router.push(`/analysis?company=${item.name}`)}
+                                onClick={() => router.push(`/analysis?company=${companyNameKo}`)}
                             >
                                 {/* Pulsing Border Effect for Highlights */}
                                 {isHighlight && (
@@ -171,10 +187,10 @@ export default function CompanyPage() {
                                     </div>
                                 )}
 
-                                <StatusBadge status={item.status} />
+                                <StatusBadge status={item.status} lang={lang} />
 
                                 <Text className={`text-lg font-medium ${isHighlight ? 'text-purple-700 font-bold' : 'text-foreground'}`}>
-                                    {item.name}
+                                    {displayName}
                                 </Text>
                             </Card>
                         );
