@@ -21,6 +21,7 @@ export const translations = {
         nav_policy: '정책 & 규제',
         nav_conferences: '글로벌 컨퍼런스',
         nav_about: '서비스 소개',
+        nav_revenue: '매출 현황',
 
         // NewsList
         news_section_title: 'MARKET INTELLIGENCE', // Exception
@@ -42,6 +43,10 @@ export const translations = {
         insights_next: '다음',
         insights_page_info: '페이지',
         insights_page_of: '/',
+
+        // Revenue
+        revenue_header: '매출 현황',
+        revenue_desc: '전체 기업 매출 및 영업이익 비교',
 
         // Company
         company_header: '기업 브리핑',
@@ -88,6 +93,7 @@ export const translations = {
         nav_policy: 'Policy & RA',
         nav_conferences: 'Global Conferences',
         nav_about: 'About',
+        nav_revenue: 'Revenue',
 
         // NewsList
         news_section_title: 'MARKET INTELLIGENCE',
@@ -109,6 +115,10 @@ export const translations = {
         insights_next: 'Next',
         insights_page_info: 'Page',
         insights_page_of: 'of',
+
+        // Revenue
+        revenue_header: 'Revenue Overview',
+        revenue_desc: 'Company revenue and operating profit comparison',
 
         // Company
         company_header: 'Company Brief',
