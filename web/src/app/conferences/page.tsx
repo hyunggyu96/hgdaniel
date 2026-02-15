@@ -7,7 +7,7 @@ import { useLanguage } from '@/components/LanguageContext';
 interface ConferenceEvent {
     id: string;
     name: { ko: string; en: string };
-    series: string;        // e.g. 'IMCAS', 'AMWC', 'KIMES', 'Dubai Derma', etc.
+    series: string;
     startDate: string;
     endDate: string;
     city: { ko: string; en: string };
@@ -16,35 +16,15 @@ interface ConferenceEvent {
     confirmed: boolean;
 }
 
-// ─── Series Color Map ───
-const SERIES_COLORS: Record<string, { color: string; bgColor: string; borderColor: string }> = {
-    IMCAS: { color: '#1e40af', bgColor: '#dbeafe', borderColor: '#3b82f6' },
-    AMWC: { color: '#9f1239', bgColor: '#fce7f3', borderColor: '#ec4899' },
-    KIMES: { color: '#7c3aed', bgColor: '#ede9fe', borderColor: '#8b5cf6' },
-    'Dubai Derma': { color: '#b45309', bgColor: '#fef3c7', borderColor: '#f59e0b' },
-    'APS Korea': { color: '#0e7490', bgColor: '#cffafe', borderColor: '#06b6d4' },
-    IDAX: { color: '#059669', bgColor: '#d1fae5', borderColor: '#10b981' },
-    CeSWAM: { color: '#6d28d9', bgColor: '#ede9fe', borderColor: '#7c3aed' },
-    CBE: { color: '#c2410c', bgColor: '#fff7ed', borderColor: '#f97316' },
-    WeSWAM: { color: '#6d28d9', bgColor: '#ede9fe', borderColor: '#7c3aed' },
-    'Korea Derma': { color: '#0e7490', bgColor: '#cffafe', borderColor: '#06b6d4' },
-    HKSDV: { color: '#0f766e', bgColor: '#ccfbf1', borderColor: '#14b8a6' },
-    'i-SWAM': { color: '#6d28d9', bgColor: '#ede9fe', borderColor: '#7c3aed' },
-    'Vietbeauty & Cosmobeauté': { color: '#be185d', bgColor: '#fce7f3', borderColor: '#ec4899' },
-    'Medical Fair Asia': { color: '#065f46', bgColor: '#d1fae5', borderColor: '#10b981' },
-    EaSWAM: { color: '#6d28d9', bgColor: '#ede9fe', borderColor: '#7c3aed' },
-    'Medical Japan': { color: '#065f46', bgColor: '#d1fae5', borderColor: '#10b981' },
-    DASIL: { color: '#92400e', bgColor: '#fef3c7', borderColor: '#f59e0b' },
-    'Cosmoprof Asia': { color: '#be185d', bgColor: '#fce7f3', borderColor: '#ec4899' },
-    'PRS Korea': { color: '#0e7490', bgColor: '#cffafe', borderColor: '#06b6d4' },
-    'ICAD Bangkok': { color: '#0f766e', bgColor: '#ccfbf1', borderColor: '#14b8a6' },
+// ─── Unified Color (clean slate-blue) ───
+const UNIFIED_STYLE = {
+    color: '#334155',
+    bgColor: '#f1f5f9',
+    borderColor: '#94a3b8',
+    activeBg: '#1e293b',
+    activeText: '#ffffff',
 };
 
-const DEFAULT_COLOR = { color: '#374151', bgColor: '#f3f4f6', borderColor: '#9ca3af' };
-
-function getSeriesColor(series: string) {
-    return SERIES_COLORS[series] || DEFAULT_COLOR;
-}
 // ─── Country Flag Emojis ───
 const COUNTRY_FLAGS: Record<string, string> = {
     '프랑스': '🇫🇷', 'France': '🇫🇷',
@@ -355,7 +335,6 @@ function isToday(year: number, month: number, day: number): boolean {
 function EventBadge({ event, onClick, isSelected, lang }: {
     event: ConferenceEvent; onClick: () => void; isSelected: boolean; lang: 'ko' | 'en';
 }) {
-    const style = getSeriesColor(event.series);
     const cityLabel = event.city[lang];
 
     return (
@@ -366,12 +345,10 @@ function EventBadge({ event, onClick, isSelected, lang }: {
         >
             <div
                 className={`text-[9px] sm:text-[11px] font-semibold px-1.5 py-0.5 rounded-md truncate transition-all duration-200 border
-          ${isSelected ? 'ring-2 ring-offset-1 scale-[1.02] shadow-md' : 'hover:scale-[1.02] hover:shadow-sm'}`}
-                style={{
-                    backgroundColor: style.bgColor, color: style.color,
-                    borderColor: isSelected ? style.borderColor : 'transparent',
-                    ['--tw-ring-color' as string]: style.borderColor,
-                } as React.CSSProperties}
+          ${isSelected
+                        ? 'bg-slate-700 text-white border-slate-600 shadow-md scale-[1.02]'
+                        : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 hover:scale-[1.02]'
+                    }`}
             >
                 {event.series} ({cityLabel})
             </div>
@@ -384,21 +361,16 @@ function EventDetailPanel({ event, onClose, lang }: {
 }) {
     const isPast = new Date(event.endDate) < new Date();
     const isOngoing = new Date(event.startDate) <= new Date() && new Date(event.endDate) >= new Date();
-    const style = getSeriesColor(event.series);
 
     const statusLabel = isOngoing ? { ko: '진행 중', en: 'LIVE' } : isPast ? { ko: '종료', en: 'ENDED' } : { ko: '예정', en: 'UPCOMING' };
     const statusStyle = isOngoing ? 'bg-emerald-100 text-emerald-700' : isPast ? 'bg-gray-100 text-gray-500' : 'bg-amber-50 text-amber-600';
 
     return (
-        <div
-            className="rounded-2xl border p-5 sm:p-6 transition-all duration-300 animate-in fade-in slide-in-from-top-2"
-            style={{ backgroundColor: style.bgColor + '40', borderColor: style.borderColor + '60' }}
-        >
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:p-6 transition-all duration-300 animate-in fade-in slide-in-from-top-2">
             <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
-                        <span className="text-[10px] font-black tracking-wider uppercase px-2.5 py-1 rounded-full"
-                            style={{ backgroundColor: style.bgColor, color: style.color }}>
+                        <span className="text-[10px] font-black tracking-wider uppercase px-2.5 py-1 rounded-full bg-slate-200 text-slate-700">
                             {event.series}
                         </span>
                         <span className={`text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full ${statusStyle}`}>
@@ -526,7 +498,7 @@ export default function ConferencesPage() {
                 {/* ── Page Header ── */}
                 <div className="mb-8 sm:mb-10">
                     <div className="flex items-center gap-3 mb-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center shadow-lg shadow-slate-500/20">
                             <span className="text-white text-lg">🌍</span>
                         </div>
                         <div>
@@ -539,128 +511,6 @@ export default function ConferencesPage() {
                         </div>
                     </div>
                 </div>
-
-                {/* ── Filters ── */}
-                <div className="space-y-4 mb-6">
-                    {/* Series filter */}
-                    <div>
-                        <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                            {lang === 'ko' ? '시리즈 / 전시회' : 'Series / Conference'}
-                        </p>
-                        <div className="flex flex-wrap gap-1.5">
-                            <button
-                                onClick={() => { setSeriesFilter('ALL'); setSelectedEvent(null); }}
-                                className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide transition-all duration-200 border ${seriesFilter === 'ALL'
-                                    ? 'bg-gray-900 text-white border-gray-900 shadow-md'
-                                    : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                                    }`}
-                            >
-                                ALL ({CONFERENCES.length})
-                            </button>
-                            {ALL_SERIES.map((s) => {
-                                const sc = getSeriesColor(s);
-                                const isActive = seriesFilter === s;
-                                return (
-                                    <button
-                                        key={s}
-                                        onClick={() => { setSeriesFilter(isActive ? 'ALL' : s); setSelectedEvent(null); }}
-                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide transition-all duration-200 border ${isActive ? 'shadow-md scale-[1.02]' : 'hover:scale-[1.02]'
-                                            }`}
-                                        style={isActive
-                                            ? { backgroundColor: sc.color, color: '#fff', borderColor: sc.color }
-                                            : { backgroundColor: sc.bgColor, color: sc.color, borderColor: sc.borderColor + '60' }
-                                        }
-                                    >
-                                        {s} {(seriesCounts[s] || 0) > 1 ? `(${seriesCounts[s]})` : ''}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </div>
-
-                    {/* Country filter */}
-                    <div>
-                        <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                            {lang === 'ko' ? '국가' : 'Country'}
-                        </p>
-                        <div className="flex flex-wrap gap-1.5">
-                            <button
-                                onClick={() => { setCountryFilter('ALL'); setSelectedEvent(null); }}
-                                className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide transition-all duration-200 border ${countryFilter === 'ALL'
-                                    ? 'bg-gray-900 text-white border-gray-900 shadow-md'
-                                    : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                                    }`}
-                            >
-                                {lang === 'ko' ? '전체' : 'All'}
-                            </button>
-                            {countries.map((c) => {
-                                const isActive = countryFilter === c;
-                                const count = CONFERENCES.filter((conf) => conf.country[lang] === c).length;
-                                const flag = COUNTRY_FLAGS[c] || COUNTRY_FLAGS[CONFERENCES.find((conf) => conf.country[lang] === c)?.country[lang === 'ko' ? 'en' : 'ko'] || ''] || '🌐';
-                                return (
-                                    <button
-                                        key={c}
-                                        onClick={() => { setCountryFilter(isActive ? 'ALL' : c); setSelectedEvent(null); }}
-                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide transition-all duration-200 border ${isActive
-                                            ? 'bg-blue-600 text-white border-blue-600 shadow-md scale-[1.02]'
-                                            : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                                            }`}
-                                    >
-                                        {flag} {c} ({count})
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </div>
-
-                    {/* Active filters summary + Today */}
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 flex-wrap">
-                            {(seriesFilter !== 'ALL' || countryFilter !== 'ALL') && (
-                                <>
-                                    <span className="text-[11px] text-gray-400 font-semibold">
-                                        {lang === 'ko' ? '필터 적용 중:' : 'Active filters:'}
-                                    </span>
-                                    {seriesFilter !== 'ALL' && (
-                                        <span className="text-[11px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
-                                            {seriesFilter}
-                                        </span>
-                                    )}
-                                    {seriesFilter !== 'ALL' && countryFilter !== 'ALL' && (
-                                        <span className="text-[11px] text-gray-300">+</span>
-                                    )}
-                                    {countryFilter !== 'ALL' && (
-                                        <span className="text-[11px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
-                                            {countryFilter}
-                                        </span>
-                                    )}
-                                    <span className="text-[11px] text-gray-400">
-                                        → {filteredConferences.length}{lang === 'ko' ? '개' : ' events'}
-                                    </span>
-                                    <button
-                                        onClick={() => { setSeriesFilter('ALL'); setCountryFilter('ALL'); setSelectedEvent(null); }}
-                                        className="text-[10px] text-red-400 hover:text-red-600 font-bold transition-colors ml-1"
-                                    >
-                                        ✕ {lang === 'ko' ? '초기화' : 'Clear'}
-                                    </button>
-                                </>
-                            )}
-                        </div>
-                        <button
-                            onClick={goToToday}
-                            className="px-4 py-2 rounded-xl text-xs font-bold tracking-wide bg-white text-gray-600 border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200"
-                        >
-                            📌 {lang === 'ko' ? '오늘' : 'Today'}
-                        </button>
-                    </div>
-                </div>
-
-                {/* ── Selected Event Detail ── */}
-                {selectedEvent && (
-                    <div className="mb-6">
-                        <EventDetailPanel event={selectedEvent} onClose={() => setSelectedEvent(null)} lang={lang} />
-                    </div>
-                )}
 
                 {/* ── Calendar ── */}
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
@@ -682,12 +532,18 @@ export default function ConferencesPage() {
                                 </p>
                             )}
                         </div>
-                        <button onClick={nextMonth} aria-label="Next month"
-                            className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 shadow-sm">
-                            <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <button onClick={goToToday}
+                                className="hidden sm:block px-3 py-2 rounded-xl text-[11px] font-bold tracking-wide bg-white text-gray-500 border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200">
+                                📌 {lang === 'ko' ? '오늘' : 'Today'}
+                            </button>
+                            <button onClick={nextMonth} aria-label="Next month"
+                                className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 shadow-sm">
+                                <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
 
                     {/* Day Headers */}
@@ -717,8 +573,8 @@ export default function ConferencesPage() {
                                     className={`min-h-[80px] sm:min-h-[110px] border-b border-r border-gray-100 p-1 sm:p-1.5 transition-colors duration-150 ${today ? 'bg-blue-50/50' : 'hover:bg-gray-50/50'
                                         }`}>
                                     <div className="flex items-center justify-between mb-1">
-                                        <span className={`text-xs sm:text-sm font-bold w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-lg ${today ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
-                                            : dayOfWeek === 0 ? 'text-red-400' : dayOfWeek === 6 ? 'text-blue-400' : 'text-gray-700'
+                                        <span className={`text-xs sm:text-sm font-bold w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-lg ${today ? 'bg-slate-800 text-white shadow-md shadow-slate-800/30'
+                                                : dayOfWeek === 0 ? 'text-red-400' : dayOfWeek === 6 ? 'text-blue-400' : 'text-gray-700'
                                             }`}>
                                             {day}
                                         </span>
@@ -743,16 +599,124 @@ export default function ConferencesPage() {
                     </div>
                 </div>
 
+                {/* ── Selected Event Detail (below calendar) ── */}
+                {selectedEvent && (
+                    <div className="mt-5">
+                        <EventDetailPanel event={selectedEvent} onClose={() => setSelectedEvent(null)} lang={lang} />
+                    </div>
+                )}
+
+                {/* ── Filters (below calendar) ── */}
+                <div className="mt-6 space-y-4 bg-white rounded-2xl border border-gray-200 p-5 sm:p-6">
+                    {/* Series filter */}
+                    <div>
+                        <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                            {lang === 'ko' ? '시리즈 / 전시회' : 'Series / Conference'}
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                            <button
+                                onClick={() => { setSeriesFilter('ALL'); setSelectedEvent(null); }}
+                                className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide transition-all duration-200 border ${seriesFilter === 'ALL'
+                                        ? 'bg-slate-800 text-white border-slate-800 shadow-md'
+                                        : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                                    }`}
+                            >
+                                ALL ({CONFERENCES.length})
+                            </button>
+                            {ALL_SERIES.map((s) => {
+                                const isActive = seriesFilter === s;
+                                return (
+                                    <button
+                                        key={s}
+                                        onClick={() => { setSeriesFilter(isActive ? 'ALL' : s); setSelectedEvent(null); }}
+                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide transition-all duration-200 border ${isActive
+                                                ? 'bg-slate-700 text-white border-slate-700 shadow-md'
+                                                : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-100'
+                                            }`}
+                                    >
+                                        {s} {(seriesCounts[s] || 0) > 1 ? `(${seriesCounts[s]})` : ''}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Country filter */}
+                    <div>
+                        <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                            {lang === 'ko' ? '국가' : 'Country'}
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                            <button
+                                onClick={() => { setCountryFilter('ALL'); setSelectedEvent(null); }}
+                                className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide transition-all duration-200 border ${countryFilter === 'ALL'
+                                        ? 'bg-slate-800 text-white border-slate-800 shadow-md'
+                                        : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                                    }`}
+                            >
+                                {lang === 'ko' ? '전체' : 'All'}
+                            </button>
+                            {countries.map((c) => {
+                                const isActive = countryFilter === c;
+                                const count = CONFERENCES.filter((conf) => conf.country[lang] === c).length;
+                                const flag = COUNTRY_FLAGS[c] || '🌐';
+                                return (
+                                    <button
+                                        key={c}
+                                        onClick={() => { setCountryFilter(isActive ? 'ALL' : c); setSelectedEvent(null); }}
+                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide transition-all duration-200 border ${isActive
+                                                ? 'bg-slate-700 text-white border-slate-700 shadow-md'
+                                                : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                                            }`}
+                                    >
+                                        {flag} {c} ({count})
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Active filters summary */}
+                    {(seriesFilter !== 'ALL' || countryFilter !== 'ALL') && (
+                        <div className="flex items-center gap-2 flex-wrap pt-2 border-t border-gray-100">
+                            <span className="text-[11px] text-gray-400 font-semibold">
+                                {lang === 'ko' ? '필터 적용 중:' : 'Active filters:'}
+                            </span>
+                            {seriesFilter !== 'ALL' && (
+                                <span className="text-[11px] font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg">
+                                    {seriesFilter}
+                                </span>
+                            )}
+                            {seriesFilter !== 'ALL' && countryFilter !== 'ALL' && (
+                                <span className="text-[11px] text-gray-300 font-bold">+</span>
+                            )}
+                            {countryFilter !== 'ALL' && (
+                                <span className="text-[11px] font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg">
+                                    {countryFilter}
+                                </span>
+                            )}
+                            <span className="text-[11px] text-gray-400">
+                                → {filteredConferences.length}{lang === 'ko' ? '개' : ' events'}
+                            </span>
+                            <button
+                                onClick={() => { setSeriesFilter('ALL'); setCountryFilter('ALL'); setSelectedEvent(null); }}
+                                className="text-[11px] text-slate-400 hover:text-slate-600 font-bold transition-colors ml-1 underline"
+                            >
+                                {lang === 'ko' ? '초기화' : 'Clear all'}
+                            </button>
+                        </div>
+                    )}
+                </div>
+
                 {/* ── Upcoming Events List ── */}
                 <div className="mt-10">
                     <h2 className="text-lg font-black tracking-tight text-gray-900 mb-4 flex items-center gap-2">
-                        <span className="w-1.5 h-6 bg-gradient-to-b from-blue-500 to-pink-500 rounded-full" />
+                        <span className="w-1.5 h-6 bg-gradient-to-b from-slate-600 to-slate-400 rounded-full" />
                         {lang === 'ko' ? '다가오는 컨퍼런스' : 'Upcoming Conferences'}
                     </h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         {upcomingEvents.map((event) => {
                             const isOngoing = new Date(event.startDate) <= new Date() && new Date(event.endDate) >= new Date();
-                            const style = getSeriesColor(event.series);
                             return (
                                 <button key={event.id}
                                     onClick={() => {
@@ -761,10 +725,9 @@ export default function ConferencesPage() {
                                         setYear(s.getFullYear()); setMonth(s.getMonth());
                                         window.scrollTo({ top: 0, behavior: 'smooth' });
                                     }}
-                                    className="text-left group bg-white rounded-xl border border-gray-100 p-4 hover:border-gray-200 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
+                                    className="text-left group bg-white rounded-xl border border-gray-100 p-4 hover:border-slate-300 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <span className="text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full"
-                                            style={{ backgroundColor: style.bgColor, color: style.color }}>
+                                        <span className="text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
                                             {event.series}
                                         </span>
                                         {isOngoing && (
@@ -776,7 +739,7 @@ export default function ConferencesPage() {
                                             </span>
                                         )}
                                     </div>
-                                    <h3 className="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition-colors mb-1.5 leading-tight">
+                                    <h3 className="text-sm font-bold text-gray-900 group-hover:text-slate-600 transition-colors mb-1.5 leading-tight">
                                         {event.name[lang]}
                                     </h3>
                                     <div className="flex items-center gap-3 text-xs text-gray-500">
@@ -796,23 +759,6 @@ export default function ConferencesPage() {
                             </p>
                         </div>
                     )}
-                </div>
-
-                {/* ── Legend ── */}
-                <div className="mt-8 flex items-center justify-center gap-4 flex-wrap text-[11px] text-gray-400 font-medium">
-                    {['IMCAS', 'AMWC'].map((s) => {
-                        const sc = getSeriesColor(s);
-                        return (
-                            <div key={s} className="flex items-center gap-1.5">
-                                <span className="w-3 h-3 rounded-sm" style={{ backgroundColor: sc.bgColor, border: `1px solid ${sc.borderColor}` }} />
-                                <span>{s}</span>
-                            </div>
-                        );
-                    })}
-                    <div className="flex items-center gap-1.5">
-                        <span className="w-3 h-3 rounded-sm bg-gray-100 border border-gray-300" />
-                        <span>{lang === 'ko' ? '개별 전시회' : 'Individual'}</span>
-                    </div>
                 </div>
 
             </div>
