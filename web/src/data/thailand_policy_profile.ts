@@ -9,19 +9,19 @@ const REF = {
     },
     md_act: {
         id: "th-md-act",
-        title: "Medical Device Act B.E. 2551 (2008) & B.E. 2562 (2019)",
-        url: "https://medical.fda.moph.go.th/laws/medical-device-act",
+        title: "Medical Device Act B.E. 2551 & 2562 (MOPH)",
+        url: "https://medical.fda.moph.go.th",
         accessedOn: "2026-02-15",
     },
     drug_act: {
         id: "th-drug-act",
-        title: "Drug Act B.E. 2510 (1967) & Amendments",
+        title: "Drug Act B.E. 2510 (MOPH)",
         url: "https://drug.fda.moph.go.th",
         accessedOn: "2026-02-15",
     },
     cosmetic_act: {
         id: "th-cosmetic-act",
-        title: "Cosmetic Act B.E. 2558 (2015)",
+        title: "Cosmetic Act B.E. 2558 (MOPH)",
         url: "https://cosmetic.fda.moph.go.th",
         accessedOn: "2026-02-15",
     },
@@ -45,8 +45,8 @@ const REF = {
     },
     amdd: {
         id: "asean-amdd",
-        title: "ASEAN Medical Device Directive (AMDD)",
-        url: "https://asean.org/wp-content/uploads/2012/05/ASEAN-Medical-Device-Directive.pdf",
+        title: "ASEAN Medical Device Directive (ASEAN.org)",
+        url: "https://asean.org/our-communities/economic-community/standards-conformance/",
         accessedOn: "2026-02-15",
     }
 };
@@ -206,7 +206,7 @@ export const thailandPolicyProfile: CountryPolicyProfile = {
             authority: "Ministry of Public Health",
             issuedDate: "2019",
             effectiveDate: "2019",
-            sourceUrl: "https://medical.fda.moph.go.th/laws/medical-device-act",
+            sourceUrl: "https://medical.fda.moph.go.th",
             summary: {
                 ko: "2008년 법령을 개정하여 ASEAN 등급 분류 체계 및 CSDT 도입을 명문화함.",
                 en: "Amended the 2008 Act to formalize ASEAN risk classification and CSDT adoption.",

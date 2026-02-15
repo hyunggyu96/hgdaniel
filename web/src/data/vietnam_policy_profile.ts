@@ -3,26 +3,26 @@ import { CountryPolicyProfile } from "@/data/policyTypes";
 const REF = {
     vbpl: {
         id: "vn-vbpl",
-        title: "VBPL (MOH legal database)",
-        url: "https://vbpl.vn/boyte/Pages/vbpq-toanvan.aspx?ItemID=153250",
+        title: "VBPL (National Database of Legal Documents)",
+        url: "https://vbpl.vn/boyte/Pages/vbpq-toanvan.aspx?ItemID=150654", // Link to Decree 98 as intro
         accessedOn: "2026-02-15",
     },
     nd98: {
         id: "vn-nd98",
-        title: "Decree 98/2021/ND-CP (Device)",
-        url: "https://imda.moh.gov.vn/documents/10182/0/E_1636511534239_98_2021_ND-CP_08112021-signed.pdf/6e96247f-e468-434c-a478-091e7cb159ef",
+        title: "Decree 98/2021/ND-CP (VBPL)",
+        url: "https://vbpl.vn/boyte/Pages/vbpq-toanvan.aspx?ItemID=150654",
         accessedOn: "2026-02-15",
     },
     circ32: {
         id: "vn-circ32",
-        title: "Circular 32/2018/TT-BYT (Drug)",
-        url: "https://dav.gov.vn/circular-no-32-2018-tt-byt-regulations-on-registration-for-marketing-authorization-of-drugs-and-medicinal-ingredients.html",
+        title: "Circular 32/2018/TT-BYT (VBPL)",
+        url: "https://vbpl.vn/boyte/Pages/vbpq-toanvan.aspx?ItemID=132788",
         accessedOn: "2026-02-15",
     },
     circ06: {
         id: "vn-circ06",
-        title: "Circular 06/2011/TT-BYT (Cosmetic)",
-        url: "https://dav.gov.vn/system-of-legal-documents-on-cosmetic-management.html",
+        title: "Circular 06/2011/TT-BYT (VBPL)",
+        url: "https://vbpl.vn/boyte/Pages/vbpq-toanvan.aspx?ItemID=26362",
         accessedOn: "2026-02-15",
     },
     dvc: {
