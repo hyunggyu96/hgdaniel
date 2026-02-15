@@ -7,6 +7,7 @@ import { API_ENDPOINTS } from '@/lib/apiConfig';
 import { COMPANY_OVERVIEWS } from '@/data/companyOverviews';
 import { isGlobalCompany } from '@/data/companyCategories';
 import CompetitorTable from '@/components/CompetitorTable';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 // Safely require MFDS Data (might be missing initially)
 // Safely require MFDS Data (prioritize filtered small set)
@@ -23,7 +24,7 @@ try {
     }
 }
 
-const YEARS = ['2026', '2025', '2024', '2023'] as const;
+const YEARS = ['2025', '2024', '2023', '2022'] as const;
 
 export default function AnalysisPage() {
     const searchParams = useSearchParams();
@@ -385,6 +386,7 @@ export default function AnalysisPage() {
                             </div>
 
                             {result.financial_history && Object.keys(result.financial_history).length > 0 ? (
+                                <>
                                 <div className="overflow-x-auto">
                                     <table className="min-w-full divide-y divide-gray-200">
                                         <thead>
@@ -392,18 +394,11 @@ export default function AnalysisPage() {
                                                 <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider bg-blue-50/80 w-32 border-r border-gray-100">
                                                     구분
                                                 </th>
-                                                <th scope="col" className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider bg-blue-50/50">
-                                                    2026
-                                                </th>
-                                                <th scope="col" className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider bg-blue-50/50">
-                                                    2025
-                                                </th>
-                                                <th scope="col" className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider bg-blue-50/50">
-                                                    2024
-                                                </th>
-                                                <th scope="col" className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider bg-blue-50/50">
-                                                    2023
-                                                </th>
+                                                {YEARS.map(year => (
+                                                    <th key={year} scope="col" className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider bg-blue-50/50">
+                                                        {year}
+                                                    </th>
+                                                ))}
                                             </tr>
                                         </thead>
                                         <tbody className="bg-white divide-y divide-gray-100">
@@ -515,6 +510,54 @@ export default function AnalysisPage() {
                                         </tbody>
                                     </table>
                                 </div>
+                                {/* Revenue Chart */}
+                                {(() => {
+                                    const chartData = [...YEARS].reverse().map(year => {
+                                        const yearData = result.financial_history[year];
+                                        const rev = yearData?.revenue;
+                                        const op = yearData?.operating_profit;
+                                        const parseEok = (v: string | undefined) => {
+                                            if (!v || v === 'N/A' || v === '-') return 0;
+                                            const n = parseFloat(v);
+                                            return isNaN(n) ? 0 : Math.round(n / 1e8);
+                                        };
+                                        return {
+                                            year,
+                                            매출액: parseEok(rev),
+                                            영업이익: parseEok(op),
+                                        };
+                                    });
+                                    const hasData = chartData.some(d => d.매출액 > 0 || d.영업이익 > 0);
+                                    if (!hasData) return null;
+
+                                    return (
+                                        <div className="mt-6 pt-4 border-t border-gray-100">
+                                            <ResponsiveContainer width="100%" height={220}>
+                                                <BarChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
+                                                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                                    <XAxis dataKey="year" tick={{ fontSize: 12, fill: '#6b7280' }} />
+                                                    <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} tickFormatter={(v) => v >= 10000 ? `${(v / 10000).toFixed(1)}조` : `${v.toLocaleString()}억`} width={60} />
+                                                    <Tooltip
+                                                        formatter={(value: number, name: string) => {
+                                                            if (value === 0) return ['-', name];
+                                                            const jo = Math.floor(value / 10000);
+                                                            const eok = value % 10000;
+                                                            let formatted = '';
+                                                            if (jo > 0) formatted += `${jo}조 `;
+                                                            if (eok > 0) formatted += `${eok.toLocaleString()}억`;
+                                                            return [formatted.trim() || '0', name];
+                                                        }}
+                                                        contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e5e7eb' }}
+                                                    />
+                                                    <Legend wrapperStyle={{ fontSize: 12 }} />
+                                                    <Bar dataKey="매출액" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                                                    <Bar dataKey="영업이익" fill="#10b981" radius={[4, 4, 0, 0]} />
+                                                </BarChart>
+                                            </ResponsiveContainer>
+                                        </div>
+                                    );
+                                })()}
+                                </>
                             ) : (
                                 <Text>No financial history available</Text>
                             )}
