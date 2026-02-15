@@ -9,13 +9,13 @@ const REF = {
     },
     nd98: {
         id: "vn-nd98",
-        title: "Decree 98/2021/ND-CP (VBPL)",
+        title: "Decree 98/2021/ND-CP (Official VBPL Source)",
         url: "https://vbpl.vn/boyte/Pages/vbpq-toanvan.aspx?ItemID=150654",
         accessedOn: "2026-02-15",
     },
     circ32: {
         id: "vn-circ32",
-        title: "Circular 32/2018/TT-BYT (VBPL)",
+        title: "Circular 32/2018/TT-BYT (Official VBPL Source)",
         url: "https://vbpl.vn/boyte/Pages/vbpq-toanvan.aspx?ItemID=132788",
         accessedOn: "2026-02-15",
     },

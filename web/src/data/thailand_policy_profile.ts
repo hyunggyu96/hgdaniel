@@ -9,19 +9,19 @@ const REF = {
     },
     md_act: {
         id: "th-md-act",
-        title: "Medical Device Act B.E. 2551 & 2562 (MOPH)",
+        title: "Medical Device Act B.E. 2551 & 2562 (Official MOPH Page)",
         url: "https://medical.fda.moph.go.th",
         accessedOn: "2026-02-15",
     },
     drug_act: {
         id: "th-drug-act",
-        title: "Drug Act B.E. 2510 (MOPH)",
+        title: "Drug Act B.E. 2510 (Official MOPH Page)",
         url: "https://drug.fda.moph.go.th",
         accessedOn: "2026-02-15",
     },
     cosmetic_act: {
         id: "th-cosmetic-act",
-        title: "Cosmetic Act B.E. 2558 (MOPH)",
+        title: "Cosmetic Act B.E. 2558 (Official MOPH Page)",
         url: "https://cosmetic.fda.moph.go.th",
         accessedOn: "2026-02-15",
     },
