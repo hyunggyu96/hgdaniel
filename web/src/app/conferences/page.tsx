@@ -895,24 +895,24 @@ export default function ConferencesPage() {
                                     <div
                                         key={event.id}
                                         onClick={() => setFocusedEvent(event)}
-                                        className={`group bg-white rounded-xl p-3 border shadow-sm cursor-pointer transition-all relative overflow-hidden flex items-center justify-between gap-3
+                                        className={`group bg-white rounded-xl p-4 border shadow-sm cursor-pointer transition-all relative overflow-hidden flex items-center justify-between gap-4 shrink-0 min-h-[72px]
                                              ${isFocused
-                                                ? 'border-blue-500 ring-2 ring-blue-100 shadow-md scale-[1.01]'
+                                                ? 'border-blue-500 ring-1 ring-blue-100 shadow-md scale-[1.01] z-10'
                                                 : 'border-gray-100 hover:border-blue-200 hover:shadow-md hover:scale-[1.005]'
                                             }`}
                                     >
                                         <div
-                                            className="absolute left-0 top-0 bottom-0 w-1 transition-all"
+                                            className="absolute left-0 top-0 bottom-0 w-1.5 transition-all"
                                             style={{ backgroundColor: cc.color }}
                                         />
 
                                         <div className="flex items-center gap-4 pl-3 flex-1 min-w-0">
-                                            <div className="flex flex-col items-center justify-center w-10 shrink-0">
-                                                <span className="text-[10px] font-bold text-gray-400 uppercase leading-none">{lang === 'ko' ? `${startDate.getMonth() + 1}월` : MONTH_NAMES_EN[startDate.getMonth()].substring(0, 3)}</span>
-                                                <span className="text-lg font-bold text-gray-900 leading-tight">{startDate.getDate()}</span>
+                                            <div className="flex flex-col items-center justify-center w-14 shrink-0 py-1.5 bg-gray-50 rounded-lg border border-gray-100/50">
+                                                <span className="text-[10px] font-bold text-gray-500 uppercase leading-none mb-0.5">{lang === 'ko' ? `${startDate.getMonth() + 1}월` : MONTH_NAMES_EN[startDate.getMonth()].substring(0, 3)}</span>
+                                                <span className="text-xl font-bold text-gray-900 leading-none">{startDate.getDate()}</span>
                                             </div>
 
-                                            <div className="min-w-0 flex flex-col gap-0.5">
+                                            <div className="min-w-0 flex flex-col gap-1">
                                                 <div className="flex items-center gap-2">
                                                     {isOngoing && (
                                                         <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-600 animate-pulse uppercase">LIVE</span>
@@ -921,7 +921,7 @@ export default function ConferencesPage() {
                                                         {event.series}
                                                     </span>
                                                 </div>
-                                                <h4 className={`text-sm font-bold transition-colors truncate ${isFocused ? 'text-blue-700' : 'text-gray-900 group-hover:text-blue-700'}`}>
+                                                <h4 className={`text-base font-bold transition-colors truncate ${isFocused ? 'text-blue-700' : 'text-gray-900 group-hover:text-blue-700'}`}>
                                                     {event.name[lang]}
                                                 </h4>
                                             </div>
