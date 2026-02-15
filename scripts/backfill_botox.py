@@ -282,5 +282,3 @@ def main():
     else:
         print("No IDs found.")
 
-if __name__ == "__main__":
-    main()

@@ -29,7 +29,7 @@ export const translations = {
 
         // Insights
         insights_title: '인사이트 & 리서치',
-        insights_desc: '엄선된 에스테틱 메디컬 연구 데이터베이스',
+        insights_desc: '에스테틱 메디컬 연구 데이터베이스',
         insights_total_papers: '총 {count}건의 논문이 수록되어 있습니다',
         insights_search_placeholder: '제목 또는 초록 검색...',
         insights_filter_topic: '주제별 필터...',
@@ -101,7 +101,7 @@ export const translations = {
 
         // Insights
         insights_title: 'Insights & Research',
-        insights_desc: 'Curated aesthetic medicine research database',
+        insights_desc: 'Aesthetic medicine research database',
         insights_total_papers: '{count} research papers in database',
         insights_search_placeholder: 'Search title or abstract...',
         insights_filter_topic: 'Filter by Topic...',
