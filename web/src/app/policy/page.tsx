@@ -19,11 +19,19 @@ interface Country {
 }
 
 const COUNTRIES: Country[] = [
-    { id: "kr", nameEn: "South Korea", nameKo: "South Korea" },
-    { id: "vn", nameEn: "Vietnam", nameKo: "Vietnam" },
-    { id: "th", nameEn: "Thailand", nameKo: "Thailand" },
-    { id: "kh", nameEn: "Cambodia", nameKo: "Cambodia" },
-    // ... other countries
+    { id: "kr", nameEn: "South Korea", nameKo: "대한민국" },
+    { id: "vn", nameEn: "Vietnam", nameKo: "베트남" },
+    { id: "th", nameEn: "Thailand", nameKo: "태국" },
+    { id: "kh", nameEn: "Cambodia", nameKo: "캄보디아" },
+    { id: "la", nameEn: "Laos", nameKo: "라오스" },
+    { id: "mm", nameEn: "Myanmar", nameKo: "미얀마" },
+    { id: "bd", nameEn: "Bangladesh", nameKo: "방글라데시" },
+    { id: "in", nameEn: "India", nameKo: "인도" },
+    { id: "my", nameEn: "Malaysia", nameKo: "말레이시아" },
+    { id: "sg", nameEn: "Singapore", nameKo: "싱가포르" },
+    { id: "id", nameEn: "Indonesia", nameKo: "인도네시아" },
+    { id: "ph", nameEn: "Philippines", nameKo: "필리핀" },
+    { id: "tw", nameEn: "Taiwan", nameKo: "대만" },
 ];
 
 const SUPPORTED_COUNTRIES = new Set(["kr", "vn", "th"]);
@@ -184,8 +192,8 @@ const DetailView = ({
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
                                 className={`flex items-center gap-2 px-4 py-3 text-sm font-bold border-b-2 transition-all ${activeTab === tab
-                                        ? "border-blue-600 text-blue-600 bg-blue-50/50"
-                                        : "border-transparent text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                                    ? "border-blue-600 text-blue-600 bg-blue-50/50"
+                                    : "border-transparent text-gray-400 hover:text-gray-600 hover:bg-gray-50"
                                     } rounded-t-lg`}
                             >
                                 {getTabIcon(tab)}
