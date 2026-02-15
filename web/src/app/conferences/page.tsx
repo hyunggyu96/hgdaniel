@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useLanguage } from '@/components/LanguageContext';
-import { Globe, Calendar as CalendarIcon, MapPin, ExternalLink, X, Filter } from "lucide-react";
+import { Globe, Calendar as CalendarIcon, MapPin, ExternalLink, X, Filter, ChevronLeft, ChevronRight } from "lucide-react";
 
 // ─── Types ───
 interface ConferenceEvent {
@@ -509,6 +509,10 @@ export default function ConferencesPage() {
     const [seriesFilter, setSeriesFilter] = useState<string>('ALL');
     const [countryFilter, setCountryFilter] = useState<string>('ALL');
 
+    // Pagination for Upcoming Events
+    const [itemsPerPage] = useState(6);
+    const [currentPage, setCurrentPage] = useState(1);
+
     const monthNames = lang === 'ko' ? MONTH_NAMES_KO : MONTH_NAMES_EN;
     const dayNames = lang === 'ko' ? DAY_NAMES_KO : DAY_NAMES_EN;
     const countries = lang === 'ko' ? ALL_COUNTRIES_KO : ALL_COUNTRIES_EN;
@@ -531,6 +535,22 @@ export default function ConferencesPage() {
             .filter((c) => new Date(c.endDate) >= today)
             .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
     }, [filteredConferences]);
+
+    // Pagination Logic
+    const totalPages = Math.ceil(upcomingEvents.length / itemsPerPage);
+    const currentUpcomingEvents = upcomingEvents.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
+    const handlePrevPage = () => {
+        setCurrentPage((prev) => Math.max(prev - 1, 1));
+    };
+
+    const handleNextPage = () => {
+        setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+    };
+
 
     const daysInMonth = getDaysInMonth(year, month);
     const firstDay = getFirstDayOfMonth(year, month);
@@ -688,46 +708,10 @@ export default function ConferencesPage() {
                     </div>
                 </div>
 
-                {/* 2-Column Grid: Filters & Upcoming Events */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-12">
-                    {/* LEFT COLUMN: Upcoming Events */}
-                    <div className="lg:col-span-4 space-y-4">
-                        <div className="flex items-center gap-2 mb-4">
-                            <h3 className="text-lg font-bold text-gray-900 border-l-4 border-blue-600 pl-3">
-                                {lang === 'ko' ? '다가오는 일정' : 'Upcoming Events'}
-                            </h3>
-                        </div>
-                        <div className="space-y-3">
-                            {upcomingEvents.slice(0, 5).map((event) => {
-                                const cc = getCountryColor(event.country[lang]);
-                                const startDate = new Date(event.startDate);
-                                return (
-                                    <div
-                                        key={event.id}
-                                        onClick={() => { setSelectedEvent(event); window.scrollTo({ top: 100, behavior: 'smooth' }); }}
-                                        className="group bg-white rounded-xl p-3 border border-gray-100 shadow-sm hover:shadow-md cursor-pointer transition-all hover:scale-[1.02] flex items-center gap-3"
-                                    >
-                                        <div className="w-12 h-12 rounded-lg bg-gray-50 flex flex-col items-center justify-center shrink-0 border border-gray-100">
-                                            <span className="text-[10px] font-bold text-gray-500 uppercase">{lang === 'ko' ? `${startDate.getMonth() + 1}월` : MONTH_NAMES_EN[startDate.getMonth()].substring(0, 3)}</span>
-                                            <span className="text-xl font-bold text-gray-900 leading-none">{startDate.getDate()}</span>
-                                        </div>
-                                        <div className="min-w-0">
-                                            <p className="text-sm font-bold text-gray-900 truncate group-hover:text-blue-600 transition-colors">
-                                                {event.name[lang]}
-                                            </p>
-                                            <div className="flex items-center gap-1.5 mt-0.5">
-                                                <FlagIcon country={event.country[lang]} size={12} />
-                                                <span className="text-xs text-gray-500 truncate">{event.city[lang]}, {event.country[lang]}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-
-                    {/* RIGHT COLUMN: Filters */}
-                    <div className="lg:col-span-8 flex flex-col gap-6 ">
+                {/* 2-Column Grid: Filters (Left) & Upcoming Events (Right) */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-12 items-start">
+                    {/* LEFT COLUMN: Filters (col-span-4) */}
+                    <div className="lg:col-span-4 flex flex-col gap-6 lg:sticky lg:top-24">
                         {/* Series Filter */}
                         <div className="bg-white/60 backdrop-blur-xl p-5 rounded-2xl shadow-sm border border-white/50 ring-1 ring-gray-200/50">
                             <div className="flex items-center gap-2 mb-3">
@@ -796,6 +780,112 @@ export default function ConferencesPage() {
                                     );
                                 })}
                             </div>
+                        </div>
+                    </div>
+
+                    {/* RIGHT COLUMN: Upcoming Events (col-span-8) */}
+                    <div className="lg:col-span-8 space-y-5">
+                        <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-200/50">
+                            <div className="flex items-center gap-2">
+                                <h3 className="text-lg font-bold text-gray-900 border-l-4 border-blue-600 pl-3">
+                                    {lang === 'ko' ? '다가오는 일정' : 'Upcoming Events'}
+                                </h3>
+                                <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                                    Total {upcomingEvents.length}
+                                </span>
+                            </div>
+                            {/* Pagination Controls */}
+                            {totalPages > 1 && (
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={handlePrevPage}
+                                        disabled={currentPage === 1}
+                                        className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                                    >
+                                        <ChevronLeft className="w-4 h-4" />
+                                    </button>
+                                    <span className="text-xs font-bold text-gray-500 tabular-nums">
+                                        {currentPage} / {totalPages}
+                                    </span>
+                                    <button
+                                        onClick={handleNextPage}
+                                        disabled={currentPage === totalPages}
+                                        className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                                    >
+                                        <ChevronRight className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="space-y-3">
+                            {currentUpcomingEvents.map((event) => {
+                                const cc = getCountryColor(event.country[lang]);
+                                const startDate = new Date(event.startDate);
+                                const endDate = new Date(event.endDate);
+                                const isOngoing = new Date(event.startDate) <= new Date() && new Date(event.endDate) >= new Date();
+
+                                return (
+                                    <div
+                                        key={event.id}
+                                        onClick={() => { setSelectedEvent(event); window.scrollTo({ top: 100, behavior: 'smooth' }); }}
+                                        className="group bg-white rounded-2xl p-4 md:p-5 border border-gray-100 shadow-sm hover:shadow-lg cursor-pointer transition-all hover:scale-[1.01] flex flex-col sm:flex-row gap-5 items-stretch relative overflow-hidden"
+                                    >
+                                        <div
+                                            className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-gray-50 to-gray-100 rounded-bl-full -mr-10 -mt-10 opacity-50 group-hover:scale-110 transition-transform duration-500 pointer-events-none"
+                                            style={{ background: `radial-gradient(circle at top right, ${cc.color}15, transparent)` }}
+                                        />
+
+                                        {/* Date Box */}
+                                        <div className="hidden sm:flex flex-col items-center justify-center w-20 shrink-0 bg-gray-50 rounded-xl border border-gray-100 group-hover:border-blue-100 group-hover:bg-blue-50/30 transition-colors">
+                                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">{lang === 'ko' ? `${startDate.getMonth() + 1}월` : MONTH_NAMES_EN[startDate.getMonth()].substring(0, 3)}</span>
+                                            <span className="text-3xl font-black text-gray-900 leading-none my-1">{startDate.getDate()}</span>
+                                            <span className="text-[10px] font-bold text-gray-400">{startDate.getFullYear()}</span>
+                                        </div>
+
+                                        {/* Content */}
+                                        <div className="flex-1 min-w-0 flex flex-col justify-center">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                                                    {event.series}
+                                                </span>
+                                                {isOngoing && (
+                                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-600 animate-pulse">
+                                                        LIVE
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <h4 className="text-lg md:text-xl font-bold text-gray-900 group-hover:text-blue-700 transition-colors truncate">
+                                                {event.name[lang]}
+                                            </h4>
+                                            <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                                                <div className="flex items-center gap-1.5">
+                                                    <FlagIcon country={event.country[lang]} size={14} />
+                                                    <span className="font-medium">{event.city[lang]}, {event.country[lang]}</span>
+                                                </div>
+                                                <div className="hidden sm:block w-1 h-1 rounded-full bg-gray-300" />
+                                                <div className="flex items-center gap-1.5 text-gray-500 text-xs sm:text-sm">
+                                                    <CalendarIcon className="w-3.5 h-3.5" />
+                                                    <span>{formatDateRange(event.startDate, event.endDate, lang)}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Action Icon (Mobile Hidden) */}
+                                        <div className="hidden sm:flex items-center justify-center pl-4 border-l border-gray-100">
+                                            <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-sm group-hover:shadow-md">
+                                                <ChevronRight className="w-5 h-5" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        {/* Bottom Pagination Info */}
+                        <div className="flex justify-center mt-6 pt-4 border-t border-gray-100">
+                            <p className="text-xs text-gray-400">
+                                Showing {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, upcomingEvents.length)} of {upcomingEvents.length} events
+                            </p>
                         </div>
                     </div>
                 </div>
