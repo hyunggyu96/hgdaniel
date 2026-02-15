@@ -112,14 +112,19 @@
                 "Q4": null
             },
             "2022": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "52600000000",
+                "operating_profit": "9500000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=290650"
+                }
             },
             "2023": {
                 "revenue": "68869546328",
@@ -159,9 +164,9 @@
                 "data_type": "annual"
             },
             "2025": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "88600000000",
+                "operating_profit": "6200000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250515001978",
@@ -175,7 +180,12 @@
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114002166",
                     "title": "분기보고서 (2025.09)"
                 },
-                "Q4": null
+                "Q4": null,
+                "data_type": "estimated_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=290650"
+                }
             },
             "2026": {
                 "revenue": "N/A",
@@ -204,24 +214,34 @@
                 "Q4": null
             },
             "2022": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "46000000000",
+                "operating_profit": "4000000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=216080"
+                }
             },
             "2023": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "58700000000",
+                "operating_profit": "2600000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=216080"
+                }
             },
             "2024": {
                 "revenue": "68520182954",
@@ -520,14 +540,19 @@
                 "Q4": null
             },
             "2022": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "492400000000",
+                "operating_profit": "40900000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=243070"
+                }
             },
             "2023": {
                 "revenue": "552006502264",
@@ -567,9 +592,9 @@
                 "data_type": "annual"
             },
             "2025": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "614200000000",
+                "operating_profit": "46100000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250515003027",
@@ -583,7 +608,12 @@
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114002901",
                     "title": "분기보고서 (2025.09)"
                 },
-                "Q4": null
+                "Q4": null,
+                "data_type": "estimated_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=243070"
+                }
             },
             "2026": {
                 "revenue": "N/A",
@@ -612,19 +642,24 @@
                 "Q4": null
             },
             "2022": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "664400000000",
+                "operating_profit": "86500000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=084110"
+                }
             },
             "2023": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "758400000000",
+                "operating_profit": "114000000000",
+                "rd_cost": "-",
                 "annual_report": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240321001484",
                     "title": "[기재정정]사업보고서 (2023.12)"
@@ -632,12 +667,17 @@
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=084110"
+                }
             },
             "2024": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "813500000000",
+                "operating_profit": "97000000000",
+                "rd_cost": "-",
                 "annual_report": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250320001575",
                     "title": "사업보고서 (2024.12)"
@@ -654,7 +694,12 @@
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241114000624",
                     "title": "분기보고서 (2024.09)"
                 },
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=084110"
+                }
             },
             "2025": {
                 "revenue": "N/A",
@@ -701,14 +746,19 @@
                 "Q4": null
             },
             "2022": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "123200000000",
+                "operating_profit": "26000000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=200670"
+                }
             },
             "2023": {
                 "revenue": "152273808567",
@@ -754,9 +804,9 @@
                 "data_type": "annual"
             },
             "2025": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "170300000000",
+                "operating_profit": "41900000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250515000188",
@@ -770,7 +820,12 @@
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114000119",
                     "title": "분기보고서 (2025.09)"
                 },
-                "Q4": null
+                "Q4": null,
+                "data_type": "estimated_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=200670"
+                }
             },
             "2026": {
                 "revenue": "N/A",
@@ -799,24 +854,34 @@
                 "Q4": null
             },
             "2022": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "281700000000",
+                "operating_profit": "101400000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=145020"
+                }
             },
             "2023": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "319700000000",
+                "operating_profit": "117800000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=145020"
+                }
             },
             "2024": {
                 "revenue": "373046885998",
@@ -839,9 +904,9 @@
                 "data_type": "annual"
             },
             "2025": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "419700000000",
+                "operating_profit": "195000000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250515002369",
@@ -855,7 +920,12 @@
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114001274",
                     "title": "분기보고서 (2025.09)"
                 },
-                "Q4": null
+                "Q4": null,
+                "data_type": "estimated_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=145020"
+                }
             },
             "2026": {
                 "revenue": "N/A",
@@ -883,14 +953,19 @@
                 "Q4": null
             },
             "2022": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "195100000000",
+                "operating_profit": "46700000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=086900"
+                }
             },
             "2023": {
                 "revenue": "221120682597",
@@ -933,9 +1008,9 @@
                 "data_type": "annual"
             },
             "2025": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "253600000000",
+                "operating_profit": "30200000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250514001162",
@@ -949,7 +1024,12 @@
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251113000758",
                     "title": "분기보고서 (2025.09)"
                 },
-                "Q4": null
+                "Q4": null,
+                "data_type": "estimated_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=086900"
+                }
             },
             "2026": {
                 "revenue": "N/A",
@@ -978,19 +1058,24 @@
                 "Q4": null
             },
             "2022": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "1280100000000",
+                "operating_profit": "95800000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=069620"
+                }
             },
             "2023": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "1375300000000",
+                "operating_profit": "122600000000",
+                "rd_cost": "-",
                 "annual_report": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240320001120",
                     "title": "사업보고서 (2023.12)"
@@ -998,7 +1083,12 @@
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=069620"
+                }
             },
             "2024": {
                 "revenue": "1422683296380",
@@ -1024,9 +1114,9 @@
                 "data_type": "annual"
             },
             "2025": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "1579900000000",
+                "operating_profit": "200300000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250515002222",
@@ -1040,7 +1130,12 @@
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114001339",
                     "title": "분기보고서 (2025.09)"
                 },
-                "Q4": null
+                "Q4": null,
+                "data_type": "estimated_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=069620"
+                }
             },
             "2026": {
                 "revenue": "N/A",
@@ -1068,14 +1163,19 @@
                 "Q4": null
             },
             "2022": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "194800000000",
+                "operating_profit": "65900000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=214450"
+                }
             },
             "2023": {
                 "revenue": "261010910564",
@@ -1118,9 +1218,9 @@
                 "data_type": "annual"
             },
             "2025": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "547500000000",
+                "operating_profit": "228100000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250521000230",
@@ -1134,7 +1234,12 @@
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114000932",
                     "title": "분기보고서 (2025.09)"
                 },
-                "Q4": null
+                "Q4": null,
+                "data_type": "estimated_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=214450"
+                }
             },
             "2026": {
                 "revenue": "N/A",
@@ -1163,29 +1268,39 @@
                 "Q4": null
             },
             "2022": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "141800000000",
+                "operating_profit": "68900000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=214150"
+                }
             },
             "2023": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "180100000000",
+                "operating_profit": "89600000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=214150"
+                }
             },
             "2024": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "242900000000",
+                "operating_profit": "122400000000",
+                "rd_cost": "-",
                 "annual_report": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250321001623",
                     "title": "사업보고서 (2024.12)"
@@ -1199,12 +1314,17 @@
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241114001342",
                     "title": "분기보고서 (2024.09)"
                 },
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=214150"
+                }
             },
             "2025": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "341200000000",
+                "operating_profit": "167900000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250515003058",
@@ -1218,7 +1338,12 @@
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114002953",
                     "title": "분기보고서 (2025.09)"
                 },
-                "Q4": null
+                "Q4": null,
+                "data_type": "estimated_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=214150"
+                }
             },
             "2026": {
                 "revenue": "N/A",
@@ -1246,14 +1371,19 @@
                 "Q4": null
             },
             "2022": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "69100000000",
+                "operating_profit": "33600000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=214370"
+                }
             },
             "2023": {
                 "revenue": "79209511675",
@@ -1409,9 +1539,9 @@
                 "Q4": null
             },
             "2022": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "77300000000",
+                "operating_profit": "5500000000",
+                "rd_cost": "-",
                 "annual_report": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230427000615",
                     "title": "연결감사보고서 (2022.12)"
@@ -1419,12 +1549,17 @@
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=240550"
+                }
             },
             "2023": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "90900000000",
+                "operating_profit": "16500000000",
+                "rd_cost": "-",
                 "annual_report": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240329001613",
                     "title": "연결감사보고서 (2023.12)"
@@ -1432,7 +1567,12 @@
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=240550"
+                }
             },
             "2024": {
                 "revenue": "105113645139",
@@ -1449,9 +1589,9 @@
                 "data_type": "annual"
             },
             "2025": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "115200000000",
+                "operating_profit": "16600000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250527000563",
@@ -1465,7 +1605,12 @@
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251125000378",
                     "title": "분기보고서 (2025.09)"
                 },
-                "Q4": null
+                "Q4": null,
+                "data_type": "estimated_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=240550"
+                }
             },
             "2026": {
                 "revenue": "N/A",
@@ -1579,9 +1724,9 @@
                 "Q4": null
             },
             "2022": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "21100000000",
+                "operating_profit": "3600000000",
+                "rd_cost": "-",
                 "annual_report": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240813000430",
                     "title": "[기재정정]감사보고서 (2022.12)"
@@ -1589,12 +1734,17 @@
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=489460"
+                }
             },
             "2023": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "17100000000",
+                "operating_profit": "5200000000",
+                "rd_cost": "-",
                 "annual_report": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240813000437",
                     "title": "[기재정정]감사보고서 (2023.12)"
@@ -1602,12 +1752,17 @@
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=489460"
+                }
             },
             "2024": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "29600000000",
+                "operating_profit": "9200000000",
+                "rd_cost": "-",
                 "annual_report": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250324000268",
                     "title": "[기재정정]연결감사보고서 (2024.12)"
@@ -1615,7 +1770,12 @@
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=489460"
+                }
             },
             "2025": {
                 "revenue": "N/A",
@@ -1848,24 +2008,34 @@
                 "Q4": null
             },
             "2022": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "27600000000",
+                "operating_profit": "3600000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=149980"
+                }
             },
             "2023": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "33700000000",
+                "operating_profit": "5300000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=149980"
+                }
             },
             "2024": {
                 "revenue": "31628770815",
@@ -1938,9 +2108,9 @@
                 "Q4": null
             },
             "2022": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "30000000000",
+                "operating_profit": "2500000000",
+                "rd_cost": "-",
                 "annual_report": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230331001309",
                     "title": "감사보고서 (2022.12)"
@@ -1948,7 +2118,12 @@
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=199550"
+                }
             },
             "2023": {
                 "revenue": "34352053954",
@@ -2033,14 +2208,19 @@
                 "Q4": null
             },
             "2022": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "55500000000",
+                "operating_profit": "-3800000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=206650"
+                }
             },
             "2023": {
                 "revenue": "69365660612",
@@ -2089,9 +2269,9 @@
                 "data_type": "annual"
             },
             "2025": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "156400000000",
+                "operating_profit": "60200000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250513000499",
@@ -2105,7 +2285,12 @@
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251110000330",
                     "title": "분기보고서 (2025.09)"
                 },
-                "Q4": null
+                "Q4": null,
+                "data_type": "estimated_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=206650"
+                }
             },
             "2026": {
                 "revenue": "N/A",
@@ -2425,14 +2610,19 @@
                 "Q4": null
             },
             "2022": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "684400000000",
+                "operating_profit": "63000000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": null,
                 "Q2": null,
                 "Q3": null,
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=001060"
+                }
             },
             "2023": {
                 "revenue": "748526707817",
@@ -2537,9 +2727,9 @@
                 "Q4": null
             },
             "2022": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "661600000000",
+                "operating_profit": "73900000000",
+                "rd_cost": "-",
                 "annual_report": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230316001371",
                     "title": "사업보고서 (2022.12)"
@@ -2556,12 +2746,17 @@
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20221114002559",
                     "title": "분기보고서 (2022.09)"
                 },
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=086450"
+                }
             },
             "2023": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "731000000000",
+                "operating_profit": "66900000000",
+                "rd_cost": "-",
                 "annual_report": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240314001722",
                     "title": "사업보고서 (2023.12)"
@@ -2578,12 +2773,17 @@
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20231114002950",
                     "title": "분기보고서 (2023.09)"
                 },
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=086450"
+                }
             },
             "2024": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "812200000000",
+                "operating_profit": "80400000000",
+                "rd_cost": "-",
                 "annual_report": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250313001454",
                     "title": "사업보고서 (2024.12)"
@@ -2600,12 +2800,17 @@
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241114001778",
                     "title": "분기보고서 (2024.09)"
                 },
-                "Q4": null
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=086450"
+                }
             },
             "2025": {
-                "revenue": "N/A",
-                "operating_profit": "N/A",
-                "rd_cost": "N/A",
+                "revenue": "917200000000",
+                "operating_profit": "97000000000",
+                "rd_cost": "-",
                 "annual_report": null,
                 "Q1": {
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250515000170",
@@ -2619,7 +2824,12 @@
                     "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114002853",
                     "title": "분기보고서 (2025.09)"
                 },
-                "Q4": null
+                "Q4": null,
+                "data_type": "estimated_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=086450"
+                }
             },
             "2026": {
                 "revenue": "N/A",
