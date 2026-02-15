@@ -418,6 +418,7 @@ function EventBadge({ event, onClick, isSelected, lang }: {
 }) {
     const cityLabel = event.city[lang];
     const cc = getCountryColor(event.country[lang]);
+    const flag = COUNTRY_FLAGS[event.country[lang]] || '🌐';
 
     return (
         <button
@@ -432,7 +433,7 @@ function EventBadge({ event, onClick, isSelected, lang }: {
                     : { backgroundColor: cc.bgColor, color: cc.color, borderColor: cc.borderColor }
                 }
             >
-                {event.name[lang].replace(/ 2026$/, '')} ({cityLabel})
+                {flag} {event.name[lang].replace(/ 2026$/, '')} ({cityLabel})
             </div>
         </button>
     );
@@ -861,7 +862,7 @@ export default function ConferencesPage() {
                                     </div>
                                     <h3 className="text-sm font-bold text-gray-900 transition-colors mb-1.5 leading-tight"
                                         style={{ ['--tw-group-hover-color' as string]: cc.color }}>
-                                        {event.name[lang]}
+                                        {flag} {event.name[lang]}
                                     </h3>
                                     <div className="flex items-center gap-3 text-xs text-gray-500">
                                         <span>📅 {formatDateRange(event.startDate, event.endDate, lang)}</span>
