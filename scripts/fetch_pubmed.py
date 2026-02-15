@@ -19,7 +19,9 @@ SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 # Keywords
 KEYWORDS = [
     'botulinum toxin',
-    'Ha filler',
+    'HA filler',
+    'dermal filler',
+    'hyaluronic filler',
     'polynucleotide(PN)',
     'polydeoxyribonucleotide (pdrn)',
     'exosome',
