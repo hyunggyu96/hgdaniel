@@ -102,6 +102,24 @@ const DetailView = ({
                 </div>
             </div>
 
+            {/* Compliance Notes */}
+            {profile.disclaimers && profile.disclaimers.length > 0 && (
+                <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100">
+                    <h3 className="text-sm font-bold text-amber-900 mb-3 flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4" />
+                        Compliance Notes
+                    </h3>
+                    <div className="space-y-2">
+                        {profile.disclaimers.map((note: any, index: number) => (
+                            <div key={index} className="flex gap-2 text-xs md:text-sm text-amber-900/80 leading-relaxed bg-white/50 p-2.5 rounded-lg border border-amber-100/50">
+                                <span className="text-amber-500 font-bold shrink-0">!</span>
+                                <p>{getLocalizedText(language, note)}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {/* Facts Grid */}
             <div className="space-y-4">
                 <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2 pl-1">
@@ -196,26 +214,7 @@ const DetailView = ({
                 </div>
             </div>
 
-            {/* Sources & Compliance */}
-            <div className="grid grid-cols-1 gap-4 pt-4">
-                {/* Compliance Notes */}
-                {profile.disclaimers && profile.disclaimers.length > 0 && (
-                    <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100">
-                        <h3 className="text-sm font-bold text-amber-900 mb-3 flex items-center gap-2">
-                            <AlertTriangle className="w-4 h-4" />
-                            Compliance Notes
-                        </h3>
-                        <div className="space-y-2">
-                            {profile.disclaimers.map((note: any, index: number) => (
-                                <div key={index} className="flex gap-2 text-xs md:text-sm text-amber-900/80 leading-relaxed bg-white/50 p-2.5 rounded-lg border border-amber-100/50">
-                                    <span className="text-amber-500 font-bold shrink-0">!</span>
-                                    <p>{getLocalizedText(language, note)}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-            </div>
+
         </div>
     );
 };
