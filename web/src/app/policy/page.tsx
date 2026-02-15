@@ -6,6 +6,7 @@ import { Scale, Globe, FileText, ExternalLink, AlertTriangle, CheckCircle2, Chev
 import { useLanguage } from "@/components/LanguageContext";
 import { koreaPolicyProfile } from "@/data/korea_policy_profile";
 import { vietnamPolicyProfile } from "@/data/vietnam_policy_profile";
+import { thailandPolicyProfile } from "@/data/thailand_policy_profile";
 import type { LocalizedText, PolicyConfidence } from "@/data/policyTypes";
 
 interface Country {
@@ -30,7 +31,7 @@ const COUNTRIES: Country[] = [
     { id: "tw", nameEn: "Taiwan", nameKo: "Taiwan" },
 ];
 
-const SUPPORTED_COUNTRIES = new Set(["kr", "vn"]);
+const SUPPORTED_COUNTRIES = new Set(["kr", "vn", "th"]);
 
 const getLocalizedText = (language: "ko" | "en", text: LocalizedText): string => {
     if (language === "en") return text.en;
@@ -259,6 +260,7 @@ export default function PolicyPage() {
     const getProfile = (id: string) => {
         if (id === 'kr') return koreaPolicyProfile;
         if (id === 'vn') return vietnamPolicyProfile;
+        if (id === 'th') return thailandPolicyProfile;
         return null;
     };
 
