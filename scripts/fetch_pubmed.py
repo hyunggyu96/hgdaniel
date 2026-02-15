@@ -30,6 +30,10 @@ KEYWORDS = [
     'CaHA'
 ]
 
+KEYWORD_MAPPING = {
+    'hyaluronic filler': 'HA filler'
+}
+
 TARGET_COUNT = 5000
 
 # NCBI E-utilities rate limit settings
@@ -180,7 +184,7 @@ def fetch_details_and_save(supabase: Client, keyword: str, pmids: List[str]):
                     "publication_date": pub_date_str,
                     "journal": journal,
                     "link": link,
-                    "keywords": [keyword]
+                    "keywords": [KEYWORD_MAPPING.get(keyword, keyword)]
                 }
 
                 supabase.table("pubmed_papers").upsert(paper).execute()

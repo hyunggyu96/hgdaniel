@@ -21,7 +21,6 @@ const KEYWORDS = [
     'botulinum toxin',
     'HA filler',
     'dermal filler',
-    'hyaluronic filler',
     'polynucleotide(PN)',
     'polydeoxyribonucleotide (pdrn)',
     'exosome',
