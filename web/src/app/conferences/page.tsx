@@ -264,8 +264,8 @@ function EventBadge({ event, onClick, isSelected }: { event: ConferenceEvent; on
                     backgroundColor: event.bgColor,
                     color: event.color,
                     borderColor: isSelected ? event.borderColor : 'transparent',
-                    ringColor: event.borderColor,
-                }}
+                    ['--tw-ring-color' as string]: event.borderColor,
+                } as React.CSSProperties}
             >
                 {event.name.replace(' 2026', '')}
             </div>
@@ -448,8 +448,8 @@ export default function ConferencesPage() {
                         <button
                             onClick={() => { setBrandFilter('ALL'); setSelectedEvent(null); }}
                             className={`px-4 py-2 rounded-xl text-xs font-bold tracking-wide transition-all duration-200 border ${brandFilter === 'ALL'
-                                    ? 'bg-gray-900 text-white border-gray-900 shadow-lg shadow-gray-900/20'
-                                    : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                                ? 'bg-gray-900 text-white border-gray-900 shadow-lg shadow-gray-900/20'
+                                : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                                 }`}
                         >
                             ALL ({CONFERENCES.length})
@@ -457,8 +457,8 @@ export default function ConferencesPage() {
                         <button
                             onClick={() => { setBrandFilter('IMCAS'); setSelectedEvent(null); }}
                             className={`px-4 py-2 rounded-xl text-xs font-bold tracking-wide transition-all duration-200 border ${brandFilter === 'IMCAS'
-                                    ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/20'
-                                    : 'bg-blue-50 text-blue-700 border-blue-200 hover:border-blue-300 hover:bg-blue-100'
+                                ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/20'
+                                : 'bg-blue-50 text-blue-700 border-blue-200 hover:border-blue-300 hover:bg-blue-100'
                                 }`}
                         >
                             IMCAS ({imcasCount})
@@ -466,8 +466,8 @@ export default function ConferencesPage() {
                         <button
                             onClick={() => { setBrandFilter('AMWC'); setSelectedEvent(null); }}
                             className={`px-4 py-2 rounded-xl text-xs font-bold tracking-wide transition-all duration-200 border ${brandFilter === 'AMWC'
-                                    ? 'bg-pink-600 text-white border-pink-600 shadow-lg shadow-pink-600/20'
-                                    : 'bg-pink-50 text-pink-700 border-pink-200 hover:border-pink-300 hover:bg-pink-100'
+                                ? 'bg-pink-600 text-white border-pink-600 shadow-lg shadow-pink-600/20'
+                                : 'bg-pink-50 text-pink-700 border-pink-200 hover:border-pink-300 hover:bg-pink-100'
                                 }`}
                         >
                             AMWC ({amwcCount})
@@ -559,12 +559,12 @@ export default function ConferencesPage() {
                                     <div className="flex items-center justify-between mb-1">
                                         <span
                                             className={`text-xs sm:text-sm font-bold w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-lg ${today
-                                                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
-                                                    : dayOfWeek === 0
-                                                        ? 'text-red-400'
-                                                        : dayOfWeek === 6
-                                                            ? 'text-blue-400'
-                                                            : 'text-gray-700'
+                                                ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
+                                                : dayOfWeek === 0
+                                                    ? 'text-red-400'
+                                                    : dayOfWeek === 6
+                                                        ? 'text-blue-400'
+                                                        : 'text-gray-700'
                                                 }`}
                                         >
                                             {day}
