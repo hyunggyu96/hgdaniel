@@ -3,19 +3,55 @@ from typing import List, Dict, Any
 from Bio import Entrez
 from supabase import Client
 from app.core.config import settings
+from urllib.error import HTTPError
 
 class PubMedService:
+    MAX_RETRIES = 3
+
     def __init__(self, supabase_client: Client):
         self.supabase = supabase_client
         Entrez.email = settings.PUBMED_EMAIL
         Entrez.api_key = settings.PUBMED_API_KEY
+        Entrez.tool = "AestheticIntelligence"
+        # NCBI E-utilities limit: up to 10 req/sec with key, 3 req/sec without key.
+        self.request_interval = 0.12 if settings.PUBMED_API_KEY else 0.34
+
+    def _safe_api_call(self, func, **kwargs):
+        for attempt in range(self.MAX_RETRIES):
+            try:
+                time.sleep(self.request_interval)
+                handle = func(**kwargs)
+                result = Entrez.read(handle)
+                handle.close()
+                return result
+            except HTTPError as e:
+                if e.code in (429, 503):
+                    wait = self.request_interval * (2 ** (attempt + 1))
+                    print(
+                        f"Rate limited on PubMed API (HTTP {e.code}). "
+                        f"Retrying in {wait:.2f}s ({attempt + 1}/{self.MAX_RETRIES})"
+                    )
+                    time.sleep(wait)
+                    continue
+                print(f"PubMed API HTTP error {e.code}: {e}")
+                return None
+            except Exception as e:
+                wait = self.request_interval * (2 ** (attempt + 1))
+                print(
+                    f"PubMed API error: {e}. "
+                    f"Retrying in {wait:.2f}s ({attempt + 1}/{self.MAX_RETRIES})"
+                )
+                time.sleep(wait)
+        return None
 
     def fetch_pubmed_ids(self, keyword: str, max_results: int = 100) -> List[str]:
         try:
-            handle = Entrez.esearch(db="pubmed", term=keyword, retmax=max_results, sort="date")
-            record = Entrez.read(handle)
-            handle.close()
-            return record["IdList"]
+            record = self._safe_api_call(
+                Entrez.esearch, db="pubmed", term=keyword, retmax=max_results, sort="date"
+            )
+            if not record:
+                return []
+            return record.get("IdList", [])
         except Exception as e:
             print(f"Error searching '{keyword}': {e}")
             return []
@@ -30,9 +66,11 @@ class PubMedService:
         for i in range(0, total, chunk_size):
             chunk = pmids[i:i+chunk_size]
             try:
-                handle = Entrez.efetch(db="pubmed", id=",".join(chunk), retmode="xml")
-                records = Entrez.read(handle)
-                handle.close()
+                records = self._safe_api_call(
+                    Entrez.efetch, db="pubmed", id=",".join(chunk), retmode="xml"
+                )
+                if not records:
+                    continue
 
                 papers_to_upsert = []
                 # Entrez returns a list of PubmedArticle or PubmedBookArticle
@@ -103,12 +141,10 @@ class PubMedService:
                          self.supabase.table("pubmed_papers").upsert(p).execute()
                     except Exception as e:
                         print(f"Error upserting {p['id']}: {e}")
-                
-                time.sleep(0.4) # Rate limit respect
 
             except Exception as e:
                 print(f"Error fetching details for chunk {i}: {e}")
-                time.sleep(1)
+                time.sleep(max(1, self.request_interval * 4))
 
     def trigger_fetch(self, keywords: List[str], max_results: int = 100):
         # This could be made async or run in background tasks
