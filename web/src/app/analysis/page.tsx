@@ -557,53 +557,6 @@ export default function AnalysisPage() {
                                         </tbody>
                                     </table>
                                 </div>
-                                {/* Revenue Chart */}
-                                {(() => {
-                                    const chartData = [...YEARS].reverse().map(year => {
-                                        const yearData = result.financial_history[year];
-                                        const rev = yearData?.revenue;
-                                        const op = yearData?.operating_profit;
-                                        const parseEok = (v: string | undefined) => {
-                                            if (!v || v === 'N/A' || v === '-') return 0;
-                                            const n = parseFloat(v);
-                                            return isNaN(n) ? 0 : Math.round(n / 1e8);
-                                        };
-                                        return {
-                                            year,
-                                            매출액: parseEok(rev),
-                                            영업이익: parseEok(op),
-                                        };
-                                    });
-                                    const hasData = chartData.some(d => d.매출액 > 0 || d.영업이익 > 0);
-                                    if (!hasData) return null;
-
-                                    return (
-                                        <div className="mt-6 pt-4 border-t border-gray-100">
-                                            <ResponsiveContainer width="100%" height={220}>
-                                                <BarChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
-                                                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                                    <XAxis dataKey="year" tick={{ fontSize: 12, fill: '#6b7280' }} />
-                                                    <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} tickFormatter={(v) => v >= 10000 ? `${(v / 10000).toFixed(1)}조` : `${v.toLocaleString()}억`} width={60} />
-                                                    <Tooltip
-                                                        formatter={(value: number, name: string) => {
-                                                            if (value === 0) return ['-', name];
-                                                            const jo = Math.floor(value / 10000);
-                                                            const eok = value % 10000;
-                                                            let formatted = '';
-                                                            if (jo > 0) formatted += `${jo}조 `;
-                                                            if (eok > 0) formatted += `${eok.toLocaleString()}억`;
-                                                            return [formatted.trim() || '0', name];
-                                                        }}
-                                                        contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e5e7eb' }}
-                                                    />
-                                                    <Legend wrapperStyle={{ fontSize: 12 }} />
-                                                    <Bar dataKey="매출액" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                                                    <Bar dataKey="영업이익" fill="#10b981" radius={[4, 4, 0, 0]} />
-                                                </BarChart>
-                                            </ResponsiveContainer>
-                                        </div>
-                                    );
-                                })()}
                                 </>
                             ) : (
                                 <Text>No financial history available</Text>
