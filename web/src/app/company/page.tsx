@@ -4,32 +4,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { API_ENDPOINTS } from '@/lib/apiConfig';
 import { useLanguage } from "@/components/LanguageContext";
-import { Building2, Globe, TrendingUp, Search, BarChart3, PieChart } from "lucide-react";
+import { Building2, Globe, Search, BarChart3, PieChart } from "lucide-react";
 
 const financialData: Record<string, any> = require('@/data/financial_data.json');
 
-const REVENUE_YEARS = ['2025', '2024', '2023', '2022'] as const;
-
-function getLatestRevenue(companyName: string): { value: string; year: string } | null {
-    const data = financialData[companyName];
-    if (!data?.financial_history) return null;
-    for (const y of REVENUE_YEARS) {
-        const rev = data.financial_history[y]?.revenue;
-        if (rev && rev !== 'N/A' && rev !== '-' && rev !== '') {
-            const num = parseFloat(rev);
-            if (isNaN(num)) continue;
-            const eok = Math.round(num / 1e8);
-            if (eok === 0) continue;
-            const jo = Math.floor(eok / 10000);
-            const remainder = eok % 10000;
-            let formatted = '';
-            if (jo > 0) formatted += `${jo}조 `;
-            if (remainder > 0) formatted += `${remainder.toLocaleString()}억`;
-            return { value: formatted.trim(), year: y };
-        }
-    }
-    return null;
-}
+// revenue logic removed for compactness
 
 type CompanyStatus = 'KOSPI' | 'KOSDAQ' | 'Unlisted' | 'Global_Listed' | 'Global_Private';
 type CompanyCategory = 'korean' | 'global';
@@ -226,16 +205,16 @@ export default function CompanyPage() {
                         const rank = rankings[companyNameKo];
                         const isHighlight = rank && rank <= 3;
                         const displayName = item.name[lang];
-                        const revenue = getLatestRevenue(companyNameKo);
+
 
                         return (
                             <div
                                 key={item.id}
                                 onClick={() => router.push(`/analysis?company=${companyNameKo}`)}
-                                className={`group relative bg-white rounded-2xl p-5 border transition-all duration-300 cursor-pointer flex flex-col items-center justify-center gap-4 min-h-[140px]
+                                className={`group relative bg-white rounded-xl p-4 border transition-all duration-300 cursor-pointer flex flex-col items-center justify-center gap-2 hover:bg-gray-50/50
                                 ${isHighlight
                                         ? 'border-violet-100 ring-2 ring-violet-500/20 shadow-lg shadow-violet-500/10'
-                                        : 'border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-blue-100'}
+                                        : 'border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-blue-100'}
                                 `}
                             >
                                 {/* Highlight Effect */}
@@ -248,32 +227,14 @@ export default function CompanyPage() {
                                     </div>
                                 )}
 
-                                {/* Initials / Logo Placeholder */}
-                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold shadow-inner ${isHighlight
-                                    ? 'bg-gradient-to-br from-violet-500 to-fuchsia-600 text-white'
-                                    : 'bg-gray-50 text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors'
-                                    }`}>
-                                    {displayName.slice(0, 1)}
-                                </div>
-
-                                <div className="text-center space-y-2 w-full">
-                                    <h3 className={`text-base font-bold truncate px-2 ${isHighlight ? 'text-violet-900' : 'text-gray-800 group-hover:text-blue-700 transition-colors'}`}>
+                                {/* Compact Content */}
+                                <div className="text-center w-full space-y-2">
+                                    <h3 className={`text-base font-bold truncate px-2 ${displayName.length > 8 ? 'text-sm' : ''} ${isHighlight ? 'text-violet-900' : 'text-gray-900 group-hover:text-blue-700 transition-colors'}`}>
                                         {displayName}
                                     </h3>
                                     <div className="flex justify-center">
                                         <StatusBadge status={item.status} lang={lang} />
                                     </div>
-                                    {revenue ? (
-                                        <div className="flex items-center justify-center gap-1 pt-1">
-                                            <TrendingUp className="w-3 h-3 text-emerald-500" />
-                                            <span className="text-xs font-bold text-emerald-600">{revenue.value}</span>
-                                            <span className="text-[10px] text-gray-400">({revenue.year})</span>
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center justify-center gap-1 pt-1">
-                                            <span className="text-[10px] text-gray-300">{lang === 'ko' ? '매출 미공시' : 'N/A'}</span>
-                                        </div>
-                                    )}
                                 </div>
 
                                 {isHighlight && (
