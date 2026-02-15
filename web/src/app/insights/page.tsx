@@ -37,6 +37,7 @@ export default function InsightsPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
 
     const fetchPapers = useCallback(async (targetPage: number) => {
         setLoading(true);
@@ -57,6 +58,7 @@ export default function InsightsPage() {
 
             setPapers(result.data || []);
             setTotalPages(result.pagination?.totalPages || 1);
+            setTotalCount(result.pagination?.total || 0);
         } catch (err) {
             console.error("Failed to fetch papers:", err);
             setError(t('insights_error'));
@@ -95,7 +97,7 @@ export default function InsightsPage() {
                             {t('insights_title')}
                         </Title>
                         <Text className="text-gray-500 mt-1">
-                            {t('insights_desc')}
+                            {t('insights_total_papers').replace('{count}', totalCount.toLocaleString())}
                         </Text>
                     </div>
                 </div>
