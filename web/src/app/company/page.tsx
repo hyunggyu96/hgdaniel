@@ -1,10 +1,10 @@
 'use client';
 
-import { Card, Text } from "@tremor/react";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { API_ENDPOINTS } from '@/lib/apiConfig';
 import { useLanguage } from "@/components/LanguageContext";
+import { Building2, Globe, TrendingUp, Search, BarChart3, PieChart } from "lucide-react";
 
 type CompanyStatus = 'KOSPI' | 'KOSDAQ' | 'Unlisted' | 'Global_Listed' | 'Global_Private';
 type CompanyCategory = 'korean' | 'global';
@@ -56,21 +56,23 @@ const allCompanies: CompanyData[] = [
 ];
 
 const StatusBadge = ({ status, lang }: { status: CompanyStatus; lang: string }) => {
-    const commonClasses = "absolute top-3 left-3 text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wide uppercase";
-    switch (status) {
-        case 'KOSPI':
-            return <span className={`${commonClasses} bg-blue-100 text-blue-700 border border-blue-200`}>KOSPI</span>;
-        case 'KOSDAQ':
-            return <span className={`${commonClasses} bg-teal-100 text-teal-700 border border-teal-200`}>KOSDAQ</span>;
-        case 'Unlisted':
-            return <span className={`${commonClasses} bg-gray-100 text-gray-500 border border-gray-200`}>{lang === 'ko' ? '비상장' : 'Unlisted'}</span>;
-        case 'Global_Listed':
-            return <span className={`${commonClasses} bg-violet-100 text-violet-700 border border-violet-200`}>Listed</span>;
-        case 'Global_Private':
-            return <span className={`${commonClasses} bg-gray-100 text-gray-500 border border-gray-200`}>Private</span>;
-        default:
-            return null;
-    }
+    // Minimal Dot Style Badge
+    const config = {
+        'KOSPI': { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-100', dot: 'bg-blue-500', label: 'KOSPI' },
+        'KOSDAQ': { bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-100', dot: 'bg-indigo-500', label: 'KOSDAQ' },
+        'Unlisted': { bg: 'bg-gray-50', text: 'text-gray-500', border: 'border-gray-100', dot: 'bg-gray-400', label: lang === 'ko' ? '비상장' : 'Unlisted' },
+        'Global_Listed': { bg: 'bg-violet-50', text: 'text-violet-700', border: 'border-violet-100', dot: 'bg-violet-500', label: 'Listed' },
+        'Global_Private': { bg: 'bg-gray-50', text: 'text-gray-500', border: 'border-gray-100', dot: 'bg-gray-400', label: 'Private' }
+    }[status];
+
+    if (!config) return null;
+
+    return (
+        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border ${config.bg} ${config.text} ${config.border} shadow-sm`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
+            {config.label}
+        </span>
+    );
 };
 
 export default function CompanyPage() {
@@ -79,19 +81,16 @@ export default function CompanyPage() {
     const { language, t } = useLanguage();
     const lang = language as 'ko' | 'en';
     const [rankings, setRankings] = useState<Record<string, number>>({});
+    const [searchQuery, setSearchQuery] = useState("");
 
-    // Initialize state from URL param, default to 'korean'
-    // Using simple initialization; useEffect will handle sync
     const initialCategory = searchParams?.get('tab') === 'global' ? 'global' : 'korean';
     const [activeCategory, setActiveCategory] = useState<'korean' | 'global'>(initialCategory);
 
-    // Sync state if URL changes (e.g. back button)
     useEffect(() => {
         const tab = searchParams?.get('tab');
         if (tab === 'global' && activeCategory !== 'global') {
             setActiveCategory('global');
         } else if (tab !== 'global' && activeCategory !== 'korean') {
-            // If tab is missing or 'korean', switch to korean
             setActiveCategory('korean');
         }
     }, [searchParams, activeCategory]);
@@ -108,94 +107,152 @@ export default function CompanyPage() {
             .catch(err => console.error(err));
     }, []);
 
-    // Filter companies by category
     const filteredCompanies = allCompanies
-        .filter(company => company.category === activeCategory)
+        .filter(company =>
+            company.category === activeCategory &&
+            (searchQuery === "" ||
+                company.name.en.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                company.name.ko.includes(searchQuery))
+        )
         .sort((a, b) => a.name[lang].localeCompare(b.name[lang], lang === 'ko' ? 'ko' : 'en'));
 
-    // Count for tabs
     const koreanCount = allCompanies.filter(c => c.category === 'korean').length;
     const globalCount = allCompanies.filter(c => c.category === 'global').length;
 
     return (
-        <main className="min-h-screen bg-gray-50 p-6 md:p-12">
+        <main className="min-h-screen bg-gray-50/50 p-6 md:p-12 pb-24">
             <div className="max-w-6xl mx-auto space-y-8">
-                {/* Header */}
-                <div className="flex flex-col gap-2">
-                    <Text className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
-                        {t('company_header')}
-                    </Text>
-                    <Text className="text-gray-500">
-                        {t('company_desc')}
-                    </Text>
+
+                {/* Premium Header */}
+                <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-xl animate-fade-in">
+                    <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-6 p-8 md:p-10">
+                        <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-inner shrink-0">
+                            <Building2 className="w-10 h-10 text-blue-200" />
+                        </div>
+                        <div className="flex-1 space-y-2">
+                            <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-white">
+                                {t('company_header')}
+                            </h2>
+                            <p className="text-slate-300 md:text-lg max-w-2xl font-light">
+                                {t('company_desc')}
+                            </p>
+                            <div className="flex flex-wrap gap-3 pt-2">
+                                <span className="px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-100 text-xs font-semibold backdrop-blur-sm flex items-center gap-1.5">
+                                    <BarChart3 className="w-3.5 h-3.5" />
+                                    {allCompanies.length} Companies Tracked
+                                </span>
+                                <span className="px-3 py-1 rounded-full bg-violet-500/20 border border-violet-400/30 text-violet-100 text-xs font-semibold backdrop-blur-sm flex items-center gap-1.5">
+                                    <Globe className="w-3.5 h-3.5" />
+                                    Global & Local Leaders
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {/* Decorative Elements */}
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
                 </div>
 
-                {/* Category Tabs */}
-                <div className="flex gap-2 border-b border-gray-200">
-                    <button
-                        onClick={() => handleCategoryChange('korean')}
-                        className={`px-6 py-3 font-semibold transition-all border-b-2 ${activeCategory === 'korean'
-                            ? 'border-blue-600 text-blue-600'
-                            : 'border-transparent text-gray-500 hover:text-gray-700'
-                            }`}
-                    >
-                        {lang === 'ko' ? `🇰🇷 한국 기업 (${koreanCount})` : `🇰🇷 Korean Companies (${koreanCount})`}
-                    </button>
-                    <button
-                        onClick={() => handleCategoryChange('global')}
-                        className={`px-6 py-3 font-semibold transition-all border-b-2 ${activeCategory === 'global'
-                            ? 'border-blue-600 text-blue-600'
-                            : 'border-transparent text-gray-500 hover:text-gray-700'
-                            }`}
-                    >
-                        {lang === 'ko' ? `🌍 글로벌 기업 (${globalCount})` : `🌍 Global Companies (${globalCount})`}
-                    </button>
+                {/* Controls: Tabs & Search */}
+                <div className="flex flex-col md:flex-row gap-4 items-center justify-between sticky top-4 z-20">
+                    {/* Segmented Tab Control */}
+                    <div className="bg-white/80 backdrop-blur-md p-1.5 rounded-xl border border-white/50 shadow-sm ring-1 ring-gray-200/50 flex w-full md:w-auto">
+                        <button
+                            onClick={() => handleCategoryChange('korean')}
+                            className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2 ${activeCategory === 'korean'
+                                    ? 'bg-white text-blue-600 shadow-md ring-1 ring-gray-100'
+                                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                                }`}
+                        >
+                            <span>🇰🇷</span>
+                            {lang === 'ko' ? `한국 기업 (${koreanCount})` : `Korean (${koreanCount})`}
+                        </button>
+                        <button
+                            onClick={() => handleCategoryChange('global')}
+                            className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2 ${activeCategory === 'global'
+                                    ? 'bg-white text-blue-600 shadow-md ring-1 ring-gray-100'
+                                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                                }`}
+                        >
+                            <span>🌍</span>
+                            {lang === 'ko' ? `글로벌 기업 (${globalCount})` : `Global (${globalCount})`}
+                        </button>
+                    </div>
+
+                    {/* Search Bar */}
+                    <div className="relative w-full md:w-64 group bg-white/80 backdrop-blur-md rounded-xl shadow-sm border border-white/50 ring-1 ring-gray-200/50">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Search className="h-4 w-4 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                        </div>
+                        <input
+                            type="text"
+                            className="block w-full pl-10 pr-3 py-2.5 bg-transparent border-none rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                            placeholder={lang === 'ko' ? "기업명 검색..." : "Search companies..."}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
                 </div>
 
                 {/* Company Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                     {filteredCompanies.map((item) => {
-                        // Use Korean name for routing and ranking key to maintain consistent API logic
                         const companyNameKo = item.name.ko;
                         const rank = rankings[companyNameKo];
                         const isHighlight = rank && rank <= 3;
-                        const isGlobal = activeCategory === 'global';
-                        // Use language-specific name for display
                         const displayName = item.name[lang];
 
                         return (
-                            <Card
+                            <div
                                 key={item.id}
-                                className={`relative cursor-pointer transition-all text-center flex items-center justify-center min-h-[100px] overflow-visible rounded-xl group
-                                hover:shadow-lg hover:-translate-y-1 hover:ring-2 hover:ring-blue-100 bg-white
-                                ${isHighlight ? 'border border-purple-200 shadow-[0_0_15px_rgba(168,85,247,0.3)]' : 'border border-gray-200 shadow-sm'}
-                                ${isGlobal ? 'bg-gradient-to-br from-blue-50 to-indigo-50' : ''}
-                            `}
                                 onClick={() => router.push(`/analysis?company=${companyNameKo}`)}
+                                className={`group relative bg-white rounded-2xl p-5 border transition-all duration-300 cursor-pointer flex flex-col items-center justify-center gap-4 min-h-[140px]
+                                ${isHighlight
+                                        ? 'border-violet-100 ring-2 ring-violet-500/20 shadow-lg shadow-violet-500/10'
+                                        : 'border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-blue-100'}
+                                `}
                             >
-                                {/* Pulsing Border Effect for Highlights */}
+                                {/* Highlight Effect */}
                                 {isHighlight && (
-                                    <div className="absolute inset-0 rounded-xl border-2 border-purple-500 animate-pulse pointer-events-none z-10"></div>
-                                )}
-
-                                {/* Global Badge */}
-                                {isGlobal && (
-                                    <div className="absolute top-2 right-2 flex gap-1">
-                                        <div className="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full font-semibold">
-                                            Global
-                                        </div>
+                                    <div className="absolute top-2 right-2">
+                                        <span className="flex h-2 w-2">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-500"></span>
+                                        </span>
                                     </div>
                                 )}
 
-                                <StatusBadge status={item.status} lang={lang} />
+                                {/* Initials / Logo Placeholder */}
+                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold shadow-inner ${isHighlight
+                                        ? 'bg-gradient-to-br from-violet-500 to-fuchsia-600 text-white'
+                                        : 'bg-gray-50 text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors'
+                                    }`}>
+                                    {displayName.slice(0, 1)}
+                                </div>
 
-                                <Text className={`text-lg font-medium ${isHighlight ? 'text-purple-700 font-bold' : 'text-foreground'}`}>
-                                    {displayName}
-                                </Text>
-                            </Card>
+                                <div className="text-center space-y-2 w-full">
+                                    <h3 className={`text-base font-bold truncate px-2 ${isHighlight ? 'text-violet-900' : 'text-gray-800 group-hover:text-blue-700 transition-colors'}`}>
+                                        {displayName}
+                                    </h3>
+                                    <div className="flex justify-center">
+                                        <StatusBadge status={item.status} lang={lang} />
+                                    </div>
+                                </div>
+
+                                {isHighlight && (
+                                    <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-violet-500/20 pointer-events-none" />
+                                )}
+                            </div>
                         );
                     })}
                 </div>
+
+                {filteredCompanies.length === 0 && (
+                    <div className="text-center py-20 text-gray-400">
+                        <Globe className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                        <p>{lang === 'ko' ? "검색 결과가 없습니다." : "No companies found."}</p>
+                    </div>
+                )}
             </div>
         </main>
     );
