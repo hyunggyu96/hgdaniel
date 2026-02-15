@@ -770,14 +770,16 @@ export default function ConferencesPage() {
                                 const isActive = countryFilter === c;
                                 const count = CONFERENCES.filter((conf) => conf.country[lang] === c).length;
                                 const flag = COUNTRY_FLAGS[c] || '🌐';
+                                const cc = getCountryColor(c);
                                 return (
                                     <button
                                         key={c}
                                         onClick={() => { setCountryFilter(isActive ? 'ALL' : c); setSelectedEvent(null); }}
-                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide transition-all duration-200 border ${isActive
-                                            ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-600/20'
-                                            : 'bg-blue-50 text-blue-700 border-blue-200 hover:border-blue-300 hover:bg-blue-100'
-                                            }`}
+                                        className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wide transition-all duration-200 border ${isActive ? 'shadow-md scale-[1.02]' : 'hover:scale-[1.02]'}`}
+                                        style={isActive
+                                            ? { backgroundColor: cc.color, color: '#fff', borderColor: cc.color }
+                                            : { backgroundColor: cc.bgColor, color: cc.color, borderColor: cc.borderColor }
+                                        }
                                     >
                                         {flag} {c} ({count})
                                     </button>
