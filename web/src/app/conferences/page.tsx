@@ -670,30 +670,30 @@ export default function ConferencesPage() {
 
     return (
         <main className="min-h-screen bg-gray-50/50 p-6 md:p-12 pb-24">
-            <div className="max-w-[1400px] mx-auto space-y-8">
+            <div className="max-w-7xl mx-auto space-y-6">
 
-                {/* Premium Header */}
-                <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-900 to-indigo-900 text-white shadow-xl animate-fade-in">
-                    <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-6 p-8 md:p-10">
-                        <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-inner shrink-0">
-                            <Globe className="w-10 h-10 text-cyan-200" />
+                {/* Premium Header Compact */}
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-900 to-indigo-900 text-white shadow-lg animate-fade-in">
+                    <div className="relative z-10 flex flex-col md:flex-row items-center gap-5 px-6 py-5 md:px-8 md:py-6">
+                        <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-inner shrink-0">
+                            <Globe className="w-7 h-7 text-cyan-200" />
                         </div>
-                        <div className="flex-1 space-y-2">
-                            <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-white">
+                        <div className="flex-1 space-y-1">
+                            <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white">
                                 Global Conferences
                             </h2>
-                            <p className="text-blue-100 md:text-lg max-w-2xl font-light">
+                            <p className="text-blue-100 text-sm md:text-base font-light">
                                 {lang === 'ko'
                                     ? `2026년 주요 글로벌 미용의학 컨퍼런스 일정`
                                     : `2026 Global Aesthetic Medicine Conferences`}
                             </p>
-                            <div className="flex flex-wrap gap-3 pt-2">
-                                <span className="px-3 py-1 rounded-full bg-cyan-500/20 border border-cyan-400/30 text-cyan-100 text-xs font-semibold backdrop-blur-sm flex items-center gap-1.5">
-                                    <CalendarIcon className="w-3.5 h-3.5" />
+                            <div className="flex flex-wrap items-center gap-2 pt-1">
+                                <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/30 text-cyan-100 text-[10px] font-semibold backdrop-blur-sm flex items-center gap-1">
+                                    <CalendarIcon className="w-3 h-3" />
                                     {CONFERENCES.length} Events
                                 </span>
-                                <span className="px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-100 text-xs font-semibold backdrop-blur-sm flex items-center gap-1.5">
-                                    <Globe className="w-3.5 h-3.5" />
+                                <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-100 text-[10px] font-semibold backdrop-blur-sm flex items-center gap-1">
+                                    <Globe className="w-3 h-3" />
                                     {ALL_COUNTRIES_EN.length} Countries
                                 </span>
                             </div>

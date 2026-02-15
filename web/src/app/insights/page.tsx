@@ -19,7 +19,9 @@ interface Paper {
 
 const KEYWORDS = [
     'botulinum toxin',
-    'Ha filler',
+    'HA filler',
+    'dermal filler',
+    'hyaluronic filler',
     'polynucleotide(PN)',
     'polydeoxyribonucleotide (pdrn)',
     'exosome',
@@ -90,26 +92,26 @@ export default function InsightsPage() {
 
     return (
         <main className="min-h-screen bg-gray-50/50 p-6 md:p-12 pb-24">
-            <div className="max-w-5xl mx-auto space-y-8">
+            <div className="max-w-7xl mx-auto space-y-6">
 
                 {/* Premium Header */}
-                <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-900 to-slate-900 text-white shadow-xl animate-fade-in">
-                    <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-6 p-8 md:p-10">
-                        <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-inner shrink-0">
-                            <GraduationCap className="w-10 h-10 text-blue-200" />
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-900 to-slate-900 text-white shadow-lg animate-fade-in">
+                    <div className="relative z-10 flex flex-col md:flex-row items-center gap-5 px-6 py-5 md:px-8 md:py-6">
+                        <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-inner shrink-0">
+                            <GraduationCap className="w-7 h-7 text-blue-200" />
                         </div>
-                        <div className="flex-1 space-y-2">
-                            <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-white">
+                        <div className="flex-1 space-y-1">
+                            <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white">
                                 {t('insights_title')}
                             </h2>
-                            <p className="text-indigo-100 md:text-lg max-w-2xl font-light leading-relaxed">
+                            <p className="text-indigo-100 text-sm md:text-base font-light leading-relaxed">
                                 {t('insights_desc')}
                             </p>
-                            <div className="flex items-center gap-3 pt-2">
-                                <span className="px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-100 text-xs font-semibold backdrop-blur-sm">
+                            <div className="flex items-center gap-2 pt-1">
+                                <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-100 text-[10px] font-semibold backdrop-blur-sm">
                                     {totalCount.toLocaleString()} Papers Indexed
                                 </span>
-                                <span className="text-xs text-indigo-300">
+                                <span className="text-[10px] text-indigo-300">
                                     updated daily
                                 </span>
                             </div>
@@ -151,8 +153,8 @@ export default function InsightsPage() {
                             <button
                                 onClick={() => setSelectedKeyword("")}
                                 className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${selectedKeyword === ""
-                                        ? 'bg-slate-800 text-white shadow-md scale-105'
-                                        : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                                    ? 'bg-slate-800 text-white shadow-md scale-105'
+                                    : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                                     }`}
                             >
                                 {t('insights_all_topics')}
@@ -162,8 +164,8 @@ export default function InsightsPage() {
                                     key={kw}
                                     onClick={() => setSelectedKeyword(kw)}
                                     className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 capitalize ${selectedKeyword === kw
-                                            ? 'bg-blue-600 text-white shadow-md scale-105 border-transparent'
-                                            : 'bg-white text-gray-600 border border-gray-200 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50/30'
+                                        ? 'bg-blue-600 text-white shadow-md scale-105 border-transparent'
+                                        : 'bg-white text-gray-600 border border-gray-200 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50/30'
                                         }`}
                                 >
                                     {kw}
