@@ -1,6 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
-import * as Sentry from "@sentry/nextjs";
 import { CATEGORIES_CONFIG } from '@/lib/constants';
 
 // Trends API: 실시간 반영을 위해 캐싱 제거
@@ -113,7 +112,6 @@ export async function GET() {
         });
     } catch (e: any) {
         console.error("Trend API Error:", e);
-        Sentry.captureException(e);
         return NextResponse.json({ error: e.message }, { status: 500 });
     }
 }
