@@ -83,26 +83,26 @@ export default function CompetitorTable({ data }: CompetitorTableProps) {
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
                     <thead>
                         <tr>
-                            <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase bg-gray-50 dark:bg-gray-800">업체명</th>
-                            <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase bg-gray-50 dark:bg-gray-800">제품명</th>
-                            <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase bg-gray-50 dark:bg-gray-800">등급</th>
-                            <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase bg-gray-50 dark:bg-gray-800">상태</th>
-                            <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase bg-gray-50 dark:bg-gray-800">허가일자</th>
+                            <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase bg-gray-50 dark:bg-gray-800/50">업체명</th>
+                            <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase bg-gray-50 dark:bg-gray-800/50">제품명</th>
+                            <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase bg-gray-50 dark:bg-gray-800/50">등급</th>
+                            <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase bg-gray-50 dark:bg-gray-800/50">상태</th>
+                            <th className="px-4 py-3 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase bg-gray-50 dark:bg-gray-800/50">허가일자</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-100 dark:divide-gray-800">
                         {currentData.length > 0 ? (
                             currentData.map((item, idx) => (
-                                <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                                <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800/50 last:border-0">
                                     <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-100">{item.ENTP_NAME}</td>
-                                    <td className="px-4 py-3 text-sm text-gray-600 truncate max-w-[150px]" title={item.PRDLST_NM}>{item.PRDLST_NM}</td>
+                                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300 truncate max-w-[150px]" title={item.PRDLST_NM}>{item.PRDLST_NM}</td>
                                     <td className="px-4 py-3 text-sm text-center">
                                         <Badge size="xs" color="gray">{item.GRADE || '4'}</Badge>
                                     </td>
                                     <td className="px-4 py-3 text-sm text-center">
                                         {getStatusBadge(item)}
                                     </td>
-                                    <td className="px-4 py-3 text-sm text-center text-gray-500 font-mono">
+                                    <td className="px-4 py-3 text-sm text-center text-gray-500 dark:text-gray-400 font-mono">
                                         {formatDate(item.PRMSN_DT)}
                                     </td>
                                 </tr>
@@ -124,17 +124,17 @@ export default function CompetitorTable({ data }: CompetitorTableProps) {
                     <button
                         onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                         disabled={currentPage === 1}
-                        className="px-2 py-1 text-xs border dark:border-gray-700 rounded hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50"
+                        className="px-2 py-1 text-xs border border-gray-200 dark:border-gray-700 rounded text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Prev
                     </button>
-                    <span className="text-xs flex items-center text-gray-500">
+                    <span className="text-xs flex items-center text-gray-500 dark:text-gray-400 font-mono">
                         {currentPage} / {totalPages}
                     </span>
                     <button
                         onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                         disabled={currentPage === totalPages}
-                        className="px-2 py-1 text-xs border dark:border-gray-700 rounded hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50"
+                        className="px-2 py-1 text-xs border border-gray-200 dark:border-gray-700 rounded text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Next
                     </button>

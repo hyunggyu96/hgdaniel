@@ -192,8 +192,8 @@ const DetailView = ({
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
                                 className={`flex items-center gap-2 px-4 py-3 text-sm font-bold border-b-2 transition-all ${activeTab === tab
-                                    ? "border-blue-600 text-blue-600 bg-blue-50/50"
-                                    : "border-transparent text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                                    ? "border-blue-600 text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10"
+                                    : "border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50"
                                     } rounded-t-lg`}
                             >
                                 {getTabIcon(tab)}
@@ -245,7 +245,7 @@ const DetailView = ({
                                         {item.title}
                                     </h4>
 
-                                    <p className="text-xs md:text-sm text-gray-600 leading-relaxed line-clamp-2 group-hover:line-clamp-none transition-all">
+                                    <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2 group-hover:line-clamp-none transition-all">
                                         {getLocalizedText(language, item.summary)}
                                     </p>
                                 </div>
@@ -254,7 +254,7 @@ const DetailView = ({
                                     href={item.sourceUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="hidden md:flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-400 hover:bg-indigo-50 hover:text-indigo-600 transition-all shrink-0 border border-gray-100"
+                                    className="hidden md:flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all shrink-0 border border-gray-100 dark:border-gray-600"
                                     title="View Source"
                                 >
                                     <ExternalLink className="w-4 h-4" />
@@ -272,18 +272,18 @@ const DetailView = ({
 const FactCard = ({ fact, language }: { fact: CountryPolicyFact; language: "ko" | "en" }) => (
     <div className="group relative bg-gray-50/50 dark:bg-gray-800/50 rounded-xl p-5 border border-gray-100 dark:border-gray-700 hover:border-blue-200 hover:bg-blue-50/30 dark:hover:bg-blue-900/20 transition-all duration-300">
         <div className="flex justify-between items-start mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-500 group-hover:text-blue-600 transition-colors">
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                 {getLocalizedText(language, fact.label)}
             </span>
             <ConfidenceIndicator level={fact.confidence} />
         </div>
 
-        <p className="text-sm md:text-base text-gray-800 font-medium leading-relaxed whitespace-pre-line mb-3">
+        <p className="text-sm md:text-base text-gray-800 dark:text-gray-200 font-medium leading-relaxed whitespace-pre-line mb-3">
             {getLocalizedText(language, fact.value)}
         </p>
 
         {fact.note && (
-            <div className="mb-3 p-2.5 bg-white rounded-lg text-xs list-disc list-inside text-gray-500 leading-normal border border-gray-200/50">
+            <div className="mb-3 p-2.5 bg-white dark:bg-gray-900 rounded-lg text-xs list-disc list-inside text-gray-500 dark:text-gray-400 leading-normal border border-gray-200/50 dark:border-gray-700">
                 {getLocalizedText(language, fact.note)}
             </div>
         )}

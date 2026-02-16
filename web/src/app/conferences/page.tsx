@@ -410,9 +410,9 @@ function EventDetailPanel({ event, onClose, lang }: {
     const statusStyle = isOngoing ? 'bg-emerald-100 text-emerald-700' : isPast ? 'bg-gray-100 text-gray-500' : 'bg-amber-50 text-amber-600';
 
     return (
-        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-xl border border-gray-200 dark:border-gray-800 ring-1 ring-black/5 p-6 animate-fade-in-down mb-8">
+        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-xl border border-gray-200 dark:border-gray-700 ring-1 ring-black/5 p-6 animate-fade-in-down mb-8">
             <div
-                className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/20 to-purple-500/20 blur-3xl rounded-full -translate-y-1/3 translate-x-1/3 pointer-events-none"
+                className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/20 to-purple-500/20 blur-3xl rounded-full -translate-y-1/3 translate-x-1/3 pointer-events-none opacity-50 dark:opacity-30"
                 style={{ background: `radial-gradient(circle, ${cc.color}20 0%, transparent 70%)` }}
             />
 
@@ -427,7 +427,7 @@ function EventDetailPanel({ event, onClose, lang }: {
                             {statusLabel[lang]}
                         </span>
                         {!event.confirmed && (
-                            <span className="text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full bg-orange-50 text-orange-500 border border-orange-100">
+                            <span className="text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 border border-orange-100 dark:border-orange-800/50">
                                 {lang === 'ko' ? '미확정' : 'TBC'}
                             </span>
                         )}
@@ -468,7 +468,7 @@ function EventDetailPanel({ event, onClose, lang }: {
                         </div>
                         <div>
                             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{lang === 'ko' ? '일정' : 'Date'}</p>
-                            <p className="text-sm font-semibold text-gray-800">{formatDateRange(event.startDate, event.endDate, lang)}</p>
+                            <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{formatDateRange(event.startDate, event.endDate, lang)}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -479,7 +479,7 @@ function EventDetailPanel({ event, onClose, lang }: {
                             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{lang === 'ko' ? '위치' : 'Location'}</p>
                             <div className="flex items-center gap-1.5">
                                 <FlagIcon country={event.country[lang]} size={16} />
-                                <p className="text-sm font-semibold text-gray-800">{event.city[lang]}, {event.country[lang]}</p>
+                                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{event.city[lang]}, {event.country[lang]}</p>
                             </div>
                         </div>
                     </div>
@@ -489,7 +489,7 @@ function EventDetailPanel({ event, onClose, lang }: {
                         </div>
                         <div>
                             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{lang === 'ko' ? '장소' : 'Venue'}</p>
-                            <p className="text-sm font-semibold text-gray-800">{event.venue}</p>
+                            <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{event.venue}</p>
                         </div>
                     </div>
                 </div>
@@ -509,9 +509,9 @@ function EmbeddedEventDetailPanel({ event, lang }: {
     const statusStyle = isOngoing ? 'bg-emerald-100 text-emerald-700' : isPast ? 'bg-gray-100 text-gray-500' : 'bg-amber-50 text-amber-600';
 
     return (
-        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-lg border border-gray-200 dark:border-gray-800 ring-1 ring-black/5 p-6 animate-fade-in h-fit sticky top-24">
+        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-lg border border-gray-200 dark:border-gray-700 ring-1 ring-black/5 p-6 animate-fade-in h-fit sticky top-24">
             <div
-                className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/20 to-purple-500/20 blur-3xl rounded-full -translate-y-1/3 translate-x-1/3 pointer-events-none"
+                className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/20 to-purple-500/20 blur-3xl rounded-full -translate-y-1/3 translate-x-1/3 pointer-events-none opacity-50 dark:opacity-30"
                 style={{ background: `radial-gradient(circle, ${cc.color}20 0%, transparent 70%)` }}
             />
 
@@ -561,7 +561,7 @@ function EmbeddedEventDetailPanel({ event, lang }: {
                         </div>
                         <div>
                             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{lang === 'ko' ? '일정' : 'Date'}</p>
-                            <p className="text-sm font-semibold text-gray-800">{formatDateRange(event.startDate, event.endDate, lang)}</p>
+                            <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{formatDateRange(event.startDate, event.endDate, lang)}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -572,7 +572,7 @@ function EmbeddedEventDetailPanel({ event, lang }: {
                             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{lang === 'ko' ? '위치' : 'Location'}</p>
                             <div className="flex items-center gap-1.5">
                                 <FlagIcon country={event.country[lang]} size={16} />
-                                <p className="text-sm font-semibold text-gray-800">{event.city[lang]}, {event.country[lang]}</p>
+                                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{event.city[lang]}, {event.country[lang]}</p>
                             </div>
                         </div>
                     </div>
@@ -582,7 +582,7 @@ function EmbeddedEventDetailPanel({ event, lang }: {
                         </div>
                         <div>
                             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{lang === 'ko' ? '장소' : 'Venue'}</p>
-                            <p className="text-sm font-semibold text-gray-800 break-words">{event.venue}</p>
+                            <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 break-words">{event.venue}</p>
                         </div>
                     </div>
                 </div>
@@ -710,9 +710,9 @@ export default function ConferencesPage() {
                 {/* Grid: Calendar (Left) & Filters (Right) */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     {/* LEFT COLUMN: Calendar (Compact) - Span 7 */}
-                    <div className="lg:col-span-7 bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-xl ring-1 ring-black/5 overflow-hidden">
+                    <div className="lg:col-span-7 bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-xl ring-1 ring-black/5 overflow-hidden">
                         {/* Calendar Header */}
-                        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/80">
                             <button onClick={prevMonth} className="w-8 h-8 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 transition-all shadow-sm">
                                 ←
                             </button>
@@ -731,7 +731,7 @@ export default function ConferencesPage() {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-7 border-b border-gray-100 bg-gray-50/30">
+                        <div className="grid grid-cols-7 border-b border-gray-100 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-800/30">
                             {dayNames.map((day, i) => (
                                 <div key={day} className={`text-center py-2 text-[10px] font-bold tracking-widest uppercase ${i === 0 ? 'text-red-400' : i === 6 ? 'text-blue-400' : 'text-gray-400'}`}>
                                     {day}
@@ -741,7 +741,7 @@ export default function ConferencesPage() {
 
                         <div className="grid grid-cols-7 bg-white dark:bg-gray-900">
                             {Array.from({ length: firstDay }).map((_, i) => (
-                                <div key={`empty-${i}`} className="min-h-[80px] bg-gray-50/20 border-b border-r border-gray-50" />
+                                <div key={`empty-${i}`} className="min-h-[80px] bg-gray-50/20 dark:bg-gray-800/20 border-b border-r border-gray-50 dark:border-gray-800" />
                             ))}
                             {Array.from({ length: daysInMonth }).map((_, i) => {
                                 const day = i + 1;
@@ -749,11 +749,11 @@ export default function ConferencesPage() {
                                 const events = getEventsForDay(day);
                                 const today = isToday(year, month, day);
                                 return (
-                                    <div key={`day-${day}`} className={`min-h-[80px] border-b border-r border-gray-100 p-1 transition-all hover:bg-blue-50/30 flex flex-col gap-0.5 group relative ${today ? 'bg-blue-50/20' : ''}`}>
+                                    <div key={`day-${day}`} className={`min-h-[80px] border-b border-r border-gray-100 dark:border-gray-800 p-1 transition-all hover:bg-blue-50/30 dark:hover:bg-gray-800/50 flex flex-col gap-0.5 group relative ${today ? 'bg-blue-50/20 dark:bg-blue-900/10' : ''}`}>
                                         <div className="flex justify-between items-start">
                                             <span className={`w-5 h-5 flex items-center justify-center rounded-md text-xs font-bold transition-all ${today
                                                 ? 'bg-blue-600 text-white shadow-sm'
-                                                : dayOfWeek === 0 ? 'text-red-400' : dayOfWeek === 6 ? 'text-blue-400' : 'text-gray-700'
+                                                : dayOfWeek === 0 ? 'text-red-400 dark:text-red-300' : dayOfWeek === 6 ? 'text-blue-400 dark:text-blue-300' : 'text-gray-700 dark:text-gray-300'
                                                 }`}>
                                                 {day}
                                             </span>
@@ -771,7 +771,7 @@ export default function ConferencesPage() {
                                                             window.scrollTo({ top: 100, behavior: 'smooth' });
                                                         }}
                                                         className={`w-full text-left text-[9px] font-bold px-1 py-0.5 rounded-[4px] truncate transition-all duration-200 border flex items-center gap-1 leading-none
-                                                        ${isSel ? 'scale-105 shadow-md z-10' : 'hover:scale-105 hover:shadow-sm hover:z-10'}`}
+                                                        ${isSel ? 'scale-105 shadow-md z-10 brightness-110' : 'hover:scale-105 hover:shadow-sm hover:z-10 hover:brightness-110'}`}
                                                         style={isSel
                                                             ? { backgroundColor: cc.color, color: '#fff', borderColor: cc.color }
                                                             : { backgroundColor: cc.bgColor, color: cc.color, borderColor: cc.borderColor }
@@ -798,7 +798,7 @@ export default function ConferencesPage() {
                     {/* RIGHT COLUMN: Filters - Span 5 */}
                     <div className="lg:col-span-5 flex flex-col gap-6">
                         {/* Series Filter */}
-                        <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+                        <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
                             <div className="flex items-center gap-2 mb-3">
                                 <Filter className="w-4 h-4 text-gray-400" />
                                 <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">
@@ -821,7 +821,7 @@ export default function ConferencesPage() {
                                         onClick={() => { setSeriesFilter(seriesFilter === s ? 'ALL' : s); setSelectedEvent(null); }}
                                         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${seriesFilter === s
                                             ? 'bg-blue-600 text-white shadow-md border-transparent'
-                                            : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:text-blue-600'
+                                            : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-600 hover:border-blue-300 hover:text-blue-600 dark:hover:bg-gray-700'
                                             }`}
                                     >
                                         {s}
@@ -831,7 +831,7 @@ export default function ConferencesPage() {
                         </div>
 
                         {/* Country Filter */}
-                        <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+                        <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
                             <div className="flex items-center gap-2 mb-3">
                                 <MapPin className="w-4 h-4 text-gray-400" />
                                 <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">
@@ -857,7 +857,7 @@ export default function ConferencesPage() {
                                             onClick={() => { setCountryFilter(isActive ? 'ALL' : c); setSelectedEvent(null); }}
                                             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border ${isActive
                                                 ? 'bg-blue-600 text-white shadow-md border-transparent'
-                                                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:text-blue-600 hover:scale-[1.02]'
+                                                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-600 hover:border-blue-300 hover:text-blue-600 hover:scale-[1.02] dark:hover:bg-gray-700'
                                                 }`}
                                         >
                                             <FlagIcon country={c} size={14} /> {c}
@@ -897,8 +897,8 @@ export default function ConferencesPage() {
                                         onClick={() => setFocusedEvent(event)}
                                         className={`group bg-white dark:bg-gray-900 rounded-xl p-4 border shadow-sm cursor-pointer transition-all relative overflow-hidden flex items-center justify-between gap-4 shrink-0 min-h-[72px]
                                              ${isFocused
-                                                ? 'border-blue-500 ring-1 ring-blue-100 shadow-md scale-[1.01] z-10'
-                                                : 'border-gray-100 dark:border-gray-800 hover:border-blue-200 hover:shadow-md hover:scale-[1.005]'
+                                                ? 'border-blue-500 ring-1 ring-blue-100 dark:ring-blue-900 shadow-md scale-[1.01] z-10'
+                                                : 'border-gray-100 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-md hover:scale-[1.005] hover:bg-gray-50/50 dark:hover:bg-gray-800'
                                             }`}
                                     >
                                         <div
@@ -907,8 +907,8 @@ export default function ConferencesPage() {
                                         />
 
                                         <div className="flex items-center gap-4 pl-3 flex-1 min-w-0">
-                                            <div className="flex flex-col items-center justify-center w-14 shrink-0 py-1.5 bg-gray-50 rounded-lg border border-gray-100/50">
-                                                <span className="text-[10px] font-bold text-gray-500 uppercase leading-none mb-0.5">{lang === 'ko' ? `${startDate.getMonth() + 1}월` : MONTH_NAMES_EN[startDate.getMonth()].substring(0, 3)}</span>
+                                            <div className="flex flex-col items-center justify-center w-14 shrink-0 py-1.5 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100/50 dark:border-gray-700">
+                                                <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase leading-none mb-0.5">{lang === 'ko' ? `${startDate.getMonth() + 1}월` : MONTH_NAMES_EN[startDate.getMonth()].substring(0, 3)}</span>
                                                 <span className="text-xl font-bold text-gray-900 dark:text-gray-100 leading-none">{startDate.getDate()}</span>
                                             </div>
 
@@ -917,7 +917,7 @@ export default function ConferencesPage() {
                                                     {isOngoing && (
                                                         <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-600 animate-pulse uppercase">LIVE</span>
                                                     )}
-                                                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                                                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                                                         {event.series}
                                                     </span>
                                                 </div>
@@ -936,7 +936,7 @@ export default function ConferencesPage() {
                             {focusedEvent ? (
                                 <EmbeddedEventDetailPanel event={focusedEvent} lang={lang} />
                             ) : (
-                                <div className="h-64 flex items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50/50 text-gray-400">
+                                <div className="h-64 flex items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/20 text-gray-400 dark:text-gray-500">
                                     {lang === 'ko' ? '일정을 선택하세요' : 'Select an event'}
                                 </div>
                             )}

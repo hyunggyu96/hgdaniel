@@ -239,24 +239,26 @@ export default function AnalysisPage() {
     return (
         <main className="min-h-screen bg-gray-50 dark:bg-gray-950 p-6 md:p-12 transition-colors duration-300">
             <div className="max-w-5xl mx-auto space-y-8">
+                {/* Back to List Navigation */}
+                {isReportMode && (
+                    <button
+                        className="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 px-3 py-1.5 rounded-lg text-sm transition-all flex items-center gap-2 self-start mb-2"
+                        onClick={() => router.push('/company')}
+                    >
+                        <span className="font-bold">←</span> Back to List
+                    </button>
+                )}
+
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-center mb-8">
                     <div>
                         <Title className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
                             Company Analyzer
                         </Title>
-                        <Text className="text-gray-500 mt-1">
+                        <Text className="text-gray-500 dark:text-gray-400 mt-1">
                             Advanced AI-powered financial analysis & real-time monitoring
                         </Text>
                     </div>
-                    {isReportMode && (
-                        <button
-                            className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 px-3 py-1 rounded text-sm transition-colors flex items-center gap-1"
-                            onClick={() => router.push('/company')}
-                        >
-                            &larr; Back to List
-                        </button>
-                    )}
                 </div>
             </div>
 
@@ -344,24 +346,24 @@ export default function AnalysisPage() {
 
                         <div className="flex flex-wrap gap-6 items-center bg-white dark:bg-gray-900 p-5 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm flex-1">
                             <div className="flex flex-col">
-                                <span className="text-xs text-gray-500 uppercase font-semibold tracking-wide">Price</span>
+                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold tracking-wide">Price</span>
                                 <div className="flex items-end gap-2 mt-1">
-                                    <span className="text-2xl font-bold text-gray-800">
-                                        -
+                                    <span className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+                                        {result.company.stock_code === '000000' || !stockData ? '-' : `${stockData.price}원`}
                                     </span>
                                 </div>
                             </div>
-                            <div className="w-px h-12 bg-gray-200 hidden md:block mx-2"></div>
+                            <div className="w-px h-12 bg-gray-200 dark:bg-gray-700 hidden md:block mx-2"></div>
                             <div className="flex flex-col">
-                                <span className="text-xs text-gray-500 uppercase font-semibold tracking-wide">Market Cap</span>
-                                <span className="text-xl font-medium text-gray-800 mt-1">
-                                    -
+                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold tracking-wide">Market Cap</span>
+                                <span className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-1">
+                                    {result.company.stock_code === '000000' || !stockData ? '-' : stockData.market_cap}
                                 </span>
                             </div>
-                            <div className="w-px h-12 bg-gray-200 hidden md:block mx-2"></div>
+                            <div className="w-px h-12 bg-gray-200 dark:bg-gray-700 hidden md:block mx-2"></div>
                             <div className="flex-1 min-w-[200px]">
-                                <span className="text-xs text-gray-500 uppercase font-semibold tracking-wide">Overview</span>
-                                <p className="text-sm text-gray-700 mt-1 leading-snug line-clamp-2">
+                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold tracking-wide">Overview</span>
+                                <p className="text-sm text-gray-700 dark:text-gray-300 mt-1 leading-snug line-clamp-2">
                                     {COMPANY_OVERVIEWS[companyName] || result.company_summary || "회사 개요 정보가 없습니다."}
                                 </p>
                             </div>
@@ -376,12 +378,12 @@ export default function AnalysisPage() {
                         <Card className="overflow-hidden shadow-lg border-0 ring-1 ring-gray-200 sm:rounded-xl">
                             <div className="mb-6 flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <div className="bg-blue-100 p-1.5 rounded-lg">
-                                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div className="bg-blue-100 dark:bg-blue-900/30 p-1.5 rounded-lg">
+                                        <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                                         </svg>
                                     </div>
-                                    <h3 className="text-lg font-bold text-gray-900">Financial History</h3>
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">Financial History</h3>
                                 </div>
                             </div>
 
@@ -437,22 +439,22 @@ export default function AnalysisPage() {
 
                                     <div className="overflow-x-auto">
                                         <table className="min-w-full divide-y divide-gray-200">
-                                            <thead>
+                                            <thead className="bg-blue-50/80 dark:bg-blue-900/20">
                                                 <tr>
-                                                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider bg-blue-50/80 w-32 border-r border-gray-100">
+                                                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-32 border-r border-gray-100 dark:border-gray-700">
                                                         구분
                                                     </th>
                                                     {YEARS.map(year => (
-                                                        <th key={year} scope="col" className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider bg-blue-50/50">
+                                                        <th key={year} scope="col" className="px-6 py-4 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                                             {year}
                                                         </th>
                                                     ))}
                                                 </tr>
                                             </thead>
-                                            <tbody className="bg-white divide-y divide-gray-100">
+                                            <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-100 dark:divide-gray-800">
                                                 {/* Revenue Row */}
-                                                <tr className="hover:bg-gray-50 transition-colors">
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 bg-gray-100/80 border-r border-gray-200">
+                                                <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 dark:text-gray-100 bg-gray-100/80 dark:bg-gray-800/50 border-r border-gray-200 dark:border-gray-700">
                                                         매출액
                                                     </td>
                                                     {YEARS.map(year => {
@@ -475,8 +477,8 @@ export default function AnalysisPage() {
                                                     })}
                                                 </tr>
                                                 {/* Operating Profit Row */}
-                                                <tr className="hover:bg-gray-50 transition-colors">
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 bg-gray-100/80 border-r border-gray-200">
+                                                <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 dark:text-gray-100 bg-gray-100/80 dark:bg-gray-800/50 border-r border-gray-200 dark:border-gray-700">
                                                         영업이익
                                                     </td>
                                                     {YEARS.map(year => (
@@ -486,8 +488,8 @@ export default function AnalysisPage() {
                                                     ))}
                                                 </tr>
                                                 {/* R&D Cost Row */}
-                                                <tr className="hover:bg-gray-50 transition-colors">
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 bg-gray-100/80 border-r border-gray-200">
+                                                <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 dark:text-gray-100 bg-gray-100/80 dark:bg-gray-800/50 border-r border-gray-200 dark:border-gray-700">
                                                         연구비용
                                                     </td>
                                                     {YEARS.map(year => {
@@ -568,17 +570,17 @@ export default function AnalysisPage() {
                         <Card className="overflow-hidden shadow-lg border-0 ring-1 ring-gray-200 sm:rounded-xl h-full">
                             <div className="mb-6 flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <div className="bg-green-100 p-1.5 rounded-lg">
-                                        <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div className="bg-green-100 dark:bg-green-900/30 p-1.5 rounded-lg">
+                                        <svg className="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                                         </svg>
                                     </div>
-                                    <h3 className="text-lg font-bold text-gray-900">Recent Headlines</h3>
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">Recent Headlines</h3>
                                 </div>
                             </div>
                             <div className="space-y-3">
                                 {(newsData?.headlines || result.news_analysis.recent_headlines).map((item: any, i: number) => (
-                                    <div key={i} className="border-b border-gray-100 pb-3 last:border-0 last:pb-0">
+                                    <div key={i} className="border-b border-gray-100 dark:border-gray-800 pb-3 last:border-0 last:pb-0">
                                         {item.link ? (
                                             <a
                                                 href={item.link}
@@ -605,21 +607,21 @@ export default function AnalysisPage() {
                         <Card className="overflow-hidden shadow-lg border-0 ring-1 ring-gray-200 dark:ring-gray-700 sm:rounded-xl bg-white dark:bg-gray-900">
                             <div className="flex justify-between items-center mb-6">
                                 <div className="flex items-center gap-2">
-                                    <div className="bg-purple-100 p-1.5 rounded-lg">
-                                        <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div className="bg-purple-100 dark:bg-purple-900/30 p-1.5 rounded-lg">
+                                        <svg className="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                                         </svg>
                                     </div>
-                                    <h3 className="text-lg font-bold text-gray-900">Analysis Summary</h3>
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">Analysis Summary</h3>
                                 </div>
                                 <button
                                     onClick={() => setLanguage(language === 'ko' ? 'en' : 'ko')}
-                                    className="px-4 py-1.5 text-sm font-medium bg-white border border-gray-300 hover:bg-gray-50 hover:text-purple-600 rounded-full transition-all shadow-sm"
+                                    className="px-4 py-1.5 text-sm font-medium bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-purple-600 dark:hover:text-purple-400 rounded-full transition-all shadow-sm"
                                 >
                                     {language === 'ko' ? 'English' : '한국어'}
                                 </button>
                             </div>
-                            <Text className="text-gray-800 font-medium whitespace-pre-line leading-relaxed text-base p-2">
+                            <Text className="text-gray-800 dark:text-gray-200 font-medium whitespace-pre-line leading-relaxed text-base p-2">
                                 {language === 'ko'
                                     ? (result.gemini_analysis || "분석 대기 중...")
                                     : (result.gemini_analysis_en || result.gemini_analysis || "Analysis pending...")
