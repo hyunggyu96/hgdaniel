@@ -8,6 +8,10 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "doctor": "npx expo-doctor",
+    "build:android:preview": "eas build --platform android --profile preview",
+    "build:android": "eas build --platform android --profile production",
+    "submit:android": "eas submit --platform android --profile production --latest",
+    "release:android": "eas build --platform android --profile production --auto-submit",
     "build:ios": "eas build --platform ios --profile production",
     "submit:ios": "eas submit --platform ios --profile production --latest",
     "release:ios": "eas build --platform ios --profile production --auto-submit"

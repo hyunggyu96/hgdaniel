@@ -25,7 +25,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0a0a12"
       },
-      "package": "com.aestheticintelligence.mobile"
+      "package": "com.aestheticintelligence.mobile",
+      "permissions": ["INTERNET"]
     },
     "web": {
       "favicon": "./assets/favicon.png"

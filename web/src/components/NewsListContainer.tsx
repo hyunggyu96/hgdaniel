@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import CollectionButton from './CollectionButton';
 import CollectionsView from './CollectionsView';
-import { LayoutGrid, Clock, Zap } from 'lucide-react';
-import { useReducedMotion, useIsLowEndDevice } from '@/hooks/useReducedMotion';
+import { LayoutGrid, Clock } from 'lucide-react';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { fmtDateKST, getYesterdayStr, toDateKey, uniqueKws } from '@/lib/utils';
 
 interface Props {
@@ -146,33 +146,6 @@ export default function NewsListContainer({
     const [viewMode, setViewMode] = useState<'category' | 'time'>('category');
 
     const reduceMotion = useReducedMotion();
-    const lowEnd = useIsLowEndDevice();
-    const [splineLoaded, setSplineLoaded] = useState(false);
-
-    const [lightMode, setLightMode] = useState<boolean>(() => {
-        if (typeof window !== 'undefined') {
-            const saved = localStorage.getItem('lightMode');
-            return saved === 'true';
-        }
-        return false;
-    });
-
-    const toggleLightMode = () => {
-        setLightMode(prev => {
-            const v = !prev;
-            localStorage.setItem('lightMode', String(v));
-            return v;
-        });
-    };
-
-    useEffect(() => {
-        if (!lowEnd && !reduceMotion && !lightMode && isLandingPage) {
-            const timer = setTimeout(() => setSplineLoaded(true), 1000);
-            return () => clearTimeout(timer);
-        } else {
-            setSplineLoaded(false);
-        }
-    }, [lowEnd, reduceMotion, lightMode, isLandingPage]);
 
     const timeSortedNews = useMemo(() => {
         if (viewMode !== 'time' || !isLandingPage) return [];
@@ -197,22 +170,7 @@ export default function NewsListContainer({
         <div className="flex-1 space-y-4">
             {/* HERO SECTION */}
             {isLandingPage ? (
-                <div className="relative w-full h-[40vh] sm:h-[50vh] min-h-[350px] sm:min-h-[450px] mb-8 overflow-hidden">
-                    <div className="absolute inset-0 z-0">
-                        {splineLoaded && !lowEnd && !reduceMotion && !lightMode ? (
-                            <iframe
-                                src='https://my.spline.design/nexbotrobotcharacterconcept-JwuKwrHPzdqqnT2z04erjDBN/'
-                                frameBorder='0'
-                                width='100%'
-                                height='100%'
-                                className="w-full h-full mix-blend-multiply opacity-90 grayscale-[0.1]"
-                                title="3D Robot Interaction"
-                                loading="lazy"
-                            />
-                        ) : (
-                            <div className="w-full h-full bg-white" />
-                        )}
-                    </div>
+                <div className="relative w-full h-[30vh] sm:h-[35vh] min-h-[280px] sm:min-h-[320px] mb-8 overflow-hidden bg-white">
                     <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background via-background to-transparent pointer-events-none z-10" />
                     <div className="absolute inset-0 flex flex-col items-center justify-end pb-12 pointer-events-none z-20 px-4">
                         {reduceMotion ? (
@@ -228,7 +186,7 @@ export default function NewsListContainer({
                                 MARKET INTELLIGENCE
                             </motion.h1>
                         )}
-                        <div className="flex items-center gap-2 bg-white/80 backdrop-blur-md px-4 py-1.5 rounded-full border border-gray-200 shadow-xl gpu-accelerated">
+                        <div className="flex items-center gap-2 bg-white/80 backdrop-blur-md px-4 py-1.5 rounded-full border border-gray-200 shadow-xl">
                             <span className="relative flex h-2 w-2 shrink-0">
                                 {!reduceMotion && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>}
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
@@ -256,23 +214,6 @@ export default function NewsListContainer({
                                 </button>
                             ))}
                         </div>
-                    </div>
-
-                    {/* Light Mode Toggle */}
-                    <div className="absolute top-4 right-4 md:right-12 z-30">
-                        <button
-                            onClick={toggleLightMode}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border shadow-lg transition-all duration-300 ${lightMode
-                                ? 'bg-amber-500 text-white border-amber-400'
-                                : 'bg-white/95 backdrop-blur-md text-gray-600 border-gray-300 hover:bg-gray-50'
-                                }`}
-                            title={lightMode ? '3D 모드로 전환' : '라이트 모드로 전환 (성능 향상)'}
-                        >
-                            <Zap size={14} className={lightMode ? 'fill-current' : ''} />
-                            <span className="text-[11px] font-bold uppercase tracking-wider">
-                                {lightMode ? 'Light' : '3D'}
-                            </span>
-                        </button>
                     </div>
                 </div>
             ) : (
