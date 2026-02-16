@@ -19,7 +19,7 @@ export default function MainNav() {
     ];
 
     return (
-        <div className="w-full border-b border-gray-100 bg-white/50 backdrop-blur-sm">
+        <div className="w-full border-b border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm transition-colors duration-300">
             <nav className="max-w-[1600px] mx-auto px-4 md:px-6 flex items-center justify-center gap-12 h-14 overflow-x-auto scrollbar-hide">
                 {NAV_ITEMS.map((item) => {
                     const isActive = item.href === '/'

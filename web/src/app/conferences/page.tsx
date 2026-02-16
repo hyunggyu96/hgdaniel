@@ -410,7 +410,7 @@ function EventDetailPanel({ event, onClose, lang }: {
     const statusStyle = isOngoing ? 'bg-emerald-100 text-emerald-700' : isPast ? 'bg-gray-100 text-gray-500' : 'bg-amber-50 text-amber-600';
 
     return (
-        <div className="relative overflow-hidden rounded-2xl bg-white shadow-xl border border-gray-200 ring-1 ring-black/5 p-6 animate-fade-in-down mb-8">
+        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-xl border border-gray-200 dark:border-gray-800 ring-1 ring-black/5 p-6 animate-fade-in-down mb-8">
             <div
                 className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/20 to-purple-500/20 blur-3xl rounded-full -translate-y-1/3 translate-x-1/3 pointer-events-none"
                 style={{ background: `radial-gradient(circle, ${cc.color}20 0%, transparent 70%)` }}
@@ -442,7 +442,7 @@ function EventDetailPanel({ event, onClose, lang }: {
 
                 {/* Title & Website Button Row */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                    <h3 className="text-2xl font-bold text-gray-900 leading-tight">
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 leading-tight">
                         {event.name[lang]}
                     </h3>
 
@@ -509,7 +509,7 @@ function EmbeddedEventDetailPanel({ event, lang }: {
     const statusStyle = isOngoing ? 'bg-emerald-100 text-emerald-700' : isPast ? 'bg-gray-100 text-gray-500' : 'bg-amber-50 text-amber-600';
 
     return (
-        <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg border border-gray-200 ring-1 ring-black/5 p-6 animate-fade-in h-fit sticky top-24">
+        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-lg border border-gray-200 dark:border-gray-800 ring-1 ring-black/5 p-6 animate-fade-in h-fit sticky top-24">
             <div
                 className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/20 to-purple-500/20 blur-3xl rounded-full -translate-y-1/3 translate-x-1/3 pointer-events-none"
                 style={{ background: `radial-gradient(circle, ${cc.color}20 0%, transparent 70%)` }}
@@ -535,7 +535,7 @@ function EmbeddedEventDetailPanel({ event, lang }: {
 
                 {/* Title & Website Button Row */}
                 <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 mb-6 w-full">
-                    <h3 className="text-2xl font-bold text-gray-900 leading-tight break-words">
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 leading-tight break-words">
                         {event.name[lang]}
                     </h3>
 
@@ -669,7 +669,7 @@ export default function ConferencesPage() {
     }
 
     return (
-        <main className="min-h-screen bg-gray-50/50 p-6 md:p-12 pb-24">
+        <main className="min-h-screen bg-gray-50/50 dark:bg-gray-950 p-6 md:p-12 pb-24 transition-colors duration-300">
             <div className="max-w-7xl mx-auto space-y-6">
 
                 {/* Premium Header Compact */}
@@ -710,22 +710,22 @@ export default function ConferencesPage() {
                 {/* Grid: Calendar (Left) & Filters (Right) */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     {/* LEFT COLUMN: Calendar (Compact) - Span 7 */}
-                    <div className="lg:col-span-7 bg-white rounded-3xl border border-gray-100 shadow-xl ring-1 ring-black/5 overflow-hidden">
+                    <div className="lg:col-span-7 bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-xl ring-1 ring-black/5 overflow-hidden">
                         {/* Calendar Header */}
-                        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">
-                            <button onClick={prevMonth} className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm">
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
+                            <button onClick={prevMonth} className="w-8 h-8 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 transition-all shadow-sm">
                                 ←
                             </button>
                             <div className="text-center">
-                                <h2 className="text-xl font-black tracking-tight text-gray-900">
+                                <h2 className="text-xl font-black tracking-tight text-gray-900 dark:text-gray-100">
                                     {lang === 'ko' ? `${year}년 ${monthNames[month]}` : `${monthNames[month]} ${year}`}
                                 </h2>
                             </div>
                             <div className="flex items-center gap-2">
-                                <button onClick={goToToday} className="hidden sm:block text-[10px] font-bold text-gray-500 hover:text-blue-600 px-2 py-1.5 bg-white rounded-md border border-gray-200 hover:border-blue-200 transition-all">
+                                <button onClick={goToToday} className="hidden sm:block text-[10px] font-bold text-gray-500 hover:text-blue-600 px-2 py-1.5 bg-white dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700 hover:border-blue-200 transition-all">
                                     {lang === 'ko' ? '오늘' : 'Today'}
                                 </button>
-                                <button onClick={nextMonth} className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm">
+                                <button onClick={nextMonth} className="w-8 h-8 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 transition-all shadow-sm">
                                     →
                                 </button>
                             </div>
@@ -739,7 +739,7 @@ export default function ConferencesPage() {
                             ))}
                         </div>
 
-                        <div className="grid grid-cols-7 bg-white">
+                        <div className="grid grid-cols-7 bg-white dark:bg-gray-900">
                             {Array.from({ length: firstDay }).map((_, i) => (
                                 <div key={`empty-${i}`} className="min-h-[80px] bg-gray-50/20 border-b border-r border-gray-50" />
                             ))}
@@ -798,7 +798,7 @@ export default function ConferencesPage() {
                     {/* RIGHT COLUMN: Filters - Span 5 */}
                     <div className="lg:col-span-5 flex flex-col gap-6">
                         {/* Series Filter */}
-                        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                        <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
                             <div className="flex items-center gap-2 mb-3">
                                 <Filter className="w-4 h-4 text-gray-400" />
                                 <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">
@@ -810,7 +810,7 @@ export default function ConferencesPage() {
                                     onClick={() => { setSeriesFilter('ALL'); setSelectedEvent(null); }}
                                     className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${seriesFilter === 'ALL'
                                         ? 'bg-slate-800 text-white shadow-md border-transparent'
-                                        : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300'
+                                        : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-blue-300'
                                         }`}
                                 >
                                     ALL
@@ -821,7 +821,7 @@ export default function ConferencesPage() {
                                         onClick={() => { setSeriesFilter(seriesFilter === s ? 'ALL' : s); setSelectedEvent(null); }}
                                         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${seriesFilter === s
                                             ? 'bg-blue-600 text-white shadow-md border-transparent'
-                                            : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:text-blue-600'
+                                            : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:text-blue-600'
                                             }`}
                                     >
                                         {s}
@@ -831,7 +831,7 @@ export default function ConferencesPage() {
                         </div>
 
                         {/* Country Filter */}
-                        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                        <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
                             <div className="flex items-center gap-2 mb-3">
                                 <MapPin className="w-4 h-4 text-gray-400" />
                                 <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">
@@ -843,7 +843,7 @@ export default function ConferencesPage() {
                                     onClick={() => { setCountryFilter('ALL'); setSelectedEvent(null); }}
                                     className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${countryFilter === 'ALL'
                                         ? 'bg-slate-800 text-white shadow-md border-transparent'
-                                        : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300'
+                                        : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-blue-300'
                                         }`}
                                 >
                                     {lang === 'ko' ? '전체' : 'All'}
@@ -857,7 +857,7 @@ export default function ConferencesPage() {
                                             onClick={() => { setCountryFilter(isActive ? 'ALL' : c); setSelectedEvent(null); }}
                                             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border ${isActive
                                                 ? 'bg-blue-600 text-white shadow-md border-transparent'
-                                                : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:text-blue-600 hover:scale-[1.02]'
+                                                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:text-blue-600 hover:scale-[1.02]'
                                                 }`}
                                         >
                                             <FlagIcon country={c} size={14} /> {c}
@@ -873,7 +873,7 @@ export default function ConferencesPage() {
                 <div className="pt-8 space-y-5">
                     <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                            <h3 className="text-lg font-bold text-gray-900 border-l-4 border-blue-600 pl-3">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 border-l-4 border-blue-600 pl-3">
                                 {lang === 'ko' ? '다가오는 일정' : 'Upcoming Events'}
                             </h3>
                             <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
@@ -895,10 +895,10 @@ export default function ConferencesPage() {
                                     <div
                                         key={event.id}
                                         onClick={() => setFocusedEvent(event)}
-                                        className={`group bg-white rounded-xl p-4 border shadow-sm cursor-pointer transition-all relative overflow-hidden flex items-center justify-between gap-4 shrink-0 min-h-[72px]
+                                        className={`group bg-white dark:bg-gray-900 rounded-xl p-4 border shadow-sm cursor-pointer transition-all relative overflow-hidden flex items-center justify-between gap-4 shrink-0 min-h-[72px]
                                              ${isFocused
                                                 ? 'border-blue-500 ring-1 ring-blue-100 shadow-md scale-[1.01] z-10'
-                                                : 'border-gray-100 hover:border-blue-200 hover:shadow-md hover:scale-[1.005]'
+                                                : 'border-gray-100 dark:border-gray-800 hover:border-blue-200 hover:shadow-md hover:scale-[1.005]'
                                             }`}
                                     >
                                         <div
@@ -909,7 +909,7 @@ export default function ConferencesPage() {
                                         <div className="flex items-center gap-4 pl-3 flex-1 min-w-0">
                                             <div className="flex flex-col items-center justify-center w-14 shrink-0 py-1.5 bg-gray-50 rounded-lg border border-gray-100/50">
                                                 <span className="text-[10px] font-bold text-gray-500 uppercase leading-none mb-0.5">{lang === 'ko' ? `${startDate.getMonth() + 1}월` : MONTH_NAMES_EN[startDate.getMonth()].substring(0, 3)}</span>
-                                                <span className="text-xl font-bold text-gray-900 leading-none">{startDate.getDate()}</span>
+                                                <span className="text-xl font-bold text-gray-900 dark:text-gray-100 leading-none">{startDate.getDate()}</span>
                                             </div>
 
                                             <div className="min-w-0 flex flex-col gap-1">
@@ -921,7 +921,7 @@ export default function ConferencesPage() {
                                                         {event.series}
                                                     </span>
                                                 </div>
-                                                <h4 className={`text-base font-bold transition-colors truncate ${isFocused ? 'text-blue-700' : 'text-gray-900 group-hover:text-blue-700'}`}>
+                                                <h4 className={`text-base font-bold transition-colors truncate ${isFocused ? 'text-blue-700 dark:text-blue-400' : 'text-gray-900 dark:text-gray-100 group-hover:text-blue-700 dark:group-hover:text-blue-400'}`}>
                                                     {event.name[lang]}
                                                 </h4>
                                             </div>

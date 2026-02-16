@@ -19,7 +19,7 @@ export default function CollectionsView({ allNews, today }: CollectionsViewProps
         return (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-0 max-w-7xl animate-pulse">
                 {[1, 2, 3, 4].map(idx => (
-                    <div key={idx} className="h-24 bg-gray-100 border-b border-gray-100 mx-3 my-1.5 rounded-lg" />
+                    <div key={idx} className="h-24 bg-gray-100 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-800 mx-3 my-1.5 rounded-lg" />
                 ))}
             </div>
         );
@@ -50,7 +50,7 @@ export default function CollectionsView({ allNews, today }: CollectionsViewProps
                     const { dateStr, timeStr } = fmtDateKST(pubDate);
 
                     return (
-                        <article key={article.id} className={`group py-1.5 px-3 hover:bg-gray-50 transition-colors border-b border-gray-100 flex gap-2 items-start ${isToday ? 'bg-blue-50' : ''}`}>
+                        <article key={article.id} className={`group py-1.5 px-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border-b border-gray-100 dark:border-gray-800 flex gap-2 items-start ${isToday ? 'bg-blue-50 dark:bg-blue-900/10' : ''}`}>
                             <CollectionButton newsLink={article.link} newsTitle={article.title} />
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 text-[9px] h-4 mb-1">

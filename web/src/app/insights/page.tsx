@@ -106,7 +106,7 @@ export default function InsightsPage() {
     };
 
     return (
-        <main className="min-h-screen bg-gray-50/50 p-6 md:p-12 pb-24">
+        <main className="min-h-screen bg-gray-50/50 dark:bg-gray-950 p-6 md:p-12 pb-24 transition-colors duration-300">
             <div className="max-w-7xl mx-auto space-y-8">
 
                 {/* Premium Header */}
@@ -141,8 +141,8 @@ export default function InsightsPage() {
                 <div className="flex flex-col lg:flex-row gap-8 items-start">
                     {/* Sidebar Filters */}
                     <aside className="w-full lg:w-64 shrink-0 space-y-4">
-                        <div className="bg-white/80 backdrop-blur-xl p-5 rounded-2xl shadow-sm border border-gray-100 lg:sticky lg:top-8">
-                            <div className="flex items-center gap-2 mb-4 text-gray-900 font-semibold px-1">
+                        <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 lg:sticky lg:top-8">
+                            <div className="flex items-center gap-2 mb-4 text-gray-900 dark:text-gray-100 font-semibold px-1">
                                 <Filter className="w-4 h-4 text-blue-600" />
                                 <span>Categories</span>
                             </div>
@@ -152,7 +152,7 @@ export default function InsightsPage() {
                                     onClick={() => setSelectedKeyword("")}
                                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-left ${selectedKeyword === ""
                                         ? 'bg-slate-800 text-white shadow-md'
-                                        : 'bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                                        : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200'
                                         }`}
                                 >
                                     {t('insights_all_topics')}
@@ -164,7 +164,7 @@ export default function InsightsPage() {
                                         onClick={() => setSelectedKeyword(kw)}
                                         className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 capitalize text-left ${selectedKeyword === kw
                                             ? 'bg-blue-600 text-white shadow-md'
-                                            : 'bg-white border border-gray-100 text-gray-600 hover:border-blue-200 hover:text-blue-600 hover:bg-blue-50/30'
+                                            : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-blue-200 dark:hover:border-blue-700 hover:text-blue-600 hover:bg-blue-50/30 dark:hover:bg-blue-900/20'
                                             }`}
                                     >
                                         {kw}
@@ -178,14 +178,14 @@ export default function InsightsPage() {
                     <section className="flex-1 min-w-0 space-y-6">
 
                         {/* Search Bar */}
-                        <div className="bg-white/80 backdrop-blur-xl p-2 rounded-2xl shadow-sm border border-gray-100">
+                        <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-2 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
                             <form onSubmit={handleSearch} className="relative w-full">
                                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                     <SearchIcon className="h-5 w-5 text-gray-400" />
                                 </div>
                                 <input
                                     type="text"
-                                    className="block w-full pl-12 pr-32 py-3 bg-transparent border-none rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-0"
+                                    className="block w-full pl-12 pr-32 py-3 bg-transparent border-none rounded-xl text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-0"
                                     placeholder={t('insights_search_placeholder')}
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -209,15 +209,15 @@ export default function InsightsPage() {
                                 <Text className="mt-4 text-gray-500 font-medium animate-pulse">{t('insights_loading')}</Text>
                             </div>
                         ) : error ? (
-                            <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-red-100 shadow-sm p-8 text-center">
+                            <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-gray-900 rounded-3xl border border-red-100 dark:border-red-900/30 shadow-sm p-8 text-center">
                                 <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mb-4">
                                     <span className="text-2xl">⚠️</span>
                                 </div>
-                                <h3 className="text-lg font-bold text-gray-900 mb-2">Error Loading Data</h3>
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">Error Loading Data</h3>
                                 <Text className="text-gray-500 mb-6 max-w-md">{error}</Text>
                                 <button
                                     onClick={() => fetchPapers(page)}
-                                    className="px-6 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium shadow-sm"
+                                    className="px-6 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 transition-colors text-sm font-medium shadow-sm"
                                 >
                                     {t('retry')}
                                 </button>
@@ -228,17 +228,17 @@ export default function InsightsPage() {
                                     papers.map((paper) => (
                                         <div
                                             key={paper.id}
-                                            className="group relative bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-100 transition-all duration-300"
+                                            className="group relative bg-white dark:bg-gray-900 rounded-xl p-5 border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md hover:border-blue-100 dark:hover:border-blue-900 transition-all duration-300"
                                         >
                                             <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                                                 <div className="flex-1 space-y-2.5">
                                                     {/* Top Meta */}
                                                     <div className="flex flex-wrap items-center gap-2 text-[11px]">
-                                                        <span className="flex items-center gap-1 text-blue-700 font-bold bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                                                        <span className="flex items-center gap-1 text-blue-700 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded border border-blue-100 dark:border-blue-800">
                                                             <BookOpen className="w-3 h-3" />
                                                             {paper.journal || 'Journal'}
                                                         </span>
-                                                        <span className="flex items-center gap-1 text-slate-600 font-bold bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                                                        <span className="flex items-center gap-1 text-slate-600 dark:text-slate-400 font-bold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">
                                                             <Calendar className="w-3 h-3" />
                                                             {paper.publication_date || 'N/A'}
                                                         </span>
@@ -246,13 +246,13 @@ export default function InsightsPage() {
 
                                                     {/* Title */}
                                                     <a href={paper.link} target="_blank" rel="noopener noreferrer" className="block outline-none">
-                                                        <h3 className="text-lg font-bold text-gray-900 leading-snug group-hover:text-blue-700 transition-colors">
+                                                        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 leading-snug group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
                                                             <Highlight text={paper.title} keyword={searchQuery} />
                                                         </h3>
                                                     </a>
 
                                                     {/* Abstract: REMOVED HOVER EXPANSION */}
-                                                    <p className="text-sm text-gray-600 leading-relaxed line-clamp-3 transition-all duration-500">
+                                                    <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-3 transition-all duration-500">
                                                         <Highlight text={paper.abstract} keyword={searchQuery} />
                                                     </p>
 
@@ -260,7 +260,7 @@ export default function InsightsPage() {
                                                     <div className="flex flex-wrap items-center justify-between gap-3 pt-2 mt-1 border-t border-gray-50">
                                                         <div className="flex items-center gap-1.5 text-xs text-gray-600">
                                                             <Users className="w-3.5 h-3.5 text-gray-400" />
-                                                            <span className="font-semibold text-gray-700 italic truncate max-w-[200px] md:max-w-md">
+                                                            <span className="font-semibold text-gray-700 dark:text-gray-300 italic truncate max-w-[200px] md:max-w-md">
                                                                 {paper.authors?.slice(0, 3).map((author, idx) => (
                                                                     <span key={idx}>
                                                                         <Highlight text={author} keyword={searchQuery} />
@@ -274,7 +274,7 @@ export default function InsightsPage() {
                                                         {/* Keywords */}
                                                         <div className="hidden md:flex gap-1.5">
                                                             {paper.keywords?.slice(0, 3).map(k => (
-                                                                <span key={k} className="text-[10px] text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded border border-gray-100">
+                                                                <span key={k} className="text-[10px] text-gray-500 bg-gray-50 dark:bg-gray-800 px-1.5 py-0.5 rounded border border-gray-100 dark:border-gray-700">
                                                                     #{k}
                                                                 </span>
                                                             ))}
@@ -287,7 +287,7 @@ export default function InsightsPage() {
                                                     href={paper.link}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm group-hover:scale-105"
+                                                    className="shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white transition-all shadow-sm group-hover:scale-105"
                                                     title="View Original Paper"
                                                 >
                                                     <ArrowUpRight className="w-4 h-4" />
@@ -296,7 +296,7 @@ export default function InsightsPage() {
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
+                                    <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-gray-900 rounded-3xl border border-dashed border-gray-200 dark:border-gray-700">
                                         <SearchIcon className="w-12 h-12 text-gray-200 mb-4" />
                                         <Text className="text-gray-500 font-medium mb-1">{t('insights_no_papers')}</Text>
                                         <p className="text-sm text-gray-400">{t('insights_no_papers_hint')}</p>
@@ -311,12 +311,12 @@ export default function InsightsPage() {
                                 <button
                                     onClick={() => handlePageChange(page - 1)}
                                     disabled={page === 1 || loading}
-                                    className="flex items-center px-5 py-2.5 rounded-xl bg-white border border-gray-200 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                    className="flex items-center px-5 py-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                                 >
                                     ← {t('insights_previous')}
                                 </button>
                                 <div className="flex flex-col items-center">
-                                    <span className="text-sm font-semibold text-gray-900">
+                                    <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                                         Page {page}
                                     </span>
                                     <span className="text-[10px] text-gray-400 uppercase tracking-wider">
@@ -326,7 +326,7 @@ export default function InsightsPage() {
                                 <button
                                     onClick={() => handlePageChange(page + 1)}
                                     disabled={page === totalPages || loading}
-                                    className="flex items-center px-5 py-2.5 rounded-xl bg-white border border-gray-200 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                    className="flex items-center px-5 py-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                                 >
                                     {t('insights_next')} →
                                 </button>

@@ -38,7 +38,7 @@ export default function MobileNav() {
             <div className="h-20 md:hidden" />
 
             {/* Bottom Nav Bar */}
-            <nav className="fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-gray-200 z-50 md:hidden flex items-center justify-around px-2 backdrop-blur-xl bg-white/90">
+            <nav className="fixed bottom-0 left-0 right-0 h-16 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-50 md:hidden flex items-center justify-around px-2 backdrop-blur-xl bg-white/90 dark:bg-gray-900/90 transition-colors duration-300">
                 <Link
                     href="/"
                     prefetch={false}
@@ -72,13 +72,13 @@ export default function MobileNav() {
                     <div className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setIsOpen(false)} />
 
                     {/* Content */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl border-t border-gray-200 max-h-[85vh] overflow-y-auto flex flex-col p-6 animate-in slide-in-from-bottom duration-300 shadow-2xl shadow-black/20">
-                        <div className="sticky top-0 bg-white z-10 pb-4 mb-2 border-b border-gray-100 flex items-center justify-between">
+                    <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-gray-900 rounded-t-3xl border-t border-gray-200 dark:border-gray-800 max-h-[85vh] overflow-y-auto flex flex-col p-6 animate-in slide-in-from-bottom duration-300 shadow-2xl shadow-black/20">
+                        <div className="sticky top-0 bg-white dark:bg-gray-900 z-10 pb-4 mb-2 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
                             <div>
                                 <h3 className="text-base font-black text-foreground uppercase tracking-tighter">Select Sector</h3>
                                 <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-0.5">Filter news by industry</p>
                             </div>
-                            <button onClick={() => setIsOpen(false)} aria-label="Close menu" className="p-2 -mr-2 text-gray-400 hover:text-foreground bg-gray-100 rounded-full">
+                            <button onClick={() => setIsOpen(false)} aria-label="Close menu" className="p-2 -mr-2 text-gray-400 hover:text-foreground bg-gray-100 dark:bg-gray-800 rounded-full">
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
@@ -87,7 +87,7 @@ export default function MobileNav() {
                             <Link
                                 href="/"
                                 prefetch={false}
-                                className={`w-full flex items-center justify-between px-4 py-4 rounded-xl border transition-all ${isOverview ? 'bg-[#3182f6] border-[#3182f6] text-white' : 'bg-gray-50 border-gray-100 text-muted-foreground hover:bg-gray-100'}`}
+                                className={`w-full flex items-center justify-between px-4 py-4 rounded-xl border transition-all ${isOverview ? 'bg-[#3182f6] border-[#3182f6] text-white' : 'bg-gray-50 dark:bg-gray-800 border-gray-100 dark:border-gray-700 text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-700'}`}
                             >
                                 <div className="flex items-center gap-3">
                                     <Home className="w-4 h-4" />
@@ -96,20 +96,20 @@ export default function MobileNav() {
                                 {isOverview && <ChevronRight className="w-4 h-4" />}
                             </Link>
 
-                            <div className="h-px bg-gray-100 my-2" />
+                            <div className="h-px bg-gray-100 dark:bg-gray-800 my-2" />
 
                             {CATEGORIES.map(cat => (
                                 <Link
                                     key={cat}
                                     href={`/?category=${encodeURIComponent(cat)}`}
-                                    className={`w-full flex items-center justify-between px-4 py-4 rounded-xl border transition-all ${selectedCategory === cat ? 'bg-[#3182f6] border-[#3182f6] text-white' : 'bg-gray-50 border-gray-100 text-muted-foreground hover:bg-gray-100'}`}
+                                    className={`w-full flex items-center justify-between px-4 py-4 rounded-xl border transition-all ${selectedCategory === cat ? 'bg-[#3182f6] border-[#3182f6] text-white' : 'bg-gray-50 dark:bg-gray-800 border-gray-100 dark:border-gray-700 text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-700'}`}
                                 >
                                     <span className="font-bold text-sm uppercase tracking-wide">{cat}</span>
                                     {selectedCategory === cat && <ChevronRight className="w-4 h-4" />}
                                 </Link>
                             ))}
 
-                            <div className="h-px bg-gray-100 my-4" />
+                            <div className="h-px bg-gray-100 dark:bg-gray-800 my-4" />
 
                             {/* Keyword Suggestion Button for Mobile */}
                             <button
@@ -117,7 +117,7 @@ export default function MobileNav() {
                                     setIsOpen(false);
                                     setIsSuggestOpen(true);
                                 }}
-                                className="w-full flex items-center justify-between px-4 py-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition-all group"
+                                className="w-full flex items-center justify-between px-4 py-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all group"
                             >
                                 <div className="flex items-center gap-3">
                                     <MessageSquarePlus className="w-4 h-4 text-blue-400" />

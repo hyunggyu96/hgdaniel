@@ -237,7 +237,7 @@ export default function AnalysisPage() {
     };
 
     return (
-        <main className="min-h-screen bg-gray-50 p-6 md:p-12">
+        <main className="min-h-screen bg-gray-50 dark:bg-gray-950 p-6 md:p-12 transition-colors duration-300">
             <div className="max-w-5xl mx-auto space-y-8">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-center mb-8">
@@ -328,7 +328,7 @@ export default function AnalysisPage() {
                                 {companyName.slice(0, 1)}
                             </div>
                             <div className="flex flex-col">
-                                <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">{result.company.name}</h1>
+                                <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">{result.company.name}</h1>
                                 <div className="flex items-center gap-2 mt-1">
                                     <span className="text-gray-500 text-lg font-medium">
                                         {result.company.stock_code === '000000' ? '비상장' : result.company.stock_code}
@@ -342,7 +342,7 @@ export default function AnalysisPage() {
                             </div>
                         </div>
 
-                        <div className="flex flex-wrap gap-6 items-center bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex-1">
+                        <div className="flex flex-wrap gap-6 items-center bg-white dark:bg-gray-900 p-5 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm flex-1">
                             <div className="flex flex-col">
                                 <span className="text-xs text-gray-500 uppercase font-semibold tracking-wide">Price</span>
                                 <div className="flex items-end gap-2 mt-1">
@@ -387,166 +387,143 @@ export default function AnalysisPage() {
 
                             {result.financial_history && Object.keys(result.financial_history).length > 0 ? (
                                 <>
-                                {/* Revenue Chart */}
-                                {(() => {
-                                    const chartData = YEARS.map(year => {
-                                        const yearData = result.financial_history[year];
-                                        const rev = yearData?.revenue;
-                                        const op = yearData?.operating_profit;
-                                        const parseEok = (v: string | undefined) => {
-                                            if (!v || v === 'N/A' || v === '-') return 0;
-                                            const n = parseFloat(v);
-                                            return isNaN(n) ? 0 : Math.round(n / 1e8);
-                                        };
-                                        return {
-                                            year,
-                                            매출액: parseEok(rev),
-                                            영업이익: parseEok(op),
-                                        };
-                                    });
-                                    const hasData = chartData.some(d => d.매출액 > 0 || d.영업이익 > 0);
-                                    if (!hasData) return null;
+                                    {/* Revenue Chart */}
+                                    {(() => {
+                                        const chartData = YEARS.map(year => {
+                                            const yearData = result.financial_history[year];
+                                            const rev = yearData?.revenue;
+                                            const op = yearData?.operating_profit;
+                                            const parseEok = (v: string | undefined) => {
+                                                if (!v || v === 'N/A' || v === '-') return 0;
+                                                const n = parseFloat(v);
+                                                return isNaN(n) ? 0 : Math.round(n / 1e8);
+                                            };
+                                            return {
+                                                year,
+                                                매출액: parseEok(rev),
+                                                영업이익: parseEok(op),
+                                            };
+                                        });
+                                        const hasData = chartData.some(d => d.매출액 > 0 || d.영업이익 > 0);
+                                        if (!hasData) return null;
 
-                                    return (
-                                        <div className="mb-6 pb-4 border-b border-gray-100">
-                                            <ResponsiveContainer width="100%" height={220}>
-                                                <ComposedChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
-                                                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                                    <XAxis dataKey="year" tick={{ fontSize: 12, fill: '#6b7280' }} />
-                                                    <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} tickFormatter={(v) => v >= 10000 ? `${(v / 10000).toFixed(1)}조` : `${v.toLocaleString()}억`} width={60} />
-                                                    <Tooltip
-                                                        formatter={(value: number, name: string) => {
-                                                            if (value === 0) return ['-', name];
-                                                            const jo = Math.floor(value / 10000);
-                                                            const eok = value % 10000;
-                                                            let formatted = '';
-                                                            if (jo > 0) formatted += `${jo}조 `;
-                                                            if (eok > 0) formatted += `${eok.toLocaleString()}억`;
-                                                            return [formatted.trim() || '0', name];
-                                                        }}
-                                                        contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e5e7eb' }}
-                                                    />
-                                                    <Legend wrapperStyle={{ fontSize: 12 }} />
-                                                    <Bar dataKey="매출액" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={36} />
-                                                    <Line type="monotone" dataKey="영업이익" stroke="#047857" strokeWidth={2.5} dot={{ r: 3.5 }} activeDot={{ r: 5 }} />
-                                                </ComposedChart>
-                                            </ResponsiveContainer>
-                                        </div>
-                                    );
-                                })()}
+                                        return (
+                                            <div className="mb-6 pb-4 border-b border-gray-100">
+                                                <ResponsiveContainer width="100%" height={220}>
+                                                    <ComposedChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
+                                                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                                        <XAxis dataKey="year" tick={{ fontSize: 12, fill: '#6b7280' }} />
+                                                        <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} tickFormatter={(v) => v >= 10000 ? `${(v / 10000).toFixed(1)}조` : `${v.toLocaleString()}억`} width={60} />
+                                                        <Tooltip
+                                                            formatter={(value: number, name: string) => {
+                                                                if (value === 0) return ['-', name];
+                                                                const jo = Math.floor(value / 10000);
+                                                                const eok = value % 10000;
+                                                                let formatted = '';
+                                                                if (jo > 0) formatted += `${jo}조 `;
+                                                                if (eok > 0) formatted += `${eok.toLocaleString()}억`;
+                                                                return [formatted.trim() || '0', name];
+                                                            }}
+                                                            contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e5e7eb' }}
+                                                        />
+                                                        <Legend wrapperStyle={{ fontSize: 12 }} />
+                                                        <Bar dataKey="매출액" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={36} />
+                                                        <Line type="monotone" dataKey="영업이익" stroke="#047857" strokeWidth={2.5} dot={{ r: 3.5 }} activeDot={{ r: 5 }} />
+                                                    </ComposedChart>
+                                                </ResponsiveContainer>
+                                            </div>
+                                        );
+                                    })()}
 
-                                <div className="overflow-x-auto">
-                                    <table className="min-w-full divide-y divide-gray-200">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider bg-blue-50/80 w-32 border-r border-gray-100">
-                                                    구분
-                                                </th>
-                                                {YEARS.map(year => (
-                                                    <th key={year} scope="col" className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider bg-blue-50/50">
-                                                        {year}
+                                    <div className="overflow-x-auto">
+                                        <table className="min-w-full divide-y divide-gray-200">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider bg-blue-50/80 w-32 border-r border-gray-100">
+                                                        구분
                                                     </th>
-                                                ))}
-                                            </tr>
-                                        </thead>
-                                        <tbody className="bg-white divide-y divide-gray-100">
-                                            {/* Revenue Row */}
-                                            <tr className="hover:bg-gray-50 transition-colors">
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 bg-gray-100/80 border-r border-gray-200">
-                                                    매출액
-                                                </td>
-                                                {YEARS.map(year => {
-                                                    const yearData = result.financial_history[year];
-                                                    const dataType = yearData?.data_type;
-                                                    const isYTD = dataType && dataType.startsWith('ytd_');
-
-                                                    return (
-                                                        <td key={year} className="px-6 py-4 whitespace-nowrap text-sm text-center font-medium text-blue-600">
-                                                            <div className="flex items-center justify-center gap-2">
-                                                                <span>{formatKoreanNumber(yearData?.revenue)}</span>
-                                                                {isYTD && (
-                                                                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800">
-                                                                        YTD
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                        </td>
-                                                    );
-                                                })}
-                                            </tr>
-                                            {/* Operating Profit Row */}
-                                            <tr className="hover:bg-gray-50 transition-colors">
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 bg-gray-100/80 border-r border-gray-200">
-                                                    영업이익
-                                                </td>
-                                                {YEARS.map(year => (
-                                                    <td key={year} className="px-6 py-4 whitespace-nowrap text-sm text-center font-medium text-green-600">
-                                                        {formatKoreanNumber(result.financial_history[year]?.operating_profit)}
-                                                    </td>
-                                                ))}
-                                            </tr>
-                                            {/* R&D Cost Row */}
-                                            <tr className="hover:bg-gray-50 transition-colors">
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 bg-gray-100/80 border-r border-gray-200">
-                                                    연구비용
-                                                </td>
-                                                {YEARS.map(year => {
-                                                    const rdCost = result.financial_history[year]?.rd_cost;
-                                                    const revenue = result.financial_history[year]?.revenue;
-                                                    const ratio = calculateRatio(rdCost, revenue);
-
-                                                    return (
-                                                        <td key={year} className="px-6 py-4 whitespace-nowrap text-sm text-center font-medium text-purple-600">
-                                                            <div className="flex items-center justify-center gap-2">
-                                                                <span>{formatKoreanNumber(rdCost)}</span>
-                                                                {ratio && (
-                                                                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800">
-                                                                        {ratio}%
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                        </td>
-                                                    );
-                                                })}
-                                            </tr>
-                                            {/* Divider Row for Visual Separation */}
-                                            <tr><td colSpan={5} className="bg-gray-50 h-2 p-0"></td></tr>
-
-                                            {/* Annual Report Row */}
-                                            <tr className="hover:bg-gray-50 transition-colors">
-                                                <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold text-gray-500 bg-gray-100/80 border-r border-gray-200">
-                                                    사업보고서
-                                                </td>
-                                                {YEARS.map(year => {
-                                                    const report = result.financial_history[year]?.annual_report;
-                                                    return (
-                                                        <td key={year} className="px-6 py-3 whitespace-nowrap text-sm text-center">
-                                                            {report ? (
-                                                                <a href={report.link} target="_blank" rel="noopener noreferrer"
-                                                                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800 transition-colors border border-blue-200">
-                                                                    View
-                                                                </a>
-                                                            ) : <span className="text-gray-300">-</span>}
-                                                        </td>
-                                                    );
-                                                })}
-                                            </tr>
-
-                                            {/* Quarterly Reports Rows */}
-                                            {['Q4', 'Q3', 'Q2', 'Q1'].map(quarter => (
-                                                <tr key={quarter} className="hover:bg-gray-50 transition-colors">
-                                                    <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold text-gray-500 bg-gray-100/80 border-r border-gray-200">
-                                                        {quarter === 'Q1' ? '1분기' : quarter === 'Q2' ? '2분기' : quarter === 'Q3' ? '3분기' : '4분기'}
+                                                    {YEARS.map(year => (
+                                                        <th key={year} scope="col" className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider bg-blue-50/50">
+                                                            {year}
+                                                        </th>
+                                                    ))}
+                                                </tr>
+                                            </thead>
+                                            <tbody className="bg-white divide-y divide-gray-100">
+                                                {/* Revenue Row */}
+                                                <tr className="hover:bg-gray-50 transition-colors">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 bg-gray-100/80 border-r border-gray-200">
+                                                        매출액
                                                     </td>
                                                     {YEARS.map(year => {
-                                                        // Dynamic access to quarter property safely
-                                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                        const report = (result.financial_history[year] as any)?.[quarter];
+                                                        const yearData = result.financial_history[year];
+                                                        const dataType = yearData?.data_type;
+                                                        const isYTD = dataType && dataType.startsWith('ytd_');
+
+                                                        return (
+                                                            <td key={year} className="px-6 py-4 whitespace-nowrap text-sm text-center font-medium text-blue-600">
+                                                                <div className="flex items-center justify-center gap-2">
+                                                                    <span>{formatKoreanNumber(yearData?.revenue)}</span>
+                                                                    {isYTD && (
+                                                                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800">
+                                                                            YTD
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            </td>
+                                                        );
+                                                    })}
+                                                </tr>
+                                                {/* Operating Profit Row */}
+                                                <tr className="hover:bg-gray-50 transition-colors">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 bg-gray-100/80 border-r border-gray-200">
+                                                        영업이익
+                                                    </td>
+                                                    {YEARS.map(year => (
+                                                        <td key={year} className="px-6 py-4 whitespace-nowrap text-sm text-center font-medium text-green-600">
+                                                            {formatKoreanNumber(result.financial_history[year]?.operating_profit)}
+                                                        </td>
+                                                    ))}
+                                                </tr>
+                                                {/* R&D Cost Row */}
+                                                <tr className="hover:bg-gray-50 transition-colors">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 bg-gray-100/80 border-r border-gray-200">
+                                                        연구비용
+                                                    </td>
+                                                    {YEARS.map(year => {
+                                                        const rdCost = result.financial_history[year]?.rd_cost;
+                                                        const revenue = result.financial_history[year]?.revenue;
+                                                        const ratio = calculateRatio(rdCost, revenue);
+
+                                                        return (
+                                                            <td key={year} className="px-6 py-4 whitespace-nowrap text-sm text-center font-medium text-purple-600">
+                                                                <div className="flex items-center justify-center gap-2">
+                                                                    <span>{formatKoreanNumber(rdCost)}</span>
+                                                                    {ratio && (
+                                                                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800">
+                                                                            {ratio}%
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            </td>
+                                                        );
+                                                    })}
+                                                </tr>
+                                                {/* Divider Row for Visual Separation */}
+                                                <tr><td colSpan={5} className="bg-gray-50 h-2 p-0"></td></tr>
+
+                                                {/* Annual Report Row */}
+                                                <tr className="hover:bg-gray-50 transition-colors">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold text-gray-500 bg-gray-100/80 border-r border-gray-200">
+                                                        사업보고서
+                                                    </td>
+                                                    {YEARS.map(year => {
+                                                        const report = result.financial_history[year]?.annual_report;
                                                         return (
                                                             <td key={year} className="px-6 py-3 whitespace-nowrap text-sm text-center">
                                                                 {report ? (
                                                                     <a href={report.link} target="_blank" rel="noopener noreferrer"
-                                                                        className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                                                                        className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800 transition-colors border border-blue-200">
                                                                         View
                                                                     </a>
                                                                 ) : <span className="text-gray-300">-</span>}
@@ -554,10 +531,33 @@ export default function AnalysisPage() {
                                                         );
                                                     })}
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
+
+                                                {/* Quarterly Reports Rows */}
+                                                {['Q4', 'Q3', 'Q2', 'Q1'].map(quarter => (
+                                                    <tr key={quarter} className="hover:bg-gray-50 transition-colors">
+                                                        <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold text-gray-500 bg-gray-100/80 border-r border-gray-200">
+                                                            {quarter === 'Q1' ? '1분기' : quarter === 'Q2' ? '2분기' : quarter === 'Q3' ? '3분기' : '4분기'}
+                                                        </td>
+                                                        {YEARS.map(year => {
+                                                            // Dynamic access to quarter property safely
+                                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                            const report = (result.financial_history[year] as any)?.[quarter];
+                                                            return (
+                                                                <td key={year} className="px-6 py-3 whitespace-nowrap text-sm text-center">
+                                                                    {report ? (
+                                                                        <a href={report.link} target="_blank" rel="noopener noreferrer"
+                                                                            className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                                                                            View
+                                                                        </a>
+                                                                    ) : <span className="text-gray-300">-</span>}
+                                                                </td>
+                                                            );
+                                                        })}
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </>
                             ) : (
                                 <Text>No financial history available</Text>
@@ -602,7 +602,7 @@ export default function AnalysisPage() {
 
                     {/* 3. Analysis Summary - BOTTOM */}
                     <div className="mt-8">
-                        <Card className="overflow-hidden shadow-lg border-0 ring-1 ring-gray-200 sm:rounded-xl bg-white">
+                        <Card className="overflow-hidden shadow-lg border-0 ring-1 ring-gray-200 dark:ring-gray-700 sm:rounded-xl bg-white dark:bg-gray-900">
                             <div className="flex justify-between items-center mb-6">
                                 <div className="flex items-center gap-2">
                                     <div className="bg-purple-100 p-1.5 rounded-lg">

@@ -61,10 +61,10 @@ export default function KeywordSuggestionModal({ isOpen, onClose }: { isOpen: bo
                         initial={{ opacity: 0, scale: 0.95, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                        className="relative w-full max-w-sm bg-white border border-gray-200 rounded-2xl shadow-2xl flex flex-col overflow-hidden max-h-[95vh] pointer-events-auto"
+                        className="relative w-full max-w-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden max-h-[95vh] pointer-events-auto"
                     >
                         {/* Header: Fixed */}
-                        <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-white shrink-0">
+                        <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-white dark:bg-gray-900 shrink-0">
                             <div className="flex items-center gap-2.5">
                                 <div className="w-7 h-7 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
                                     <MessageSquarePlus className="w-3.5 h-3.5 text-blue-500" />
@@ -76,14 +76,14 @@ export default function KeywordSuggestionModal({ isOpen, onClose }: { isOpen: bo
                             </div>
                             <button
                                 onClick={onClose}
-                                className="p-1.5 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-foreground"
+                                className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors text-gray-400 hover:text-foreground"
                                 aria-label="Close"
                             >
                                 <X className="w-4 h-4" />
                             </button>
                         </div>
                         {/* Body: Scrollable */}
-                        <div className="overflow-y-auto px-5 py-5 custom-scrollbar bg-gray-50">
+                        <div className="overflow-y-auto px-5 py-5 custom-scrollbar bg-gray-50 dark:bg-gray-900/50">
                             {!userId ? (
                                 <div className="py-10 flex flex-col items-center justify-center text-center">
                                     <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mb-4">
@@ -133,7 +133,7 @@ export default function KeywordSuggestionModal({ isOpen, onClose }: { isOpen: bo
                                             value={keyword}
                                             onChange={(e) => setKeyword(e.target.value)}
                                             placeholder="예: 제테마, 쥬베룩 등"
-                                            className="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-blue-500/50 transition-colors"
+                                            className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3.5 py-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-blue-500/50 transition-colors"
                                         />
                                     </div>
 
@@ -146,8 +146,8 @@ export default function KeywordSuggestionModal({ isOpen, onClose }: { isOpen: bo
                                                     type="button"
                                                     onClick={() => setCategory(cat)}
                                                     className={`py-2 rounded-lg text-[10px] font-bold transition-all border ${category === cat
-                                                        ? 'bg-blue-50 text-blue-600 border-blue-200'
-                                                        : 'bg-white text-gray-400 border-gray-200 hover:bg-gray-100'
+                                                        ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800'
+                                                        : 'bg-white dark:bg-gray-800 text-gray-400 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700'
                                                         }`}
                                                 >
                                                     {cat}
@@ -163,7 +163,7 @@ export default function KeywordSuggestionModal({ isOpen, onClose }: { isOpen: bo
                                             onChange={(e) => setReason(e.target.value)}
                                             placeholder="메모를 입력해 주세요."
                                             rows={2}
-                                            className="w-full bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-blue-500/50 transition-colors resize-none"
+                                            className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3.5 py-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-blue-500/50 transition-colors resize-none"
                                         />
                                     </div>
                                 </form>
@@ -172,7 +172,7 @@ export default function KeywordSuggestionModal({ isOpen, onClose }: { isOpen: bo
 
                         {/* Footer: Fixed */}
                         {userId && status !== 'success' && (
-                            <div className="px-5 py-4 border-t border-gray-100 bg-white shrink-0">
+                            <div className="px-5 py-4 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shrink-0">
                                 <button
                                     form="suggest-form"
                                     disabled={status === 'loading'}

@@ -24,7 +24,7 @@ export default function HeaderStatus() {
         <>
             {/* Desktop View */}
             <div className="hidden lg:flex flex-col items-end gap-1">
-                <div className="text-[11px] font-bold text-foreground uppercase tracking-widest bg-white px-4 py-1.5 rounded-full border border-gray-200 shadow-sm transition-all hover:bg-gray-50">
+                <div className="text-[11px] font-bold text-foreground uppercase tracking-widest bg-white dark:bg-gray-800 px-4 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:bg-gray-50 dark:hover:bg-gray-700">
                     {dateStr}
                 </div>
                 <div className="flex items-center gap-1.5 text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mt-1">

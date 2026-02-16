@@ -43,13 +43,13 @@ export default function SearchBar() {
                     value={searchQuery}
                     onChange={(e) => handleSearch(e.target.value)}
                     placeholder="뉴스 검색..."
-                    className="w-full pl-10 pr-10 py-2 bg-white border border-gray-200 rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all shadow-sm hover:border-blue-300 hover:bg-gray-50/50"
+                    className="w-full pl-10 pr-10 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 focus:border-blue-500 transition-all shadow-sm hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50/50 dark:hover:bg-gray-700/50"
                 />
                 {searchQuery && (
                     <button
                         onClick={clearSearch}
                         aria-label="Clear search"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-foreground transition-colors p-1 rounded-full hover:bg-gray-100"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-foreground transition-colors p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                         <X className="w-3.5 h-3.5" />
                     </button>

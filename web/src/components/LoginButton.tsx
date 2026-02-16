@@ -49,7 +49,7 @@ export default function LoginButton() {
     if (userId) {
         return (
             <div
-                className="flex items-center gap-3 bg-white border border-gray-200 px-4 h-10 rounded-xl hover:bg-gray-50 transition-all cursor-default group"
+                className="flex items-center gap-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 h-10 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all cursor-default group"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >
@@ -76,7 +76,7 @@ export default function LoginButton() {
         return (
             <form
                 onSubmit={handleLogin}
-                className="flex items-center bg-white border border-gray-200 h-10 rounded-xl overflow-hidden focus-within:border-blue-500/50 transition-all shadow-lg shadow-black/5"
+                className="flex items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 h-10 rounded-xl overflow-hidden focus-within:border-blue-500/50 transition-all shadow-lg shadow-black/5"
             >
                 <input
                     autoFocus

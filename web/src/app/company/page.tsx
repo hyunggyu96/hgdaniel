@@ -124,7 +124,7 @@ export default function CompanyPage() {
     const globalCount = allCompanies.filter(c => c.category === 'global').length;
 
     return (
-        <main className="min-h-screen bg-gray-50/50 p-6 md:p-12 pb-24">
+        <main className="min-h-screen bg-gray-50/50 dark:bg-gray-950 p-6 md:p-12 pb-24 transition-colors duration-300">
             <div className="max-w-7xl mx-auto space-y-6">
 
                 {/* Premium Header Compact */}
@@ -160,12 +160,12 @@ export default function CompanyPage() {
                 {/* Controls: Tabs & Search */}
                 <div className="flex flex-col md:flex-row gap-4 items-center justify-between sticky top-4 z-20">
                     {/* Segmented Tab Control */}
-                    <div className="bg-white/80 backdrop-blur-md p-1.5 rounded-xl border border-white/50 shadow-sm ring-1 ring-gray-200/50 flex w-full md:w-auto">
+                    <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md p-1.5 rounded-xl border border-white/50 dark:border-gray-700 shadow-sm ring-1 ring-gray-200/50 dark:ring-gray-700 flex w-full md:w-auto">
                         <button
                             onClick={() => handleCategoryChange('korean')}
                             className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2 ${activeCategory === 'korean'
-                                ? 'bg-white text-blue-600 shadow-md ring-1 ring-gray-100'
-                                : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                                ? 'bg-white dark:bg-gray-800 text-blue-600 shadow-md ring-1 ring-gray-100 dark:ring-gray-700'
+                                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700'
                                 }`}
                         >
                             <span>🇰🇷</span>
@@ -174,8 +174,8 @@ export default function CompanyPage() {
                         <button
                             onClick={() => handleCategoryChange('global')}
                             className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2 ${activeCategory === 'global'
-                                ? 'bg-white text-blue-600 shadow-md ring-1 ring-gray-100'
-                                : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                                ? 'bg-white dark:bg-gray-800 text-blue-600 shadow-md ring-1 ring-gray-100 dark:ring-gray-700'
+                                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700'
                                 }`}
                         >
                             <span>🌍</span>
@@ -184,13 +184,13 @@ export default function CompanyPage() {
                     </div>
 
                     {/* Search Bar */}
-                    <div className="relative w-full md:w-64 group bg-white/80 backdrop-blur-md rounded-xl shadow-sm border border-white/50 ring-1 ring-gray-200/50">
+                    <div className="relative w-full md:w-64 group bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-xl shadow-sm border border-white/50 dark:border-gray-700 ring-1 ring-gray-200/50 dark:ring-gray-700">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <Search className="h-4 w-4 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
                         </div>
                         <input
                             type="text"
-                            className="block w-full pl-10 pr-3 py-2.5 bg-transparent border-none rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                            className="block w-full pl-10 pr-3 py-2.5 bg-transparent border-none rounded-xl text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                             placeholder={lang === 'ko' ? "기업명 검색..." : "Search companies..."}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
@@ -211,10 +211,10 @@ export default function CompanyPage() {
                             <div
                                 key={item.id}
                                 onClick={() => router.push(`/analysis?company=${companyNameKo}`)}
-                                className={`group relative bg-white rounded-xl p-4 border transition-all duration-300 cursor-pointer flex flex-col items-center justify-center gap-2 hover:bg-gray-50/50
+                                className={`group relative bg-white dark:bg-gray-900 rounded-xl p-4 border transition-all duration-300 cursor-pointer flex flex-col items-center justify-center gap-2 hover:bg-gray-50/50 dark:hover:bg-gray-800
                                 ${isHighlight
                                         ? 'border-violet-100 ring-2 ring-violet-500/20 shadow-lg shadow-violet-500/10'
-                                        : 'border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-blue-100'}
+                                        : 'border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-blue-100 dark:hover:border-blue-900'}
                                 `}
                             >
                                 {/* Highlight Effect */}
@@ -229,7 +229,7 @@ export default function CompanyPage() {
 
                                 {/* Compact Content */}
                                 <div className="text-center w-full space-y-2">
-                                    <h3 className={`text-base font-bold truncate px-2 ${displayName.length > 8 ? 'text-sm' : ''} ${isHighlight ? 'text-violet-900' : 'text-gray-900 group-hover:text-blue-700 transition-colors'}`}>
+                                    <h3 className={`text-base font-bold truncate px-2 ${displayName.length > 8 ? 'text-sm' : ''} ${isHighlight ? 'text-violet-900 dark:text-violet-300' : 'text-gray-900 dark:text-gray-100 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors'}`}>
                                         {displayName}
                                     </h3>
                                     <div className="flex justify-center">

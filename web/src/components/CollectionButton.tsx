@@ -24,7 +24,7 @@ export default function CollectionButton({ newsLink, newsTitle, size = 14 }: { n
             disabled={!isLoggedIn}
             title={!isLoggedIn ? "로그인이 필요합니다" : ""}
             aria-label={inCollection ? "Remove from collections" : "Add to collections"}
-            className={`group/star p-1 rounded-lg transition-all ${isLoggedIn ? 'hover:bg-gray-100' : 'cursor-not-allowed opacity-30 shadow-none'}`}
+            className={`group/star p-1 rounded-lg transition-all ${isLoggedIn ? 'hover:bg-gray-100 dark:hover:bg-gray-700' : 'cursor-not-allowed opacity-30 shadow-none'}`}
         >
             <Star
                 style={{ width: `${size}px`, height: `${size}px` }}

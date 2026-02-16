@@ -34,7 +34,7 @@ export default function TrendChartInner() {
     }, []);
 
     if (loading) {
-        return <div className="h-80 w-full animate-pulse bg-gray-100 rounded-lg flex items-center justify-center text-muted-foreground">데이터를 불러오는 중...</div>;
+        return <div className="h-80 w-full animate-pulse bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center text-muted-foreground">데이터를 불러오는 중...</div>;
     }
 
     const CATEGORY_COLORS: Record<string, string> = {
@@ -53,7 +53,7 @@ export default function TrendChartInner() {
     };
 
     return (
-        <Card className="mt-4 bg-white border-gray-200 shadow-xl">
+        <Card className="mt-4 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 shadow-xl transition-colors duration-300">
             <Title className="text-xl font-black text-foreground tracking-tight">키워드 뉴스 트렌드</Title>
             <Text className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mt-1">제품 카테고리별 뉴스 발생 추이 (최근 7일)</Text>
 
@@ -77,7 +77,7 @@ export default function TrendChartInner() {
                                 </linearGradient>
                             ))}
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-gray-200 dark:text-gray-700" vertical={false} />
                         <XAxis
                             dataKey="date"
                             axisLine={false}

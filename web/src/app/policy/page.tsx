@@ -124,7 +124,7 @@ const DetailView = ({
     };
 
     return (
-        <div className="space-y-6 animate-fade-in bg-white rounded-3xl p-6 md:p-8 border border-gray-100 shadow-sm">
+        <div className="space-y-6 animate-fade-in bg-white dark:bg-gray-900 rounded-3xl p-6 md:p-8 border border-gray-100 dark:border-gray-800 shadow-sm">
             {/* Country Header */}
             <div className="flex flex-col md:flex-row items-start gap-6 border-b border-gray-100 pb-6">
                 <img
@@ -134,7 +134,7 @@ const DetailView = ({
                 />
                 <div className="flex-1 space-y-2">
                     <div className="flex flex-wrap items-center gap-3">
-                        <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900">{countryName} Regulations</h2>
+                        <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">{countryName} Regulations</h2>
                         <div className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-100 text-[10px] font-bold uppercase tracking-wide">
                             {profile.facts.length} Fields Analyzed
                         </div>
@@ -222,13 +222,13 @@ const DetailView = ({
 
             {/* Key Legal Instruments */}
             <div className="space-y-4 pt-6 border-t border-gray-100">
-                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2 pl-1">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2 pl-1">
                     <div className="w-1 h-5 bg-indigo-600 rounded-full"></div>
                     Key Legal Instruments
                 </h3>
                 <div className="grid grid-cols-1 gap-3">
                     {profile.keyRegulations.map((item: any) => (
-                        <div key={item.id} className="flex flex-col bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md hover:border-indigo-300 transition-all duration-200 group">
+                        <div key={item.id} className="flex flex-col bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md hover:border-indigo-300 transition-all duration-200 group">
                             <div className="flex-1 p-4 md:flex md:items-start md:justify-between gap-4">
                                 <div className="space-y-1.5 flex-1">
                                     <div className="flex flex-wrap items-center gap-2">
@@ -241,7 +241,7 @@ const DetailView = ({
                                         <span className="text-[11px] text-gray-400 font-mono">{item.documentNo}</span>
                                     </div>
 
-                                    <h4 className="text-sm md:text-base font-bold text-gray-900 group-hover:text-indigo-700 transition-colors">
+                                    <h4 className="text-sm md:text-base font-bold text-gray-900 dark:text-gray-100 group-hover:text-indigo-700 transition-colors">
                                         {item.title}
                                     </h4>
 
@@ -270,7 +270,7 @@ const DetailView = ({
 
 // Extracted Fact Card for reusability
 const FactCard = ({ fact, language }: { fact: CountryPolicyFact; language: "ko" | "en" }) => (
-    <div className="group relative bg-gray-50/50 rounded-xl p-5 border border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all duration-300">
+    <div className="group relative bg-gray-50/50 dark:bg-gray-800/50 rounded-xl p-5 border border-gray-100 dark:border-gray-700 hover:border-blue-200 hover:bg-blue-50/30 dark:hover:bg-blue-900/20 transition-all duration-300">
         <div className="flex justify-between items-start mb-2">
             <span className="text-xs font-bold uppercase tracking-wider text-gray-500 group-hover:text-blue-600 transition-colors">
                 {getLocalizedText(language, fact.label)}
@@ -353,7 +353,7 @@ export default function PolicyPage() {
     const lang = language as "ko" | "en";
 
     return (
-        <main className="min-h-screen bg-gray-50/50 p-6 md:p-12 pb-24">
+        <main className="min-h-screen bg-gray-50/50 dark:bg-gray-950 p-6 md:p-12 pb-24 transition-colors duration-300">
             <div className="max-w-7xl mx-auto space-y-6">
 
                 {/* Premium Header Compact */}
@@ -388,7 +388,7 @@ export default function PolicyPage() {
 
                     {/* Left Panel: Country List (Sticky) */}
                     <div className="lg:col-span-4 lg:sticky lg:top-8 flex flex-col gap-3">
-                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+                        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-4">
                             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-1">Select Region</h3>
                             <div className="space-y-2">
                                 {COUNTRIES.map((country) => {
@@ -402,7 +402,7 @@ export default function PolicyPage() {
                                             className={`group relative flex items-center gap-3 p-3 rounded-xl transition-all cursor-pointer border
                                                 ${isSelected
                                                     ? "bg-blue-50 border-blue-200 shadow-sm"
-                                                    : "bg-white border-transparent hover:border-gray-100 hover:bg-gray-50"
+                                                    : "bg-white dark:bg-gray-900 border-transparent hover:border-gray-100 dark:hover:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
                                                 }
                                                 ${!isSupported && "opacity-60 grayscale hover:grayscale-0"}
                                             `}
@@ -420,7 +420,7 @@ export default function PolicyPage() {
 
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center justify-between">
-                                                    <h4 className={`text-sm font-bold truncate ${isSelected ? "text-blue-700" : "text-gray-700"}`}>
+                                                    <h4 className={`text-sm font-bold truncate ${isSelected ? "text-blue-700 dark:text-blue-400" : "text-gray-700 dark:text-gray-300"}`}>
                                                         {lang === "ko" ? country.nameKo : country.nameEn}
                                                     </h4>
                                                     {isSupported && isSelected && <ChevronRight className="w-4 h-4 text-blue-500" />}
@@ -451,17 +451,17 @@ export default function PolicyPage() {
                                 language={lang}
                             />
                         ) : selectedCountry && !profile ? (
-                            <div className="bg-white rounded-3xl p-12 text-center border border-gray-100 shadow-sm flex flex-col items-center justify-center h-full min-h-[400px]">
+                            <div className="bg-white dark:bg-gray-900 rounded-3xl p-12 text-center border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col items-center justify-center h-full min-h-[400px]">
                                 <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-4 text-3xl grayscale opacity-50">
                                     🚧
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-900 mb-2">Coming Soon</h3>
+                                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">Coming Soon</h3>
                                 <p className="text-gray-500 max-w-sm mx-auto leading-relaxed">
                                     Detailed regulatory data for <span className="font-bold text-gray-700">{lang === 'ko' ? COUNTRIES.find(c => c.id === selectedCountry)?.nameKo : COUNTRIES.find(c => c.id === selectedCountry)?.nameEn}</span> is currently being collected/verified.
                                 </p>
                             </div>
                         ) : (
-                            <div className="bg-white rounded-3xl p-12 text-center border border-gray-100 shadow-sm flex flex-col items-center justify-center h-full min-h-[400px]">
+                            <div className="bg-white dark:bg-gray-900 rounded-3xl p-12 text-center border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col items-center justify-center h-full min-h-[400px]">
                                 <Globe className="w-12 h-12 text-gray-200 mb-4" />
                                 <p className="text-gray-400">Select a country to view regulations</p>
                             </div>
