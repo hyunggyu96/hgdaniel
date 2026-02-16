@@ -27,7 +27,8 @@ const KEYWORDS = [
     'PLLA',
     'PDLLA',
     'CaHA',
-    'HIFU'
+    'HIFU',
+    'Radiofrequency (RF)'
 ];
 
 export default function InsightsPage() {
