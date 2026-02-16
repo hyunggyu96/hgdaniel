@@ -38,7 +38,6 @@ export default function AnalysisPage() {
     const [language, setLanguage] = useState<'ko' | 'en'>('ko');
 
     // Separate state for real-time data
-    const [stockData, setStockData] = useState<any>(null);
     const [newsData, setNewsData] = useState<any>(null);
 
     useEffect(() => {
@@ -48,19 +47,12 @@ export default function AnalysisPage() {
         }
     }, [queryCompany]);
 
-    // Auto-refresh stock and news data every 30 seconds
+    // Auto-refresh news data every 30 seconds
     useEffect(() => {
         if (!companyName || !result) return;
 
         const refreshData = async () => {
             try {
-                // Fetch stock data
-                const stockRes = await fetch(API_ENDPOINTS.stockData(companyName));
-                if (stockRes.ok) {
-                    const stockJson = await stockRes.json();
-                    setStockData(stockJson);
-                }
-
                 // Fetch news data
                 const newsRes = await fetch(API_ENDPOINTS.news(companyName));
                 if (newsRes.ok) {
@@ -89,39 +81,40 @@ export default function AnalysisPage() {
         // Use Real Data from JSON if available
         const realData = financialData[name];
 
-        const db: Record<string, { code: string, price: string, change: string, cap: string }> = {
-            "한스바이오메드": { code: "042520", price: "24,950", change: "+150 (+0.6%)", cap: "3,553억" },
-            "엘앤씨바이오": { code: "290650", price: "68,200", change: "-500 (-0.7%)", cap: "1조 6,942억" },
-            "제테마": { code: "216080", price: "8,990", change: "+10 (+0.1%)", cap: "3,114억" },
-            "한국비엔씨": { code: "256840", price: "4,845", change: "+45 (+0.9%)", cap: "3,290억" },
-            "종근당바이오": { code: "063160", price: "21,250", change: "+250 (+1.2%)", cap: "1,166억" },
-            "휴온스": { code: "243070", price: "27,300", change: "+100 (+0.4%)", cap: "3,270억" },
-            "휴온스글로벌": { code: "084110", price: "50,900", change: "-200 (-0.4%)", cap: "6,444억" },
-            "휴메딕스": { code: "200670", price: "41,600", change: "+400 (+1.0%)", cap: "4,672억" },
-            "휴젤": { code: "145020", price: "270,500", change: "+2,500 (+0.9%)", cap: "3조 4,000억" },
-            "메디톡스": { code: "086900", price: "127,800", change: "-1,200 (-0.9%)", cap: "9,000억" },
-            "대웅제약": { code: "069620", price: "168,700", change: "+1,700 (+1.0%)", cap: "1조 9,300억" },
-            "파마리서치": { code: "214450", price: "510,000", change: "+5,000 (+1.0%)", cap: "5조 1,000억" },
-            "클래시스": { code: "214150", price: "63,900", change: "+600 (+0.9%)", cap: "4조 1,700억" },
-            "케어젠": { code: "214370", price: "101,800", change: "-500 (-0.5%)", cap: "4조 9,800억" },
-            "원텍": { code: "336570", price: "8,710", change: "+10 (+0.1%)", cap: "7,836억" },
-            "동방메디컬": { code: "240550", price: "7,580", change: "+110 (+1.5%)", cap: "1,607억" },
-            "제이시스메디칼": { code: "287410", price: "12,900", change: "0 (0.0%)", cap: "9,764억" },
-            "바이오비쥬": { code: "489460", price: "12,780", change: "+80 (+0.6%)", cap: "1,876억" },
-            "바이오플러스": { code: "099430", price: "5,300", change: "-50 (-0.9%)", cap: "3,267억" },
-            "비올": { code: "335890", price: "12,500", change: "+100 (+0.8%)", cap: "7,302억" },
-            "하이로닉": { code: "149980", price: "5,090", change: "-10 (-0.2%)", cap: "946억" },
-            "레이저옵텍": { code: "199550", price: "6,320", change: "+20 (+0.3%)", cap: "775억" },
-            "유바이오로직스": { code: "206650", price: "11,810", change: "+110 (+0.9%)", cap: "4,330억" },
-            "바임글로벌": { code: "000000", price: "-", change: "-", cap: "-" },
-            "엑소코바이오": { code: "305000", price: "-", change: "-", cap: "-" },
-            "멀츠": { code: "MERZ", price: "-", change: "-", cap: "Private" },
-            "앨러간": { code: "ABBV", price: "178.20", change: "+1.5 (+0.8%)", cap: "315B (USD)" },
-            "갈더마": { code: "GALD", price: "72.50", change: "+0.5 (+0.7%)", cap: "18B (CHF)" },
-            "테옥산": { code: "TEOX", price: "-", change: "-", cap: "Private" },
+        // Stock data removed as requested
+
+        // Basic company info map (simplified)
+        const db: Record<string, { code: string }> = {
+            "한스바이오메드": { code: "042520" },
+            "엘앤씨바이오": { code: "290650" },
+            "제테마": { code: "216080" },
+            "한국비엔씨": { code: "256840" },
+            "종근당바이오": { code: "063160" },
+            "휴온스": { code: "243070" },
+            "휴온스글로벌": { code: "084110" },
+            "휴메딕스": { code: "200670" },
+            "휴젤": { code: "145020" },
+            "메디톡스": { code: "086900" },
+            "대웅제약": { code: "069620" },
+            "파마리서치": { code: "214450" },
+            "클래시스": { code: "214150" },
+            "케어젠": { code: "214370" },
+            "원텍": { code: "336570" },
+            "동방메디컬": { code: "240550" },
+            "제이시스메디칼": { code: "287410" },
+            "바이오비쥬": { code: "489460" },
+            "바이오플러스": { code: "099430" },
+            "비올": { code: "335890" },
+            "하이로닉": { code: "149980" },
+            "레이저옵텍": { code: "199550" },
+            "유바이오로직스": { code: "206650" },
+            "멀츠": { code: "MERZ" },
+            "앨러간": { code: "ABBV" },
+            "갈더마": { code: "GALD" },
+            "테옥산": { code: "TEOX" },
         };
 
-        const companyInfo = db[name] || { code: "000000", price: "0", change: "0", cap: "0" };
+        const companyInfo = db[name] || { code: "000000" };
 
         return {
             "company": {
@@ -129,13 +122,6 @@ export default function AnalysisPage() {
                 "stock_code": companyInfo.code
             },
             "company_summary": `${name}은(는) 의료기기 및 바이오 헬스케어 분야에서 혁신적인 기술력을 보유한 선도 기업입니다. 지속적인 R&D 투자와 글로벌 시장 확대를 통해 안정적인 성장을 이어가고 있으며, 특히 에스테틱 및 치료용 의료기기 시장에서 강력한 경쟁력을 입증하고 있습니다.`,
-            "market_data": {
-                "price": companyInfo.price,
-                "change": companyInfo.change,
-                "market_cap": companyInfo.cap,
-                "market_type": "KOSDAQ",
-                "code": companyInfo.code
-            },
             "financial_history": (realData && realData.financial_history && Object.keys(realData.financial_history).length > 0)
                 ? realData.financial_history
                 : {
@@ -144,17 +130,6 @@ export default function AnalysisPage() {
                     "2024": { "revenue": "900", "operating_profit": "120", "rd_cost": "40" },
                     "2023": { "revenue": "850", "operating_profit": "100", "rd_cost": "35" }
                 },
-            "audit_report": {
-                "title": "제56기 반기보고서 (2024.06)",
-                "date": "2024-08-14",
-                "link": "#",
-                "financials": { "revenue": "450", "profit": "60" }
-            },
-            "prior_report": {
-                "title": "제55기 사업보고서 (2023.12)",
-                "date": "2024-03-12",
-                "financials": { "revenue": "850", "profit": "50" }
-            },
             "news_analysis": {
                 "recent_headlines": [
                     { "title": `${name}, 글로벌 시장 공략 가속화... 수출 비중 확대`, "date": "2024-10-25", "link": "#" },
@@ -300,7 +275,7 @@ export default function AnalysisPage() {
 
                 {result && (
                     <div className="space-y-8 animate-fade-in-up">
-                        {/* Company Header Info */}
+                        {/* Company Header Info (NO Stock Data) */}
                         <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-800 hover:shadow-md transition-all">
                             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
                                 <div className="flex items-center gap-4">
@@ -316,12 +291,6 @@ export default function AnalysisPage() {
                                         </div>
                                         <div className="flex items-center gap-3 mt-1 text-sm">
                                             <span className="text-gray-500 dark:text-gray-400">KOSDAQ</span>
-                                            <span className="flex items-center gap-1 font-medium text-gray-900 dark:text-gray-100">
-                                                {stockData?.price || result.market_data.price}
-                                                <span className={`text-xs ${(stockData?.change || result.market_data.change).includes('+') ? 'text-red-500' : 'text-blue-500'}`}>
-                                                    {stockData?.change || result.market_data.change}
-                                                </span>
-                                            </span>
                                         </div>
                                     </div>
                                 </div>
