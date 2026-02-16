@@ -26,7 +26,8 @@ const KEYWORDS = [
     'exosome',
     'PLLA',
     'PDLLA',
-    'CaHA'
+    'CaHA',
+    'HIFU'
 ];
 
 export default function InsightsPage() {
