@@ -43,8 +43,8 @@ function InlineBadge({ isToday, isYesterday }: { isToday: boolean; isYesterday: 
 /** Keyword badges row */
 function KwBadges({ kws, max, size = 'sm' }: { kws: string[]; max: number; size?: 'sm' | 'xs' }) {
     const cls = size === 'xs'
-        ? "text-[9px] font-semibold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded uppercase tracking-tight border border-blue-200"
-        : "text-[10px] font-semibold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded uppercase tracking-tight border border-blue-200";
+        ? "text-[9px] font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded uppercase tracking-tight border border-blue-200 dark:border-blue-800"
+        : "text-[10px] font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded uppercase tracking-tight border border-blue-200 dark:border-blue-800";
     return (
         <>
             {kws.slice(0, max).map((k, i) => (
@@ -70,7 +70,7 @@ function LoadMore({ remaining, onClick }: { remaining: number; onClick: () => vo
         <div className="mt-12 flex justify-center">
             <button
                 onClick={onClick}
-                className="group relative px-8 py-3 bg-white hover:bg-[#3182f6] border border-gray-200 hover:border-[#3182f6] rounded-lg transition-all duration-300 overflow-hidden"
+                className="group relative px-8 py-3 bg-white dark:bg-gray-800 hover:bg-[#3182f6] border border-gray-200 dark:border-gray-700 hover:border-[#3182f6] rounded-lg transition-all duration-300 overflow-hidden"
             >
                 <span className="relative z-10 text-sm font-medium text-muted-foreground group-hover:text-white transition-colors">
                     Load More ({remaining})
@@ -170,13 +170,13 @@ export default function NewsListContainer({
         <div className="flex-1 space-y-4">
             {/* HERO SECTION — Compact */}
             {isLandingPage ? (
-                <div className="pt-5 pb-4 px-4 md:px-6 lg:px-12 bg-white">
+                <div className="pt-5 pb-4 px-4 md:px-6 lg:px-12 bg-white dark:bg-gray-900 transition-colors duration-300">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
-                            <h1 className="text-2xl md:text-3xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-500 uppercase">
+                            <h1 className="text-2xl md:text-3xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-500 dark:from-gray-100 dark:to-gray-400 uppercase">
                                 Market Intelligence
                             </h1>
-                            <div className="flex items-center gap-1.5 bg-gray-50 px-2.5 py-1 rounded-full border border-gray-200">
+                            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-800 px-2.5 py-1 rounded-full border border-gray-200 dark:border-gray-700">
                                 <span className="relative flex h-1.5 w-1.5 shrink-0">
                                     {!reduceMotion && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>}
                                     <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-cyan-500"></span>
@@ -188,14 +188,14 @@ export default function NewsListContainer({
                         </div>
 
                         {/* View Mode Toggle */}
-                        <div className="flex items-center p-0.5 bg-gray-100 rounded-lg border border-gray-200">
+                        <div className="flex items-center p-0.5 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                             {([['category', LayoutGrid, 'Category'], ['time', Clock, 'Time']] as const).map(([mode, Icon, label]) => (
                                 <button
                                     key={mode}
                                     onClick={() => setViewMode(mode as 'category' | 'time')}
                                     className={`flex items-center gap-1 px-2.5 py-1 rounded-md transition-all duration-200 ${viewMode === mode
                                         ? 'bg-blue-500 text-white shadow-sm'
-                                        : 'text-gray-500 hover:text-gray-900'
+                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                                         }`}
                                 >
                                     <Icon size={13} />
@@ -273,7 +273,7 @@ export default function NewsListContainer({
                                                     prefetch={true}
                                                     className="group/link flex flex-col items-center justify-center gap-1.5 p-2 rounded-xl transition-all duration-300 hover:bg-gray-50"
                                                 >
-                                                    <h2 className="text-xl font-black text-foreground tracking-tighter uppercase transition-colors group-hover/link:text-blue-600">
+                                                    <h2 className="text-xl font-black text-foreground tracking-tighter uppercase transition-colors group-hover/link:text-blue-600 dark:group-hover/link:text-blue-400">
                                                         {category}
                                                     </h2>
                                                     <div className="h-1 w-6 bg-blue-600 rounded-full transition-all duration-500 group-hover/link:w-16 group-hover/link:bg-blue-400" />
@@ -341,7 +341,7 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
     return (
         <motion.div
             whileHover={{ x: 2 }}
-            className="group/card flex flex-col gap-0.5 pb-1.5 border-b border-gray-100 last:border-0 last:pb-0 relative transition-all duration-300 cursor-pointer"
+            className="group/card flex flex-col gap-0.5 pb-1.5 border-b border-gray-100 dark:border-gray-700 last:border-0 last:pb-0 relative transition-all duration-300 cursor-pointer"
         >
             <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
@@ -356,7 +356,7 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
             <div className="flex items-center justify-between mt-0.5">
                 <div className="flex flex-wrap gap-1">
                     {kws.slice(0, 2).map((k, i) => (
-                        <span key={i} className="text-[11px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 uppercase tracking-tight group-hover/card:border-blue-300 group-hover/card:text-blue-700 transition-all">
+                        <span key={i} className="text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded border border-blue-200 dark:border-blue-800 uppercase tracking-tight group-hover/card:border-blue-300 group-hover/card:text-blue-700 dark:group-hover/card:text-blue-300 transition-all">
                             {k}
                         </span>
                     ))}
@@ -376,7 +376,7 @@ const NewsRow = React.memo(function NewsRow({ article, today, category }: { arti
     // Time View (landing page) - wide layout
     if (category) {
         return (
-            <article className={`group py-3 sm:py-0.5 px-4 bg-white hover:bg-gray-50 border-b border-gray-100 transition-all duration-200 ${isToday ? 'bg-blue-50/30' : ''}`}>
+            <article className={`group py-3 sm:py-0.5 px-4 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-800 transition-all duration-200 ${isToday ? 'bg-blue-50/30 dark:bg-blue-900/10' : ''}`}>
                 {/* MOBILE */}
                 <div className="flex flex-col gap-2 sm:hidden">
                     <div className="flex items-center justify-between pb-1 border-b border-dashed border-gray-100/50">
@@ -386,7 +386,7 @@ const NewsRow = React.memo(function NewsRow({ article, today, category }: { arti
                     <div className="flex items-start gap-2">
                         <div className="mt-0.5"><CollectionButton newsLink={article.link} newsTitle={article.title} size={16} /></div>
                         <a href={article.link} target="_blank" rel="noopener noreferrer" className="news-link flex-1 min-w-0 block">
-                            <h3 className="text-[15px] font-bold text-gray-900 leading-snug tracking-tight group-hover:text-[#3182f6] transition-colors line-clamp-2">
+                            <h3 className="text-[15px] font-bold text-gray-900 dark:text-gray-100 leading-snug tracking-tight group-hover:text-[#3182f6] transition-colors line-clamp-2">
                                 <InlineBadge isToday={isToday} isYesterday={isYesterday} />
                                 {article.title}
                             </h3>
@@ -426,7 +426,7 @@ const NewsRow = React.memo(function NewsRow({ article, today, category }: { arti
 
     // Category Page layout
     return (
-        <article className={`group py-3 sm:py-1.5 px-4 bg-white hover:bg-gray-50 border-b border-gray-100 transition-all duration-200 ${isToday ? 'bg-blue-50/30' : ''}`}>
+        <article className={`group py-3 sm:py-1.5 px-4 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-800 transition-all duration-200 ${isToday ? 'bg-blue-50/30 dark:bg-blue-900/10' : ''}`}>
             {/* MOBILE */}
             <div className="flex flex-col gap-2 sm:hidden">
                 <div className="flex items-center justify-end pb-1 border-b border-dashed border-gray-100/50">
@@ -435,7 +435,7 @@ const NewsRow = React.memo(function NewsRow({ article, today, category }: { arti
                 <div className="flex items-start gap-2">
                     <div className="mt-0.5"><CollectionButton newsLink={article.link} newsTitle={article.title} size={16} /></div>
                     <a href={article.link} target="_blank" rel="noopener noreferrer" className="news-link flex-1 min-w-0 block">
-                        <h3 className="text-[15px] font-bold text-gray-900 leading-snug tracking-tight group-hover:text-[#3182f6] transition-colors line-clamp-2">
+                        <h3 className="text-[15px] font-bold text-gray-900 dark:text-gray-100 leading-snug tracking-tight group-hover:text-[#3182f6] transition-colors line-clamp-2">
                             <InlineBadge isToday={isToday} isYesterday={isYesterday} />
                             {article.title}
                         </h3>
