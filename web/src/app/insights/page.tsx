@@ -21,14 +21,15 @@ const KEYWORDS = [
     'botulinum toxin',
     'HA filler',
     'dermal filler',
-    'polynucleotide(PN)',
-    'polydeoxyribonucleotide (pdrn)',
+    'PN (polynucleotide)',
+    'PDRN (polydeoxyribonucleotide)',
     'exosome',
     'PLLA',
+    'PCL (polycaprolactone)',
     'PDLLA',
     'CaHA',
     'HIFU',
-    'Radiofrequency (RF)'
+    'RF (radiofrequency)'
 ];
 
 export default function InsightsPage() {
