@@ -323,8 +323,8 @@ def parse_article(article: Dict) -> Optional[Dict]:
     try:
         medline = article["MedlineCitation"]
         pmid = str(medline["PMID"])
-        article_info = medline["Article"]
-        title = str(article_info.get("ArticleTitle", ""))
+        article_info = medline.get("Article") or medline.get("BookDocument") or {}
+        title = str(article_info.get("ArticleTitle") or article_info.get("BookTitle") or "")
 
         abstract_text = ""
         if "Abstract" in article_info and "AbstractText" in article_info["Abstract"]:
@@ -347,8 +347,13 @@ def parse_article(article: Dict) -> Optional[Dict]:
                 authors.append(full_name)
 
         journal = article_info.get("Journal", {}).get("Title", "")
+        if not journal:
+            journal = str(article_info.get("BookTitle") or article_info.get("PublisherName") or "")
         pub_date = extract_pub_date(article)
         link = f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/"
+
+        if not title:
+            title = f"PubMed record {pmid}"
 
         return {
             "id": pmid,
@@ -389,8 +394,10 @@ def fetch_details_and_save(supabase: Client, pmids: List[str]):
             continue
 
         articles = records.get("PubmedArticle", [])
+        book_articles = records.get("PubmedBookArticle", [])
+        all_records = list(articles) + list(book_articles)
         papers = []
-        for article in articles:
+        for article in all_records:
             paper = parse_article(article)
             if paper:
                 papers.append(paper)

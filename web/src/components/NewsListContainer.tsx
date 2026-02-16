@@ -168,49 +168,38 @@ export default function NewsListContainer({
 
     return (
         <div className="flex-1 space-y-4">
-            {/* HERO SECTION */}
+            {/* HERO SECTION — Compact */}
             {isLandingPage ? (
-                <div className="relative w-full h-[30vh] sm:h-[35vh] min-h-[280px] sm:min-h-[320px] mb-8 overflow-hidden bg-white">
-                    <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background via-background to-transparent pointer-events-none z-10" />
-                    <div className="absolute inset-0 flex flex-col items-center justify-end pb-12 pointer-events-none z-20 px-4">
-                        {reduceMotion ? (
-                            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-foreground leading-tight drop-shadow-2xl text-center bg-clip-text text-transparent bg-gradient-to-b from-gray-900 to-gray-500 mb-6">
-                                MARKET INTELLIGENCE
+                <div className="pt-5 pb-4 px-4 md:px-6 lg:px-12 bg-white">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                            <h1 className="text-2xl md:text-3xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-500 uppercase">
+                                Market Intelligence
                             </h1>
-                        ) : (
-                            <motion.h1
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-foreground leading-tight drop-shadow-2xl text-center bg-clip-text text-transparent bg-gradient-to-b from-gray-900 to-gray-500 mb-6"
-                            >
-                                MARKET INTELLIGENCE
-                            </motion.h1>
-                        )}
-                        <div className="flex items-center gap-2 bg-white/80 backdrop-blur-md px-4 py-1.5 rounded-full border border-gray-200 shadow-xl">
-                            <span className="relative flex h-2 w-2 shrink-0">
-                                {!reduceMotion && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>}
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
-                            </span>
-                            <span className="text-[10px] font-bold text-cyan-600 uppercase tracking-[0.3em]">
-                                AI-Powered Analysis
-                            </span>
+                            <div className="flex items-center gap-1.5 bg-gray-50 px-2.5 py-1 rounded-full border border-gray-200">
+                                <span className="relative flex h-1.5 w-1.5 shrink-0">
+                                    {!reduceMotion && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>}
+                                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-cyan-500"></span>
+                                </span>
+                                <span className="text-[9px] font-bold text-cyan-600 uppercase tracking-[0.2em]">
+                                    AI-Powered
+                                </span>
+                            </div>
                         </div>
-                    </div>
 
-                    {/* View Mode Toggle */}
-                    <div className="absolute top-4 left-4 md:left-12 z-30">
-                        <div className="flex items-center p-1 bg-white/95 backdrop-blur-md rounded-lg border border-gray-300 shadow-lg">
+                        {/* View Mode Toggle */}
+                        <div className="flex items-center p-0.5 bg-gray-100 rounded-lg border border-gray-200">
                             {([['category', LayoutGrid, 'Category'], ['time', Clock, 'Time']] as const).map(([mode, Icon, label]) => (
                                 <button
                                     key={mode}
                                     onClick={() => setViewMode(mode as 'category' | 'time')}
-                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all duration-300 ${viewMode === mode
+                                    className={`flex items-center gap-1 px-2.5 py-1 rounded-md transition-all duration-200 ${viewMode === mode
                                         ? 'bg-blue-500 text-white shadow-sm'
-                                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                                        : 'text-gray-500 hover:text-gray-900'
                                         }`}
                                 >
-                                    <Icon size={14} />
-                                    <span className="text-[11px] font-bold uppercase tracking-wider">{label}</span>
+                                    <Icon size={13} />
+                                    <span className="text-[10px] font-bold uppercase tracking-wider">{label}</span>
                                 </button>
                             ))}
                         </div>
