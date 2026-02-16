@@ -137,8 +137,8 @@ export default function InsightsPage() {
                                 <button
                                     onClick={() => setSelectedKeyword("")}
                                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-left ${selectedKeyword === ""
-                                            ? 'bg-slate-800 text-white shadow-md'
-                                            : 'bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                                        ? 'bg-slate-800 text-white shadow-md'
+                                        : 'bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                                         }`}
                                 >
                                     {t('insights_all_topics')}
@@ -149,8 +149,8 @@ export default function InsightsPage() {
                                         key={kw}
                                         onClick={() => setSelectedKeyword(kw)}
                                         className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 capitalize text-left ${selectedKeyword === kw
-                                                ? 'bg-blue-600 text-white shadow-md'
-                                                : 'bg-white border border-gray-100 text-gray-600 hover:border-blue-200 hover:text-blue-600 hover:bg-blue-50/30'
+                                            ? 'bg-blue-600 text-white shadow-md'
+                                            : 'bg-white border border-gray-100 text-gray-600 hover:border-blue-200 hover:text-blue-600 hover:bg-blue-50/30'
                                             }`}
                                     >
                                         {kw}
@@ -214,47 +214,47 @@ export default function InsightsPage() {
                                     papers.map((paper) => (
                                         <div
                                             key={paper.id}
-                                            className="group relative bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:translate-y-[-2px] hover:border-blue-100 transition-all duration-300"
+                                            className="group relative bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-100 transition-all duration-300"
                                         >
                                             <div className="flex flex-col md:flex-row justify-between items-start gap-4">
-                                                <div className="flex-1 space-y-3">
+                                                <div className="flex-1 space-y-2">
                                                     {/* Top Meta */}
-                                                    <div className="flex flex-wrap items-center gap-3 text-xs">
-                                                        <span className="flex items-center gap-1.5 text-blue-700 font-bold bg-blue-50 px-2.5 py-1 rounded-md border border-blue-100">
-                                                            <BookOpen className="w-3.5 h-3.5" />
+                                                    <div className="flex flex-wrap items-center gap-2 text-[11px]">
+                                                        <span className="flex items-center gap-1 text-blue-700 font-bold bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                                                            <BookOpen className="w-3 h-3" />
                                                             {paper.journal || 'Journal'}
                                                         </span>
-                                                        <span className="flex items-center gap-1.5 text-gray-500 bg-gray-50 px-2.5 py-1 rounded-md border border-gray-100">
-                                                            <Calendar className="w-3.5 h-3.5" />
+                                                        <span className="flex items-center gap-1 text-gray-500 bg-gray-50 px-2 py-0.5 rounded border border-gray-100">
+                                                            <Calendar className="w-3 h-3" />
                                                             {paper.publication_date || 'N/A'}
                                                         </span>
                                                     </div>
 
                                                     {/* Title */}
                                                     <a href={paper.link} target="_blank" rel="noopener noreferrer" className="block outline-none">
-                                                        <h3 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight group-hover:text-blue-700 transition-colors">
+                                                        <h3 className="text-lg font-bold text-gray-900 leading-snug group-hover:text-blue-700 transition-colors">
                                                             {paper.title}
                                                         </h3>
                                                     </a>
 
                                                     {/* Abstract */}
-                                                    <p className="text-sm md:text-base text-gray-600 leading-relaxed line-clamp-3 md:line-clamp-2 md:group-hover:line-clamp-4 transition-all duration-500">
+                                                    <p className="text-sm text-gray-600 leading-relaxed line-clamp-2 group-hover:line-clamp-3 transition-all duration-500">
                                                         {paper.abstract}
                                                     </p>
 
                                                     {/* Footer Meta */}
-                                                    <div className="flex flex-wrap items-center justify-between gap-4 pt-3 mt-1 border-t border-gray-50">
-                                                        <div className="flex items-center gap-2 text-sm text-gray-500">
-                                                            <Users className="w-4 h-4 text-gray-400" />
+                                                    <div className="flex flex-wrap items-center justify-between gap-3 pt-2 mt-1 border-t border-gray-50">
+                                                        <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                                                            <Users className="w-3.5 h-3.5 text-gray-400" />
                                                             <span className="italic truncate max-w-[200px] md:max-w-md">
                                                                 {paper.authors?.slice(0, 3).join(", ")} {paper.authors?.length > 3 && "et al."}
                                                             </span>
                                                         </div>
 
                                                         {/* Keywords */}
-                                                        <div className="hidden md:flex gap-2">
+                                                        <div className="hidden md:flex gap-1.5">
                                                             {paper.keywords?.slice(0, 3).map(k => (
-                                                                <span key={k} className="text-[10px] text-gray-500 bg-gray-50 px-2 py-0.5 rounded border border-gray-100">
+                                                                <span key={k} className="text-[10px] text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded border border-gray-100">
                                                                     #{k}
                                                                 </span>
                                                             ))}
@@ -267,10 +267,10 @@ export default function InsightsPage() {
                                                     href={paper.link}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm group-hover:scale-110"
+                                                    className="shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm group-hover:scale-105"
                                                     title="View Original Paper"
                                                 >
-                                                    <ArrowUpRight className="w-5 h-5" />
+                                                    <ArrowUpRight className="w-4 h-4" />
                                                 </a>
                                             </div>
                                         </div>
