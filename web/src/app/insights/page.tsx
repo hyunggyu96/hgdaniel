@@ -91,6 +91,20 @@ export default function InsightsPage() {
         }
     };
 
+    const Highlight = ({ text, keyword }: { text: string, keyword: string }) => {
+        if (!keyword || !text) return <>{text}</>;
+        const parts = text.split(new RegExp(`(${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'));
+        return (
+            <span>
+                {parts.map((part, i) =>
+                    part.toLowerCase() === keyword.toLowerCase() ?
+                        <span key={i} className="bg-yellow-200 text-slate-900 font-semibold rounded-[2px] px-0.5 mx-0.5">{part}</span> :
+                        part
+                )}
+            </span>
+        );
+    };
+
     return (
         <main className="min-h-screen bg-gray-50/50 p-6 md:p-12 pb-24">
             <div className="max-w-7xl mx-auto space-y-8">
@@ -217,14 +231,14 @@ export default function InsightsPage() {
                                             className="group relative bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-100 transition-all duration-300"
                                         >
                                             <div className="flex flex-col md:flex-row justify-between items-start gap-4">
-                                                <div className="flex-1 space-y-2">
+                                                <div className="flex-1 space-y-2.5">
                                                     {/* Top Meta */}
                                                     <div className="flex flex-wrap items-center gap-2 text-[11px]">
                                                         <span className="flex items-center gap-1 text-blue-700 font-bold bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
                                                             <BookOpen className="w-3 h-3" />
                                                             {paper.journal || 'Journal'}
                                                         </span>
-                                                        <span className="flex items-center gap-1 text-gray-500 bg-gray-50 px-2 py-0.5 rounded border border-gray-100">
+                                                        <span className="flex items-center gap-1 text-slate-600 font-bold bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                                                             <Calendar className="w-3 h-3" />
                                                             {paper.publication_date || 'N/A'}
                                                         </span>
@@ -233,21 +247,27 @@ export default function InsightsPage() {
                                                     {/* Title */}
                                                     <a href={paper.link} target="_blank" rel="noopener noreferrer" className="block outline-none">
                                                         <h3 className="text-lg font-bold text-gray-900 leading-snug group-hover:text-blue-700 transition-colors">
-                                                            {paper.title}
+                                                            <Highlight text={paper.title} keyword={searchQuery} />
                                                         </h3>
                                                     </a>
 
-                                                    {/* Abstract */}
-                                                    <p className="text-sm text-gray-600 leading-relaxed line-clamp-2 group-hover:line-clamp-3 transition-all duration-500">
-                                                        {paper.abstract}
+                                                    {/* Abstract: REMOVED HOVER EXPANSION */}
+                                                    <p className="text-sm text-gray-600 leading-relaxed line-clamp-3 transition-all duration-500">
+                                                        <Highlight text={paper.abstract} keyword={searchQuery} />
                                                     </p>
 
                                                     {/* Footer Meta */}
                                                     <div className="flex flex-wrap items-center justify-between gap-3 pt-2 mt-1 border-t border-gray-50">
-                                                        <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                                                        <div className="flex items-center gap-1.5 text-xs text-gray-600">
                                                             <Users className="w-3.5 h-3.5 text-gray-400" />
-                                                            <span className="italic truncate max-w-[200px] md:max-w-md">
-                                                                {paper.authors?.slice(0, 3).join(", ")} {paper.authors?.length > 3 && "et al."}
+                                                            <span className="font-semibold text-gray-700 italic truncate max-w-[200px] md:max-w-md">
+                                                                {paper.authors?.slice(0, 3).map((author, idx) => (
+                                                                    <span key={idx}>
+                                                                        <Highlight text={author} keyword={searchQuery} />
+                                                                        {idx < Math.min(paper.authors.length, 3) - 1 ? ", " : ""}
+                                                                    </span>
+                                                                ))}
+                                                                {paper.authors?.length > 3 && " et al."}
                                                             </span>
                                                         </div>
 

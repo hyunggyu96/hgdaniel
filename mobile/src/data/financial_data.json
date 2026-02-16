@@ -1,0 +1,3117 @@
+{
+    "한스바이오메드": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "20214623244",
+                "operating_profit": "1298028272",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20221220000196",
+                    "title": "사업보고서 (2022.09)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230214001079",
+                    "title": "분기보고서 (2022.12)"
+                },
+                "data_type": "annual"
+            },
+            "2023": {
+                "revenue": "18466892403",
+                "operating_profit": "121738664",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20231219000383",
+                    "title": "사업보고서 (2023.09)"
+                },
+                "Q1": null,
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230814001141",
+                    "title": "분기보고서 (2023.06)"
+                },
+                "Q3": null,
+                "Q4": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240215000279",
+                    "title": "[기재정정]분기보고서 (2023.12)"
+                },
+                "data_type": "annual"
+            },
+            "2024": {
+                "revenue": "20814468108",
+                "operating_profit": "653951434",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241219000524",
+                    "title": "사업보고서 (2024.09)"
+                },
+                "Q1": null,
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240814001376",
+                    "title": "분기보고서 (2024.06)"
+                },
+                "Q3": null,
+                "Q4": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250214002522",
+                    "title": "분기보고서 (2024.12)"
+                },
+                "data_type": "annual"
+            },
+            "2025": {
+                "revenue": "22033892083",
+                "operating_profit": "40796559",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251218000494",
+                    "title": "사업보고서 (2025.09)"
+                },
+                "Q1": null,
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814003628",
+                    "title": "분기보고서 (2025.06)"
+                },
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "042520",
+        "company_summary": "유방 보형물 '벨라젤'과 리프팅 실 브랜드 '민트리프트(MINT Lift)'를 생산합니다. 뼈 이식재 등 인체조직 재생 제품과 미용 성형용 소모품을 공급하고 있습니다."
+    },
+    "엘앤씨바이오": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "52600000000",
+                "operating_profit": "9500000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=290650"
+                }
+            },
+            "2023": {
+                "revenue": "68869546328",
+                "operating_profit": "7748005680",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240320001633",
+                    "title": "사업보고서 (2023.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2024": {
+                "revenue": "72093323401",
+                "operating_profit": "2542071249",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250321001430",
+                    "title": "사업보고서 (2024.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240516000903",
+                    "title": "분기보고서 (2024.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240814004035",
+                    "title": "반기보고서 (2024.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241114002539",
+                    "title": "분기보고서 (2024.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2025": {
+                "revenue": "88600000000",
+                "operating_profit": "6200000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250515001978",
+                    "title": "분기보고서 (2025.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814003932",
+                    "title": "반기보고서 (2025.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114002166",
+                    "title": "분기보고서 (2025.09)"
+                },
+                "Q4": null,
+                "data_type": "estimated_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=290650"
+                }
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "290650",
+        "company_summary": "인체조직 이식재 '메가덤'과 무릎 연골 재생 치료제 '메가카티'를 제조하여 공급합니다. 피부 재생 스킨부스터 '리투오' 등 재생 의학 기반의 제품군을 보유하고 있습니다."
+    },
+    "제테마": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "46000000000",
+                "operating_profit": "4000000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=216080"
+                }
+            },
+            "2023": {
+                "revenue": "58700000000",
+                "operating_profit": "2600000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=216080"
+                }
+            },
+            "2024": {
+                "revenue": "68520182954",
+                "operating_profit": "4110925721",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250321000516",
+                    "title": "사업보고서 (2024.12)"
+                },
+                "Q1": null,
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240813000680",
+                    "title": "반기보고서 (2024.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241114001303",
+                    "title": "분기보고서 (2024.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2025": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250515002923",
+                    "title": "분기보고서 (2025.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814002921",
+                    "title": "반기보고서 (2025.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114002486",
+                    "title": "분기보고서 (2025.09)"
+                },
+                "Q4": null
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "216080"
+    },
+    "한국비엔씨": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "42303378385",
+                "operating_profit": "-10096839835",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20231213000526",
+                    "title": "[기재정정]사업보고서 (2022.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2023": {
+                "revenue": "80997489681",
+                "operating_profit": "6045988919",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240321001661",
+                    "title": "사업보고서 (2023.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230516000296",
+                    "title": "[기재정정]분기보고서 (2023.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230814001727",
+                    "title": "반기보고서 (2023.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20231213000528",
+                    "title": "[기재정정]분기보고서 (2023.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2024": {
+                "revenue": "89229997633",
+                "operating_profit": "10705760232",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814003452",
+                    "title": "[기재정정]사업보고서 (2024.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240516001689",
+                    "title": "분기보고서 (2024.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240814004073",
+                    "title": "반기보고서 (2024.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241114002117",
+                    "title": "분기보고서 (2024.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2025": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250515002448",
+                    "title": "분기보고서 (2025.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814003531",
+                    "title": "반기보고서 (2025.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114002256",
+                    "title": "분기보고서 (2025.09)"
+                },
+                "Q4": null
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "256840",
+        "company_summary": "히알루론산 필러 브랜드 '테소로(Tesoro)'와 전문 의약품용 유착방지제를 제조합니다. 생체 재료 기반 의료기기 생산과 더불어 신약 파이프라인 연구개발을 수행합니다."
+    },
+    "종근당바이오": {
+        "financial_history": {
+            "2021": {
+                "revenue": "142238418404",
+                "operating_profit": "-11432270296",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20220317000204",
+                    "title": "사업보고서 (2021.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20210517000035",
+                    "title": "분기보고서 (2021.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20210817000677",
+                    "title": "반기보고서 (2021.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20211115001780",
+                    "title": "분기보고서 (2021.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2022": {
+                "revenue": "156042327041",
+                "operating_profit": "-14810343537",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230314000316",
+                    "title": "사업보고서 (2022.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20220516000733",
+                    "title": "분기보고서 (2022.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20220816001512",
+                    "title": "반기보고서 (2022.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20221114001179",
+                    "title": "분기보고서 (2022.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2023": {
+                "revenue": "160352778354",
+                "operating_profit": "-20152520381",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240320001689",
+                    "title": "사업보고서 (2023.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230515001059",
+                    "title": "분기보고서 (2023.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230811001729",
+                    "title": "반기보고서 (2023.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20231114001732",
+                    "title": "분기보고서 (2023.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2024": {
+                "revenue": "171756008722",
+                "operating_profit": "10953544485",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250318001004",
+                    "title": "사업보고서 (2024.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240516001395",
+                    "title": "분기보고서 (2024.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240814003522",
+                    "title": "반기보고서 (2024.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241114001292",
+                    "title": "분기보고서 (2024.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2025": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250515001546",
+                    "title": "분기보고서 (2025.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814003489",
+                    "title": "반기보고서 (2025.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114002206",
+                    "title": "분기보고서 (2025.09)"
+                },
+                "Q4": null
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "063160",
+        "company_summary": "보툴리눔 톡신 제제 '티엠버스(Tyemvers)'와 항생제 원료의약품을 생산합니다. 프로바이오틱스 원료 공급과 더불어 차세대 톡신 및 마이크로바이옴 연구를 수행합니다."
+    },
+    "휴온스": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "492400000000",
+                "operating_profit": "40900000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=243070"
+                }
+            },
+            "2023": {
+                "revenue": "552006502264",
+                "operating_profit": "56002319215",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240320000849",
+                    "title": "사업보고서 (2023.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2024": {
+                "revenue": "590231059719",
+                "operating_profit": "39695088137",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250318000815",
+                    "title": "사업보고서 (2024.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240516001590",
+                    "title": "분기보고서 (2024.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240814001126",
+                    "title": "반기보고서 (2024.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241114002437",
+                    "title": "분기보고서 (2024.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2025": {
+                "revenue": "614200000000",
+                "operating_profit": "46100000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250515003027",
+                    "title": "분기보고서 (2025.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814003610",
+                    "title": "반기보고서 (2025.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114002901",
+                    "title": "분기보고서 (2025.09)"
+                },
+                "Q4": null,
+                "data_type": "estimated_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=243070"
+                }
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "243070",
+        "company_summary": "보툴리눔 톡신 '리즈톡스'의 국내 유통과 국소마취제 '리도카인' 생산을 담당합니다. 전문의약품 및 수액제, 웰빙 의약품군을 생산하는 종합 제약 기업입니다."
+    },
+    "휴온스글로벌": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "664400000000",
+                "operating_profit": "86500000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=084110"
+                }
+            },
+            "2023": {
+                "revenue": "758400000000",
+                "operating_profit": "114000000000",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240321001484",
+                    "title": "[기재정정]사업보고서 (2023.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=084110"
+                }
+            },
+            "2024": {
+                "revenue": "813500000000",
+                "operating_profit": "97000000000",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250320001575",
+                    "title": "사업보고서 (2024.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240516000140",
+                    "title": "분기보고서 (2024.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240814001127",
+                    "title": "반기보고서 (2024.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241114000624",
+                    "title": "분기보고서 (2024.09)"
+                },
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=084110"
+                }
+            },
+            "2025": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250515000869",
+                    "title": "분기보고서 (2025.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814003093",
+                    "title": "반기보고서 (2025.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114003116",
+                    "title": "[기재정정]분기보고서 (2025.09)"
+                },
+                "Q4": null
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "084110"
+    },
+    "휴메딕스": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "123200000000",
+                "operating_profit": "26000000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=200670"
+                }
+            },
+            "2023": {
+                "revenue": "152273808567",
+                "operating_profit": "37310070521",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240320000202",
+                    "title": "사업보고서 (2023.12)"
+                },
+                "Q1": null,
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230810000460",
+                    "title": "반기보고서 (2023.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20231110000012",
+                    "title": "분기보고서 (2023.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2024": {
+                "revenue": "161872958430",
+                "operating_profit": "43141324184",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250318000146",
+                    "title": "사업보고서 (2024.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240510000129",
+                    "title": "분기보고서 (2024.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240813000098",
+                    "title": "반기보고서 (2024.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241111000061",
+                    "title": "분기보고서 (2024.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2025": {
+                "revenue": "170300000000",
+                "operating_profit": "41900000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250515000188",
+                    "title": "분기보고서 (2025.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814001007",
+                    "title": "반기보고서 (2025.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114000119",
+                    "title": "분기보고서 (2025.09)"
+                },
+                "Q4": null,
+                "data_type": "estimated_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=200670"
+                }
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "200670",
+        "company_summary": "히알루론산 필러 브랜드 '엘라비에(Elravie)'와 관절염 치료제 '하이히알' 등을 생산합니다. 원료의약품 제조 기술을 바탕으로 필러 및 기능성 화장품 사업을 영위합니다."
+    },
+    "휴젤": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "281700000000",
+                "operating_profit": "101400000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=145020"
+                }
+            },
+            "2023": {
+                "revenue": "319700000000",
+                "operating_profit": "117800000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=145020"
+                }
+            },
+            "2024": {
+                "revenue": "373046885998",
+                "operating_profit": "166229170618",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250321000621",
+                    "title": "사업보고서 (2024.12)"
+                },
+                "Q1": null,
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240814001396",
+                    "title": "반기보고서 (2024.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241114001233",
+                    "title": "분기보고서 (2024.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2025": {
+                "revenue": "419700000000",
+                "operating_profit": "195000000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250515002369",
+                    "title": "분기보고서 (2025.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814002269",
+                    "title": "반기보고서 (2025.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114001274",
+                    "title": "분기보고서 (2025.09)"
+                },
+                "Q4": null,
+                "data_type": "estimated_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=145020"
+                }
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "145020"
+    },
+    "메디톡스": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "195100000000",
+                "operating_profit": "46700000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=086900"
+                }
+            },
+            "2023": {
+                "revenue": "221120682597",
+                "operating_profit": "17322328805",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240321001302",
+                    "title": "사업보고서 (2023.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20231113000743",
+                    "title": "분기보고서 (2023.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2024": {
+                "revenue": "228621969000",
+                "operating_profit": "20348723000",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250320001592",
+                    "title": "사업보고서 (2024.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240516001990",
+                    "title": "분기보고서 (2024.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240814003759",
+                    "title": "반기보고서 (2024.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241114002330",
+                    "title": "분기보고서 (2024.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2025": {
+                "revenue": "253600000000",
+                "operating_profit": "30200000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250514001162",
+                    "title": "분기보고서 (2025.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814000625",
+                    "title": "반기보고서 (2025.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251113000758",
+                    "title": "분기보고서 (2025.09)"
+                },
+                "Q4": null,
+                "data_type": "estimated_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=086900"
+                }
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "086900",
+        "company_summary": "보툴리눔 톡신 제제 '메디톡신'과 히알루론산 필러 '뉴라미스'를 주력으로 생산합니다. '코어톡스' 등 신규 톡신 제제 라인업을 통해 에스테틱 사업을 영위하고 있습니다."
+    },
+    "대웅제약": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "1280100000000",
+                "operating_profit": "95800000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=069620"
+                }
+            },
+            "2023": {
+                "revenue": "1375300000000",
+                "operating_profit": "122600000000",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240320001120",
+                    "title": "사업보고서 (2023.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=069620"
+                }
+            },
+            "2024": {
+                "revenue": "1422683296380",
+                "operating_profit": "147942198476",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814004375",
+                    "title": "[기재정정]사업보고서 (2024.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240514001381",
+                    "title": "분기보고서 (2024.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240814004326",
+                    "title": "반기보고서 (2024.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241114001604",
+                    "title": "분기보고서 (2024.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2025": {
+                "revenue": "1579900000000",
+                "operating_profit": "200300000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250515002222",
+                    "title": "분기보고서 (2025.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814004456",
+                    "title": "반기보고서 (2025.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114001339",
+                    "title": "분기보고서 (2025.09)"
+                },
+                "Q4": null,
+                "data_type": "estimated_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=069620"
+                }
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "069620"
+    },
+    "파마리서치": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "194800000000",
+                "operating_profit": "65900000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=214450"
+                }
+            },
+            "2023": {
+                "revenue": "261010910564",
+                "operating_profit": "92257786628",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240315000795",
+                    "title": "사업보고서 (2023.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20231114002119",
+                    "title": "분기보고서 (2023.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2024": {
+                "revenue": "350115068641",
+                "operating_profit": "126050757121",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250317000758",
+                    "title": "사업보고서 (2024.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240514001617",
+                    "title": "분기보고서 (2024.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240814004016",
+                    "title": "반기보고서 (2024.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241113000721",
+                    "title": "분기보고서 (2024.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2025": {
+                "revenue": "547500000000",
+                "operating_profit": "228100000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250521000230",
+                    "title": "[기재정정]분기보고서 (2025.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814002565",
+                    "title": "반기보고서 (2025.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114000932",
+                    "title": "분기보고서 (2025.09)"
+                },
+                "Q4": null,
+                "data_type": "estimated_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=214450"
+                }
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "214450",
+        "company_summary": "연어 유래 성분의 스킨부스터 '리쥬란(REJURAN)'과 관절강 주사 '콘쥬란'을 제조합니다. PDRN/PN 원천 기술을 기반으로 의약품과 의료기기 사업을 운영하고 있습니다."
+    },
+    "클래시스": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "141800000000",
+                "operating_profit": "68900000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=214150"
+                }
+            },
+            "2023": {
+                "revenue": "180100000000",
+                "operating_profit": "89600000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=214150"
+                }
+            },
+            "2024": {
+                "revenue": "242900000000",
+                "operating_profit": "122400000000",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250321001623",
+                    "title": "사업보고서 (2024.12)"
+                },
+                "Q1": null,
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240814003845",
+                    "title": "반기보고서 (2024.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241114001342",
+                    "title": "분기보고서 (2024.09)"
+                },
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=214150"
+                }
+            },
+            "2025": {
+                "revenue": "341200000000",
+                "operating_profit": "167900000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250515003058",
+                    "title": "분기보고서 (2025.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814004297",
+                    "title": "반기보고서 (2025.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114002953",
+                    "title": "분기보고서 (2025.09)"
+                },
+                "Q4": null,
+                "data_type": "estimated_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=214150"
+                }
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "214150"
+    },
+    "케어젠": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "69100000000",
+                "operating_profit": "33600000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=214370"
+                }
+            },
+            "2023": {
+                "revenue": "79209511675",
+                "operating_profit": "40377972813",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240311000407",
+                    "title": "사업보고서 (2023.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2024": {
+                "revenue": "82585947786",
+                "operating_profit": "34249787129",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250317000927",
+                    "title": "사업보고서 (2024.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240513000430",
+                    "title": "분기보고서 (2024.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240814002146",
+                    "title": "반기보고서 (2024.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241113000332",
+                    "title": "분기보고서 (2024.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2025": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250513000540",
+                    "title": "분기보고서 (2025.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814003836",
+                    "title": "반기보고서 (2025.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114000849",
+                    "title": "분기보고서 (2025.09)"
+                },
+                "Q4": null
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "214370",
+        "company_summary": "펩타이드 필러 '레보필(REVOFIL)'과 기능성 화장품 브랜드 '더마힐'을 제조합니다. 펩타이드 플랫폼 기술을 활용하여 필러 및 건강기능식품 사업을 영위합니다."
+    },
+    "원텍": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20220721000157",
+                    "title": "[기재정정]사업보고서 (2021.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2023": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2024": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2025": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "336570"
+    },
+    "동방메디컬": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20220404003254",
+                    "title": "감사보고서 (2021.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "77300000000",
+                "operating_profit": "5500000000",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230427000615",
+                    "title": "연결감사보고서 (2022.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=240550"
+                }
+            },
+            "2023": {
+                "revenue": "90900000000",
+                "operating_profit": "16500000000",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240329001613",
+                    "title": "연결감사보고서 (2023.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=240550"
+                }
+            },
+            "2024": {
+                "revenue": "105113645139",
+                "operating_profit": "15045956736",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250320001252",
+                    "title": "사업보고서 (2024.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2025": {
+                "revenue": "115200000000",
+                "operating_profit": "16600000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250527000563",
+                    "title": "분기보고서 (2025.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250827000578",
+                    "title": "반기보고서 (2025.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251125000378",
+                    "title": "분기보고서 (2025.09)"
+                },
+                "Q4": null,
+                "data_type": "estimated_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=240550"
+                }
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "240550"
+    },
+    "제이시스메디칼": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2023": {
+                "revenue": "143029552904",
+                "operating_profit": "36313752059",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240314001085",
+                    "title": "사업보고서 (2023.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20231109000100",
+                    "title": "분기보고서 (2023.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2024": {
+                "revenue": "192076238234",
+                "operating_profit": "39973819896",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250407003477",
+                    "title": "사업보고서 (2024.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240510000873",
+                    "title": "분기보고서 (2024.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240814003970",
+                    "title": "반기보고서 (2024.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241114001304",
+                    "title": "분기보고서 (2024.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2025": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "287410",
+        "company_summary": "고주파 미용 기기 '포텐자(POTENZA)'와 초음파 장비 '리니어지(LinearZ)'를 설계 및 제조합니다. 글로벌 유통망을 통해 미용 성형용 에너지 의료기기를 수출하고 있습니다."
+    },
+    "바이오비쥬": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "21100000000",
+                "operating_profit": "3600000000",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240813000430",
+                    "title": "[기재정정]감사보고서 (2022.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=489460"
+                }
+            },
+            "2023": {
+                "revenue": "17100000000",
+                "operating_profit": "5200000000",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240813000437",
+                    "title": "[기재정정]감사보고서 (2023.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=489460"
+                }
+            },
+            "2024": {
+                "revenue": "29600000000",
+                "operating_profit": "9200000000",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250324000268",
+                    "title": "[기재정정]연결감사보고서 (2024.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=489460"
+                }
+            },
+            "2025": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814001640",
+                    "title": "반기보고서 (2025.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114000184",
+                    "title": "분기보고서 (2025.09)"
+                },
+                "Q4": null
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "489460"
+    },
+    "바이오플러스": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "56718818557",
+                "operating_profit": "25271435156",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230323000659",
+                    "title": "사업보고서 (2022.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2023": {
+                "revenue": "65042901061",
+                "operating_profit": "28025617245",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240319000814",
+                    "title": "사업보고서 (2023.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230515000690",
+                    "title": "분기보고서 (2023.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230814001308",
+                    "title": "반기보고서 (2023.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20231114001356",
+                    "title": "분기보고서 (2023.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2024": {
+                "revenue": "66409594582",
+                "operating_profit": "23667463055",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250320001165",
+                    "title": "사업보고서 (2024.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240522000108",
+                    "title": "[기재정정]분기보고서 (2024.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240814002123",
+                    "title": "반기보고서 (2024.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241114000021",
+                    "title": "분기보고서 (2024.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2025": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250514000267",
+                    "title": "분기보고서 (2025.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814002310",
+                    "title": "반기보고서 (2025.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114001002",
+                    "title": "분기보고서 (2025.09)"
+                },
+                "Q4": null
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "099430",
+        "company_summary": "히알루론산 필러 '하이알듀(HyalDew)'와 유착방지제를 생산합니다. 생체 재료 기술을 기반으로 미용 성형용 의료기기와 유착방지 제품을 제조합니다."
+    },
+    "비올": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2023": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2024": {
+                "revenue": "58193098799",
+                "operating_profit": "36061882438",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250317000468",
+                    "title": "사업보고서 (2024.12)"
+                },
+                "Q1": null,
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240812000294",
+                    "title": "반기보고서 (2024.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241111000103",
+                    "title": "분기보고서 (2024.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2025": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250515000107",
+                    "title": "분기보고서 (2025.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814001416",
+                    "title": "반기보고서 (2025.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114002028",
+                    "title": "분기보고서 (2025.09)"
+                },
+                "Q4": null
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "335890"
+    },
+    "하이로닉": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "27600000000",
+                "operating_profit": "3600000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=149980"
+                }
+            },
+            "2023": {
+                "revenue": "33700000000",
+                "operating_profit": "5300000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=149980"
+                }
+            },
+            "2024": {
+                "revenue": "31628770815",
+                "operating_profit": "-4757481207",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250421000041",
+                    "title": "[기재정정]사업보고서 (2024.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240827000048",
+                    "title": "[기재정정]분기보고서 (2024.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240814003506",
+                    "title": "반기보고서 (2024.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241114002597",
+                    "title": "분기보고서 (2024.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2025": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250515001080",
+                    "title": "분기보고서 (2025.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814004275",
+                    "title": "반기보고서 (2025.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114003055",
+                    "title": "분기보고서 (2025.09)"
+                },
+                "Q4": null
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "149980"
+    },
+    "레이저옵텍": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20220711000625",
+                    "title": "감사보고서 (2021.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "30000000000",
+                "operating_profit": "2500000000",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230331001309",
+                    "title": "감사보고서 (2022.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=199550"
+                }
+            },
+            "2023": {
+                "revenue": "34352053954",
+                "operating_profit": "4480826362",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240729000269",
+                    "title": "[기재정정]사업보고서 (2023.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2024": {
+                "revenue": "33037915734",
+                "operating_profit": "-196045064",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250320001659",
+                    "title": "사업보고서 (2024.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240514001228",
+                    "title": "분기보고서 (2024.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240814001075",
+                    "title": "반기보고서 (2024.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241114002771",
+                    "title": "분기보고서 (2024.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2025": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250515000966",
+                    "title": "분기보고서 (2025.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814003831",
+                    "title": "반기보고서 (2025.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114001241",
+                    "title": "분기보고서 (2025.09)"
+                },
+                "Q4": null
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "199550",
+        "company_summary": "피부 질환 및 미용 치료용 레이저 기기인 '팔라스(PALLAS)'와 '헬리오스(HELIOS)' 시리즈를 제조합니다. 독자적인 레이저 설계 기술을 바탕으로 의료용 장비 사업을 운영합니다."
+    },
+    "유바이오로직스": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "55500000000",
+                "operating_profit": "-3800000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=206650"
+                }
+            },
+            "2023": {
+                "revenue": "69365660612",
+                "operating_profit": "7699109509",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240319000532",
+                    "title": "사업보고서 (2023.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230512000855",
+                    "title": "분기보고서 (2023.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230811002422",
+                    "title": "반기보고서 (2023.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20231110000472",
+                    "title": "분기보고서 (2023.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2024": {
+                "revenue": "96035297831",
+                "operating_profit": "34321335803",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250318000779",
+                    "title": "사업보고서 (2024.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240513000515",
+                    "title": "분기보고서 (2024.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240813001337",
+                    "title": "반기보고서 (2024.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241112000009",
+                    "title": "분기보고서 (2024.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2025": {
+                "revenue": "156400000000",
+                "operating_profit": "60200000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250513000499",
+                    "title": "분기보고서 (2025.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250813001443",
+                    "title": "반기보고서 (2025.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251110000330",
+                    "title": "분기보고서 (2025.09)"
+                },
+                "Q4": null,
+                "data_type": "estimated_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=206650"
+                }
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "206650",
+        "company_summary": "경구용 콜레라 백신 '유비콜(Euvichol)'을 생산하여 글로벌 공공 시장에 공급합니다. 백신 제조 기술을 바탕으로 바이오의약품 위탁생산(CMO) 서비스를 제공합니다."
+    },
+    "바임글로벌": {
+        "financial_history": {
+            "2022": {
+                "revenue": "14070000000",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "currency": "KRW",
+                "original_revenue": 14070000000,
+                "data_type": "manual"
+            },
+            "2023": {
+                "revenue": "28730000000",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "currency": "KRW",
+                "original_revenue": 28730000000,
+                "data_type": "manual"
+            }
+        }
+    },
+    "엑소코바이오": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20220328000495",
+                    "title": "연결감사보고서 (2021.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230330001056",
+                    "title": "연결감사보고서 (2022.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2023": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240328000239",
+                    "title": "연결감사보고서 (2023.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2024": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250422000427",
+                    "title": "[기재정정]감사보고서 (2024.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2025": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": ""
+    },
+    "멀츠": {
+        "financial_history": {
+            "2023": {
+                "revenue": "1012500000000",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "currency": "USD",
+                "original_revenue": 750000000,
+                "data_type": "manual"
+            }
+        }
+    },
+    "앨러간": {
+        "financial_history": {
+            "2023": {
+                "revenue": "7155000000000",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "currency": "USD",
+                "original_revenue": 5300000000,
+                "data_type": "manual"
+            }
+        }
+    },
+    "갈더마": {
+        "financial_history": {
+            "2023": {
+                "revenue": "5510700000000",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "currency": "USD",
+                "original_revenue": 4082000000,
+                "data_type": "manual"
+            }
+        }
+    },
+    "테옥산": {
+        "financial_history": {
+            "2023": {
+                "revenue": "367200000000",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "currency": "CHF",
+                "original_revenue": 240000000,
+                "data_type": "manual"
+            }
+        }
+    },
+    "알에프바이오": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230404002725",
+                    "title": "감사보고서 (2022.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2023": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240409003188",
+                    "title": "감사보고서 (2023.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2024": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250404002720",
+                    "title": "감사보고서 (2024.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2025": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": ""
+    },
+    "차메디텍": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20220401000203",
+                    "title": "감사보고서 (2021.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "11400000000",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "currency": "KRW",
+                "original_revenue": 11400000000,
+                "data_type": "manual"
+            },
+            "2023": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240405003279",
+                    "title": "감사보고서 (2023.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2024": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250407002272",
+                    "title": "감사보고서 (2024.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2025": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": ""
+    },
+    "JW중외제약": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "684400000000",
+                "operating_profit": "63000000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=001060"
+                }
+            },
+            "2023": {
+                "revenue": "748526707817",
+                "operating_profit": "100303770111",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240318000800",
+                    "title": "사업보고서 (2023.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230515002719",
+                    "title": "분기보고서 (2023.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230814002387",
+                    "title": "반기보고서 (2023.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20231114000598",
+                    "title": "분기보고서 (2023.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2024": {
+                "revenue": "719375756340",
+                "operating_profit": "82488136816",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250318001192",
+                    "title": "사업보고서 (2024.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240514000947",
+                    "title": "분기보고서 (2024.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240826000402",
+                    "title": "[기재정정]반기보고서 (2024.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241114000760",
+                    "title": "분기보고서 (2024.09)"
+                },
+                "Q4": null,
+                "data_type": "annual"
+            },
+            "2025": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250515002944",
+                    "title": "분기보고서 (2025.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814001862",
+                    "title": "반기보고서 (2025.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114001622",
+                    "title": "분기보고서 (2025.09)"
+                },
+                "Q4": null
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "001060"
+    },
+    "동국제약": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20220317001170",
+                    "title": "사업보고서 (2021.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20210514001535",
+                    "title": "분기보고서 (2021.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20210817001983",
+                    "title": "반기보고서 (2021.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20211115002018",
+                    "title": "분기보고서 (2021.09)"
+                },
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "661600000000",
+                "operating_profit": "73900000000",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230316001371",
+                    "title": "사업보고서 (2022.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20220516001540",
+                    "title": "분기보고서 (2022.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20220816002169",
+                    "title": "반기보고서 (2022.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20221114002559",
+                    "title": "분기보고서 (2022.09)"
+                },
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=086450"
+                }
+            },
+            "2023": {
+                "revenue": "731000000000",
+                "operating_profit": "66900000000",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240314001722",
+                    "title": "사업보고서 (2023.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230515002680",
+                    "title": "분기보고서 (2023.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230811002572",
+                    "title": "반기보고서 (2023.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20231114002950",
+                    "title": "분기보고서 (2023.09)"
+                },
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=086450"
+                }
+            },
+            "2024": {
+                "revenue": "812200000000",
+                "operating_profit": "80400000000",
+                "rd_cost": "-",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250313001454",
+                    "title": "사업보고서 (2024.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240516001882",
+                    "title": "분기보고서 (2024.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240814004110",
+                    "title": "반기보고서 (2024.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241114001778",
+                    "title": "분기보고서 (2024.09)"
+                },
+                "Q4": null,
+                "data_type": "annual_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=086450"
+                }
+            },
+            "2025": {
+                "revenue": "917200000000",
+                "operating_profit": "97000000000",
+                "rd_cost": "-",
+                "annual_report": null,
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250515000170",
+                    "title": "분기보고서 (2025.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814003105",
+                    "title": "반기보고서 (2025.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251114002853",
+                    "title": "분기보고서 (2025.09)"
+                },
+                "Q4": null,
+                "data_type": "estimated_naver",
+                "source_report": {
+                    "title": "네이버증권 기업실적분석",
+                    "link": "https://finance.naver.com/item/main.naver?code=086450"
+                }
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": "086450"
+    },
+    "리젠바이오텍": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2023": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240402003077",
+                    "title": "감사보고서 (2023.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2024": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250325000383",
+                    "title": "감사보고서 (2024.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2025": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": ""
+    },
+    "울트라브이": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20220331001656",
+                    "title": "사업보고서 (2021.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20210514000600",
+                    "title": "분기보고서 (2021.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20210812000522",
+                    "title": "반기보고서 (2021.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20211115000816",
+                    "title": "분기보고서 (2021.09)"
+                },
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230331002102",
+                    "title": "사업보고서 (2022.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20220516000327",
+                    "title": "분기보고서 (2022.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20220816001450",
+                    "title": "반기보고서 (2022.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20221114002614",
+                    "title": "분기보고서 (2022.09)"
+                },
+                "Q4": null
+            },
+            "2023": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240325000516",
+                    "title": "사업보고서 (2023.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230515002610",
+                    "title": "분기보고서 (2023.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230811002605",
+                    "title": "반기보고서 (2023.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20231114002791",
+                    "title": "분기보고서 (2023.09)"
+                },
+                "Q4": null
+            },
+            "2024": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250325000852",
+                    "title": "사업보고서 (2024.12)"
+                },
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240516000883",
+                    "title": "분기보고서 (2024.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240814001149",
+                    "title": "반기보고서 (2024.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20241114000690",
+                    "title": "분기보고서 (2024.09)"
+                },
+                "Q4": null
+            },
+            "2025": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250515002172",
+                    "title": "분기보고서 (2025.03)"
+                },
+                "Q2": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250814002377",
+                    "title": "반기보고서 (2025.06)"
+                },
+                "Q3": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20251113000902",
+                    "title": "분기보고서 (2025.09)"
+                },
+                "Q4": null
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": ""
+    },
+    "제노스": {
+        "financial_history": {
+            "2021": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20220331003261",
+                    "title": "감사보고서 (2021.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2022": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20230331002939",
+                    "title": "감사보고서 (2022.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2023": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20240401001287",
+                    "title": "감사보고서 (2023.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2024": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": {
+                    "link": "http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20250402001474",
+                    "title": "감사보고서 (2024.12)"
+                },
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2025": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            },
+            "2026": {
+                "revenue": "N/A",
+                "operating_profit": "N/A",
+                "rd_cost": "N/A",
+                "annual_report": null,
+                "Q1": null,
+                "Q2": null,
+                "Q3": null,
+                "Q4": null
+            }
+        },
+        "stock_code": ""
+    }
+}
