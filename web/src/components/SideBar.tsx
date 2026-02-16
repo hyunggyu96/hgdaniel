@@ -30,7 +30,7 @@ export default function SideBar() {
                         <Link
                             href="/"
                             prefetch={true}
-                            className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 group flex items-center justify-between ${isOverview ? 'bg-[#3182f6] text-white' : 'text-muted-foreground hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-foreground'}`}
+                            className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 group flex items-center justify-between ${isOverview ? 'bg-[#3182f6] dark:bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-muted-foreground hover:bg-gray-200 dark:hover:bg-gray-800 hover:text-foreground'}`}
                         >
                             <span className="text-sm font-bold uppercase tracking-tight">{t('sidebar_overview')}</span>
                             <ChevronRight
@@ -42,7 +42,7 @@ export default function SideBar() {
                                 key={category}
                                 href={`/?category=${encodeURIComponent(category)}`}
                                 prefetch={true}
-                                className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 group flex items-center justify-between ${selectedCategory === category ? 'bg-[#3182f6] text-white' : 'text-muted-foreground hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-foreground'}`}
+                                className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 group flex items-center justify-between ${selectedCategory === category ? 'bg-[#3182f6] dark:bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-muted-foreground hover:bg-gray-200 dark:hover:bg-gray-800 hover:text-foreground'}`}
                             >
                                 <span className="text-sm font-bold uppercase tracking-tight">{category}</span>
                                 <ChevronRight
@@ -58,7 +58,7 @@ export default function SideBar() {
                     <Link
                         href="/?collections=true"
                         prefetch={true}
-                        className={`flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition-all group/collections ${isCollections ? 'bg-[#3182f6] text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                        className={`flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition-all group/collections ${isCollections ? 'bg-[#3182f6] dark:bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'hover:bg-gray-200 dark:hover:bg-gray-800'}`}
                     >
                         <div className="flex items-center gap-3">
                             <span className="text-yellow-400 text-lg">⭐</span>

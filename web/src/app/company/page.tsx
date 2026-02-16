@@ -62,17 +62,17 @@ const allCompanies: CompanyData[] = [
 const StatusBadge = ({ status, lang }: { status: CompanyStatus; lang: string }) => {
     // Minimal Dot Style Badge
     const config = {
-        'KOSPI': { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-100', dot: 'bg-blue-500', label: 'KOSPI' },
-        'KOSDAQ': { bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-100', dot: 'bg-indigo-500', label: 'KOSDAQ' },
-        'Unlisted': { bg: 'bg-gray-50', text: 'text-gray-500', border: 'border-gray-100', dot: 'bg-gray-400', label: lang === 'ko' ? '비상장' : 'Unlisted' },
-        'Global_Listed': { bg: 'bg-violet-50', text: 'text-violet-700', border: 'border-violet-100', dot: 'bg-violet-500', label: 'Listed' },
-        'Global_Private': { bg: 'bg-gray-50', text: 'text-gray-500', border: 'border-gray-100', dot: 'bg-gray-400', label: 'Private' }
+        'KOSPI': { bg: 'bg-blue-50 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', border: 'border-blue-100 dark:border-blue-800/50', dot: 'bg-blue-500', label: 'KOSPI' },
+        'KOSDAQ': { bg: 'bg-indigo-50 dark:bg-indigo-900/30', text: 'text-indigo-700 dark:text-indigo-300', border: 'border-indigo-100 dark:border-indigo-800/50', dot: 'bg-indigo-500', label: 'KOSDAQ' },
+        'Unlisted': { bg: 'bg-gray-50 dark:bg-gray-800/50', text: 'text-gray-500 dark:text-gray-400', border: 'border-gray-100 dark:border-gray-700/50', dot: 'bg-gray-400', label: lang === 'ko' ? '비상장' : 'Unlisted' },
+        'Global_Listed': { bg: 'bg-violet-50 dark:bg-violet-900/30', text: 'text-violet-700 dark:text-violet-300', border: 'border-violet-100 dark:border-violet-800/50', dot: 'bg-violet-500', label: 'Listed' },
+        'Global_Private': { bg: 'bg-gray-50 dark:bg-gray-800/50', text: 'text-gray-500 dark:text-gray-400', border: 'border-gray-100 dark:border-gray-700/50', dot: 'bg-gray-400', label: 'Private' }
     }[status];
 
     if (!config) return null;
 
     return (
-        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border ${config.bg} ${config.text} ${config.border} shadow-sm`}>
+        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border ${config.bg} ${config.text} ${config.border} shadow-sm transition-colors duration-300`}>
             <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
             {config.label}
         </span>
@@ -160,12 +160,12 @@ export default function CompanyPage() {
                 {/* Controls: Tabs & Search */}
                 <div className="flex flex-col md:flex-row gap-4 items-center justify-between sticky top-4 z-20">
                     {/* Segmented Tab Control */}
-                    <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md p-1.5 rounded-xl border border-white/50 dark:border-gray-700 shadow-sm ring-1 ring-gray-200/50 dark:ring-gray-700 flex w-full md:w-auto">
+                    <div className="bg-white/80 dark:bg-gray-900/60 backdrop-blur-md p-1.5 rounded-xl border border-white/50 dark:border-gray-800 shadow-sm ring-1 ring-gray-200/50 dark:ring-gray-800 flex w-full md:w-auto">
                         <button
                             onClick={() => handleCategoryChange('korean')}
                             className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2 ${activeCategory === 'korean'
-                                ? 'bg-white dark:bg-gray-800 text-blue-600 shadow-md ring-1 ring-gray-100 dark:ring-gray-700'
-                                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700'
+                                ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-md ring-1 ring-gray-100 dark:ring-gray-700'
+                                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200'
                                 }`}
                         >
                             <span>🇰🇷</span>
@@ -174,8 +174,8 @@ export default function CompanyPage() {
                         <button
                             onClick={() => handleCategoryChange('global')}
                             className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2 ${activeCategory === 'global'
-                                ? 'bg-white dark:bg-gray-800 text-blue-600 shadow-md ring-1 ring-gray-100 dark:ring-gray-700'
-                                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700'
+                                ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-md ring-1 ring-gray-100 dark:ring-gray-700'
+                                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200'
                                 }`}
                         >
                             <span>🌍</span>
@@ -184,7 +184,7 @@ export default function CompanyPage() {
                     </div>
 
                     {/* Search Bar */}
-                    <div className="relative w-full md:w-64 group bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-xl shadow-sm border border-white/50 dark:border-gray-700 ring-1 ring-gray-200/50 dark:ring-gray-700">
+                    <div className="relative w-full md:w-64 group bg-white/80 dark:bg-gray-900/60 backdrop-blur-md rounded-xl shadow-sm border border-white/50 dark:border-gray-800 ring-1 ring-gray-200/50 dark:ring-gray-800">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <Search className="h-4 w-4 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
                         </div>
@@ -213,8 +213,8 @@ export default function CompanyPage() {
                                 onClick={() => router.push(`/analysis?company=${companyNameKo}`)}
                                 className={`group relative bg-white dark:bg-gray-900 rounded-xl p-4 border transition-all duration-300 cursor-pointer flex flex-col items-center justify-center gap-2 hover:bg-gray-50/50 dark:hover:bg-gray-800
                                 ${isHighlight
-                                        ? 'border-violet-100 ring-2 ring-violet-500/20 shadow-lg shadow-violet-500/10'
-                                        : 'border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-blue-100 dark:hover:border-blue-900'}
+                                        ? 'border-violet-100 dark:border-violet-900/30 ring-2 ring-violet-500/20 shadow-lg shadow-violet-500/10'
+                                        : 'border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-blue-100 dark:hover:border-blue-900/50'}
                                 `}
                             >
                                 {/* Highlight Effect */}

@@ -153,15 +153,15 @@ const DetailView = ({
 
             {/* Compliance Notes (Critical - Always Top) */}
             {profile.disclaimers && profile.disclaimers.length > 0 && (
-                <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100">
-                    <h3 className="text-sm font-bold text-amber-900 mb-3 flex items-center gap-2">
+                <div className="bg-amber-50 dark:bg-amber-900/10 rounded-2xl p-5 border border-amber-100 dark:border-amber-900/30">
+                    <h3 className="text-sm font-bold text-amber-900 dark:text-amber-200 mb-3 flex items-center gap-2">
                         <AlertTriangle className="w-4 h-4" />
                         Compliance Notes
                     </h3>
                     <div className="space-y-2">
                         {profile.disclaimers.map((note: any, index: number) => (
-                            <div key={index} className="flex gap-2 text-xs md:text-sm text-amber-900/80 leading-relaxed bg-white/50 p-2.5 rounded-lg border border-amber-100/50">
-                                <span className="text-amber-500 font-bold shrink-0">!</span>
+                            <div key={index} className="flex gap-2 text-xs md:text-sm text-amber-900/80 dark:text-amber-200/80 leading-relaxed bg-white/50 dark:bg-amber-950/20 p-2.5 rounded-lg border border-amber-100/50 dark:border-amber-800/20">
+                                <span className="text-amber-500 dark:text-amber-400 font-bold shrink-0">!</span>
                                 <p>{getLocalizedText(language, note)}</p>
                             </div>
                         ))}
@@ -401,13 +401,13 @@ export default function PolicyPage() {
                                             onClick={() => handleCountrySelect(country.id)}
                                             className={`group relative flex items-center gap-3 p-3 rounded-xl transition-all cursor-pointer border
                                                 ${isSelected
-                                                    ? "bg-blue-50 border-blue-200 shadow-sm"
+                                                    ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800/50 shadow-sm"
                                                     : "bg-white dark:bg-gray-900 border-transparent hover:border-gray-100 dark:hover:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
                                                 }
                                                 ${!isSupported && "opacity-60 grayscale hover:grayscale-0"}
                                             `}
                                         >
-                                            <div className={`relative w-10 h-10 rounded-lg overflow-hidden border ${isSelected ? 'border-blue-200' : 'border-gray-100'} shrink-0`}>
+                                            <div className={`relative w-10 h-10 rounded-lg overflow-hidden border ${isSelected ? 'border-blue-200 dark:border-blue-800' : 'border-gray-100 dark:border-gray-800'} shrink-0`}>
                                                 <img
                                                     src={`https://flagcdn.com/w80/${country.id}.png`}
                                                     alt={country.nameEn}
@@ -431,7 +431,7 @@ export default function PolicyPage() {
                                             </div>
 
                                             {!isSupported && (
-                                                <span className="text-[9px] font-bold text-gray-300 border border-gray-100 px-1.5 py-0.5 rounded bg-gray-50">
+                                                <span className="text-[9px] font-bold text-gray-300 dark:text-gray-600 border border-gray-100 dark:border-gray-800 px-1.5 py-0.5 rounded bg-gray-50 dark:bg-gray-800">
                                                     SOON
                                                 </span>
                                             )}
