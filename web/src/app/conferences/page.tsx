@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useLanguage } from '@/components/LanguageContext';
 import { Globe, Calendar as CalendarIcon, MapPin, ExternalLink, X, Filter, ChevronRight } from "lucide-react";
+import { supabase } from '@/lib/supabaseClient';
 
 // ─── Types ───
 interface ConferenceEvent {
@@ -545,10 +546,6 @@ const CONFERENCES: ConferenceEvent[] = [
 ];
 
 // ─── Derived Data ───
-const ALL_SERIES = Array.from(new Set(CONFERENCES.map((c) => c.series)));
-const ALL_COUNTRIES_KO = Array.from(new Set(CONFERENCES.map((c) => c.country.ko))).sort();
-const ALL_COUNTRIES_EN = Array.from(new Set(CONFERENCES.map((c) => c.country.en))).sort();
-
 // ─── Utility ───
 const MONTH_NAMES_KO = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
 const MONTH_NAMES_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -788,6 +785,7 @@ export default function ConferencesPage() {
     const lang = language as 'ko' | 'en';
 
     const currentDate = new Date();
+    const [conferences, setConferences] = useState<ConferenceEvent[]>(CONFERENCES);
     const [year, setYear] = useState(2026);
     const [month, setMonth] = useState(currentDate.getFullYear() === 2026 ? currentDate.getMonth() : 0);
     const [selectedEvent, setSelectedEvent] = useState<ConferenceEvent | null>(null);
@@ -798,11 +796,58 @@ export default function ConferencesPage() {
     // Pagination Removed as per user request
     const monthNames = lang === 'ko' ? MONTH_NAMES_KO : MONTH_NAMES_EN;
     const dayNames = lang === 'ko' ? DAY_NAMES_KO : DAY_NAMES_EN;
-    const countries = lang === 'ko' ? ALL_COUNTRIES_KO : ALL_COUNTRIES_EN;
+    const allSeries = useMemo(() => Array.from(new Set(conferences.map((c) => c.series))), [conferences]);
+    const allCountriesKo = useMemo(() => Array.from(new Set(conferences.map((c) => c.country.ko))).sort(), [conferences]);
+    const allCountriesEn = useMemo(() => Array.from(new Set(conferences.map((c) => c.country.en))).sort(), [conferences]);
+    const countries = lang === 'ko' ? allCountriesKo : allCountriesEn;
+
+    useEffect(() => {
+        const fetchConferences = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('conferences')
+                    .select('id, series, name_ko, name_en, start_date, end_date, city_ko, city_en, country_ko, country_en, venue, confirmed, url, is_active')
+                    .eq('is_active', true)
+                    .order('start_date', { ascending: true })
+                    .order('end_date', { ascending: true });
+
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    const mapped: ConferenceEvent[] = data.map((item: any) => ({
+                        id: item.id,
+                        series: item.series,
+                        name: {
+                            ko: item.name_ko,
+                            en: item.name_en,
+                        },
+                        startDate: item.start_date,
+                        endDate: item.end_date,
+                        city: {
+                            ko: item.city_ko,
+                            en: item.city_en,
+                        },
+                        country: {
+                            ko: item.country_ko,
+                            en: item.country_en,
+                        },
+                        venue: item.venue,
+                        confirmed: Boolean(item.confirmed),
+                        url: item.url,
+                    }));
+                    setConferences(mapped);
+                }
+            } catch (fetchError) {
+                console.error('Failed to fetch conferences from Supabase:', fetchError);
+            }
+        };
+
+        fetchConferences();
+    }, []);
 
     // Filtered conferences
     const filteredConferences = useMemo(() => {
-        let result = CONFERENCES;
+        let result = conferences;
         if (seriesFilter !== 'ALL') {
             result = result.filter((c) => c.series === seriesFilter);
         }
@@ -810,7 +855,7 @@ export default function ConferencesPage() {
             result = result.filter((c) => c.country[lang] === countryFilter);
         }
         return result;
-    }, [seriesFilter, countryFilter, lang]);
+    }, [conferences, seriesFilter, countryFilter, lang]);
 
     const upcomingEvents = useMemo(() => {
         const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -883,11 +928,11 @@ export default function ConferencesPage() {
                             <div className="flex flex-wrap items-center gap-2 pt-1">
                                 <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/30 text-cyan-100 text-[10px] font-semibold backdrop-blur-sm flex items-center gap-1">
                                     <CalendarIcon className="w-3 h-3" />
-                                    {CONFERENCES.length} Events
+                                    {conferences.length} Events
                                 </span>
                                 <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-100 text-[10px] font-semibold backdrop-blur-sm flex items-center gap-1">
                                     <Globe className="w-3 h-3" />
-                                    {ALL_COUNTRIES_EN.length} Countries
+                                    {allCountriesEn.length} Countries
                                 </span>
                             </div>
                         </div>
@@ -1037,7 +1082,7 @@ export default function ConferencesPage() {
                                 >
                                     ALL
                                 </button>
-                                {ALL_SERIES.map((s) => (
+                                {allSeries.map((s) => (
                                     <button
                                         key={s}
                                         onClick={() => { setSeriesFilter(seriesFilter === s ? 'ALL' : s); setSelectedEvent(null); }}

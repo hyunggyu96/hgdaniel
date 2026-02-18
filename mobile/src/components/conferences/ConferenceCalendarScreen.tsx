@@ -20,7 +20,8 @@ import {
 import { AntigravityHeader, FloatingCard, SpringPressable } from "@/components/antigravity";
 import { useTheme } from "@/context/ThemeContext";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { CONFERENCE_EVENTS_2026, ConferenceEvent } from "@/data/conferences";
+import { ConferenceEvent } from "@/data/conferences";
+import { useConferences } from "@/hooks/useConferences";
 
 interface Props {
   showBackButton?: boolean;
@@ -87,6 +88,7 @@ export default function ConferenceCalendarScreen({ showBackButton = false }: Pro
   const router = useRouter();
   const { colors, isDark } = useTheme();
   const { language } = useLanguage();
+  const { conferences } = useConferences();
 
   const today = useMemo(() => new Date(), []);
   const [year, setYear] = useState(today.getFullYear());
@@ -97,7 +99,7 @@ export default function ConferenceCalendarScreen({ showBackButton = false }: Pro
 
   const eventMap = useMemo(() => {
     const map: Record<string, ConferenceEvent[]> = {};
-    CONFERENCE_EVENTS_2026.forEach((event) => {
+    conferences.forEach((event) => {
       let cursor = new Date(`${event.startDate}T00:00:00`).getTime();
       const end = new Date(`${event.endDate}T00:00:00`).getTime();
 
@@ -110,20 +112,20 @@ export default function ConferenceCalendarScreen({ showBackButton = false }: Pro
       }
     });
     return map;
-  }, []);
+  }, [conferences]);
 
   const monthlyEvents = useMemo(() => {
     // Get all events that fall within the current month
     const startOfMonth = new Date(year, month, 1).getTime();
     const endOfMonth = new Date(year, month + 1, 0).getTime();
 
-    return CONFERENCE_EVENTS_2026.filter((e) => {
+    return conferences.filter((e) => {
       const eStart = new Date(`${e.startDate}T00:00:00`).getTime();
       const eEnd = new Date(`${e.endDate}T00:00:00`).getTime();
       // Check overlap
       return eStart <= endOfMonth && eEnd >= startOfMonth;
     }).sort((a, b) => a.startDate.localeCompare(b.startDate));
-  }, [year, month]);
+  }, [year, month, conferences]);
 
   // Scroll to selected date or just keep state
   useEffect(() => {
