@@ -25,7 +25,7 @@ try {
     }
 }
 
-const YEARS = ['2025', '2024', '2023', '2022'] as const;
+const YEARS = ['2022', '2023', '2024', '2025'] as const;
 
 export default function AnalysisPage() {
     const searchParams = useSearchParams();
