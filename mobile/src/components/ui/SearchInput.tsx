@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import { StyleSheet, TextInput, View, Pressable } from "react-native";
 import { Search, X } from "lucide-react-native";
 import { useTheme } from "@/context/ThemeContext";
@@ -8,12 +8,32 @@ interface SearchInputProps {
   value: string;
   onChangeText: (text: string) => void;
   placeholder?: string;
+  debounceMs?: number;
 }
 
-export function SearchInput({ value, onChangeText, placeholder }: SearchInputProps) {
+export function SearchInput({ value, onChangeText, placeholder, debounceMs = 400 }: SearchInputProps) {
   const { colors, isDark } = useTheme();
   const { t } = useLanguage();
   const [focused, setFocused] = useState(false);
+  const [localValue, setLocalValue] = useState(value);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Sync external value changes (e.g. clear from parent)
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+
+  const handleChange = useCallback((text: string) => {
+    setLocalValue(text);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => onChangeText(text), debounceMs);
+  }, [onChangeText, debounceMs]);
+
+  const handleClear = useCallback(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    setLocalValue("");
+    onChangeText("");
+  }, [onChangeText]);
 
   return (
     <View
@@ -30,8 +50,8 @@ export function SearchInput({ value, onChangeText, placeholder }: SearchInputPro
       <Search size={16} color={colors.textMuted} />
       <TextInput
         style={[styles.input, { color: colors.textPrimary }]}
-        value={value}
-        onChangeText={onChangeText}
+        value={localValue}
+        onChangeText={handleChange}
         placeholder={placeholder || t("search")}
         placeholderTextColor={colors.textMuted}
         onFocus={() => setFocused(true)}
@@ -39,8 +59,8 @@ export function SearchInput({ value, onChangeText, placeholder }: SearchInputPro
         autoCorrect={false}
         autoCapitalize="none"
       />
-      {value.length > 0 && (
-        <Pressable onPress={() => onChangeText("")}>
+      {localValue.length > 0 && (
+        <Pressable onPress={handleClear}>
           <X size={16} color={colors.textMuted} />
         </Pressable>
       )}

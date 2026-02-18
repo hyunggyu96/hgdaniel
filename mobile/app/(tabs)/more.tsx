@@ -12,6 +12,7 @@ import {
   LayoutList,
   ChevronRight,
   GraduationCap,
+  TrendingUp,
 } from "lucide-react-native";
 import { AntigravityHeader, FloatingCard, SpringPressable } from "@/components/antigravity";
 import { useTheme } from "@/context/ThemeContext";
@@ -74,6 +75,12 @@ export default function MoreScreen() {
           />
           <View style={[menuStyles.divider, { backgroundColor: colors.glassBorder }]} />
           <MenuItem
+            icon={<TrendingUp size={20} color={colors.primary} />}
+            label={language === "ko" ? "매출 비교" : "Revenue"}
+            onPress={() => router.push("/revenue" as any)}
+          />
+          <View style={[menuStyles.divider, { backgroundColor: colors.glassBorder }]} />
+          <MenuItem
             icon={<Shield size={20} color={colors.primary} />}
             label={t("nav_policy")}
             onPress={() => router.push("/policy")}
@@ -97,30 +104,6 @@ export default function MoreScreen() {
                 {language === "ko" ? "화면 설정" : "Screen Settings"}
               </Text>
             </View>
-
-            <View style={menuStyles.prefRows}>
-              <PreferenceRow
-                label={language === "ko" ? "보기 모드 전환 버튼" : "Show View Mode Toggle"}
-                enabled={landing.showViewModeToggle}
-                onToggle={() =>
-                  setLanding({ showViewModeToggle: !landing.showViewModeToggle })
-                }
-              />
-              <PreferenceRow
-                label={language === "ko" ? "검색창 표시" : "Show Search"}
-                enabled={landing.showSearch}
-                onToggle={() => setLanding({ showSearch: !landing.showSearch })}
-              />
-              <PreferenceRow
-                label={language === "ko" ? "카테고리 칩" : "Show Categories"}
-                enabled={landing.showCategoryChips}
-                onToggle={() =>
-                  setLanding({ showCategoryChips: !landing.showCategoryChips })
-                }
-              />
-            </View>
-
-            <View style={{ height: 1, backgroundColor: colors.glassBorder, marginVertical: 8 }} />
 
             <Text style={[menuStyles.sectionTitle, { color: colors.textSecondary, marginBottom: 8 }]}>
               {language === "ko" ? "하단 네비게이션" : "Bottom Navigation"}

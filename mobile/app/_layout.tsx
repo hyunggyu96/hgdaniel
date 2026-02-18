@@ -38,6 +38,10 @@ function InnerLayout() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
+          name="revenue/index"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
           name="about"
           options={{ headerShown: false }}
         />

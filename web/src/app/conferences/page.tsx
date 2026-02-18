@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useLanguage } from '@/components/LanguageContext';
-import { Globe, Calendar as CalendarIcon, MapPin, ExternalLink, X, Filter, ChevronRight, ChevronDown, ChevronUp } from "lucide-react";
+import { Globe, Calendar as CalendarIcon, MapPin, ExternalLink, X, Filter, ChevronRight, ChevronDown, ChevronUp, ChevronLeft } from "lucide-react";
 import { supabase } from '@/lib/supabaseClient';
 
 // ─── Types ───
@@ -1020,6 +1020,18 @@ export default function ConferencesPage() {
         setSelectedDate(now);
     }
 
+    const lastScrollTime = React.useRef(0);
+    const handleWheel = (e: React.WheelEvent) => {
+        const now = Date.now();
+        if (now - lastScrollTime.current < 300) return;
+
+        if (Math.abs(e.deltaY) > 20) {
+            lastScrollTime.current = now;
+            if (e.deltaY > 0) nextMonth();
+            else prevMonth();
+        }
+    };
+
     return (
         <main className="min-h-screen bg-gray-50/50 dark:bg-gray-950 p-6 md:p-12 pb-24 transition-colors duration-300">
             <div className="max-w-7xl mx-auto space-y-6">
@@ -1062,23 +1074,39 @@ export default function ConferencesPage() {
                 {/* Grid: Calendar (Left) & Filters (Right) */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     {/* LEFT COLUMN: Calendar (Compact) - Span 7 */}
-                    <div className="lg:col-span-8 bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-xl ring-1 ring-black/5 overflow-hidden flex flex-col h-full">
+                    <div
+                        className="lg:col-span-8 bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-xl ring-1 ring-black/5 overflow-hidden flex flex-col h-full relative"
+                        onWheel={handleWheel}
+                    >
                         {/* Calendar Header */}
-                        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/80">
-                            <button onClick={prevMonth} aria-label={lang === 'ko' ? '이전 달' : 'Previous month'} className="w-8 h-8 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 transition-all shadow-sm">
-                                <ChevronRight className="w-4 h-4 rotate-180" />
-                            </button>
-                            <div className="text-center">
-                                <h2 className="text-xl font-black tracking-tight text-gray-900 dark:text-gray-100">
+                        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/80">
+                            <div className="w-20" /> {/* Spacer */}
+
+                            <div className="flex items-center gap-6">
+                                <button
+                                    onClick={prevMonth}
+                                    className="w-10 h-10 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-200 hover:text-blue-600 transition-all active:scale-95 group"
+                                    aria-label={lang === 'ko' ? '이전 달' : 'Previous month'}
+                                >
+                                    <ChevronLeft className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
+                                </button>
+
+                                <h2 className="text-2xl font-black tracking-tight text-gray-900 dark:text-gray-100 min-w-[140px] text-center select-none">
                                     {lang === 'ko' ? `${year}년 ${monthNames[month]}` : `${monthNames[month]} ${year}`}
                                 </h2>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <button onClick={goToToday} className="hidden sm:block text-[10px] font-bold text-gray-500 hover:text-blue-600 px-2 py-1.5 bg-white dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700 hover:border-blue-200 transition-all">
-                                    {lang === 'ko' ? '오늘' : 'Today'}
+
+                                <button
+                                    onClick={nextMonth}
+                                    aria-label={lang === 'ko' ? '다음 달' : 'Next month'}
+                                    className="w-10 h-10 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-200 hover:text-blue-600 transition-all active:scale-95 group"
+                                >
+                                    <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
                                 </button>
-                                <button onClick={nextMonth} aria-label={lang === 'ko' ? '다음 달' : 'Next month'} className="w-8 h-8 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 transition-all shadow-sm">
-                                    <ChevronRight className="w-4 h-4" />
+                            </div>
+
+                            <div className="w-20 flex justify-end">
+                                <button onClick={goToToday} className="px-3 py-1.5 text-xs font-bold text-gray-500 hover:text-blue-600 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-200 transition-all shadow-sm">
+                                    {lang === 'ko' ? '오늘' : 'Today'}
                                 </button>
                             </div>
                         </div>

@@ -247,18 +247,40 @@ export default function RevenueScreen() {
               <SpringPressable key={cat} onPress={() => setActiveCategory(cat)} haptic="selection">
                 <View style={[
                   styles.tabBtn,
-                  { backgroundColor: active ? (isDark ? "rgba(255,255,255,0.1)" : "#fff") : "transparent" },
+                  {
+                    backgroundColor: active
+                      ? (isDark ? "rgba(255,255,255,0.1)" : "#fff")
+                      : "transparent",
+                  },
+                  active && styles.tabBtnActive,
                 ]}>
-                  <Icon size={14} color={active ? colors.primary : colors.textMuted} />
+                  <View style={[
+                    styles.tabIcon,
+                    { backgroundColor: active ? `${colors.primary}18` : "transparent" },
+                  ]}>
+                    <Icon size={16} color={active ? colors.primary : colors.textMuted} />
+                  </View>
                   <Text style={{
-                    fontSize: 12,
+                    fontSize: 13,
                     fontWeight: "700",
                     color: active ? colors.primary : colors.textMuted,
                   }}>
                     {cat === "korean"
-                      ? (language === "ko" ? `한국 (${count})` : `Korean (${count})`)
-                      : (language === "ko" ? `글로벌 (${count})` : `Global (${count})`)}
+                      ? (language === "ko" ? "한국 기업" : "Korean")
+                      : (language === "ko" ? "글로벌" : "Global")}
                   </Text>
+                  <View style={[
+                    styles.countBadge,
+                    { backgroundColor: active ? `${colors.primary}18` : isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)" },
+                  ]}>
+                    <Text style={{
+                      fontSize: 11,
+                      fontWeight: "800",
+                      color: active ? colors.primary : colors.textMuted,
+                    }}>
+                      {count}
+                    </Text>
+                  </View>
                 </View>
               </SpringPressable>
             );
@@ -356,8 +378,11 @@ const styles = StyleSheet.create({
   backRow: { paddingHorizontal: 16, paddingVertical: 8 },
   backBtn: { width: 40, height: 40, borderRadius: 12, justifyContent: "center", alignItems: "center" },
   controlsRow: { paddingHorizontal: 16, marginBottom: 12 },
-  tabContainer: { flexDirection: "row", borderRadius: 14, borderWidth: 1, padding: 3 },
-  tabBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 8, borderRadius: 11 },
+  tabContainer: { flexDirection: "row", borderRadius: 16, borderWidth: 1, padding: 4, gap: 4 },
+  tabBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 10, paddingHorizontal: 12, borderRadius: 12 },
+  tabBtnActive: { shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 2 },
+  tabIcon: { width: 28, height: 28, borderRadius: 8, alignItems: "center", justifyContent: "center" },
+  countBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10, minWidth: 24, alignItems: "center" },
   headerRow: { flexDirection: "row", alignItems: "center", borderBottomWidth: 1, paddingVertical: 10, paddingHorizontal: 8 },
   headerCell: { flexDirection: "row", alignItems: "center", gap: 4 },
   headerText: { fontSize: 10, fontWeight: "700", textTransform: "uppercase", letterSpacing: 0.5 },

@@ -5,7 +5,8 @@
       "WebFetch(domain:comp.fnguide.com)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(npx expo start:*)"
     ]
   }
 }
