@@ -8,6 +8,7 @@ import { COMPANY_OVERVIEWS } from '@/data/companyOverviews';
 import { isGlobalCompany } from '@/data/companyCategories';
 import CompetitorTable from '@/components/CompetitorTable';
 import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import governanceData from '@/data/governance_data.json';
 
 // Safely require MFDS Data (might be missing initially)
 // Safely require MFDS Data (prioritize filtered small set)
@@ -35,7 +36,6 @@ export default function AnalysisPage() {
     const [result, setResult] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [language, setLanguage] = useState<'ko' | 'en'>('ko');
 
     // Separate state for real-time data
     const [newsData, setNewsData] = useState<any>(null);
@@ -563,31 +563,80 @@ export default function AnalysisPage() {
 
                         <div className="border-t border-gray-200 dark:border-gray-800 my-8"></div>
 
-                        {/* 3. Analysis Summary - BOTTOM */}
+                        {/* 3. Analysis Summary - Corporate Governance */}
                         <div className="mt-8">
                             <Card className="overflow-hidden shadow-lg border-0 ring-1 ring-gray-200 dark:ring-gray-800 sm:rounded-xl bg-white dark:bg-gray-900 transition-colors">
                                 <div className="flex justify-between items-center mb-6">
                                     <div className="flex items-center gap-2">
                                         <div className="bg-purple-100 dark:bg-purple-900/30 p-1.5 rounded-lg">
                                             <svg className="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                             </svg>
                                         </div>
                                         <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">Analysis Summary</h3>
+                                        <span className="text-xs text-gray-400 dark:text-gray-500 ml-1">— 기업 지배구조</span>
                                     </div>
-                                    <button
-                                        onClick={() => setLanguage(language === 'ko' ? 'en' : 'ko')}
-                                        className="px-4 py-1.5 text-sm font-medium bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-purple-600 dark:hover:text-purple-400 rounded-full transition-all shadow-sm"
-                                    >
-                                        {language === 'ko' ? 'English' : '한국어'}
-                                    </button>
                                 </div>
-                                <Text className="text-gray-800 dark:text-gray-200 font-medium whitespace-pre-line leading-relaxed text-base p-2">
-                                    {language === 'ko'
-                                        ? (result.gemini_analysis || "분석 대기 중...")
-                                        : (result.gemini_analysis_en || result.gemini_analysis || "Analysis pending...")
+
+                                {(() => {
+                                    const gov = (governanceData as Record<string, any>)[companyName];
+                                    if (!gov) {
+                                        return (
+                                            <div className="text-center py-8 text-gray-400 dark:text-gray-500">
+                                                <svg className="w-10 h-10 mx-auto mb-2 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5" />
+                                                </svg>
+                                                <p className="text-sm">지배구조 정보가 아직 등록되지 않았습니다.</p>
+                                            </div>
+                                        );
                                     }
-                                </Text>
+
+                                    const rows = [
+                                        { label: "최대주주", value: gov.largest_shareholder, icon: "👤" },
+                                        { label: "대표이사 (CEO)", value: gov.ceo, icon: "🏛️" },
+                                        { label: "모회사 / 그룹", value: gov.parent_group, icon: "🏢" },
+                                        { label: "경영형태", value: gov.governance_type, icon: "📋" },
+                                        { label: "주요 자회사", value: gov.subsidiaries, icon: "🔗" },
+                                    ];
+
+                                    return (
+                                        <div className="space-y-4">
+                                            <div className="overflow-x-auto">
+                                                <table className="min-w-full">
+                                                    <tbody className="divide-y divide-gray-100 dark:divide-gray-800/50">
+                                                        {rows.map((row, i) => (
+                                                            <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
+                                                                <td className="px-4 py-3.5 whitespace-nowrap w-48">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-base">{row.icon}</span>
+                                                                        <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">{row.label}</span>
+                                                                    </div>
+                                                                </td>
+                                                                <td className="px-4 py-3.5 text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                                    {row.value || (
+                                                                        <span className="text-gray-300 dark:text-gray-600 italic">미확인</span>
+                                                                    )}
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                            {/* Data Source Footer */}
+                                            <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center gap-2 px-4">
+                                                <svg className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                <span className="text-xs text-gray-400 dark:text-gray-500">
+                                                    출처: {gov.source || "DART 전자공시 / 기업 IR"}
+                                                    {gov.source_date && ` (${gov.source_date})`}
+                                                    {" · 실제와 다를 수 있으며 최신 공시를 확인하세요"}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
                             </Card>
                         </div>
 
