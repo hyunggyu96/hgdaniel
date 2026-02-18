@@ -1020,17 +1020,30 @@ export default function ConferencesPage() {
         setSelectedDate(now);
     }
 
+    const calendarRef = React.useRef<HTMLDivElement>(null);
     const lastScrollTime = React.useRef(0);
-    const handleWheel = (e: React.WheelEvent) => {
-        const now = Date.now();
-        if (now - lastScrollTime.current < 300) return;
 
-        if (Math.abs(e.deltaY) > 20) {
-            lastScrollTime.current = now;
-            if (e.deltaY > 0) nextMonth();
-            else prevMonth();
-        }
-    };
+    useEffect(() => {
+        const el = calendarRef.current;
+        if (!el) return;
+
+        const onWheel = (e: WheelEvent) => {
+            const now = Date.now();
+            if (now - lastScrollTime.current < 400) {
+                e.preventDefault();
+                return;
+            }
+            if (Math.abs(e.deltaY) > 20) {
+                e.preventDefault();
+                lastScrollTime.current = now;
+                if (e.deltaY > 0) nextMonth();
+                else prevMonth();
+            }
+        };
+
+        el.addEventListener('wheel', onWheel, { passive: false });
+        return () => el.removeEventListener('wheel', onWheel);
+    });
 
     return (
         <main className="min-h-screen bg-gray-50/50 dark:bg-gray-950 p-6 md:p-12 pb-24 transition-colors duration-300">
@@ -1075,8 +1088,8 @@ export default function ConferencesPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     {/* LEFT COLUMN: Calendar (Compact) - Span 7 */}
                     <div
+                        ref={calendarRef}
                         className="lg:col-span-8 bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-xl ring-1 ring-black/5 overflow-hidden flex flex-col h-full relative"
-                        onWheel={handleWheel}
                     >
                         {/* Calendar Header */}
                         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/80">
