@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 
 export interface Paper {
@@ -35,17 +35,22 @@ export function useInsights(
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   const fetchPapers = useCallback(async () => {
     setLoading(true);
     const from = (page - 1) * limit;
     const to = from + limit - 1;
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     let dbQuery = supabase
       .from("pubmed_papers")
-      .select("*", { count: "exact" })
+      .select("*", { count: "planned" })
       .order("publication_date", { ascending: false })
-      .range(from, to);
+      .range(from, to)
+      .abortSignal(controller.signal);
 
     if (keyword) {
       dbQuery = dbQuery.contains("keywords", [keyword]);
@@ -58,20 +63,33 @@ export function useInsights(
       );
     }
 
-    const { data: papers, error: err, count } = await dbQuery;
+    try {
+      const { data: papers, error: err, count } = await dbQuery;
+      if (controller.signal.aborted) return;
 
-    if (err) {
-      setError(err.message);
-    } else {
-      setData(papers || []);
-      setTotal(count || 0);
-      setError(null);
+      if (err) {
+        setError(err.message);
+      } else {
+        setData(papers || []);
+        setTotal(count || 0);
+        setError(null);
+      }
+    } catch (e: any) {
+      if (e?.name !== "AbortError") {
+        setError(e?.message || "Failed to load papers");
+      }
+    } finally {
+      if (!controller.signal.aborted) {
+        setLoading(false);
+      }
     }
-    setLoading(false);
   }, [page, limit, keyword, query]);
 
   useEffect(() => {
     fetchPapers();
+    return () => {
+      abortRef.current?.abort();
+    };
   }, [fetchPapers]);
 
   return {

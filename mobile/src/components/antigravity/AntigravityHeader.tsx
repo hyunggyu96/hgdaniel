@@ -32,29 +32,49 @@ export function AntigravityHeader({
       ]}
     >
       <View style={styles.content}>
-        <View style={styles.titleRow}>
-          <Text
-            style={[
-              styles.title,
-              { color: colors.textPrimary },
-            ]}
-          >
-            {title}
-          </Text>
-          {showPulse && <PulseIndicator />}
-          {badge !== undefined && (
+        {/* Live Indicator Row */}
+        {badge === "Live" ? (
+          <View style={styles.liveRow}>
+            <PulseIndicator color="#4ade80" size={5} />
+            <Text style={[styles.liveText, { color: "#4ade80" }]}>Live</Text>
+          </View>
+        ) : badge !== undefined ? (
+          <View style={styles.topBadgeRow}>
             <View
-              style={[styles.badge, { backgroundColor: colors.primary }]}
+              style={[
+                styles.badge,
+                { backgroundColor: colors.primary },
+              ]}
             >
               <Text style={styles.badgeText}>{badge}</Text>
             </View>
+          </View>
+        ) : null}
+
+        {/* Main Title */}
+        <Text
+          style={[
+            styles.title,
+            { color: colors.textPrimary },
+          ]}
+        >
+          {title.startsWith("AI ") ? (
+            <>
+              <Text style={{ fontWeight: "300" }}>AI </Text>
+              {title.slice(3)}
+            </>
+          ) : (
+            title
           )}
-        </View>
+        </Text>
+
+        {/* Subtitle */}
         {subtitle && (
           <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
             {subtitle}
           </Text>
         )}
+
         {children}
       </View>
     </View>
@@ -64,30 +84,49 @@ export function AntigravityHeader({
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
-    paddingBottom: 12,
-    paddingTop: 8,
+    paddingBottom: 16,
+    paddingTop: 12,
   },
   content: {
     gap: 4,
+    alignItems: "center",
   },
-  titleRow: {
+  liveRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    justifyContent: "center",
+    gap: 6,
+    marginBottom: 2,
+    backgroundColor: "rgba(74, 222, 128, 0.1)",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  topBadgeRow: {
+    marginBottom: 4,
+  },
+  liveText: {
+    fontSize: 12,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   title: {
-    fontSize: 28,
-    fontWeight: "800",
+    fontSize: 24,
+    fontWeight: "900",
     letterSpacing: -0.5,
+    textAlign: "center",
+    textTransform: "uppercase",
   },
   subtitle: {
     fontSize: 13,
-    marginTop: 2,
+    fontWeight: "500",
+    textAlign: "center",
   },
   badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
   },
   badgeText: {
     color: "#ffffff",

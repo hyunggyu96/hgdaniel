@@ -12,11 +12,13 @@ import { AntigravityHeader, SpringPressable } from "@/components/antigravity";
 import { SearchInput } from "@/components/ui/SearchInput";
 import { useTheme } from "@/context/ThemeContext";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { allCompanies, CompanyData, CompanyStatus } from "@/data/companyList";
+import { CompanyData, CompanyStatus } from "@/data/companyList";
+import { useCompanies } from "@/hooks/useCompanies";
 import { COMPANY_OVERVIEWS } from "@/data/companyOverviews";
 import { ANTIGRAVITY_SPRING, STAGGER_DELAY } from "@/theme/springs";
 
 function StatusBadge({ status, lang }: { status: CompanyStatus; lang: string }) {
+  // ... existing StatusBadge implementation unchanged ...
   const config: Record<CompanyStatus, { bg: string; color: string; label: string }> = {
     KOSPI: { bg: "rgba(59,130,246,0.15)", color: "#3b82f6", label: "KOSPI" },
     KOSDAQ: { bg: "rgba(99,102,241,0.15)", color: "#6366f1", label: "KOSDAQ" },
@@ -97,22 +99,31 @@ export default function CompanyScreen() {
   const insets = useSafeAreaInsets();
   const { colors, isDark } = useTheme();
   const { t, language } = useLanguage();
+  const { companies, loading } = useCompanies();
 
   const [region, setRegion] = useState<"korean" | "global">("korean");
   const [searchQuery, setSearchQuery] = useState("");
 
   const filtered = useMemo(() => {
-    let companies = allCompanies.filter((c) => c.category === region);
+    let list = companies.filter((c) => c.category === region);
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      companies = companies.filter(
+      list = list.filter(
         (c) =>
           c.name.ko.toLowerCase().includes(q) ||
           c.name.en.toLowerCase().includes(q)
       );
     }
-    return companies;
-  }, [region, searchQuery]);
+
+    // Sort alphabetically
+    list.sort((a, b) => {
+      const nameA = language === 'ko' ? a.name.ko : a.name.en;
+      const nameB = language === 'ko' ? b.name.ko : b.name.en;
+      return nameA.localeCompare(nameB, language === 'ko' ? 'ko' : 'en');
+    });
+
+    return list;
+  }, [region, searchQuery, language, companies]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
@@ -129,7 +140,7 @@ export default function CompanyScreen() {
             <AntigravityHeader
               title={t("company_header")}
               subtitle={t("company_desc")}
-              badge={filtered.length}
+              badge="Live"
             />
             <View style={styles.toggleRow}>
               {(["korean", "global"] as const).map((r) => (
@@ -146,8 +157,8 @@ export default function CompanyScreen() {
                           region === r
                             ? colors.primary
                             : isDark
-                            ? "rgba(255,255,255,0.06)"
-                            : "rgba(0,0,0,0.04)",
+                              ? "rgba(255,255,255,0.06)"
+                              : "rgba(0,0,0,0.04)",
                       },
                     ]}
                   >
@@ -171,7 +182,9 @@ export default function CompanyScreen() {
         }
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Text style={{ color: colors.textMuted }}>No companies found</Text>
+            <Text style={{ color: colors.textMuted }}>
+              {loading ? t("loading") : "No companies found"}
+            </Text>
           </View>
         }
         contentContainerStyle={{ paddingBottom: 100, gap: 12 }}

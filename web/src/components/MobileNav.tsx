@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams, usePathname } from 'next/navigation';
-import { Home, Menu, Star, X, ChevronRight, MessageSquarePlus } from 'lucide-react';
+import { Home, Menu, Star, X, ChevronRight, MessageSquarePlus, Calendar as CalendarIcon } from 'lucide-react';
 import { CATEGORIES } from '@/lib/constants';
 import KeywordSuggestionModal from './KeywordSuggestionModal';
 
@@ -14,8 +14,9 @@ export default function MobileNav() {
     const pathname = usePathname();
     const selectedCategory = searchParams?.get('category');
     const isCollections = searchParams?.get('collections') === 'true';
+    const isConferences = pathname === '/conferences';
     const searchQuery = searchParams?.get('search');
-    const isOverview = !selectedCategory && !isCollections && !searchQuery;
+    const isOverview = !selectedCategory && !isCollections && !searchQuery && !isConferences;
 
     // Close menu when route changes
     useEffect(() => {
@@ -55,6 +56,14 @@ export default function MobileNav() {
                     <Menu className="w-5 h-5" />
                     <span className="text-[9px] font-bold uppercase tracking-wider">Sector</span>
                 </button>
+
+                <Link
+                    href="/conferences"
+                    className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all w-16 ${isConferences ? 'text-[#3182f6]' : 'text-gray-400 hover:text-foreground'}`}
+                >
+                    <CalendarIcon className={`w-5 h-5 ${isConferences ? 'fill-current' : ''}`} />
+                    <span className="text-[9px] font-bold uppercase tracking-wider">Calendar</span>
+                </Link>
 
                 <Link
                     href="/?collections=true"

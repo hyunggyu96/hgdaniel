@@ -4,6 +4,7 @@ export const translations = {
     tab_news: "뉴스",
     tab_insights: "인사이트",
     tab_company: "기업",
+    tab_calender: "달력",
     tab_more: "더보기",
 
     // Nav
@@ -16,7 +17,7 @@ export const translations = {
     nav_revenue: "매출 현황",
 
     // News
-    news_section_title: "MARKET INTELLIGENCE",
+    news_section_title: "AI 뉴스피드",
     news_section_desc: "AI-Powered Analysis",
     news_overview: "종합 개요",
     news_categories: "카테고리",
@@ -86,6 +87,7 @@ export const translations = {
     tab_news: "News",
     tab_insights: "Insights",
     tab_company: "Companies",
+    tab_calender: "Calendar",
     tab_more: "More",
 
     nav_news: "AI Newsfeed",
@@ -96,7 +98,7 @@ export const translations = {
     nav_about: "About",
     nav_revenue: "Revenue",
 
-    news_section_title: "MARKET INTELLIGENCE",
+    news_section_title: "AI NEWSFEED",
     news_section_desc: "AI-Powered Analysis",
     news_overview: "Overview",
     news_categories: "Categories",

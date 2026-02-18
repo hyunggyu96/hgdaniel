@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useLanguage } from '@/components/LanguageContext';
-import { Globe, Calendar as CalendarIcon, MapPin, ExternalLink, X, Filter } from "lucide-react";
+import { Globe, Calendar as CalendarIcon, MapPin, ExternalLink, X, Filter, ChevronRight } from "lucide-react";
 
 // ─── Types ───
 interface ConferenceEvent {
@@ -36,6 +36,11 @@ const COUNTRY_CODES: Record<string, string> = {
     '홍콩': 'hk', 'Hong Kong': 'hk',
     '싱가포르': 'sg', 'Singapore': 'sg',
     '인도': 'in', 'India': 'in',
+    '영국': 'gb', 'United Kingdom': 'gb',
+    '이탈리아': 'it', 'Italy': 'it',
+    '포르투갈': 'pt', 'Portugal': 'pt',
+    '스페인': 'es', 'Spain': 'es',
+    '오스트리아': 'at', 'Austria': 'at',
 };
 
 function FlagIcon({ country, size = 16 }: { country: string; size?: number }) {
@@ -86,6 +91,16 @@ const COUNTRY_COLORS: Record<string, { color: string; bgColor: string; borderCol
     'Singapore': { color: '#EF3340', bgColor: '#FDECEE', borderColor: '#F9B0B6' },
     '인도': { color: '#D96B00', bgColor: '#FFF3E6', borderColor: '#F5C88A' },
     'India': { color: '#D96B00', bgColor: '#FFF3E6', borderColor: '#F5C88A' },
+    '영국': { color: '#1F3C88', bgColor: '#E8EDF8', borderColor: '#A3B5E3' },
+    'United Kingdom': { color: '#1F3C88', bgColor: '#E8EDF8', borderColor: '#A3B5E3' },
+    '이탈리아': { color: '#008C45', bgColor: '#E8F6EE', borderColor: '#9EDBB8' },
+    'Italy': { color: '#008C45', bgColor: '#E8F6EE', borderColor: '#9EDBB8' },
+    '포르투갈': { color: '#046A38', bgColor: '#E7F5EE', borderColor: '#9AD7BE' },
+    'Portugal': { color: '#046A38', bgColor: '#E7F5EE', borderColor: '#9AD7BE' },
+    '스페인': { color: '#AA151B', bgColor: '#FBEAEC', borderColor: '#E8A6AB' },
+    'Spain': { color: '#AA151B', bgColor: '#FBEAEC', borderColor: '#E8A6AB' },
+    '오스트리아': { color: '#ED2939', bgColor: '#FDECEE', borderColor: '#F7B5BC' },
+    'Austria': { color: '#ED2939', bgColor: '#FDECEE', borderColor: '#F7B5BC' },
 };
 
 const DEFAULT_COUNTRY_COLOR = { color: '#3B82F6', bgColor: '#EFF6FF', borderColor: '#BFDBFE' };
@@ -93,263 +108,231 @@ function getCountryColor(country: string) {
     return COUNTRY_COLORS[country] || DEFAULT_COUNTRY_COLOR;
 }
 
-// ─── 2026 Conference Data ───
+// Conference Data (2025-2026 Verified)
 const CONFERENCES: ConferenceEvent[] = [
     {
+        id: 'imcas-world-2025', series: 'IMCAS',
+        name: { ko: 'IMCAS World Congress 2025', en: 'IMCAS World Congress 2025' },
+        startDate: '2025-01-30', endDate: '2025-02-01',
+        city: { ko: 'Paris', en: 'Paris' }, country: { ko: 'France', en: 'France' },
+        venue: 'Palais des Congres de Paris', confirmed: true,
+        url: 'https://www.imcas.com/en/imcas-world-congress-2025',
+    },
+    {
+        id: 'amwc-americas-2025', series: 'AMWC',
+        name: { ko: 'AMWC Americas 2025', en: 'AMWC Americas 2025' },
+        startDate: '2025-02-15', endDate: '2025-02-17',
+        city: { ko: 'Miami', en: 'Miami' }, country: { ko: 'USA', en: 'USA' },
+        venue: 'TBD', confirmed: true,
+        url: 'https://www.amwcamericas.com/en/practical-info/cme-accreditation.html',
+    },
+    {
+        id: 'aad-annual-2025', series: 'AAD',
+        name: { ko: 'AAD Annual Meeting 2025', en: 'AAD Annual Meeting 2025' },
+        startDate: '2025-03-07', endDate: '2025-03-11',
+        city: { ko: 'Orlando', en: 'Orlando' }, country: { ko: 'USA', en: 'USA' },
+        venue: 'TBD', confirmed: false,
+        url: 'https://www.aad.org/member/meetings/archive',
+    },
+    {
+        id: 'aesthetic-meet-2025', series: 'Aesthetic MEET',
+        name: { ko: 'The Aesthetic MEET 2025', en: 'The Aesthetic MEET 2025' },
+        startDate: '2025-03-20', endDate: '2025-03-23',
+        city: { ko: 'Austin', en: 'Austin' }, country: { ko: 'USA', en: 'USA' },
+        venue: 'TBD', confirmed: true,
+        url: 'https://www.theaestheticmeet.org/info/',
+    },
+    {
+        id: 'amwc-monaco-2025', series: 'AMWC',
+        name: { ko: 'AMWC Monaco 2025', en: 'AMWC Monaco 2025' },
+        startDate: '2025-03-27', endDate: '2025-03-29',
+        city: { ko: 'Monte Carlo', en: 'Monte Carlo' }, country: { ko: 'Monaco', en: 'Monaco' },
+        venue: 'Grimaldi Forum', confirmed: true,
+        url: 'https://www.amwc-conference.com/content/dam/markets/aest/amwc-conference/2025/pdf/amwc2025-program-new.pdf',
+    },
+    {
+        id: 'dubai-derma-2025', series: 'Dubai Derma',
+        name: { ko: 'Dubai Derma 2025', en: 'Dubai Derma 2025' },
+        startDate: '2025-04-14', endDate: '2025-04-16',
+        city: { ko: 'Dubai', en: 'Dubai' }, country: { ko: 'UAE', en: 'UAE' },
+        venue: 'Dubai World Trade Centre', confirmed: true,
+        url: 'https://www.dubaiderma.com/',
+    },
+    {
+        id: 'sime-congress-2025', series: 'SIME',
+        name: { ko: 'SIME Congress 2025', en: 'SIME Congress 2025' },
+        startDate: '2025-05-16', endDate: '2025-05-18',
+        city: { ko: 'Rome', en: 'Rome' }, country: { ko: 'Italy', en: 'Italy' },
+        venue: 'TBD', confirmed: true,
+        url: 'https://www.simecongress.com/',
+    },
+    {
+        id: 'fivecc-2025', series: '5CC',
+        name: { ko: '5-Continent Congress 2025', en: '5-Continent Congress 2025' },
+        startDate: '2025-05-29', endDate: '2025-05-31',
+        city: { ko: 'Lisbon', en: 'Lisbon' }, country: { ko: 'Portugal', en: 'Portugal' },
+        venue: 'TBD', confirmed: true,
+        url: 'https://www.5-cc.com/',
+    },
+    {
+        id: 'vegas-cosmetic-surgery-2025', series: 'VCS',
+        name: { ko: 'Vegas Cosmetic Surgery 2025', en: 'Vegas Cosmetic Surgery 2025' },
+        startDate: '2025-05-29', endDate: '2025-05-31',
+        city: { ko: 'Las Vegas', en: 'Las Vegas' }, country: { ko: 'USA', en: 'USA' },
+        venue: 'TBD', confirmed: true,
+        url: 'https://www.vegascosmeticsurgery.com/en/scientific-program/accreditation.html',
+    },
+    {
+        id: 'eadv-congress-2025', series: 'EADV',
+        name: { ko: 'EADV Congress 2025', en: 'EADV Congress 2025' },
+        startDate: '2025-09-17', endDate: '2025-09-20',
+        city: { ko: 'Paris', en: 'Paris' }, country: { ko: 'France', en: 'France' },
+        venue: 'TBD', confirmed: true,
+        url: 'https://eadv.org/event/sessions-at-the-eadv-congress-2025/',
+    },
+    {
+        id: 'ccr-london-2025', series: 'CCR London',
+        name: { ko: 'CCR London 2025', en: 'CCR London 2025' },
+        startDate: '2025-09-25', endDate: '2025-09-26',
+        city: { ko: 'London', en: 'London' }, country: { ko: 'United Kingdom', en: 'United Kingdom' },
+        venue: 'ExCeL London', confirmed: true,
+        url: 'https://www.ccrlondon.com/',
+    },
+    {
+        id: 'asds-annual-meeting-2025', series: 'ASDS',
+        name: { ko: 'ASDS Annual Meeting 2025', en: 'ASDS Annual Meeting 2025' },
+        startDate: '2025-11-13', endDate: '2025-11-16',
+        city: { ko: 'Chicago', en: 'Chicago' }, country: { ko: 'USA', en: 'USA' },
+        venue: 'TBD', confirmed: true,
+        url: 'https://www.asds.net/AnnualMeeting',
+    },
+    {
+        id: 'toxins-2026', series: 'TOXINS',
+        name: { ko: 'TOXINS 2026', en: 'TOXINS 2026' },
+        startDate: '2026-01-14', endDate: '2026-01-17',
+        city: { ko: 'Madrid', en: 'Madrid' }, country: { ko: 'Spain', en: 'Spain' },
+        venue: 'TBD', confirmed: true,
+        url: 'https://www.neurotoxins.org/',
+    },
+    {
         id: 'imcas-world-2026', series: 'IMCAS',
-        name: { ko: 'IMCAS World Congress', en: 'IMCAS World Congress' },
+        name: { ko: 'IMCAS World Congress 2026', en: 'IMCAS World Congress 2026' },
         startDate: '2026-01-29', endDate: '2026-01-31',
-        city: { ko: '파리', en: 'Paris' }, country: { ko: '프랑스', en: 'France' },
-        venue: 'Palais des Congrès de Paris', confirmed: true,
+        city: { ko: 'Paris', en: 'Paris' }, country: { ko: 'France', en: 'France' },
+        venue: 'Palais des Congres de Paris', confirmed: true,
         url: 'https://www.imcas.com/en/imcas-world-congress-2026',
     },
     {
+        id: 'south-beach-symposium-2026', series: 'South Beach Symposium',
+        name: { ko: 'South Beach Symposium 2026', en: 'South Beach Symposium 2026' },
+        startDate: '2026-02-05', endDate: '2026-02-08',
+        city: { ko: 'Miami Beach', en: 'Miami Beach' }, country: { ko: 'USA', en: 'USA' },
+        venue: 'Loews Miami Beach Hotel', confirmed: true,
+        url: 'https://www.southbeachsymposium.org/',
+    },
+    {
         id: 'amwc-americas-2026', series: 'AMWC',
-        name: { ko: 'AMWC Americas', en: 'AMWC Americas' },
+        name: { ko: 'AMWC Americas 2026', en: 'AMWC Americas 2026' },
         startDate: '2026-02-14', endDate: '2026-02-16',
-        city: { ko: '마이애미', en: 'Miami' }, country: { ko: '미국', en: 'USA' },
+        city: { ko: 'Miami', en: 'Miami' }, country: { ko: 'USA', en: 'USA' },
         venue: 'JW Marriott Miami Turnberry Resort', confirmed: true,
-        url: 'https://www.amwcamericas.com',
+        url: 'https://www.amwcamericas.com/en/aesthetic-medicine-conference-miami-2026/aesthetic-medicine-conference-miami-2026.html',
+    },
+    {
+        id: 'ace-london-2026', series: 'ACE',
+        name: { ko: 'ACE London 2026', en: 'ACE London 2026' },
+        startDate: '2026-03-13', endDate: '2026-03-14',
+        city: { ko: 'London', en: 'London' }, country: { ko: 'United Kingdom', en: 'United Kingdom' },
+        venue: 'Business Design Centre', confirmed: true,
+        url: 'https://www.aestheticsconference.com/ace-london-2026/',
     },
     {
         id: 'imcas-americas-2026', series: 'IMCAS',
-        name: { ko: 'IMCAS Americas', en: 'IMCAS Americas' },
+        name: { ko: 'IMCAS Americas 2026', en: 'IMCAS Americas 2026' },
         startDate: '2026-03-13', endDate: '2026-03-15',
-        city: { ko: '상파울루', en: 'São Paulo' }, country: { ko: '브라질', en: 'Brazil' },
-        venue: 'The World Trade Center São Paulo', confirmed: true,
+        city: { ko: 'Sao Paulo', en: 'Sao Paulo' }, country: { ko: 'Brazil', en: 'Brazil' },
+        venue: 'The World Trade Center Sao Paulo', confirmed: true,
         url: 'https://www.imcas.com/en/imcas-americas-2026',
     },
     {
-        id: 'kimes-2026', series: 'KIMES',
-        name: { ko: 'KIMES 2026', en: 'KIMES 2026' },
-        startDate: '2026-03-19', endDate: '2026-03-22',
-        city: { ko: '서울', en: 'Seoul' }, country: { ko: '한국', en: 'South Korea' },
-        venue: 'COEX', confirmed: true,
-        url: 'https://kimes.kr/en',
+        id: 'amwc-monaco-2026', series: 'AMWC',
+        name: { ko: 'AMWC Monaco 2026', en: 'AMWC Monaco 2026' },
+        startDate: '2026-03-26', endDate: '2026-03-28',
+        city: { ko: 'Monte Carlo', en: 'Monte Carlo' }, country: { ko: 'Monaco', en: 'Monaco' },
+        venue: 'Grimaldi Forum', confirmed: true,
+        url: 'https://www.amwc-conference.com/en/home.html',
     },
     {
-        id: 'amwc-monaco-2026', series: 'AMWC',
-        name: { ko: 'AMWC Monaco', en: 'AMWC Monaco' },
-        startDate: '2026-03-26', endDate: '2026-03-28',
-        city: { ko: '몬테카를로', en: 'Monte Carlo' }, country: { ko: '모나코', en: 'Monaco' },
-        venue: 'Grimaldi Forum', confirmed: true,
-        url: 'https://www.amwc-conference.com',
+        id: 'aad-annual-2026', series: 'AAD',
+        name: { ko: 'AAD Annual Meeting 2026', en: 'AAD Annual Meeting 2026' },
+        startDate: '2026-03-27', endDate: '2026-03-31',
+        city: { ko: 'Denver', en: 'Denver' }, country: { ko: 'USA', en: 'USA' },
+        venue: 'TBD', confirmed: true,
+        url: 'https://www.aad.org/member/meetings-education/am26',
     },
     {
         id: 'dubai-derma-2026', series: 'Dubai Derma',
         name: { ko: 'Dubai Derma 2026', en: 'Dubai Derma 2026' },
         startDate: '2026-03-31', endDate: '2026-04-02',
-        city: { ko: '두바이', en: 'Dubai' }, country: { ko: 'UAE', en: 'UAE' },
+        city: { ko: 'Dubai', en: 'Dubai' }, country: { ko: 'UAE', en: 'UAE' },
         venue: 'Dubai World Trade Centre', confirmed: true,
-        url: 'https://www.dubaiderma.com',
+        url: 'https://www.dubaiderma.com/',
     },
     {
-        id: 'aps-korea-2026', series: 'APS Korea',
-        name: { ko: 'APS Korea 2026', en: 'APS Korea 2026' },
-        startDate: '2026-04-04', endDate: '2026-04-05',
-        city: { ko: '서울', en: 'Seoul' }, country: { ko: '한국', en: 'South Korea' },
-        venue: 'COEX (TBD)', confirmed: false,
-        url: 'https://www.apskorea.or.kr',
+        id: 'bcam-conference-2026', series: 'BCAM',
+        name: { ko: 'BCAM Conference 2026', en: 'BCAM Conference 2026' },
+        startDate: '2026-05-02', endDate: '2026-05-02',
+        city: { ko: 'London', en: 'London' }, country: { ko: 'United Kingdom', en: 'United Kingdom' },
+        venue: 'Royal College of Physicians', confirmed: true,
+        url: 'https://bcam.ac.uk/events-calendar/',
     },
     {
-        id: 'idax-2026', series: 'IDAX',
-        name: { ko: 'IDAX 2026', en: 'IDAX 2026' },
-        startDate: '2026-04-09', endDate: '2026-04-11',
-        city: { ko: '하노이', en: 'Hanoi' }, country: { ko: '베트남', en: 'Vietnam' },
-        venue: 'NECC', confirmed: true,
-        url: 'https://www.idaxexpo.com',
+        id: 'scale-nashville-2026', series: 'SCALE',
+        name: { ko: 'SCALE Nashville 2026', en: 'SCALE Nashville 2026' },
+        startDate: '2026-05-13', endDate: '2026-05-17',
+        city: { ko: 'Nashville', en: 'Nashville' }, country: { ko: 'USA', en: 'USA' },
+        venue: 'Music City Center', confirmed: true,
+        url: 'https://www.scalemusiccity.com/',
     },
     {
-        id: 'ceswam-2026', series: 'SWAM',
-        name: { ko: 'CeSWAM 2026', en: 'CeSWAM 2026' },
-        startDate: '2026-04-17', endDate: '2026-04-19',
-        city: { ko: '스마랑', en: 'Semarang' }, country: { ko: '인도네시아', en: 'Indonesia' },
-        venue: 'Padma Hotel', confirmed: true,
-        url: 'https://swam.id',
-    },
-    {
-        id: 'amwc-asia-2026', series: 'AMWC',
-        name: { ko: 'AMWC Asia', en: 'AMWC Asia' },
-        startDate: '2026-05-01', endDate: '2026-05-03',
-        city: { ko: '타이베이', en: 'Taipei' }, country: { ko: '대만', en: 'Taiwan' },
-        venue: 'Taipei Intl Convention Center (TICC)', confirmed: true,
-        url: 'https://www.amwc-asia.com',
-    },
-    {
-        id: 'cbe-2026', series: 'CBE',
-        name: { ko: 'CBE 2026 (China Beauty Expo)', en: 'CBE 2026 (China Beauty Expo)' },
-        startDate: '2026-05-12', endDate: '2026-05-14',
-        city: { ko: '상하이', en: 'Shanghai' }, country: { ko: '중국', en: 'China' },
-        venue: 'SNIEC', confirmed: true,
-        url: 'https://www.chinabeautyexpo.com',
-    },
-    {
-        id: 'weswam-2026', series: 'SWAM',
-        name: { ko: 'WeSWAM 2026', en: 'WeSWAM 2026' },
-        startDate: '2026-06-12', endDate: '2026-06-14',
-        city: { ko: '반둥', en: 'Bandung' }, country: { ko: '인도네시아', en: 'Indonesia' },
-        venue: 'El Hotel', confirmed: true,
-        url: 'https://swam.id',
-    },
-    {
-        id: 'korea-derma-2026', series: 'Korea Derma',
-        name: { ko: 'Korea Derma 2026', en: 'Korea Derma 2026' },
-        startDate: '2026-06-15', endDate: '2026-06-17',
-        city: { ko: '서울', en: 'Seoul' }, country: { ko: '한국', en: 'South Korea' },
-        venue: 'The-K Hotel (TBD)', confirmed: false,
-        url: 'https://www.koderma.co.kr',
-    },
-    {
-        id: 'amwc-brazil-2026', series: 'AMWC',
-        name: { ko: 'AMWC Brazil', en: 'AMWC Brazil' },
-        startDate: '2026-06-17', endDate: '2026-06-19',
-        city: { ko: '상파울루', en: 'São Paulo' }, country: { ko: '브라질', en: 'Brazil' },
-        venue: 'Centro de Convenções Frei Caneca', confirmed: true,
-        url: 'https://www.amwcbrazil.com.br',
+        id: 'vegas-cosmetic-surgery-2026', series: 'VCS',
+        name: { ko: 'Vegas Cosmetic Surgery 2026', en: 'Vegas Cosmetic Surgery 2026' },
+        startDate: '2026-05-28', endDate: '2026-05-30',
+        city: { ko: 'Las Vegas', en: 'Las Vegas' }, country: { ko: 'USA', en: 'USA' },
+        venue: 'Fontainebleau Las Vegas', confirmed: true,
+        url: 'https://www.vegascosmeticsurgery.com/',
     },
     {
         id: 'imcas-asia-2026', series: 'IMCAS',
-        name: { ko: 'IMCAS Asia', en: 'IMCAS Asia' },
+        name: { ko: 'IMCAS Asia 2026', en: 'IMCAS Asia 2026' },
         startDate: '2026-06-19', endDate: '2026-06-21',
-        city: { ko: '방콕', en: 'Bangkok' }, country: { ko: '태국', en: 'Thailand' },
+        city: { ko: 'Bangkok', en: 'Bangkok' }, country: { ko: 'Thailand', en: 'Thailand' },
         venue: 'The Athenee Hotel', confirmed: true,
         url: 'https://www.imcas.com/en/imcas-asia-2026',
     },
     {
-        id: 'amwc-korea-2026', series: 'AMWC',
-        name: { ko: 'AMWC Korea', en: 'AMWC Korea' },
-        startDate: '2026-06-19', endDate: '2026-06-20',
-        city: { ko: '서울', en: 'Seoul' }, country: { ko: '한국', en: 'South Korea' },
-        venue: '인터컨티넨탈 그랜드 서울 파르나스', confirmed: true,
-        url: 'https://www.amwc-korea.com',
-    },
-    {
-        id: 'hksdv-2026', series: 'HKSDV',
-        name: { ko: 'HKSDV Annual Meeting 2026', en: 'HKSDV Annual Meeting 2026' },
-        startDate: '2026-07-04', endDate: '2026-07-05',
-        city: { ko: '홍콩', en: 'Hong Kong' }, country: { ko: '홍콩', en: 'Hong Kong' },
-        venue: 'Sheraton HK Hotel', confirmed: true,
-        url: 'https://www.hksdv.org',
-    },
-    {
-        id: 'iswam-bali-2026', series: 'SWAM',
-        name: { ko: '8th i-SWAM Bali 2026', en: '8th i-SWAM Bali 2026' },
-        startDate: '2026-07-10', endDate: '2026-07-12',
-        city: { ko: '발리', en: 'Bali' }, country: { ko: '인도네시아', en: 'Indonesia' },
-        venue: 'The Trans Resort Bali', confirmed: true,
-        url: 'https://www.internationalswam.com',
-    },
-    {
-        id: 'vietbeauty-2026', series: 'Vietbeauty',
-        name: { ko: 'Vietbeauty & Cosmobeauté 2026', en: 'Vietbeauty & Cosmobeauté 2026' },
-        startDate: '2026-07-23', endDate: '2026-07-26',
-        city: { ko: '호찌민', en: 'Ho Chi Minh City' }, country: { ko: '베트남', en: 'Vietnam' },
-        venue: 'SECC', confirmed: true,
-        url: 'https://www.vietbeautyshow.com',
-    },
-    {
         id: 'imcas-china-2026', series: 'IMCAS',
-        name: { ko: 'IMCAS China', en: 'IMCAS China' },
+        name: { ko: 'IMCAS China 2026', en: 'IMCAS China 2026' },
         startDate: '2026-08-27', endDate: '2026-08-29',
-        city: { ko: '상하이', en: 'Shanghai' }, country: { ko: '중국', en: 'China' },
+        city: { ko: 'Shanghai', en: 'Shanghai' }, country: { ko: 'China', en: 'China' },
         venue: 'W Hotel - The Bund', confirmed: true,
         url: 'https://www.imcas.com/en/imcas-china-2026',
     },
     {
-        id: 'medical-fair-asia-2026', series: 'Medical Fair Asia',
-        name: { ko: 'Medical Fair Asia 2026', en: 'Medical Fair Asia 2026' },
-        startDate: '2026-09-09', endDate: '2026-09-11',
-        city: { ko: '싱가포르', en: 'Singapore' }, country: { ko: '싱가포르', en: 'Singapore' },
-        venue: 'Marina Bay Sands', confirmed: true,
-        url: 'https://www.medicalfair-asia.com',
-    },
-    {
-        id: 'easwam-2026', series: 'SWAM',
-        name: { ko: 'EaSWAM 2026', en: 'EaSWAM 2026' },
-        startDate: '2026-09-25', endDate: '2026-09-27',
-        city: { ko: '수라바야', en: 'Surabaya' }, country: { ko: '인도네시아', en: 'Indonesia' },
-        venue: 'Dyandra Convention Ctr', confirmed: true,
-        url: 'https://swam.id',
-    },
-    {
-        id: 'medical-japan-2026', series: 'Medical Japan',
-        name: { ko: 'Medical Japan Tokyo 2026', en: 'Medical Japan Tokyo 2026' },
-        startDate: '2026-10-07', endDate: '2026-10-09',
-        city: { ko: '도쿄', en: 'Tokyo' }, country: { ko: '일본', en: 'Japan' },
-        venue: 'Makuhari Messe', confirmed: true,
-        url: 'https://www.medical-jpn.jp/tokyo/en-gb.html',
-    },
-    {
-        id: 'amwc-china-2026', series: 'AMWC',
-        name: { ko: 'AMWC China', en: 'AMWC China' },
-        startDate: '2026-10-16', endDate: '2026-10-18',
-        city: { ko: '청두', en: 'Chengdu' }, country: { ko: '중국', en: 'China' },
-        venue: 'Wuzhouqing Ctr', confirmed: true,
-        url: 'https://www.amwcchina.com',
-    },
-    {
-        id: 'amwc-dubai-2026', series: 'AMWC',
-        name: { ko: 'AMWC Dubai', en: 'AMWC Dubai' },
-        startDate: '2026-10-21', endDate: '2026-10-23',
-        city: { ko: '두바이', en: 'Dubai' }, country: { ko: 'UAE', en: 'UAE' },
+        id: 'eadv-congress-2026', series: 'EADV',
+        name: { ko: 'EADV Congress 2026', en: 'EADV Congress 2026' },
+        startDate: '2026-09-30', endDate: '2026-10-03',
+        city: { ko: 'Vienna', en: 'Vienna' }, country: { ko: 'Austria', en: 'Austria' },
         venue: 'TBD', confirmed: true,
-        url: 'https://www.amwc-dubai.com',
+        url: 'https://eadvcongress2026.org/',
     },
     {
-        id: 'dasil-2026', series: 'DASIL',
-        name: { ko: 'DASIL 2026', en: 'DASIL 2026' },
-        startDate: '2026-10-28', endDate: '2026-10-31',
-        city: { ko: '코치', en: 'Kochi' }, country: { ko: '인도', en: 'India' },
-        venue: 'TBD', confirmed: false,
-        url: 'https://www.dasil.org',
-    },
-    {
-        id: 'amwc-latam-2026', series: 'AMWC',
-        name: { ko: 'AMWC Latin America', en: 'AMWC Latin America' },
-        startDate: '2026-10-29', endDate: '2026-10-31',
-        city: { ko: '메델린', en: 'Medellín' }, country: { ko: '콜롬비아', en: 'Colombia' },
-        venue: 'TBD', confirmed: true,
-        url: 'https://www.amwc-la.com',
-    },
-    {
-        id: 'prs-korea-2026', series: 'PRS Korea',
-        name: { ko: 'PRS Korea 2026', en: 'PRS Korea 2026' },
-        startDate: '2026-11-05', endDate: '2026-11-07',
-        city: { ko: '서울', en: 'Seoul' }, country: { ko: '한국', en: 'South Korea' },
-        venue: 'Grand InterContinental (TBD)', confirmed: false,
-        url: 'https://www.prskorea.org',
-    },
-    {
-        id: 'cosmoprof-asia-2026', series: 'Cosmoprof Asia',
-        name: { ko: 'Cosmoprof Asia 2026', en: 'Cosmoprof Asia 2026' },
-        startDate: '2026-11-10', endDate: '2026-11-13',
-        city: { ko: '홍콩', en: 'Hong Kong' }, country: { ko: '홍콩', en: 'Hong Kong' },
-        venue: 'HKCEC & AsiaWorld', confirmed: true,
-        url: 'https://www.cosmoprof-asia.com',
-    },
-    {
-        id: 'icad-bangkok-2026', series: 'ICAD Bangkok',
-        name: { ko: 'ICAD Bangkok 2026', en: 'ICAD Bangkok 2026' },
-        startDate: '2026-11-20', endDate: '2026-11-22',
-        city: { ko: '방콕', en: 'Bangkok' }, country: { ko: '태국', en: 'Thailand' },
-        venue: 'Centara Grand (TBD)', confirmed: false,
-        url: 'https://www.icadbangkok.com',
-    },
-    {
-        id: 'amwc-sea-2026', series: 'AMWC',
-        name: { ko: 'AMWC Southeast Asia', en: 'AMWC Southeast Asia' },
-        startDate: '2026-11-26', endDate: '2026-11-28',
-        city: { ko: '방콕', en: 'Bangkok' }, country: { ko: '태국', en: 'Thailand' },
-        venue: 'The Athenee Hotel, Bangkok', confirmed: true,
-        url: 'https://www.amwc-southeastasia.com',
-    },
-    {
-        id: 'iswam-world-2026', series: 'SWAM',
-        name: { ko: '17th i-SWAM World Congress 2026', en: '17th i-SWAM World Congress 2026' },
-        startDate: '2026-12-04', endDate: '2026-12-06',
-        city: { ko: '탕게랑', en: 'Tangerang' }, country: { ko: '인도네시아', en: 'Indonesia' },
-        venue: 'ICE BSD City', confirmed: true,
-        url: 'https://www.internationalswam.com',
+        id: 'ccr-london-2026', series: 'CCR London',
+        name: { ko: 'CCR London 2026', en: 'CCR London 2026' },
+        startDate: '2026-10-01', endDate: '2026-10-02',
+        city: { ko: 'London', en: 'London' }, country: { ko: 'United Kingdom', en: 'United Kingdom' },
+        venue: 'ExCeL London', confirmed: true,
+        url: 'https://www.ccrlondon.com/',
     },
 ];
 
@@ -600,6 +583,7 @@ export default function ConferencesPage() {
     const [year, setYear] = useState(2026);
     const [month, setMonth] = useState(currentDate.getFullYear() === 2026 ? currentDate.getMonth() : 0);
     const [selectedEvent, setSelectedEvent] = useState<ConferenceEvent | null>(null);
+    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [seriesFilter, setSeriesFilter] = useState<string>('ALL');
     const [countryFilter, setCountryFilter] = useState<string>('ALL');
 
@@ -666,6 +650,7 @@ export default function ConferencesPage() {
         setYear(now.getFullYear());
         setMonth(now.getMonth());
         setSelectedEvent(null);
+        setSelectedDate(now);
     }
 
     return (
@@ -749,7 +734,22 @@ export default function ConferencesPage() {
                                 const events = getEventsForDay(day);
                                 const today = isToday(year, month, day);
                                 return (
-                                    <div key={`day-${day}`} className={`min-h-[80px] border-b border-r border-gray-100 dark:border-gray-800 p-1 transition-all hover:bg-blue-50/30 dark:hover:bg-gray-800/50 flex flex-col gap-0.5 group relative ${today ? 'bg-blue-50/20 dark:bg-blue-900/10' : ''}`}>
+                                    <div
+                                        key={`day-${day}`}
+                                        onClick={() => {
+                                            const clickedDate = new Date(year, month, day);
+                                            setSelectedDate(clickedDate);
+                                            // On mobile, scroll to events list
+                                            if (window.innerWidth < 1024) {
+                                                const el = document.getElementById('day-events-list');
+                                                if (el) el.scrollIntoView({ behavior: 'smooth' });
+                                            }
+                                        }}
+                                        className={`min-h-[60px] md:min-h-[80px] border-b border-r border-gray-100 dark:border-gray-800 p-1 transition-all hover:bg-blue-50/30 dark:hover:bg-gray-800/50 flex flex-col gap-0.5 group relative cursor-pointer
+                                            ${today ? 'bg-blue-50/20 dark:bg-blue-900/10' : ''}
+                                            ${selectedDate && selectedDate.getDate() === day && selectedDate.getMonth() === month && selectedDate.getFullYear() === year ? 'bg-blue-50 dark:bg-gray-800 ring-1 ring-inset ring-blue-500' : ''}
+                                        `}
+                                    >
                                         <div className="flex justify-between items-start">
                                             <span className={`w-5 h-5 flex items-center justify-center rounded-md text-xs font-bold transition-all ${today
                                                 ? 'bg-blue-600 text-white shadow-sm'
@@ -758,7 +758,21 @@ export default function ConferencesPage() {
                                                 {day}
                                             </span>
                                         </div>
-                                        <div className="space-y-0.5 mt-0.5">
+
+                                        {/* Mobile View: Simple Dots */}
+                                        <div className="md:hidden flex flex-wrap justify-center gap-1 mt-1">
+                                            {events.length > 0 && (
+                                                <>
+                                                    {events.slice(0, 4).map((e) => (
+                                                        <div key={e.id} className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: getCountryColor(e.country[lang]).color }} />
+                                                    ))}
+                                                    {events.length > 4 && <div className="w-1.5 h-1.5 rounded-full bg-gray-300" />}
+                                                </>
+                                            )}
+                                        </div>
+
+                                        {/* Desktop View: Full Bars */}
+                                        <div className="hidden md:flex flex-col gap-0.5 mt-0.5">
                                             {events.slice(0, 2).map((event) => {
                                                 const cc = getCountryColor(event.country[lang]);
                                                 const isSel = selectedEvent?.id === event.id;
@@ -880,6 +894,46 @@ export default function ConferencesPage() {
                                 Total {upcomingEvents.length}
                             </span>
                         </div>
+                    </div>
+
+                    {/* Mobile Selected Date Events */}
+                    <div id="day-events-list" className="block lg:hidden mb-6 scroll-mt-24">
+                        {selectedDate && (
+                            <div className="animate-fade-in space-y-3 mb-6 p-4 bg-blue-50/50 dark:bg-blue-900/10 rounded-2xl border border-blue-100 dark:border-blue-800">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <CalendarIcon className="w-4 h-4 text-blue-600" />
+                                    <h4 className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                                        {lang === 'ko' ? `${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일 일정` : `Events on ${MONTH_NAMES_EN[selectedDate.getMonth()]} ${selectedDate.getDate()}`}
+                                    </h4>
+                                </div>
+                                {getEventsForDay(selectedDate.getDate()).length > 0 ? (
+                                    getEventsForDay(selectedDate.getDate()).map(event => {
+                                        const cc = getCountryColor(event.country[lang]);
+                                        return (
+                                            <div
+                                                key={event.id}
+                                                onClick={() => setSelectedEvent(event)}
+                                                className="bg-white dark:bg-gray-900 p-3 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm flex items-center gap-3 cursor-pointer"
+                                            >
+                                                <div className="w-1 h-8 rounded-full" style={{ backgroundColor: cc.color }} />
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">{event.series}</span>
+                                                        <p className="text-sm font-bold text-gray-900 dark:text-gray-100 line-clamp-1">{event.name[lang]}</p>
+                                                    </div>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{event.city[lang]}, {event.country[lang]}</p>
+                                                </div>
+                                                <ChevronRight className="w-4 h-4 text-gray-300" />
+                                            </div>
+                                        )
+                                    })
+                                ) : (
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 py-2">
+                                        {lang === 'ko' ? '등록된 일정이 없습니다.' : 'No events scheduled for this day.'}
+                                    </p>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

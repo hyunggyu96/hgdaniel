@@ -15,6 +15,8 @@ import { useTheme } from "@/context/ThemeContext";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { COMPANY_OVERVIEWS } from "@/data/companyOverviews";
 import { allCompanies } from "@/data/companyList";
+import { useCompanies } from "@/hooks/useCompanies";
+import { CompanyFinancials } from "@/components/company/CompanyFinancials";
 
 export default function CompanyDetailScreen() {
   const insets = useSafeAreaInsets();
@@ -22,9 +24,10 @@ export default function CompanyDetailScreen() {
   const { language } = useLanguage();
   const router = useRouter();
   const { name } = useLocalSearchParams<{ name: string }>();
+  const { companies } = useCompanies();
 
   const companyName = decodeURIComponent(name || "");
-  const company = allCompanies.find((c) => c.name.ko === companyName);
+  const company = companies.find((c) => c.name.ko === companyName) || allCompanies.find((c) => c.name.ko === companyName);
   const overview = COMPANY_OVERVIEWS[companyName];
   const { data: headlines, loading } = useCompanyNews(companyName);
 
@@ -90,7 +93,7 @@ export default function CompanyDetailScreen() {
             <AntigravityHeader
               title={displayName}
               subtitle={company?.status}
-              badge={headlines.length}
+              badge="Live"
             />
 
             {overview && (
@@ -105,6 +108,10 @@ export default function CompanyDetailScreen() {
                 </FloatingCard>
               </View>
             )}
+
+            <View style={styles.cardWrapper}>
+              <CompanyFinancials companyName={company?.name.ko || companyName} />
+            </View>
 
             <View style={styles.cardWrapper}>
               <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>

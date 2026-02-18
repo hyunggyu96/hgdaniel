@@ -4,6 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import { ThemeProvider, useTheme } from "@/context/ThemeContext";
 import { CollectionProvider } from "@/context/CollectionContext";
 import { LanguageProvider } from "@/i18n/LanguageContext";
+import { PreferencesProvider } from "@/context/PreferencesContext";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 function InnerLayout() {
@@ -50,9 +51,11 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider>
         <LanguageProvider>
-          <CollectionProvider>
-            <InnerLayout />
-          </CollectionProvider>
+          <PreferencesProvider>
+            <CollectionProvider>
+              <InnerLayout />
+            </CollectionProvider>
+          </PreferencesProvider>
         </LanguageProvider>
       </ThemeProvider>
     </GestureHandlerRootView>
