@@ -16,6 +16,8 @@ import {
   ExternalLink,
   ArrowLeft,
   Calendar,
+  Filter,
+  X,
 } from "lucide-react-native";
 import { AntigravityHeader, FloatingCard, SpringPressable } from "@/components/antigravity";
 import { useTheme } from "@/context/ThemeContext";
@@ -97,9 +99,43 @@ export default function ConferenceCalendarScreen({ showBackButton = false }: Pro
     toDateKey(today.getFullYear(), today.getMonth(), today.getDate())
   );
 
+  // Filter state
+  const [selectedSeries, setSelectedSeries] = useState<string[]>([]);
+  const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
+
+  const uniqueSeries = useMemo(() =>
+    [...new Set(conferences.map((c) => c.series))].sort(),
+    [conferences]
+  );
+  const uniqueCountries = useMemo(() =>
+    [...new Set(conferences.map((c) => c.country.en))].sort(),
+    [conferences]
+  );
+
+  const filteredConferences = useMemo(() => {
+    let result = conferences;
+    if (selectedSeries.length > 0)
+      result = result.filter((c) => selectedSeries.includes(c.series));
+    if (selectedCountries.length > 0)
+      result = result.filter((c) => selectedCountries.includes(c.country.en));
+    return result;
+  }, [conferences, selectedSeries, selectedCountries]);
+
+  const activeFilterCount = selectedSeries.length + selectedCountries.length;
+
+  const toggleSeries = (s: string) =>
+    setSelectedSeries((prev) =>
+      prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]
+    );
+  const toggleCountry = (c: string) =>
+    setSelectedCountries((prev) =>
+      prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]
+    );
+
   const eventMap = useMemo(() => {
     const map: Record<string, ConferenceEvent[]> = {};
-    conferences.forEach((event) => {
+    filteredConferences.forEach((event) => {
       let cursor = new Date(`${event.startDate}T00:00:00`).getTime();
       const end = new Date(`${event.endDate}T00:00:00`).getTime();
 
@@ -112,20 +148,18 @@ export default function ConferenceCalendarScreen({ showBackButton = false }: Pro
       }
     });
     return map;
-  }, [conferences]);
+  }, [filteredConferences]);
 
   const monthlyEvents = useMemo(() => {
-    // Get all events that fall within the current month
     const startOfMonth = new Date(year, month, 1).getTime();
     const endOfMonth = new Date(year, month + 1, 0).getTime();
 
-    return conferences.filter((e) => {
+    return filteredConferences.filter((e) => {
       const eStart = new Date(`${e.startDate}T00:00:00`).getTime();
       const eEnd = new Date(`${e.endDate}T00:00:00`).getTime();
-      // Check overlap
       return eStart <= endOfMonth && eEnd >= startOfMonth;
     }).sort((a, b) => a.startDate.localeCompare(b.startDate));
-  }, [year, month, conferences]);
+  }, [year, month, filteredConferences]);
 
   // Scroll to selected date or just keep state
   useEffect(() => {
@@ -187,6 +221,114 @@ export default function ConferenceCalendarScreen({ showBackButton = false }: Pro
           subtitle={language === "ko" ? "글로벌 컨퍼런스" : "Global Conferences"}
           badge="Live"
         />
+
+        {/* Filter toggle */}
+        <View style={styles.filterToggleRow}>
+          <SpringPressable onPress={() => setShowFilters(!showFilters)} haptic="selection">
+            <View style={[
+              styles.filterToggleBtn,
+              {
+                backgroundColor: activeFilterCount > 0
+                  ? `${colors.primary}20`
+                  : isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+                borderColor: activeFilterCount > 0 ? colors.primary : 'transparent',
+              },
+            ]}>
+              <Filter size={14} color={activeFilterCount > 0 ? colors.primary : colors.textSecondary} />
+              <Text style={{
+                fontSize: 12,
+                fontWeight: '700',
+                color: activeFilterCount > 0 ? colors.primary : colors.textSecondary,
+              }}>
+                {language === 'ko' ? '필터' : 'Filter'}
+              </Text>
+              {activeFilterCount > 0 && (
+                <View style={[styles.filterCountBadge, { backgroundColor: colors.primary }]}>
+                  <Text style={styles.filterCountText}>{activeFilterCount}</Text>
+                </View>
+              )}
+            </View>
+          </SpringPressable>
+          {activeFilterCount > 0 && (
+            <SpringPressable
+              onPress={() => { setSelectedSeries([]); setSelectedCountries([]); }}
+              haptic="light"
+            >
+              <View style={[styles.filterResetBtn, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' }]}>
+                <X size={12} color={colors.textMuted} />
+                <Text style={{ fontSize: 11, fontWeight: '600', color: colors.textMuted }}>
+                  {language === 'ko' ? '초기화' : 'Reset'}
+                </Text>
+              </View>
+            </SpringPressable>
+          )}
+        </View>
+
+        {/* Filter panel */}
+        {showFilters && (
+          <View style={[
+            styles.filterPanel,
+            {
+              backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : colors.surface,
+              borderColor: colors.glassBorder,
+            },
+          ]}>
+            <Text style={[styles.filterSectionLabel, { color: colors.textMuted }]}>
+              SERIES
+            </Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterChipScroll}>
+              <View style={styles.filterChipRow}>
+                {uniqueSeries.map((s) => {
+                  const active = selectedSeries.includes(s);
+                  return (
+                    <SpringPressable key={s} onPress={() => toggleSeries(s)} haptic="selection">
+                      <View style={[
+                        styles.filterChip,
+                        {
+                          backgroundColor: active ? colors.primary : isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
+                        },
+                      ]}>
+                        <Text style={{
+                          fontSize: 11,
+                          fontWeight: '700',
+                          color: active ? '#fff' : colors.textSecondary,
+                        }}>{s}</Text>
+                      </View>
+                    </SpringPressable>
+                  );
+                })}
+              </View>
+            </ScrollView>
+
+            <Text style={[styles.filterSectionLabel, { color: colors.textMuted, marginTop: 12 }]}>
+              COUNTRY
+            </Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterChipScroll}>
+              <View style={styles.filterChipRow}>
+                {uniqueCountries.map((c) => {
+                  const active = selectedCountries.includes(c);
+                  const accent = COUNTRY_ACCENT[c] || colors.primary;
+                  return (
+                    <SpringPressable key={c} onPress={() => toggleCountry(c)} haptic="selection">
+                      <View style={[
+                        styles.filterChip,
+                        {
+                          backgroundColor: active ? accent : isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
+                        },
+                      ]}>
+                        <Text style={{
+                          fontSize: 11,
+                          fontWeight: '700',
+                          color: active ? '#fff' : colors.textSecondary,
+                        }}>{c}</Text>
+                      </View>
+                    </SpringPressable>
+                  );
+                })}
+              </View>
+            </ScrollView>
+          </View>
+        )}
 
         <View
           style={[
@@ -555,37 +697,63 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700",
   },
-  sectionCount: {
-    // Legacy removed
+  filterToggleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
-  eventCard: {
-    // Legacy removed
+  filterToggleBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 14,
+    borderWidth: 1,
   },
-  eventTopRow: {
-    // Legacy removed
+  filterCountBadge: {
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 2,
   },
-  seriesBadge: {
-    // Legacy removed
+  filterCountText: {
+    fontSize: 10,
+    fontWeight: "800",
+    color: "#fff",
   },
-  seriesText: {
-    // Legacy removed
+  filterResetBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 14,
   },
-  dateRange: {
-    // Legacy removed
+  filterPanel: {
+    borderWidth: 1,
+    borderRadius: 16,
+    padding: 14,
   },
-  eventTitle: {
-    // Legacy removed
+  filterSectionLabel: {
+    fontSize: 10,
+    fontWeight: "700",
+    letterSpacing: 1,
+    marginBottom: 8,
   },
-  metaRow: {
-    // Legacy removed
+  filterChipScroll: {
+    marginHorizontal: -4,
   },
-  metaText: {
-    // Legacy removed
+  filterChipRow: {
+    flexDirection: "row",
+    gap: 6,
+    paddingHorizontal: 4,
   },
-  linkBtn: {
-    // Legacy removed
-  },
-  linkText: {
-    // Legacy removed
+  filterChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
   },
 });

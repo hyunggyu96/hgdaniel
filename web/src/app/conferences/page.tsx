@@ -780,6 +780,7 @@ function EmbeddedEventDetailPanel({ event, lang }: {
 }
 
 // ─── Filter Section Component ───
+// ─── Filter Section Component ───
 function FilterSection({
     items,
     selected,
@@ -798,34 +799,27 @@ function FilterSection({
     labelKey?: string
 }) {
     const [expanded, setExpanded] = useState(false);
-    // Button height ~32px + gap 8px = 40px/row. 3 rows = 120px. Max height slightly more to catch edge cases.
-    const MAX_HEIGHT = 130;
-
-    // We can't easily check scrollHeight in SSR/hydration cleanly without a ref and layout effect,
-    // but for simplicity we can check the *number* of items as a proxy or just rely on CSS max-height.
-    // However, to show/hide the button, let's use a rough heuristic:
-    // If text buttons, maybe > 15 items? If country buttons, maybe > 12?
-    // Let's use a ref-based approach for robustness.
+    // Button height approx 36px + gap 8px. 3 rows = ~124px.
+    // We set max-height slightly less than 3 full rows to show continuity, or exact to show 3 rows.
+    // Let's rely on gradient to hide the cut-off.
+    const COLLAPSED_HEIGHT = 'max-h-[140px]';
 
     const contentRef = React.useRef<HTMLDivElement>(null);
     const [showToggle, setShowToggle] = useState(false);
 
     useEffect(() => {
         if (contentRef.current) {
-            // Check if scrollHeight is significantly larger than clientHeight (when collapsed)
-            // But initially it might be expanded or not.
-            // If we set max-h-130, and scrollHeight > 130, then show toggle.
-            if (contentRef.current.scrollHeight > MAX_HEIGHT + 10) {
+            if (contentRef.current.scrollHeight > 150) { // Threshold slightly larger than limit
                 setShowToggle(true);
             }
         }
     }, [items]);
 
     return (
-        <div>
+        <div className="relative">
             <div
                 ref={contentRef}
-                className={`flex flex-wrap gap-2 transition-all duration-500 ease-in-out overflow-hidden ${expanded ? 'max-h-[1000px]' : 'max-h-[130px]'}`}
+                className={`flex flex-wrap gap-2 transition-all duration-500 ease-in-out overflow-hidden ${expanded ? 'max-h-[1000px]' : COLLAPSED_HEIGHT}`}
             >
                 {items.map((item) => {
                     const value = valueKey ? item[valueKey] : item;
@@ -862,22 +856,30 @@ function FilterSection({
                     }
                 })}
             </div>
+
             {showToggle && (
-                <button
-                    onClick={() => setExpanded(!expanded)}
-                    aria-label={expanded ? "Show less options" : "Show more options"}
-                    className="flex items-center gap-1 text-[10px] font-bold text-gray-400 hover:text-blue-500 mt-2 ml-1 transition-colors"
-                >
-                    {expanded ? (
-                        <>
-                            {lang === 'ko' ? '접기' : 'Show Less'} <ChevronUp className="w-3 h-3" />
-                        </>
-                    ) : (
-                        <>
-                            {lang === 'ko' ? '더보기' : 'Show More'} <ChevronDown className="w-3 h-3" />
-                        </>
-                    )}
-                </button>
+                !expanded ? (
+                    <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white via-white/90 to-transparent dark:from-gray-900 dark:via-gray-900/90 dark:to-transparent flex items-end justify-center pb-0 pointer-events-none">
+                        <button
+                            onClick={() => setExpanded(true)}
+                            className="pointer-events-auto transform translate-y-1/2 flex items-center justify-center w-8 h-8 rounded-full bg-white dark:bg-gray-800 shadow-md border border-gray-100 dark:border-gray-700 text-gray-400 hover:text-blue-600 hover:border-blue-200 transition-all hover:scale-110 active:scale-95 group"
+                            aria-label="Expand"
+                        >
+                            <ChevronDown className="w-5 h-5 group-hover:animate-bounce-small" />
+                        </button>
+                    </div>
+                ) : (
+                    <div className="flex justify-center mt-6 relative">
+                        <div className="absolute inset-x-0 top-1/2 h-px bg-gray-100 dark:bg-gray-800 border-t border-dashed border-gray-200 dark:border-gray-700" />
+                        <button
+                            onClick={() => setExpanded(false)}
+                            className="relative z-10 flex items-center justify-center w-8 h-8 rounded-full bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 text-gray-400 hover:text-blue-600 hover:border-blue-200 transition-all hover:scale-110 active:scale-95"
+                            aria-label="Collapse"
+                        >
+                            <ChevronUp className="w-5 h-5" />
+                        </button>
+                    </div>
+                )
             )}
         </div>
     );

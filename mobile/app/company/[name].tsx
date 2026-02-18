@@ -17,6 +17,7 @@ import { COMPANY_OVERVIEWS } from "@/data/companyOverviews";
 import { allCompanies } from "@/data/companyList";
 import { useCompanies } from "@/hooks/useCompanies";
 import { CompanyFinancials } from "@/components/company/CompanyFinancials";
+import { CompanyGovernance } from "@/components/company/CompanyGovernance";
 
 export default function CompanyDetailScreen() {
   const insets = useSafeAreaInsets();
@@ -111,6 +112,10 @@ export default function CompanyDetailScreen() {
 
             <View style={styles.cardWrapper}>
               <CompanyFinancials companyName={company?.name.ko || companyName} />
+            </View>
+
+            <View style={styles.cardWrapper}>
+              <CompanyGovernance companyName={company?.name.ko || companyName} />
             </View>
 
             <View style={styles.cardWrapper}>
