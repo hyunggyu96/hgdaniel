@@ -790,16 +790,24 @@ export default function ConferencesPage() {
     const [month, setMonth] = useState(currentDate.getFullYear() === 2026 ? currentDate.getMonth() : 0);
     const [selectedEvent, setSelectedEvent] = useState<ConferenceEvent | null>(null);
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-    const [seriesFilter, setSeriesFilter] = useState<string>('ALL');
-    const [countryFilter, setCountryFilter] = useState<string>('ALL');
+    const [selectedSeries, setSelectedSeries] = useState<string[]>([]);
+    const [selectedCountriesEn, setSelectedCountriesEn] = useState<string[]>([]);
 
     // Pagination Removed as per user request
     const monthNames = lang === 'ko' ? MONTH_NAMES_KO : MONTH_NAMES_EN;
     const dayNames = lang === 'ko' ? DAY_NAMES_KO : DAY_NAMES_EN;
     const allSeries = useMemo(() => Array.from(new Set(conferences.map((c) => c.series))), [conferences]);
-    const allCountriesKo = useMemo(() => Array.from(new Set(conferences.map((c) => c.country.ko))).sort(), [conferences]);
     const allCountriesEn = useMemo(() => Array.from(new Set(conferences.map((c) => c.country.en))).sort(), [conferences]);
-    const countries = lang === 'ko' ? allCountriesKo : allCountriesEn;
+    const countryOptions = useMemo(() => {
+        const countryMap = new Map<string, { ko: string; en: string }>();
+        conferences.forEach((c) => {
+            if (!countryMap.has(c.country.en)) {
+                countryMap.set(c.country.en, { ko: c.country.ko, en: c.country.en });
+            }
+        });
+        const locale = lang === 'ko' ? 'ko' : 'en';
+        return Array.from(countryMap.values()).sort((a, b) => a[lang].localeCompare(b[lang], locale));
+    }, [conferences, lang]);
 
     useEffect(() => {
         const fetchConferences = async () => {
@@ -848,14 +856,14 @@ export default function ConferencesPage() {
     // Filtered conferences
     const filteredConferences = useMemo(() => {
         let result = conferences;
-        if (seriesFilter !== 'ALL') {
-            result = result.filter((c) => c.series === seriesFilter);
+        if (selectedSeries.length > 0) {
+            result = result.filter((c) => selectedSeries.includes(c.series));
         }
-        if (countryFilter !== 'ALL') {
-            result = result.filter((c) => c.country[lang] === countryFilter);
+        if (selectedCountriesEn.length > 0) {
+            result = result.filter((c) => selectedCountriesEn.includes(c.country.en));
         }
         return result;
-    }, [conferences, seriesFilter, countryFilter, lang]);
+    }, [conferences, selectedSeries, selectedCountriesEn]);
 
     const upcomingEvents = useMemo(() => {
         const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -1074,8 +1082,8 @@ export default function ConferencesPage() {
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 <button
-                                    onClick={() => { setSeriesFilter('ALL'); setSelectedEvent(null); }}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${seriesFilter === 'ALL'
+                                    onClick={() => { setSelectedSeries([]); setSelectedEvent(null); }}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${selectedSeries.length === 0
                                         ? 'bg-slate-800 text-white shadow-md border-transparent'
                                         : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-blue-300'
                                         }`}
@@ -1085,8 +1093,15 @@ export default function ConferencesPage() {
                                 {allSeries.map((s) => (
                                     <button
                                         key={s}
-                                        onClick={() => { setSeriesFilter(seriesFilter === s ? 'ALL' : s); setSelectedEvent(null); }}
-                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${seriesFilter === s
+                                        onClick={() => {
+                                            setSelectedSeries((prev) => (
+                                                prev.includes(s)
+                                                    ? prev.filter((item) => item !== s)
+                                                    : [...prev, s]
+                                            ));
+                                            setSelectedEvent(null);
+                                        }}
+                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${selectedSeries.includes(s)
                                             ? 'bg-blue-600 text-white shadow-md border-transparent'
                                             : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-600 hover:border-blue-300 hover:text-blue-600 dark:hover:bg-gray-700'
                                             }`}
@@ -1107,27 +1122,34 @@ export default function ConferencesPage() {
                             </div>
                             <div className="flex flex-wrap gap-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
                                 <button
-                                    onClick={() => { setCountryFilter('ALL'); setSelectedEvent(null); }}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${countryFilter === 'ALL'
+                                    onClick={() => { setSelectedCountriesEn([]); setSelectedEvent(null); }}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${selectedCountriesEn.length === 0
                                         ? 'bg-slate-800 text-white shadow-md border-transparent'
                                         : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-blue-300'
                                         }`}
                                 >
                                     {lang === 'ko' ? '전체' : 'All'}
                                 </button>
-                                {countries.map((c) => {
-                                    const isActive = countryFilter === c;
-                                    const cc = getCountryColor(c);
+                                {countryOptions.map((c) => {
+                                    const isActive = selectedCountriesEn.includes(c.en);
+                                    const cc = getCountryColor(c.en);
                                     return (
                                         <button
-                                            key={c}
-                                            onClick={() => { setCountryFilter(isActive ? 'ALL' : c); setSelectedEvent(null); }}
+                                            key={c.en}
+                                            onClick={() => {
+                                                setSelectedCountriesEn((prev) => (
+                                                    prev.includes(c.en)
+                                                        ? prev.filter((item) => item !== c.en)
+                                                        : [...prev, c.en]
+                                                ));
+                                                setSelectedEvent(null);
+                                            }}
                                             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border ${isActive
                                                 ? 'bg-blue-600 text-white shadow-md border-transparent'
                                                 : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-600 hover:border-blue-300 hover:text-blue-600 hover:scale-[1.02] dark:hover:bg-gray-700'
                                                 }`}
                                         >
-                                            <FlagIcon country={c} size={14} /> {c}
+                                            <FlagIcon country={c.en} size={14} /> {c[lang]}
                                         </button>
                                     );
                                 })}
