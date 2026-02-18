@@ -4,7 +4,7 @@
     "ceo": "김근영",
     "parent_group": "",
     "governance_type": "오너경영 (창업주 사내이사)",
-    "subsidiaries": "",
+    "subsidiaries": "레보스 (Rebos, 중국 위고그룹 합작법인)",
     "source": "DART 전자공시",
     "source_date": "2025"
   },
@@ -22,17 +22,17 @@
     "ceo": "김재영, 남정선 (각자대표)",
     "parent_group": "",
     "governance_type": "오너경영",
-    "subsidiaries": "",
+    "subsidiaries": "Jetema USA Inc. (미국 보툴리눔톡신 임상/사업화)",
     "source": "DART 전자공시",
     "source_date": "2025"
   },
   "한국비엔씨": {
-    "largest_shareholder": "",
+    "largest_shareholder": "최완규 외 7인 (19.61%)",
     "ceo": "최완규",
     "parent_group": "",
-    "governance_type": "",
-    "subsidiaries": "",
-    "source": "DART 전자공시",
+    "governance_type": "오너경영",
+    "subsidiaries": "한국비티비 (구 지티지웰니스), BNC KOREA USA Inc., 지노믹스원, 프로앱텍",
+    "source": "DART 전자공시 / FnGuide",
     "source_date": "2025"
   },
   "종근당바이오": {
@@ -46,7 +46,7 @@
   },
   "휴온스": {
     "largest_shareholder": "휴온스글로벌 (40.74%)",
-    "ceo": "",
+    "ceo": "송수영",
     "parent_group": "휴온스그룹",
     "governance_type": "그룹 계열 (자회사)",
     "subsidiaries": "팬젠 (바이오시밀러)",
@@ -99,13 +99,13 @@
     "source_date": "2025"
   },
   "파마리서치": {
-    "largest_shareholder": "",
+    "largest_shareholder": "파마리서치홀딩스",
     "ceo": "손지훈",
-    "parent_group": "파마리서치홀딩스 (2025 인적분할)",
-    "governance_type": "",
+    "parent_group": "파마리서치홀딩스 (2025 인적분할, 지주회사)",
+    "governance_type": "오너경영 (지주회사 체제)",
     "subsidiaries": "파마리서치바이오 (보툴리눔톡신)",
     "source": "DART 전자공시",
-    "source_date": "2025.3"
+    "source_date": "2025"
   },
   "클래시스": {
     "largest_shareholder": "베인캐피탈 (54.16%)",
@@ -130,16 +130,16 @@
     "ceo": "김종원, 김정현 (각자대표)",
     "parent_group": "",
     "governance_type": "오너경영 (부자 공동경영)",
-    "subsidiaries": "",
+    "subsidiaries": "Wontech Asia (태국), Wontech China, Wontech Japan",
     "source": "DART 전자공시",
-    "source_date": "2025.11"
+    "source_date": "2025"
   },
   "동방메디컬": {
     "largest_shareholder": "김근식 외 (49.02%)",
     "ceo": "김근식",
     "parent_group": "",
     "governance_type": "오너경영",
-    "subsidiaries": "",
+    "subsidiaries": "PT Dongbang Medical Global (인도네시아), 중국법인 (쑤저우, 칭따오)",
     "source": "DART 전자공시",
     "source_date": "2025"
   },
@@ -166,9 +166,9 @@
     "ceo": "정현규",
     "parent_group": "",
     "governance_type": "오너경영",
-    "subsidiaries": "",
+    "subsidiaries": "BioPlus USA Inc. (미국법인, 2025 신설)",
     "source": "DART 전자공시",
-    "source_date": "2024.6"
+    "source_date": "2025"
   },
   "비올": {
     "largest_shareholder": "비엔나투자목적회사 / VIG파트너스 (48.77%)",
@@ -184,7 +184,7 @@
     "ceo": "이진우",
     "parent_group": "",
     "governance_type": "오너경영",
-    "subsidiaries": "",
+    "subsidiaries": "하이로닉코리아, 블루코어컴퍼니, 아띠베뷰티, HIRONIC JAPAN",
     "source": "DART 전자공시",
     "source_date": "2025"
   },
@@ -201,8 +201,8 @@
     "largest_shareholder": "바이오노트 외 (~20%)",
     "ceo": "백영옥",
     "parent_group": "",
-    "governance_type": "",
-    "subsidiaries": "",
+    "governance_type": "전문경영인 체제",
+    "subsidiaries": "Euvipharm JSC (베트남)",
     "source": "DART 전자공시",
     "source_date": "2025"
   },
@@ -256,7 +256,7 @@
     "ceo": "송준호",
     "parent_group": "동국그룹",
     "governance_type": "오너경영 (전문경영인 대표)",
-    "subsidiaries": "",
+    "subsidiaries": "동국생명과학 (조영제), 리봄화장품 (ODM), 위드닉스 (뷰티디바이스)",
     "source": "DART 전자공시",
     "source_date": "2025"
   },
