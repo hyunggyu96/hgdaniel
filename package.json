@@ -8,5 +8,9 @@
     "build": "cd web && npm run build",
     "start": "cd web && npm run start",
     "lint": "cd web && npm run lint"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.96.0",
+    "pg": "^8.18.0"
   }
 }

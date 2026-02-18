@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useLanguage } from '@/components/LanguageContext';
-import { Globe, Calendar as CalendarIcon, MapPin, ExternalLink, X, Filter } from "lucide-react";
+import { Globe, Calendar as CalendarIcon, MapPin, ExternalLink, X, Filter, ChevronRight } from "lucide-react";
 
 // ─── Types ───
 interface ConferenceEvent {
@@ -600,6 +600,7 @@ export default function ConferencesPage() {
     const [year, setYear] = useState(2026);
     const [month, setMonth] = useState(currentDate.getFullYear() === 2026 ? currentDate.getMonth() : 0);
     const [selectedEvent, setSelectedEvent] = useState<ConferenceEvent | null>(null);
+    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [seriesFilter, setSeriesFilter] = useState<string>('ALL');
     const [countryFilter, setCountryFilter] = useState<string>('ALL');
 
@@ -666,6 +667,7 @@ export default function ConferencesPage() {
         setYear(now.getFullYear());
         setMonth(now.getMonth());
         setSelectedEvent(null);
+        setSelectedDate(now);
     }
 
     return (
@@ -749,7 +751,22 @@ export default function ConferencesPage() {
                                 const events = getEventsForDay(day);
                                 const today = isToday(year, month, day);
                                 return (
-                                    <div key={`day-${day}`} className={`min-h-[80px] border-b border-r border-gray-100 dark:border-gray-800 p-1 transition-all hover:bg-blue-50/30 dark:hover:bg-gray-800/50 flex flex-col gap-0.5 group relative ${today ? 'bg-blue-50/20 dark:bg-blue-900/10' : ''}`}>
+                                    <div
+                                        key={`day-${day}`}
+                                        onClick={() => {
+                                            const clickedDate = new Date(year, month, day);
+                                            setSelectedDate(clickedDate);
+                                            // On mobile, scroll to events list
+                                            if (window.innerWidth < 1024) {
+                                                const el = document.getElementById('day-events-list');
+                                                if (el) el.scrollIntoView({ behavior: 'smooth' });
+                                            }
+                                        }}
+                                        className={`min-h-[60px] md:min-h-[80px] border-b border-r border-gray-100 dark:border-gray-800 p-1 transition-all hover:bg-blue-50/30 dark:hover:bg-gray-800/50 flex flex-col gap-0.5 group relative cursor-pointer
+                                            ${today ? 'bg-blue-50/20 dark:bg-blue-900/10' : ''}
+                                            ${selectedDate && selectedDate.getDate() === day && selectedDate.getMonth() === month && selectedDate.getFullYear() === year ? 'bg-blue-50 dark:bg-gray-800 ring-1 ring-inset ring-blue-500' : ''}
+                                        `}
+                                    >
                                         <div className="flex justify-between items-start">
                                             <span className={`w-5 h-5 flex items-center justify-center rounded-md text-xs font-bold transition-all ${today
                                                 ? 'bg-blue-600 text-white shadow-sm'
@@ -758,7 +775,21 @@ export default function ConferencesPage() {
                                                 {day}
                                             </span>
                                         </div>
-                                        <div className="space-y-0.5 mt-0.5">
+
+                                        {/* Mobile View: Simple Dots */}
+                                        <div className="md:hidden flex flex-wrap justify-center gap-1 mt-1">
+                                            {events.length > 0 && (
+                                                <>
+                                                    {events.slice(0, 4).map((e) => (
+                                                        <div key={e.id} className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: getCountryColor(e.country[lang]).color }} />
+                                                    ))}
+                                                    {events.length > 4 && <div className="w-1.5 h-1.5 rounded-full bg-gray-300" />}
+                                                </>
+                                            )}
+                                        </div>
+
+                                        {/* Desktop View: Full Bars */}
+                                        <div className="hidden md:flex flex-col gap-0.5 mt-0.5">
                                             {events.slice(0, 2).map((event) => {
                                                 const cc = getCountryColor(event.country[lang]);
                                                 const isSel = selectedEvent?.id === event.id;
@@ -880,6 +911,46 @@ export default function ConferencesPage() {
                                 Total {upcomingEvents.length}
                             </span>
                         </div>
+                    </div>
+
+                    {/* Mobile Selected Date Events */}
+                    <div id="day-events-list" className="block lg:hidden mb-6 scroll-mt-24">
+                        {selectedDate && (
+                            <div className="animate-fade-in space-y-3 mb-6 p-4 bg-blue-50/50 dark:bg-blue-900/10 rounded-2xl border border-blue-100 dark:border-blue-800">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <CalendarIcon className="w-4 h-4 text-blue-600" />
+                                    <h4 className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                                        {lang === 'ko' ? `${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일 일정` : `Events on ${MONTH_NAMES_EN[selectedDate.getMonth()]} ${selectedDate.getDate()}`}
+                                    </h4>
+                                </div>
+                                {getEventsForDay(selectedDate.getDate()).length > 0 ? (
+                                    getEventsForDay(selectedDate.getDate()).map(event => {
+                                        const cc = getCountryColor(event.country[lang]);
+                                        return (
+                                            <div
+                                                key={event.id}
+                                                onClick={() => setSelectedEvent(event)}
+                                                className="bg-white dark:bg-gray-900 p-3 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm flex items-center gap-3 cursor-pointer"
+                                            >
+                                                <div className="w-1 h-8 rounded-full" style={{ backgroundColor: cc.color }} />
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">{event.series}</span>
+                                                        <p className="text-sm font-bold text-gray-900 dark:text-gray-100 line-clamp-1">{event.name[lang]}</p>
+                                                    </div>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{event.city[lang]}, {event.country[lang]}</p>
+                                                </div>
+                                                <ChevronRight className="w-4 h-4 text-gray-300" />
+                                            </div>
+                                        )
+                                    })
+                                ) : (
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 py-2">
+                                        {lang === 'ko' ? '등록된 일정이 없습니다.' : 'No events scheduled for this day.'}
+                                    </p>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

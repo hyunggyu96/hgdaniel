@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import {
   FlatList,
   RefreshControl,
@@ -19,6 +19,7 @@ import { useTheme } from "@/context/ThemeContext";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useCollections } from "@/context/CollectionContext";
 import { useHaptics } from "@/hooks/useHaptics";
+import { usePreferences } from "@/context/PreferencesContext";
 import { CATEGORIES, groupNewsByCategory } from "@/lib/constants";
 
 type ViewMode = "overview" | "collections";
@@ -28,13 +29,33 @@ export default function NewsFeedScreen() {
   const { colors, isDark } = useTheme();
   const { t } = useLanguage();
   const haptics = useHaptics();
-  const { data: allNews, loading, error, refetch } = useNews();
+  const { landing } = usePreferences();
+  const {
+    data: allNews,
+    total,
+    loading,
+    loadingMore,
+    hasMore,
+    error,
+    refetch,
+    loadMore,
+  } = useNews();
   const { collections } = useCollections();
 
   const [viewMode, setViewMode] = useState<ViewMode>("overview");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    setViewMode(landing.defaultNewsMode);
+  }, [landing.defaultNewsMode]);
+
+  useEffect(() => {
+    if (!landing.showSearch) {
+      setSearchQuery("");
+    }
+  }, [landing.showSearch]);
 
   const grouped = useMemo(() => groupNewsByCategory(allNews), [allNews]);
 
@@ -75,64 +96,82 @@ export default function NewsFeedScreen() {
     setRefreshing(false);
   }, [refetch, haptics]);
 
+  const onEndReached = useCallback(() => {
+    if (!loading && !loadingMore && hasMore) {
+      loadMore();
+    }
+  }, [loading, loadingMore, hasMore, loadMore]);
+
   const renderHeader = () => (
     <View style={{ gap: 12 }}>
       <AntigravityHeader
         title={t("news_section_title")}
         subtitle={t("news_section_desc")}
-        badge={allNews.length}
+        badge="Live"
         showPulse
       />
 
+      {error ? (
+        <View style={styles.errorRow}>
+          <Text style={[styles.errorText, { color: colors.textMuted }]}>
+            Failed to load news: {error}
+          </Text>
+        </View>
+      ) : null}
+
       {/* View Mode Toggle */}
-      <View style={styles.toggleRow}>
-        {(["overview", "collections"] as const).map((mode) => (
-          <SpringPressable
-            key={mode}
-            onPress={() => {
-              setViewMode(mode);
-              setSelectedCategory(null);
-            }}
-            haptic="selection"
-          >
-            <View
-              style={[
-                styles.toggleBtn,
-                {
-                  backgroundColor:
-                    viewMode === mode
-                      ? colors.primary
-                      : isDark
-                      ? "rgba(255,255,255,0.06)"
-                      : "rgba(0,0,0,0.04)",
-                },
-              ]}
+      {landing.showViewModeToggle ? (
+        <View style={styles.toggleRow}>
+          {(["overview", "collections"] as const).map((mode) => (
+            <SpringPressable
+              key={mode}
+              onPress={() => {
+                setViewMode(mode);
+                setSelectedCategory(null);
+              }}
+              haptic="selection"
             >
-              <Text
+              <View
                 style={[
-                  styles.toggleText,
+                  styles.toggleBtn,
                   {
-                    color:
-                      viewMode === mode ? "#fff" : colors.textSecondary,
+                    backgroundColor:
+                      viewMode === mode
+                        ? colors.primary
+                        : isDark
+                          ? "rgba(255,255,255,0.06)"
+                          : "rgba(0,0,0,0.04)",
                   },
                 ]}
               >
-                {mode === "overview"
-                  ? t("news_overview")
-                  : t("news_collections")}
-              </Text>
-            </View>
-          </SpringPressable>
-        ))}
-      </View>
+                <Text
+                  style={[
+                    styles.toggleText,
+                    {
+                      color:
+                        viewMode === mode ? "#fff" : colors.textSecondary,
+                    },
+                  ]}
+                >
+                  {mode === "overview"
+                    ? t("news_overview")
+                    : t("news_collections")}
+                </Text>
+              </View>
+            </SpringPressable>
+          ))}
+        </View>
+      ) : null}
 
       {/* Search */}
-      <View style={styles.searchRow}>
-        <SearchInput value={searchQuery} onChangeText={setSearchQuery} />
-      </View>
+      {landing.showSearch ? (
+        <View style={styles.searchRow}>
+          <SearchInput value={searchQuery} onChangeText={setSearchQuery} />
+        </View>
+      ) : null}
 
       {/* Category Chips */}
-      {viewMode === "overview" && (
+      {viewMode === "overview" && landing.showCategoryChips && (
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -142,7 +181,6 @@ export default function NewsFeedScreen() {
             label="All"
             selected={!selectedCategory}
             onPress={() => setSelectedCategory(null)}
-            count={allNews.length}
           />
           {CATEGORIES.map((cat) => (
             <CategoryChip
@@ -154,7 +192,6 @@ export default function NewsFeedScreen() {
                   selectedCategory === cat ? null : cat
                 )
               }
-              count={categoryCounts[cat]}
             />
           ))}
         </ScrollView>
@@ -203,10 +240,23 @@ export default function NewsFeedScreen() {
             </Text>
           </View>
         }
+        ListFooterComponent={
+          loadingMore ? (
+            <View style={styles.footerLoading}>
+              <ActivityIndicator size="small" color={colors.primary} />
+            </View>
+          ) : null
+        }
         contentContainerStyle={{
           paddingBottom: 100,
           gap: 12,
         }}
+        onEndReached={onEndReached}
+        onEndReachedThreshold={0.6}
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
+        windowSize={7}
+        removeClippedSubviews
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -250,6 +300,12 @@ const styles = StyleSheet.create({
   searchRow: {
     paddingHorizontal: 20,
   },
+  errorRow: {
+    paddingHorizontal: 20,
+  },
+  errorText: {
+    fontSize: 12,
+  },
   chipRow: {
     paddingHorizontal: 20,
     gap: 8,
@@ -263,5 +319,9 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 14,
+  },
+  footerLoading: {
+    paddingVertical: 14,
+    alignItems: "center",
   },
 });

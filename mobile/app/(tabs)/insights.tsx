@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   FlatList,
   RefreshControl,
@@ -7,7 +7,6 @@ import {
   Text,
   View,
   ActivityIndicator,
-  Pressable,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as WebBrowser from "expo-web-browser";
@@ -100,7 +99,7 @@ function PaperCard({ paper, index }: { paper: Paper; index: number }) {
 
 export default function InsightsScreen() {
   const insets = useSafeAreaInsets();
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
   const { t } = useLanguage();
   const haptics = useHaptics();
 
@@ -121,14 +120,16 @@ export default function InsightsScreen() {
     setRefreshing(false);
   }, [refetch, haptics]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setQuery(searchInput.trim());
+      setPage(1);
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
   const handleSearch = (text: string) => {
     setSearchInput(text);
-    // Debounce: apply after 500ms typing pause
-    const timer = setTimeout(() => {
-      setQuery(text);
-      setPage(1);
-    }, 500);
-    return () => clearTimeout(timer);
   };
 
   return (
@@ -148,7 +149,7 @@ export default function InsightsScreen() {
             <AntigravityHeader
               title={t("insights_title")}
               subtitle={t("insights_desc")}
-              badge={total}
+              badge="Live"
             />
             <View style={styles.searchRow}>
               <SearchInput
@@ -212,6 +213,11 @@ export default function InsightsScreen() {
           loading ? (
             <View style={styles.center}>
               <ActivityIndicator size="large" color={colors.primary} />
+            </View>
+          ) : error ? (
+            <View style={styles.center}>
+              <Text style={{ color: colors.textMuted }}>Failed to load papers</Text>
+              <Text style={{ color: colors.textMuted, marginTop: 6 }}>{error}</Text>
             </View>
           ) : (
             <View style={styles.center}>

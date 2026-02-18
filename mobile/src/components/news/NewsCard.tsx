@@ -85,6 +85,7 @@ export function NewsCard({ article, index }: NewsCardProps) {
               </View>
             )}
             <View style={{ flex: 1 }} />
+            {/* Bookmark Hidden
             <SpringPressable onPress={handleBookmark} haptic="none">
               <Star
                 size={18}
@@ -92,6 +93,7 @@ export function NewsCard({ article, index }: NewsCardProps) {
                 fill={saved ? "#f59e0b" : "transparent"}
               />
             </SpringPressable>
+            */}
           </View>
         </View>
       </SpringPressable>

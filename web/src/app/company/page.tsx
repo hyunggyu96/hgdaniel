@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { API_ENDPOINTS } from '@/lib/apiConfig';
 import { useLanguage } from "@/components/LanguageContext";
 import { Building2, Globe, Search, BarChart3, PieChart } from "lucide-react";
+import { supabase } from '@/lib/supabaseClient';
 
 const financialData: Record<string, any> = require('@/data/financial_data.json');
 
@@ -86,6 +87,7 @@ export default function CompanyPage() {
     const lang = language as 'ko' | 'en';
     const [rankings, setRankings] = useState<Record<string, number>>({});
     const [searchQuery, setSearchQuery] = useState("");
+    const [companies, setCompanies] = useState<CompanyData[]>(allCompanies);
 
     const initialCategory = searchParams?.get('tab') === 'global' ? 'global' : 'korean';
     const [activeCategory, setActiveCategory] = useState<'korean' | 'global'>(initialCategory);
@@ -109,9 +111,31 @@ export default function CompanyPage() {
             .then(res => res.json())
             .then(data => setRankings(data))
             .catch(err => console.error(err));
+
+        const fetchCompanies = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('companies')
+                    .select('*')
+                    .order('name_ko', { ascending: true });
+
+                if (data) {
+                    const mapped: CompanyData[] = data.map((item: any) => ({
+                        id: item.id,
+                        name: { ko: item.name_ko, en: item.name_en },
+                        status: item.status as CompanyStatus,
+                        category: item.category as CompanyCategory
+                    }));
+                    setCompanies(mapped);
+                }
+            } catch (e) {
+                console.error('Failed to fetch companies', e);
+            }
+        };
+        fetchCompanies();
     }, []);
 
-    const filteredCompanies = allCompanies
+    const filteredCompanies = companies
         .filter(company =>
             company.category === activeCategory &&
             (searchQuery === "" ||
@@ -120,8 +144,8 @@ export default function CompanyPage() {
         )
         .sort((a, b) => a.name[lang].localeCompare(b.name[lang], lang === 'ko' ? 'ko' : 'en'));
 
-    const koreanCount = allCompanies.filter(c => c.category === 'korean').length;
-    const globalCount = allCompanies.filter(c => c.category === 'global').length;
+    const koreanCount = companies.filter(c => c.category === 'korean').length;
+    const globalCount = companies.filter(c => c.category === 'global').length;
 
     return (
         <main className="min-h-screen bg-gray-50/50 dark:bg-gray-950 p-6 md:p-12 pb-24 transition-colors duration-300">
@@ -143,7 +167,7 @@ export default function CompanyPage() {
                             <div className="flex flex-wrap items-center gap-2 pt-1">
                                 <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-100 text-[10px] font-semibold backdrop-blur-sm flex items-center gap-1">
                                     <BarChart3 className="w-3 h-3" />
-                                    {allCompanies.length} Companies Tracked
+                                    {companies.length} Companies Tracked
                                 </span>
                                 <span className="px-2.5 py-0.5 rounded-full bg-violet-500/20 border border-violet-400/30 text-violet-100 text-[10px] font-semibold backdrop-blur-sm flex items-center gap-1">
                                     <Globe className="w-3 h-3" />
