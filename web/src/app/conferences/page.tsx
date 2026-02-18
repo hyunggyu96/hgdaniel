@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useLanguage } from '@/components/LanguageContext';
-import { Globe, Calendar as CalendarIcon, MapPin, ExternalLink, X, Filter, ChevronRight } from "lucide-react";
+import { Globe, Calendar as CalendarIcon, MapPin, ExternalLink, X, Filter, ChevronRight, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from '@/lib/supabaseClient';
 
 // ─── Types ───
@@ -779,6 +779,110 @@ function EmbeddedEventDetailPanel({ event, lang }: {
     );
 }
 
+// ─── Filter Section Component ───
+function FilterSection({
+    items,
+    selected,
+    onSelect,
+    type,
+    lang,
+    valueKey,
+    labelKey
+}: {
+    items: any[],
+    selected: string[],
+    onSelect: (val: any) => void,
+    type: 'text' | 'country',
+    lang: 'ko' | 'en',
+    valueKey?: string,
+    labelKey?: string
+}) {
+    const [expanded, setExpanded] = useState(false);
+    // Button height ~32px + gap 8px = 40px/row. 3 rows = 120px. Max height slightly more to catch edge cases.
+    const MAX_HEIGHT = 130;
+
+    // We can't easily check scrollHeight in SSR/hydration cleanly without a ref and layout effect,
+    // but for simplicity we can check the *number* of items as a proxy or just rely on CSS max-height.
+    // However, to show/hide the button, let's use a rough heuristic:
+    // If text buttons, maybe > 15 items? If country buttons, maybe > 12?
+    // Let's use a ref-based approach for robustness.
+
+    const contentRef = React.useRef<HTMLDivElement>(null);
+    const [showToggle, setShowToggle] = useState(false);
+
+    useEffect(() => {
+        if (contentRef.current) {
+            // Check if scrollHeight is significantly larger than clientHeight (when collapsed)
+            // But initially it might be expanded or not.
+            // If we set max-h-130, and scrollHeight > 130, then show toggle.
+            if (contentRef.current.scrollHeight > MAX_HEIGHT + 10) {
+                setShowToggle(true);
+            }
+        }
+    }, [items]);
+
+    return (
+        <div>
+            <div
+                ref={contentRef}
+                className={`flex flex-wrap gap-2 transition-all duration-500 ease-in-out overflow-hidden ${expanded ? 'max-h-[1000px]' : 'max-h-[130px]'}`}
+            >
+                {items.map((item) => {
+                    const value = valueKey ? item[valueKey] : item;
+                    // Use labelKey if available, otherwise fallback to item[lang] for country or item for text
+                    const label = labelKey ? item[labelKey] : (type === 'country' ? item[lang] : item);
+                    const isActive = selected.includes(value);
+
+                    if (type === 'country') {
+                        return (
+                            <button
+                                key={value}
+                                onClick={() => onSelect(value)}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border ${isActive
+                                    ? 'bg-blue-600 text-white shadow-md border-transparent'
+                                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-600 hover:border-blue-300 hover:text-blue-600 hover:scale-[1.02] dark:hover:bg-gray-700'
+                                    }`}
+                            >
+                                <FlagIcon country={value} size={14} /> {label}
+                            </button>
+                        );
+                    } else {
+                        return (
+                            <button
+                                key={value}
+                                onClick={() => onSelect(value)}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${isActive
+                                    ? 'bg-blue-600 text-white shadow-md border-transparent'
+                                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-600 hover:border-blue-300 hover:text-blue-600 dark:hover:bg-gray-700'
+                                    }`}
+                            >
+                                {label}
+                            </button>
+                        );
+                    }
+                })}
+            </div>
+            {showToggle && (
+                <button
+                    onClick={() => setExpanded(!expanded)}
+                    aria-label={expanded ? "Show less options" : "Show more options"}
+                    className="flex items-center gap-1 text-[10px] font-bold text-gray-400 hover:text-blue-500 mt-2 ml-1 transition-colors"
+                >
+                    {expanded ? (
+                        <>
+                            {lang === 'ko' ? '접기' : 'Show Less'} <ChevronUp className="w-3 h-3" />
+                        </>
+                    ) : (
+                        <>
+                            {lang === 'ko' ? '더보기' : 'Show More'} <ChevronDown className="w-3 h-3" />
+                        </>
+                    )}
+                </button>
+            )}
+        </div>
+    );
+}
+
 // ─── Main Page ───
 export default function ConferencesPage() {
     const { language } = useLanguage();
@@ -956,11 +1060,11 @@ export default function ConferencesPage() {
                 {/* Grid: Calendar (Left) & Filters (Right) */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     {/* LEFT COLUMN: Calendar (Compact) - Span 7 */}
-                    <div className="lg:col-span-7 bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-xl ring-1 ring-black/5 overflow-hidden">
+                    <div className="lg:col-span-8 bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-xl ring-1 ring-black/5 overflow-hidden flex flex-col h-full">
                         {/* Calendar Header */}
                         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/80">
-                            <button onClick={prevMonth} className="w-8 h-8 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 transition-all shadow-sm">
-                                ←
+                            <button onClick={prevMonth} aria-label={lang === 'ko' ? '이전 달' : 'Previous month'} className="w-8 h-8 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 transition-all shadow-sm">
+                                <ChevronRight className="w-4 h-4 rotate-180" />
                             </button>
                             <div className="text-center">
                                 <h2 className="text-xl font-black tracking-tight text-gray-900 dark:text-gray-100">
@@ -971,8 +1075,8 @@ export default function ConferencesPage() {
                                 <button onClick={goToToday} className="hidden sm:block text-[10px] font-bold text-gray-500 hover:text-blue-600 px-2 py-1.5 bg-white dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700 hover:border-blue-200 transition-all">
                                     {lang === 'ko' ? '오늘' : 'Today'}
                                 </button>
-                                <button onClick={nextMonth} className="w-8 h-8 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 transition-all shadow-sm">
-                                    →
+                                <button onClick={nextMonth} aria-label={lang === 'ko' ? '다음 달' : 'Next month'} className="w-8 h-8 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 transition-all shadow-sm">
+                                    <ChevronRight className="w-4 h-4" />
                                 </button>
                             </div>
                         </div>
@@ -985,9 +1089,9 @@ export default function ConferencesPage() {
                             ))}
                         </div>
 
-                        <div className="grid grid-cols-7 bg-white dark:bg-gray-900">
+                        <div className="grid grid-cols-7 bg-white dark:bg-gray-900 flex-1">
                             {Array.from({ length: firstDay }).map((_, i) => (
-                                <div key={`empty-${i}`} className="min-h-[80px] bg-gray-50/20 dark:bg-gray-800/20 border-b border-r border-gray-50 dark:border-gray-800" />
+                                <div key={`empty-${i}`} className="min-h-[60px] md:min-h-[80px] bg-gray-50/20 dark:bg-gray-800/20 border-b border-r border-gray-50 dark:border-gray-800" />
                             ))}
                             {Array.from({ length: daysInMonth }).map((_, i) => {
                                 const day = i + 1;
@@ -1065,95 +1169,79 @@ export default function ConferencesPage() {
                                 );
                             })}
                             {Array.from({ length: (7 - ((firstDay + daysInMonth) % 7)) % 7 }).map((_, i) => (
-                                <div key={`empty-end-${i}`} className="min-h-[80px] bg-gray-50/20 border-b border-r border-gray-50" />
+                                <div key={`empty-end-${i}`} className="min-h-[60px] md:min-h-[80px] bg-gray-50/20 border-b border-r border-gray-50" />
                             ))}
                         </div>
                     </div>
 
                     {/* RIGHT COLUMN: Filters - Span 5 */}
-                    <div className="lg:col-span-5 flex flex-col gap-6">
+                    <div className="lg:col-span-4 flex flex-col gap-6">
                         {/* Series Filter */}
                         <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                            <div className="flex items-center gap-2 mb-3">
-                                <Filter className="w-4 h-4 text-gray-400" />
-                                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">
-                                    {lang === 'ko' ? '시리즈 필터' : 'Filter by Series'}
-                                </h3>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex items-center justify-between gap-2 mb-3">
+                                <div className="flex items-center gap-2">
+                                    <Filter className="w-4 h-4 text-gray-400" />
+                                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                                        {lang === 'ko' ? '시리즈 필터' : 'Filter by Series'}
+                                    </h3>
+                                </div>
                                 <button
                                     onClick={() => { setSelectedSeries([]); setSelectedEvent(null); }}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${selectedSeries.length === 0
-                                        ? 'bg-slate-800 text-white shadow-md border-transparent'
-                                        : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-blue-300'
-                                        }`}
+                                    className="text-[10px] text-gray-400 hover:text-blue-500"
                                 >
-                                    ALL
+                                    Reset
                                 </button>
-                                {allSeries.map((s) => (
-                                    <button
-                                        key={s}
-                                        onClick={() => {
-                                            setSelectedSeries((prev) => (
-                                                prev.includes(s)
-                                                    ? prev.filter((item) => item !== s)
-                                                    : [...prev, s]
-                                            ));
-                                            setSelectedEvent(null);
-                                        }}
-                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${selectedSeries.includes(s)
-                                            ? 'bg-blue-600 text-white shadow-md border-transparent'
-                                            : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-600 hover:border-blue-300 hover:text-blue-600 dark:hover:bg-gray-700'
-                                            }`}
-                                    >
-                                        {s}
-                                    </button>
-                                ))}
                             </div>
+
+                            <FilterSection
+                                items={allSeries}
+                                selected={selectedSeries}
+                                onSelect={(s) => {
+                                    setSelectedSeries((prev) => (
+                                        prev.includes(s)
+                                            ? prev.filter((item) => item !== s)
+                                            : [...prev, s]
+                                    ));
+                                    setSelectedEvent(null);
+                                }}
+                                type="text"
+                                lang={lang}
+                            />
                         </div>
 
                         {/* Country Filter */}
                         <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                            <div className="flex items-center gap-2 mb-3">
-                                <MapPin className="w-4 h-4 text-gray-400" />
-                                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">
-                                    {lang === 'ko' ? '국가 필터' : 'Filter by Country'}
-                                </h3>
-                            </div>
-                            <div className="flex flex-wrap gap-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
+                            <div className="flex items-center justify-between gap-2 mb-3">
+                                <div className="flex items-center gap-2">
+                                    <MapPin className="w-4 h-4 text-gray-400" />
+                                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                                        {lang === 'ko' ? '국가 필터' : 'Filter by Country'}
+                                    </h3>
+                                </div>
                                 <button
                                     onClick={() => { setSelectedCountriesEn([]); setSelectedEvent(null); }}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${selectedCountriesEn.length === 0
-                                        ? 'bg-slate-800 text-white shadow-md border-transparent'
-                                        : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-blue-300'
-                                        }`}
+                                    className="text-[10px] text-gray-400 hover:text-blue-500"
                                 >
-                                    {lang === 'ko' ? '전체' : 'All'}
+                                    Reset
                                 </button>
-                                {countryOptions.map((c) => {
-                                    const isActive = selectedCountriesEn.includes(c.en);
-                                    const cc = getCountryColor(c.en);
-                                    return (
-                                        <button
-                                            key={c.en}
-                                            onClick={() => {
-                                                setSelectedCountriesEn((prev) => (
-                                                    prev.includes(c.en)
-                                                        ? prev.filter((item) => item !== c.en)
-                                                        : [...prev, c.en]
-                                                ));
-                                                setSelectedEvent(null);
-                                            }}
-                                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border ${isActive
-                                                ? 'bg-blue-600 text-white shadow-md border-transparent'
-                                                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-600 hover:border-blue-300 hover:text-blue-600 hover:scale-[1.02] dark:hover:bg-gray-700'
-                                                }`}
-                                        >
-                                            <FlagIcon country={c.en} size={14} /> {c[lang]}
-                                        </button>
-                                    );
-                                })}
                             </div>
+
+                            <FilterSection
+                                items={countryOptions}
+                                selected={selectedCountriesEn}
+                                onSelect={(c) => {
+                                    setSelectedCountriesEn((prev) => (
+                                        prev.includes(c)
+                                            ? prev.filter((item) => item !== c)
+                                            : [...prev, c]
+                                    ));
+                                    setSelectedEvent(null);
+                                }}
+                                type="country"
+                                lang={lang}
+                                valueKey="en"
+                                labelKey={lang}
+                            />
                         </div>
                     </div>
                 </div>
