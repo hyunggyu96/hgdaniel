@@ -199,6 +199,14 @@ const CONFERENCES: ConferenceEvent[] = [
         url: 'https://www.ccrlondon.com/',
     },
     {
+        id: 'global-aesthetics-conference-2025', series: 'Global Aesthetics Conference',
+        name: { ko: 'Global Aesthetics Conference 2025', en: 'Global Aesthetics Conference 2025' },
+        startDate: '2025-10-30', endDate: '2025-11-02',
+        city: { ko: 'Miami Beach', en: 'Miami Beach' }, country: { ko: 'USA', en: 'USA' },
+        venue: 'Loews Miami Beach Hotel', confirmed: true,
+        url: 'https://globalaestheticsconference.com/',
+    },
+    {
         id: 'asds-annual-meeting-2025', series: 'ASDS',
         name: { ko: 'ASDS Annual Meeting 2025', en: 'ASDS Annual Meeting 2025' },
         startDate: '2025-11-13', endDate: '2025-11-16',
