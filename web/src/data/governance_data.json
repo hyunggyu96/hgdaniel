@@ -13,7 +13,7 @@
     "ceo": "이환철, 이재호 (각자대표)",
     "parent_group": "",
     "governance_type": "오너경영",
-    "subsidiaries": "엘앤씨이에스, 엘앤씨메디케어, 엘앤씨퓨처랩, 글로벌의학연구센터, L&C Bioscience Technology(중국)",
+    "subsidiaries": "L&C Bioscience Technology (중국), 엘앤씨이에스, 엘앤씨메디케어, 엘앤씨에이아이, 엘앤씨퓨처랩, 글로벌의학연구센터",
     "source": "DART 전자공시",
     "source_date": "2025"
   },
@@ -49,7 +49,7 @@
     "ceo": "송수영",
     "parent_group": "휴온스그룹",
     "governance_type": "그룹 계열 (자회사)",
-    "subsidiaries": "팬젠 (바이오시밀러)",
+    "subsidiaries": "휴메딕스, 휴온스바이오파마, 휴온스메디텍, 휴엠앤씨, 휴온스엔, 팬젠, 휴온스생명과학, 휴온스랩, HuM&C Vina (베트남), Huons USA, Huons Japan",
     "source": "DART 전자공시",
     "source_date": "2025"
   },
@@ -58,7 +58,7 @@
     "ceo": "송수영",
     "parent_group": "휴온스그룹 (지주회사)",
     "governance_type": "오너경영",
-    "subsidiaries": "휴온스, 휴메딕스, 휴온스바이오파마, 휴온스엔, 휴엠앤씨, 휴온스생명과학, 팬젠",
+    "subsidiaries": "휴온스, 휴메딕스, 휴온스바이오파마, 휴온스메디텍, 휴엠앤씨, 휴온스엔, 팬젠, 휴온스생명과학, 푸드어셈블, 휴온스랩, Huons USA, Huons Japan",
     "source": "DART 전자공시",
     "source_date": "2025"
   },
@@ -76,7 +76,7 @@
     "ceo": "문형진, 박철민 (각자대표)",
     "parent_group": "컨소시엄 (GS·CBC·무바달라·IMM)",
     "governance_type": "컨소시엄 경영",
-    "subsidiaries": "아크로스 (HA필러 OEM), 에이비바이오, Hugel America Inc.",
+    "subsidiaries": "아크로스 (HA필러), 제이월드, Hugel America, Hugel Australia, Hugel Thailand, Hugel Taiwan, Hugel Canada, Hugel Hong Kong, Hugel Shanghai, Hugel Singapore",
     "source": "DART 전자공시",
     "source_date": "2025"
   },
@@ -85,7 +85,7 @@
     "ceo": "정현호",
     "parent_group": "",
     "governance_type": "오너경영 (창업주)",
-    "subsidiaries": "뉴메코 (보툴리눔톡신 뉴럭스), 메디톡스벤처투자",
+    "subsidiaries": "뉴메코 (보툴리눔톡신), 메디톡스벤처투자, 리비옴, 벙커엠, 하이웨이원, Luvantas Inc, MDT International, Medytox Thailand",
     "source": "DART 전자공시",
     "source_date": "2025.11"
   },
@@ -94,7 +94,7 @@
     "ceo": "이창재, 박성수 (각자대표)",
     "parent_group": "대웅그룹",
     "governance_type": "오너경영",
-    "subsidiaries": "대웅바이오, 한올바이오파마, 대웅테라퓨틱스, 대웅생명과학, 대웅펫, 엠디웰",
+    "subsidiaries": "한올바이오파마, 아이엔테라퓨틱스, 힐리언스, 아피셀테라퓨틱스, Daewoong America, Daewoong Japan, Daewoong HK, PT Selatox Bio Pharma (인도네시아)",
     "source": "DART 전자공시",
     "source_date": "2025"
   },
@@ -103,7 +103,7 @@
     "ceo": "손지훈",
     "parent_group": "파마리서치홀딩스 (2025 인적분할, 지주회사)",
     "governance_type": "오너경영 (지주회사 체제)",
-    "subsidiaries": "파마리서치바이오 (보툴리눔톡신)",
+    "subsidiaries": "파마리서치바이오 (제약), 파마리서치헬스케어, 파마리서치H&B, Pharmaresearch USA, Pharmaresearch Singapore, 수인투자, 플루토, 메디코썬, 튜링바이오, Dr.J Skinclinic, 알파오메가메디칼",
     "source": "DART 전자공시",
     "source_date": "2025"
   },
@@ -112,7 +112,7 @@
     "ceo": "백승한",
     "parent_group": "Bain Capital (PE)",
     "governance_type": "PE 경영",
-    "subsidiaries": "이루다 (합병, EBD기기), 슈링크홈 (뷰티디바이스/화장품)",
+    "subsidiaries": "엔슨 (의료기기), Classys Japan, Skederm Inc (미국, 화장품), Skederm Shanghai",
     "source": "DART 전자공시 / The Bell",
     "source_date": "2025"
   },
