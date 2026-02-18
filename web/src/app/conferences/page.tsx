@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useLanguage } from '@/components/LanguageContext';
 import { Globe, Calendar as CalendarIcon, MapPin, ExternalLink, X, Filter, ChevronRight } from "lucide-react";
+import { supabase } from '@/lib/supabaseClient';
 
 // ─── Types ───
 interface ConferenceEvent {
@@ -199,6 +200,14 @@ const CONFERENCES: ConferenceEvent[] = [
         url: 'https://www.ccrlondon.com/',
     },
     {
+        id: 'global-aesthetics-conference-2025', series: 'Global Aesthetics Conference',
+        name: { ko: 'Global Aesthetics Conference 2025', en: 'Global Aesthetics Conference 2025' },
+        startDate: '2025-10-30', endDate: '2025-11-02',
+        city: { ko: 'Miami Beach', en: 'Miami Beach' }, country: { ko: 'USA', en: 'USA' },
+        venue: 'Loews Miami Beach Hotel', confirmed: true,
+        url: 'https://globalaestheticsconference.com/',
+    },
+    {
         id: 'asds-annual-meeting-2025', series: 'ASDS',
         name: { ko: 'ASDS Annual Meeting 2025', en: 'ASDS Annual Meeting 2025' },
         startDate: '2025-11-13', endDate: '2025-11-16',
@@ -255,6 +264,14 @@ const CONFERENCES: ConferenceEvent[] = [
         url: 'https://www.imcas.com/en/imcas-americas-2026',
     },
     {
+        id: 'kimes-2026', series: 'KIMES',
+        name: { ko: 'KIMES 2026', en: 'KIMES 2026' },
+        startDate: '2026-03-19', endDate: '2026-03-22',
+        city: { ko: 'Seoul', en: 'Seoul' }, country: { ko: 'South Korea', en: 'South Korea' },
+        venue: 'COEX', confirmed: true,
+        url: 'https://kimes.kr/en',
+    },
+    {
         id: 'amwc-monaco-2026', series: 'AMWC',
         name: { ko: 'AMWC Monaco 2026', en: 'AMWC Monaco 2026' },
         startDate: '2026-03-26', endDate: '2026-03-28',
@@ -279,6 +296,38 @@ const CONFERENCES: ConferenceEvent[] = [
         url: 'https://www.dubaiderma.com/',
     },
     {
+        id: 'aps-korea-2026', series: 'APS Korea',
+        name: { ko: 'APS Korea 2026', en: 'APS Korea 2026' },
+        startDate: '2026-04-04', endDate: '2026-04-05',
+        city: { ko: 'Seoul', en: 'Seoul' }, country: { ko: 'South Korea', en: 'South Korea' },
+        venue: 'COEX (TBD)', confirmed: false,
+        url: 'https://www.apskorea.or.kr',
+    },
+    {
+        id: 'idax-2026', series: 'IDAX',
+        name: { ko: 'IDAX 2026', en: 'IDAX 2026' },
+        startDate: '2026-04-09', endDate: '2026-04-11',
+        city: { ko: 'Hanoi', en: 'Hanoi' }, country: { ko: 'Vietnam', en: 'Vietnam' },
+        venue: 'NECC', confirmed: true,
+        url: 'https://www.idaxexpo.com',
+    },
+    {
+        id: 'ceswam-2026', series: 'SWAM',
+        name: { ko: 'CeSWAM 2026', en: 'CeSWAM 2026' },
+        startDate: '2026-04-17', endDate: '2026-04-19',
+        city: { ko: 'Semarang', en: 'Semarang' }, country: { ko: 'Indonesia', en: 'Indonesia' },
+        venue: 'Padma Hotel', confirmed: true,
+        url: 'https://swam.id',
+    },
+    {
+        id: 'amwc-asia-2026', series: 'AMWC',
+        name: { ko: 'AMWC Asia 2026', en: 'AMWC Asia 2026' },
+        startDate: '2026-05-01', endDate: '2026-05-03',
+        city: { ko: 'Taipei', en: 'Taipei' }, country: { ko: 'Taiwan', en: 'Taiwan' },
+        venue: 'Taipei Intl Convention Center', confirmed: true,
+        url: 'https://www.amwc-asia.com',
+    },
+    {
         id: 'bcam-conference-2026', series: 'BCAM',
         name: { ko: 'BCAM Conference 2026', en: 'BCAM Conference 2026' },
         startDate: '2026-05-02', endDate: '2026-05-02',
@@ -295,12 +344,52 @@ const CONFERENCES: ConferenceEvent[] = [
         url: 'https://www.scalemusiccity.com/',
     },
     {
+        id: 'cbe-2026', series: 'CBE',
+        name: { ko: 'CBE 2026 (China Beauty Expo)', en: 'CBE 2026 (China Beauty Expo)' },
+        startDate: '2026-05-12', endDate: '2026-05-14',
+        city: { ko: 'Shanghai', en: 'Shanghai' }, country: { ko: 'China', en: 'China' },
+        venue: 'SNIEC', confirmed: true,
+        url: 'https://www.chinabeautyexpo.com',
+    },
+    {
         id: 'vegas-cosmetic-surgery-2026', series: 'VCS',
         name: { ko: 'Vegas Cosmetic Surgery 2026', en: 'Vegas Cosmetic Surgery 2026' },
         startDate: '2026-05-28', endDate: '2026-05-30',
         city: { ko: 'Las Vegas', en: 'Las Vegas' }, country: { ko: 'USA', en: 'USA' },
         venue: 'Fontainebleau Las Vegas', confirmed: true,
         url: 'https://www.vegascosmeticsurgery.com/',
+    },
+    {
+        id: 'weswam-2026', series: 'SWAM',
+        name: { ko: 'WeSWAM 2026', en: 'WeSWAM 2026' },
+        startDate: '2026-06-12', endDate: '2026-06-14',
+        city: { ko: 'Bandung', en: 'Bandung' }, country: { ko: 'Indonesia', en: 'Indonesia' },
+        venue: 'El Hotel', confirmed: true,
+        url: 'https://swam.id',
+    },
+    {
+        id: 'korea-derma-2026', series: 'Korea Derma',
+        name: { ko: 'Korea Derma 2026', en: 'Korea Derma 2026' },
+        startDate: '2026-06-15', endDate: '2026-06-17',
+        city: { ko: 'Seoul', en: 'Seoul' }, country: { ko: 'South Korea', en: 'South Korea' },
+        venue: 'The-K Hotel (TBD)', confirmed: false,
+        url: 'https://www.koderma.co.kr',
+    },
+    {
+        id: 'amwc-brazil-2026', series: 'AMWC',
+        name: { ko: 'AMWC Brazil 2026', en: 'AMWC Brazil 2026' },
+        startDate: '2026-06-17', endDate: '2026-06-19',
+        city: { ko: 'Sao Paulo', en: 'Sao Paulo' }, country: { ko: 'Brazil', en: 'Brazil' },
+        venue: 'Frei Caneca Convention Center', confirmed: true,
+        url: 'https://www.amwcbrazil.com.br',
+    },
+    {
+        id: 'amwc-korea-2026', series: 'AMWC',
+        name: { ko: 'AMWC Korea 2026', en: 'AMWC Korea 2026' },
+        startDate: '2026-06-19', endDate: '2026-06-20',
+        city: { ko: 'Seoul', en: 'Seoul' }, country: { ko: 'South Korea', en: 'South Korea' },
+        venue: 'InterContinental Grand Seoul Parnas', confirmed: true,
+        url: 'https://www.amwc-korea.com',
     },
     {
         id: 'imcas-asia-2026', series: 'IMCAS',
@@ -311,12 +400,52 @@ const CONFERENCES: ConferenceEvent[] = [
         url: 'https://www.imcas.com/en/imcas-asia-2026',
     },
     {
+        id: 'hksdv-2026', series: 'HKSDV',
+        name: { ko: 'HKSDV Annual Meeting 2026', en: 'HKSDV Annual Meeting 2026' },
+        startDate: '2026-07-04', endDate: '2026-07-05',
+        city: { ko: 'Hong Kong', en: 'Hong Kong' }, country: { ko: 'Hong Kong', en: 'Hong Kong' },
+        venue: 'Sheraton Hong Kong Hotel', confirmed: true,
+        url: 'https://www.hksdv.org',
+    },
+    {
+        id: 'iswam-bali-2026', series: 'SWAM',
+        name: { ko: '8th i-SWAM Bali 2026', en: '8th i-SWAM Bali 2026' },
+        startDate: '2026-07-10', endDate: '2026-07-12',
+        city: { ko: 'Bali', en: 'Bali' }, country: { ko: 'Indonesia', en: 'Indonesia' },
+        venue: 'The Trans Resort Bali', confirmed: true,
+        url: 'https://www.internationalswam.com',
+    },
+    {
+        id: 'vietbeauty-2026', series: 'Vietbeauty',
+        name: { ko: 'Vietbeauty 2026', en: 'Vietbeauty 2026' },
+        startDate: '2026-07-23', endDate: '2026-07-26',
+        city: { ko: 'Ho Chi Minh City', en: 'Ho Chi Minh City' }, country: { ko: 'Vietnam', en: 'Vietnam' },
+        venue: 'SECC', confirmed: true,
+        url: 'https://www.vietbeautyshow.com',
+    },
+    {
         id: 'imcas-china-2026', series: 'IMCAS',
         name: { ko: 'IMCAS China 2026', en: 'IMCAS China 2026' },
         startDate: '2026-08-27', endDate: '2026-08-29',
         city: { ko: 'Shanghai', en: 'Shanghai' }, country: { ko: 'China', en: 'China' },
         venue: 'W Hotel - The Bund', confirmed: true,
         url: 'https://www.imcas.com/en/imcas-china-2026',
+    },
+    {
+        id: 'medical-fair-asia-2026', series: 'Medical Fair Asia',
+        name: { ko: 'Medical Fair Asia 2026', en: 'Medical Fair Asia 2026' },
+        startDate: '2026-09-09', endDate: '2026-09-11',
+        city: { ko: 'Singapore', en: 'Singapore' }, country: { ko: 'Singapore', en: 'Singapore' },
+        venue: 'Marina Bay Sands', confirmed: true,
+        url: 'https://www.medicalfair-asia.com',
+    },
+    {
+        id: 'easwam-2026', series: 'SWAM',
+        name: { ko: 'EaSWAM 2026', en: 'EaSWAM 2026' },
+        startDate: '2026-09-25', endDate: '2026-09-27',
+        city: { ko: 'Surabaya', en: 'Surabaya' }, country: { ko: 'Indonesia', en: 'Indonesia' },
+        venue: 'Dyandra Convention Ctr', confirmed: true,
+        url: 'https://swam.id',
     },
     {
         id: 'eadv-congress-2026', series: 'EADV',
@@ -334,13 +463,89 @@ const CONFERENCES: ConferenceEvent[] = [
         venue: 'ExCeL London', confirmed: true,
         url: 'https://www.ccrlondon.com/',
     },
+    {
+        id: 'medical-japan-2026', series: 'Medical Japan',
+        name: { ko: 'Medical Japan Tokyo 2026', en: 'Medical Japan Tokyo 2026' },
+        startDate: '2026-10-07', endDate: '2026-10-09',
+        city: { ko: 'Tokyo', en: 'Tokyo' }, country: { ko: 'Japan', en: 'Japan' },
+        venue: 'Makuhari Messe', confirmed: true,
+        url: 'https://www.medical-jpn.jp/tokyo/en-gb.html',
+    },
+    {
+        id: 'amwc-china-2026', series: 'AMWC',
+        name: { ko: 'AMWC China 2026', en: 'AMWC China 2026' },
+        startDate: '2026-10-16', endDate: '2026-10-18',
+        city: { ko: 'Chengdu', en: 'Chengdu' }, country: { ko: 'China', en: 'China' },
+        venue: 'Wuzhouqing Convention Center', confirmed: true,
+        url: 'https://www.amwcchina.com',
+    },
+    {
+        id: 'amwc-dubai-2026', series: 'AMWC',
+        name: { ko: 'AMWC Dubai 2026', en: 'AMWC Dubai 2026' },
+        startDate: '2026-10-21', endDate: '2026-10-23',
+        city: { ko: 'Dubai', en: 'Dubai' }, country: { ko: 'UAE', en: 'UAE' },
+        venue: 'TBD', confirmed: true,
+        url: 'https://www.amwc-dubai.com',
+    },
+    {
+        id: 'dasil-2026', series: 'DASIL',
+        name: { ko: 'DASIL 2026', en: 'DASIL 2026' },
+        startDate: '2026-10-28', endDate: '2026-10-31',
+        city: { ko: 'Kochi', en: 'Kochi' }, country: { ko: 'India', en: 'India' },
+        venue: 'TBD', confirmed: true,
+        url: 'https://www.dasil.org',
+    },
+    {
+        id: 'amwc-latam-2026', series: 'AMWC',
+        name: { ko: 'AMWC Latin America 2026', en: 'AMWC Latin America 2026' },
+        startDate: '2026-10-29', endDate: '2026-10-31',
+        city: { ko: 'Medellin', en: 'Medellin' }, country: { ko: 'Colombia', en: 'Colombia' },
+        venue: 'TBD', confirmed: true,
+        url: 'https://www.amwc-la.com',
+    },
+    {
+        id: 'prs-korea-2026', series: 'PRS Korea',
+        name: { ko: 'PRS Korea 2026', en: 'PRS Korea 2026' },
+        startDate: '2026-11-05', endDate: '2026-11-07',
+        city: { ko: 'Seoul', en: 'Seoul' }, country: { ko: 'South Korea', en: 'South Korea' },
+        venue: 'Grand InterContinental Seoul', confirmed: true,
+        url: 'https://www.prskorea.org',
+    },
+    {
+        id: 'cosmoprof-asia-2026', series: 'Cosmoprof Asia',
+        name: { ko: 'Cosmoprof Asia 2026', en: 'Cosmoprof Asia 2026' },
+        startDate: '2026-11-10', endDate: '2026-11-13',
+        city: { ko: 'Hong Kong', en: 'Hong Kong' }, country: { ko: 'Hong Kong', en: 'Hong Kong' },
+        venue: 'HKCEC & AsiaWorld', confirmed: true,
+        url: 'https://www.cosmoprof-asia.com',
+    },
+    {
+        id: 'icad-bangkok-2026', series: 'ICAD Bangkok',
+        name: { ko: 'ICAD Bangkok 2026', en: 'ICAD Bangkok 2026' },
+        startDate: '2026-11-20', endDate: '2026-11-22',
+        city: { ko: 'Bangkok', en: 'Bangkok' }, country: { ko: 'Thailand', en: 'Thailand' },
+        venue: 'Centara Grand (TBD)', confirmed: false,
+        url: 'https://www.icadbangkok.com',
+    },
+    {
+        id: 'amwc-sea-2026', series: 'AMWC',
+        name: { ko: 'AMWC Southeast Asia 2026', en: 'AMWC Southeast Asia 2026' },
+        startDate: '2026-11-26', endDate: '2026-11-28',
+        city: { ko: 'Bangkok', en: 'Bangkok' }, country: { ko: 'Thailand', en: 'Thailand' },
+        venue: 'The Athenee Hotel', confirmed: true,
+        url: 'https://www.amwc-southeastasia.com',
+    },
+    {
+        id: 'iswam-world-2026', series: 'SWAM',
+        name: { ko: '17th i-SWAM World Congress 2026', en: '17th i-SWAM World Congress 2026' },
+        startDate: '2026-12-04', endDate: '2026-12-06',
+        city: { ko: 'Tangerang', en: 'Tangerang' }, country: { ko: 'Indonesia', en: 'Indonesia' },
+        venue: 'ICE BSD City', confirmed: true,
+        url: 'https://www.internationalswam.com',
+    },
 ];
 
 // ─── Derived Data ───
-const ALL_SERIES = Array.from(new Set(CONFERENCES.map((c) => c.series)));
-const ALL_COUNTRIES_KO = Array.from(new Set(CONFERENCES.map((c) => c.country.ko))).sort();
-const ALL_COUNTRIES_EN = Array.from(new Set(CONFERENCES.map((c) => c.country.en))).sort();
-
 // ─── Utility ───
 const MONTH_NAMES_KO = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
 const MONTH_NAMES_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -580,29 +785,85 @@ export default function ConferencesPage() {
     const lang = language as 'ko' | 'en';
 
     const currentDate = new Date();
+    const [conferences, setConferences] = useState<ConferenceEvent[]>(CONFERENCES);
     const [year, setYear] = useState(2026);
     const [month, setMonth] = useState(currentDate.getFullYear() === 2026 ? currentDate.getMonth() : 0);
     const [selectedEvent, setSelectedEvent] = useState<ConferenceEvent | null>(null);
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-    const [seriesFilter, setSeriesFilter] = useState<string>('ALL');
-    const [countryFilter, setCountryFilter] = useState<string>('ALL');
+    const [selectedSeries, setSelectedSeries] = useState<string[]>([]);
+    const [selectedCountriesEn, setSelectedCountriesEn] = useState<string[]>([]);
 
     // Pagination Removed as per user request
     const monthNames = lang === 'ko' ? MONTH_NAMES_KO : MONTH_NAMES_EN;
     const dayNames = lang === 'ko' ? DAY_NAMES_KO : DAY_NAMES_EN;
-    const countries = lang === 'ko' ? ALL_COUNTRIES_KO : ALL_COUNTRIES_EN;
+    const allSeries = useMemo(() => Array.from(new Set(conferences.map((c) => c.series))), [conferences]);
+    const allCountriesEn = useMemo(() => Array.from(new Set(conferences.map((c) => c.country.en))).sort(), [conferences]);
+    const countryOptions = useMemo(() => {
+        const countryMap = new Map<string, { ko: string; en: string }>();
+        conferences.forEach((c) => {
+            if (!countryMap.has(c.country.en)) {
+                countryMap.set(c.country.en, { ko: c.country.ko, en: c.country.en });
+            }
+        });
+        const locale = lang === 'ko' ? 'ko' : 'en';
+        return Array.from(countryMap.values()).sort((a, b) => a[lang].localeCompare(b[lang], locale));
+    }, [conferences, lang]);
+
+    useEffect(() => {
+        const fetchConferences = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('conferences')
+                    .select('id, series, name_ko, name_en, start_date, end_date, city_ko, city_en, country_ko, country_en, venue, confirmed, url, is_active')
+                    .eq('is_active', true)
+                    .order('start_date', { ascending: true })
+                    .order('end_date', { ascending: true });
+
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    const mapped: ConferenceEvent[] = data.map((item: any) => ({
+                        id: item.id,
+                        series: item.series,
+                        name: {
+                            ko: item.name_ko,
+                            en: item.name_en,
+                        },
+                        startDate: item.start_date,
+                        endDate: item.end_date,
+                        city: {
+                            ko: item.city_ko,
+                            en: item.city_en,
+                        },
+                        country: {
+                            ko: item.country_ko,
+                            en: item.country_en,
+                        },
+                        venue: item.venue,
+                        confirmed: Boolean(item.confirmed),
+                        url: item.url,
+                    }));
+                    setConferences(mapped);
+                }
+            } catch (fetchError) {
+                console.error('Failed to fetch conferences from Supabase:', fetchError);
+            }
+        };
+
+        fetchConferences();
+    }, []);
 
     // Filtered conferences
     const filteredConferences = useMemo(() => {
-        let result = CONFERENCES;
-        if (seriesFilter !== 'ALL') {
-            result = result.filter((c) => c.series === seriesFilter);
+        let result = conferences;
+        if (selectedSeries.length > 0) {
+            result = result.filter((c) => selectedSeries.includes(c.series));
         }
-        if (countryFilter !== 'ALL') {
-            result = result.filter((c) => c.country[lang] === countryFilter);
+        if (selectedCountriesEn.length > 0) {
+            result = result.filter((c) => selectedCountriesEn.includes(c.country.en));
         }
         return result;
-    }, [seriesFilter, countryFilter, lang]);
+    }, [conferences, selectedSeries, selectedCountriesEn]);
 
     const upcomingEvents = useMemo(() => {
         const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -675,11 +936,11 @@ export default function ConferencesPage() {
                             <div className="flex flex-wrap items-center gap-2 pt-1">
                                 <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/30 text-cyan-100 text-[10px] font-semibold backdrop-blur-sm flex items-center gap-1">
                                     <CalendarIcon className="w-3 h-3" />
-                                    {CONFERENCES.length} Events
+                                    {conferences.length} Events
                                 </span>
                                 <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-100 text-[10px] font-semibold backdrop-blur-sm flex items-center gap-1">
                                     <Globe className="w-3 h-3" />
-                                    {ALL_COUNTRIES_EN.length} Countries
+                                    {allCountriesEn.length} Countries
                                 </span>
                             </div>
                         </div>
@@ -821,19 +1082,26 @@ export default function ConferencesPage() {
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 <button
-                                    onClick={() => { setSeriesFilter('ALL'); setSelectedEvent(null); }}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${seriesFilter === 'ALL'
+                                    onClick={() => { setSelectedSeries([]); setSelectedEvent(null); }}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${selectedSeries.length === 0
                                         ? 'bg-slate-800 text-white shadow-md border-transparent'
                                         : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-blue-300'
                                         }`}
                                 >
                                     ALL
                                 </button>
-                                {ALL_SERIES.map((s) => (
+                                {allSeries.map((s) => (
                                     <button
                                         key={s}
-                                        onClick={() => { setSeriesFilter(seriesFilter === s ? 'ALL' : s); setSelectedEvent(null); }}
-                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${seriesFilter === s
+                                        onClick={() => {
+                                            setSelectedSeries((prev) => (
+                                                prev.includes(s)
+                                                    ? prev.filter((item) => item !== s)
+                                                    : [...prev, s]
+                                            ));
+                                            setSelectedEvent(null);
+                                        }}
+                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${selectedSeries.includes(s)
                                             ? 'bg-blue-600 text-white shadow-md border-transparent'
                                             : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-600 hover:border-blue-300 hover:text-blue-600 dark:hover:bg-gray-700'
                                             }`}
@@ -854,27 +1122,34 @@ export default function ConferencesPage() {
                             </div>
                             <div className="flex flex-wrap gap-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
                                 <button
-                                    onClick={() => { setCountryFilter('ALL'); setSelectedEvent(null); }}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${countryFilter === 'ALL'
+                                    onClick={() => { setSelectedCountriesEn([]); setSelectedEvent(null); }}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${selectedCountriesEn.length === 0
                                         ? 'bg-slate-800 text-white shadow-md border-transparent'
                                         : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-blue-300'
                                         }`}
                                 >
                                     {lang === 'ko' ? '전체' : 'All'}
                                 </button>
-                                {countries.map((c) => {
-                                    const isActive = countryFilter === c;
-                                    const cc = getCountryColor(c);
+                                {countryOptions.map((c) => {
+                                    const isActive = selectedCountriesEn.includes(c.en);
+                                    const cc = getCountryColor(c.en);
                                     return (
                                         <button
-                                            key={c}
-                                            onClick={() => { setCountryFilter(isActive ? 'ALL' : c); setSelectedEvent(null); }}
+                                            key={c.en}
+                                            onClick={() => {
+                                                setSelectedCountriesEn((prev) => (
+                                                    prev.includes(c.en)
+                                                        ? prev.filter((item) => item !== c.en)
+                                                        : [...prev, c.en]
+                                                ));
+                                                setSelectedEvent(null);
+                                            }}
                                             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border ${isActive
                                                 ? 'bg-blue-600 text-white shadow-md border-transparent'
                                                 : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-600 hover:border-blue-300 hover:text-blue-600 hover:scale-[1.02] dark:hover:bg-gray-700'
                                                 }`}
                                         >
-                                            <FlagIcon country={c} size={14} /> {c}
+                                            <FlagIcon country={c.en} size={14} /> {c[lang]}
                                         </button>
                                     );
                                 })}
