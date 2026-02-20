@@ -122,9 +122,9 @@ export default function AskAiTab() {
     const hasContext = contextReady && sources.length > 0;
 
     return (
-        <div className="flex flex-col lg:flex-row gap-6 items-start">
-            {/* Left: Context Builder */}
-            <div className="w-full lg:w-[380px] shrink-0 space-y-4">
+        <div className="flex flex-col lg:flex-row gap-6 items-start lg:h-[calc(100vh-180px)]">
+            {/* Left: Context Builder - Scrollable on desktop */}
+            <div className="w-full lg:w-[380px] shrink-0 space-y-4 lg:h-full lg:overflow-y-auto lg:pr-2 custom-scrollbar">
                 {/* Paper Selector */}
                 <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
                     <button
@@ -261,8 +261,8 @@ export default function AskAiTab() {
                 )}
             </div>
 
-            {/* Right: Chat Panel */}
-            <div className="flex-1 min-w-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden" style={{ minHeight: '600px' }}>
+            {/* Right: Chat Panel - Fixed height on desktop */}
+            <div className="flex-1 w-full lg:min-w-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden lg:h-full flex flex-col min-h-[600px] lg:min-h-0">
                 <ChatPanel sessionId={sessionId} hasContext={hasContext} />
             </div>
         </div>

@@ -76,7 +76,8 @@ ${contextStr || 'No context sources available. Please inform the user to add pap
 ${sourceRefs.map(s => `[Source ${s.index}] ${s.title}${s.journal ? ` (${s.journal})` : ''}`).join('\n')}`;
 
         // 7. Stream response from Gemini
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        // 7. Stream response from Gemini
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
         const chat = model.startChat({
             history: chatHistory,
             generationConfig: {

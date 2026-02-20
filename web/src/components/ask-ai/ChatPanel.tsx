@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Loader2, Bot, User, AlertCircle } from "lucide-react";
+import { Send, Loader2, Bot, User, AlertCircle, RefreshCw } from "lucide-react";
 import { useLanguage } from "@/components/LanguageContext";
 
 interface Message {
@@ -15,6 +15,7 @@ interface Message {
         journal?: string;
         link?: string;
     }>;
+    isError?: boolean;
 }
 
 interface ChatPanelProps {
@@ -30,12 +31,16 @@ export default function ChatPanel({ sessionId, hasContext }: ChatPanelProps) {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
-    useEffect(() => {
+    // Auto-scroll to bottom
+    const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
+    };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages, isStreaming]);
+
+    const handleSubmit = async () => {
         if (!input.trim() || !sessionId || isStreaming) return;
 
         const userMessage: Message = {
@@ -53,6 +58,11 @@ export default function ChatPanel({ sessionId, hasContext }: ChatPanelProps) {
         setMessages(prev => [...prev, userMessage, assistantMessage]);
         setInput("");
         setIsStreaming(true);
+
+        // Reset height
+        if (inputRef.current) {
+            inputRef.current.style.height = 'auto';
+        }
 
         try {
             const history = messages.map(m => ({ role: m.role, content: m.content }));
@@ -94,7 +104,7 @@ export default function ChatPanel({ sessionId, hasContext }: ChatPanelProps) {
                         if (data.error) {
                             setMessages(prev =>
                                 prev.map(m => m.id === assistantMessage.id
-                                    ? { ...m, content: `Error: ${data.error}` }
+                                    ? { ...m, content: data.error, isError: true }
                                     : m
                                 )
                             );
@@ -126,7 +136,7 @@ export default function ChatPanel({ sessionId, hasContext }: ChatPanelProps) {
         } catch (err: any) {
             setMessages(prev =>
                 prev.map(m => m.id === assistantMessage.id
-                    ? { ...m, content: `Error: ${err.message}` }
+                    ? { ...m, content: err.message, isError: true }
                     : m
                 )
             );
@@ -138,7 +148,7 @@ export default function ChatPanel({ sessionId, hasContext }: ChatPanelProps) {
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            handleSubmit(e);
+            handleSubmit();
         }
     };
 
@@ -146,6 +156,7 @@ export default function ChatPanel({ sessionId, hasContext }: ChatPanelProps) {
     const renderContent = (content: string, sources?: Message['sources']) => {
         if (!sources || sources.length === 0) return content;
 
+        // Split by source citation pattern [Source N]
         const parts = content.split(/(\[Source \d+\])/g);
         return parts.map((part, i) => {
             const match = part.match(/\[Source (\d+)\]/);
@@ -156,11 +167,11 @@ export default function ChatPanel({ sessionId, hasContext }: ChatPanelProps) {
                     return (
                         <span
                             key={i}
-                            className="inline-flex items-center gap-0.5 px-1 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-semibold cursor-pointer hover:bg-blue-200 dark:hover:bg-blue-800/40 transition-colors"
+                            className="inline-flex items-center gap-0.5 px-1.5 py-0.5 mx-0.5 rounded-md bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-[10px] font-bold cursor-pointer hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors align-middle"
                             title={`${source.title}${source.journal ? ` (${source.journal})` : ''}`}
                             onClick={() => source.link && window.open(source.link, '_blank')}
                         >
-                            [{idx}]
+                            {idx}
                         </span>
                     );
                 }
@@ -170,19 +181,21 @@ export default function ChatPanel({ sessionId, hasContext }: ChatPanelProps) {
     };
 
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-950/50">
             {/* Messages area */}
-            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 space-y-6 scroll-smooth">
                 {messages.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-full text-center py-12">
-                        <Bot className="w-12 h-12 text-gray-300 dark:text-gray-600 mb-3" />
-                        <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-1">
-                            {t('ask_ai_title') || 'Ask AI'}
+                    <div className="flex flex-col items-center justify-center h-full text-center p-8 opacity-80">
+                        <div className="w-16 h-16 bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-center mb-6 animate-pulse-slow">
+                            <Bot className="w-8 h-8 text-blue-500" />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">
+                            {t('ask_ai_title') || 'Ask AI Assistant'}
                         </h3>
-                        <p className="text-sm text-gray-400 max-w-sm">
+                        <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm leading-relaxed">
                             {hasContext
-                                ? (t('ask_ai_ready') || 'Context loaded! Ask me anything about your selected papers and files.')
-                                : (t('ask_ai_no_context') || 'Add papers or upload files first, then ask your questions.')
+                                ? (t('ask_ai_ready') || 'Context loaded! I can answer questions based on your selected papers.')
+                                : (t('ask_ai_no_context') || 'Please add papers or upload files on the left to start analyzing.')
                             }
                         </p>
                     </div>
@@ -190,70 +203,63 @@ export default function ChatPanel({ sessionId, hasContext }: ChatPanelProps) {
                     messages.map((msg) => (
                         <div
                             key={msg.id}
-                            className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                            className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
                             {msg.role === 'assistant' && (
-                                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shrink-0 mt-0.5">
-                                    <Bot className="w-4 h-4 text-white" />
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-1 shadow-sm ${msg.isError ? 'bg-red-100 text-red-500 border border-red-200' : 'bg-white dark:bg-slate-800 text-blue-600 border border-slate-100 dark:border-slate-700'}`}>
+                                    {msg.isError ? <AlertCircle className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
                                 </div>
                             )}
-                            <div className={`max-w-[80%] ${
-                                msg.role === 'user'
-                                    ? 'bg-blue-600 text-white rounded-2xl rounded-tr-md px-4 py-2.5'
-                                    : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-2xl rounded-tl-md px-4 py-2.5'
-                            }`}>
-                                <div className="text-sm leading-relaxed whitespace-pre-wrap">
-                                    {msg.role === 'assistant' && msg.content === '' && isStreaming ? (
-                                        <span className="flex items-center gap-1.5 text-gray-400">
-                                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                            {t('ask_ai_thinking') || 'Thinking...'}
-                                        </span>
+
+                            <div className={`relative max-w-[85%] lg:max-w-[75%] space-y-2 group`}>
+                                <div className={`px-5 py-3.5 shadow-sm text-sm leading-relaxed whitespace-pre-wrap ${msg.role === 'user'
+                                        ? 'bg-blue-600 text-white rounded-2xl rounded-tr-sm'
+                                        : msg.isError
+                                            ? 'bg-red-50 dark:bg-red-900/10 text-red-800 dark:text-red-200 border border-red-100 dark:border-red-900/30 rounded-2xl rounded-tl-sm'
+                                            : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-100 dark:border-slate-700 rounded-2xl rounded-tl-sm'
+                                    }`}>
+                                    {msg.role === 'assistant' && !msg.content && isStreaming ? (
+                                        <div className="flex items-center gap-2 py-1">
+                                            <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                                            <span className="text-slate-400 text-xs font-medium">Analyzing papers...</span>
+                                        </div>
                                     ) : (
                                         renderContent(msg.content, msg.sources)
                                     )}
                                 </div>
 
-                                {/* Source references */}
+                                {/* Source references block */}
                                 {msg.sources && msg.sources.length > 0 && (
-                                    <div className="mt-3 pt-2.5 border-t border-gray-200 dark:border-gray-700">
-                                        <p className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
-                                            References
+                                    <div className="ml-2 bg-slate-100 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-700/50">
+                                        <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                                            <span className="w-1 h-1 rounded-full bg-slate-400"></span>
+                                            Cited Sources
                                         </p>
-                                        <div className="space-y-1">
+                                        <div className="grid gap-1.5">
                                             {msg.sources.map(s => (
-                                                <div
+                                                <a
                                                     key={s.index}
-                                                    className="flex items-start gap-1.5 text-xs"
+                                                    href={s.link || '#'}
+                                                    target={s.link ? "_blank" : undefined}
+                                                    rel="noopener noreferrer"
+                                                    className="flex items-start gap-2 p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 transition-colors group/link"
                                                 >
-                                                    <span className="text-blue-600 dark:text-blue-400 font-bold shrink-0">
-                                                        [{s.index}]
+                                                    <span className="flex items-center justify-center w-4 h-4 rounded text-[9px] font-bold bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5">
+                                                        {s.index}
                                                     </span>
-                                                    <span className="text-gray-600 dark:text-gray-400">
-                                                        {s.link ? (
-                                                            <a
-                                                                href={s.link}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="hover:text-blue-600 dark:hover:text-blue-400 hover:underline"
-                                                            >
-                                                                {s.title}
-                                                            </a>
-                                                        ) : (
-                                                            s.title
-                                                        )}
-                                                        {s.journal && (
-                                                            <span className="text-gray-400"> — {s.journal}</span>
-                                                        )}
+                                                    <span className="text-xs text-slate-600 dark:text-slate-300 line-clamp-1 group-hover/link:text-blue-600 dark:group-hover/link:text-blue-400 transition-colors">
+                                                        {s.title}
                                                     </span>
-                                                </div>
+                                                </a>
                                             ))}
                                         </div>
                                     </div>
                                 )}
                             </div>
+
                             {msg.role === 'user' && (
-                                <div className="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center shrink-0 mt-0.5">
-                                    <User className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                                <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center shrink-0 mt-1">
+                                    <User className="w-5 h-5 text-slate-500 dark:text-slate-300" />
                                 </div>
                             )}
                         </div>
@@ -263,44 +269,56 @@ export default function ChatPanel({ sessionId, hasContext }: ChatPanelProps) {
             </div>
 
             {/* Input area */}
-            <div className="border-t border-gray-200 dark:border-gray-700 p-3">
-                {!hasContext && (
-                    <div className="flex items-center gap-2 mb-2 px-2 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
-                        <AlertCircle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                        <span className="text-xs text-amber-600 dark:text-amber-400">
-                            {t('ask_ai_add_context') || 'Add papers or files to enable AI chat'}
-                        </span>
+            <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
+                <div className={`relative flex flex-col gap-2 transition-all duration-300 ${!hasContext ? 'opacity-60 grayscale-[0.5]' : ''}`}>
+                    {/* Status bar inside input area */}
+                    {!hasContext && (
+                        <div className="absolute -top-10 left-0 right-0 flex justify-center animate-bounce-slow pointer-events-none">
+                            <span className="bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-xs px-3 py-1 rounded-full border border-amber-200 dark:border-amber-800 shadow-sm font-medium flex items-center gap-1.5 backdrop-blur-sm">
+                                <AlertCircle className="w-3 h-3" />
+                                Add papers to start chat
+                            </span>
+                        </div>
+                    )}
+
+                    <div className="relative">
+                        <textarea
+                            ref={inputRef}
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            disabled={!sessionId || isStreaming || !hasContext}
+                            placeholder={hasContext ? (t('ask_ai_placeholder') || 'Ask a question about the papers...') : 'Waiting for papers...'}
+                            rows={1}
+                            className="w-full pl-5 pr-14 py-3.5 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 focus:bg-white dark:focus:bg-slate-900 transition-all shadow-sm resize-none disabled:cursor-not-allowed"
+                            style={{ minHeight: '52px', maxHeight: '160px' }}
+                            onInput={(e) => {
+                                const el = e.target as HTMLTextAreaElement;
+                                el.style.height = 'auto';
+                                el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+                            }}
+                        />
+                        <button
+                            onClick={handleSubmit}
+                            disabled={!input.trim() || !sessionId || isStreaming || !hasContext}
+                            className={`absolute right-2 bottom-2 p-2 rounded-xl flex items-center justify-center transition-all duration-200 ${input.trim() && !isStreaming
+                                    ? 'bg-blue-600 text-white shadow-md hover:bg-blue-700 hover:scale-105 active:scale-95'
+                                    : 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed'
+                                }`}
+                        >
+                            {isStreaming ? (
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                            ) : (
+                                <Send className="w-5 h-5 ml-0.5" />
+                            )}
+                        </button>
                     </div>
-                )}
-                <form onSubmit={handleSubmit} className="flex items-end gap-2">
-                    <textarea
-                        ref={inputRef}
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        disabled={!sessionId || isStreaming}
-                        placeholder={t('ask_ai_placeholder') || 'Ask a question about your papers...'}
-                        rows={1}
-                        className="flex-1 resize-none bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 disabled:opacity-50 max-h-32"
-                        style={{ minHeight: '42px' }}
-                        onInput={(e) => {
-                            const el = e.target as HTMLTextAreaElement;
-                            el.style.height = 'auto';
-                            el.style.height = Math.min(el.scrollHeight, 128) + 'px';
-                        }}
-                    />
-                    <button
-                        type="submit"
-                        disabled={!input.trim() || !sessionId || isStreaming}
-                        className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
-                    >
-                        {isStreaming ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                            <Send className="w-4 h-4" />
-                        )}
-                    </button>
-                </form>
+                </div>
+                <div className="text-center mt-2">
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500">
+                        AI can make mistakes. Please verify important information.
+                    </p>
+                </div>
             </div>
         </div>
     );
