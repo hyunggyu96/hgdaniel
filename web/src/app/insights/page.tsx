@@ -41,33 +41,7 @@ export default function InsightsPage() {
     const { userId } = useUser();
     const [activeTab, setActiveTab] = useState<'search' | 'ask-ai'>('search');
 
-    if (!userId) {
-        return (
-            <main className="min-h-screen bg-gray-50/50 dark:bg-gray-950 p-6 md:p-12 flex items-center justify-center transition-colors duration-300">
-                <div className="flex flex-col items-center justify-center max-w-md w-full p-8 bg-white dark:bg-gray-900 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-800 text-center space-y-6 animate-fade-in-up">
-                    <div className="w-20 h-20 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center animate-pulse-slow">
-                        <Lock className="w-8 h-8 text-blue-500" />
-                    </div>
-                    <div className="space-y-2">
-                        <h2 className="text-2xl font-black text-gray-900 dark:text-gray-100 tracking-tight">
-                            {t('insights_login_required') || 'Login Required'}
-                        </h2>
-                        <p className="text-gray-500 dark:text-gray-400 leading-relaxed text-sm">
-                            {t('insights_login_desc') || 'Access to advanced AI insights and research tools is restricted to registered members.'}
-                        </p>
-                    </div>
 
-                    <div className="w-full pt-2 flex justify-center transform scale-110">
-                        <LoginButton />
-                    </div>
-
-                    <div className="text-xs text-gray-400 pt-4 border-t border-gray-100 dark:border-gray-800 w-full uppercase tracking-wider font-semibold">
-                        Secure Access • Aesthetic Intelligence
-                    </div>
-                </div>
-            </main>
-        );
-    }
     const [papers, setPapers] = useState<Paper[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
