@@ -15,8 +15,19 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'message required' }, { status: 400 });
         }
 
-        // 1. Search similar chunks
-        const chunks = await searchSimilarChunks(session_id, message, 10);
+        if (!process.env.GEMINI_API_KEY) {
+            console.error('GEMINI_API_KEY is missing');
+            return NextResponse.json({ error: 'Server configuration error: Missing API Key' }, { status: 500 });
+        }
+
+        // 1. Search similar chunks (with error handling)
+        let chunks: any[] = [];
+        try {
+            chunks = await searchSimilarChunks(session_id, message, 10);
+        } catch (searchError) {
+            console.warn('RAG search failed, continuing without context:', searchError);
+            // Don't fail the request, just proceed with empty chunks
+        }
 
         // 2. Get source metadata
         const sources = await getSourcesForSession(session_id);
