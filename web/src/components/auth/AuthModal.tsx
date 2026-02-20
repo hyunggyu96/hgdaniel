@@ -38,6 +38,18 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
         };
     }, [isOpen, mounted]);
 
+    useEffect(() => {
+        if (!isOpen || !mounted) return;
+
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') onClose();
+        };
+        window.addEventListener('keydown', onKeyDown);
+        return () => {
+            window.removeEventListener('keydown', onKeyDown);
+        };
+    }, [isOpen, mounted, onClose]);
+
     const currentQuery = searchParams?.toString();
     const currentPath = `${pathname || '/'}${currentQuery ? `?${currentQuery}` : ''}`;
     const next = encodeURIComponent(currentPath);
@@ -47,7 +59,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
     return createPortal((
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed left-0 top-0 z-[1300] h-[100dvh] w-screen flex items-center justify-center p-4 pointer-events-none">
+                <div className="fixed inset-0 z-[1300] flex items-center justify-center p-4 pointer-events-none">
                     <motion.button
                         type="button"
                         initial={{ opacity: 0 }}
@@ -55,7 +67,13 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
                         exit={{ opacity: 0 }}
                         aria-label="Close auth modal"
                         onClick={onClose}
-                        className="absolute inset-0 bg-black/70 backdrop-blur-md pointer-events-auto"
+                        className="fixed pointer-events-auto bg-black/70 backdrop-blur-md"
+                        style={{
+                            left: '-50vw',
+                            top: '-50dvh',
+                            width: '200vw',
+                            height: '200dvh',
+                        }}
                     />
 
                     <motion.div
