@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Loader2, Bot, User, AlertCircle, RefreshCw, Copy, Download, X, FileText, Paperclip } from "lucide-react";
+import { Send, Loader2, Bot, User, AlertCircle, RefreshCw, Copy, Download, X, FileText, Paperclip, Sparkles } from "lucide-react";
 import { useLanguage } from "@/components/LanguageContext";
 import { toast } from "sonner";
 
@@ -46,8 +46,9 @@ export default function ChatPanel({
     selectedPapers = [],
     uploadedFiles = [],
     onRemovePaper,
-    onRemoveFile
-}: ChatPanelProps) {
+    onRemoveFile,
+    onEmbed
+}: ChatPanelProps & { onEmbed?: () => void }) {
     const { t } = useLanguage();
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
@@ -55,6 +56,8 @@ export default function ChatPanel({
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
+
+    const hasSelectedItems = selectedPapers.length > 0 || uploadedFiles.length > 0;
 
     // Auto-scroll to bottom
     const scrollToBottom = () => {
@@ -69,6 +72,20 @@ export default function ChatPanel({
 
     const handleSubmit = async () => {
         if (!input.trim() || !sessionId || isStreaming) return;
+
+        // Auto-embed if context is not ready but items are selected
+        if (!hasContext && hasSelectedItems && onEmbed) {
+            setIsStreaming(true);
+            try {
+                await onEmbed();
+            } catch (error) {
+                console.error("Embedding failed:", error);
+                toast.error("Failed to analyze papers. Please try again.");
+                setIsStreaming(false);
+                return;
+            }
+            // Continue to chat logic...
+        }
 
         const userMessage: Message = {
             id: `user-${Date.now()}`,
@@ -272,12 +289,24 @@ export default function ChatPanel({
                         <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">
                             {t('ask_ai_title') || 'Ask AI Assistant'}
                         </h3>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm leading-relaxed">
+                        <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm leading-relaxed mb-6">
                             {hasContext
                                 ? (t('ask_ai_ready') || 'Context loaded! I can answer questions based on your selected papers.')
-                                : (t('ask_ai_no_context') || 'Please add papers or upload files on the left to start analyzing.')
+                                : hasSelectedItems
+                                    ? 'Papers selected. Click "Start Analysis" to process them.'
+                                    : (t('ask_ai_no_context') || 'Please add papers or upload files on the left to start analyzing.')
                             }
                         </p>
+
+                        {!hasContext && hasSelectedItems && onEmbed && (
+                            <button
+                                onClick={onEmbed}
+                                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-all shadow-md hover:scale-105 active:scale-95 flex items-center gap-2"
+                            >
+                                <Sparkles className="w-4 h-4" />
+                                Start Analysis
+                            </button>
+                        )}
                     </div>
                 ) : (
                     <>
@@ -372,8 +401,21 @@ export default function ChatPanel({
             <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
                 <div className={`relative flex flex-col gap-2 transition-all duration-300 ${!hasContext ? 'opacity-60 grayscale-[0.5]' : ''}`}>
                     {/* Status bar inside input area */}
-                    {!hasContext && (
-                        <div className="absolute -top-10 left-0 right-0 flex justify-center animate-bounce-slow pointer-events-none">
+                    {/* Status bar inside input area */}
+                    {!hasContext && hasSelectedItems && (
+                        <div className="absolute -top-12 left-0 right-0 flex justify-center pointer-events-none z-10">
+                            <button
+                                onClick={onEmbed}
+                                className="pointer-events-auto bg-blue-600 hover:bg-blue-700 text-white text-xs px-4 py-1.5 rounded-full shadow-lg font-bold flex items-center gap-1.5 transition-all animate-bounce-slow"
+                            >
+                                <Sparkles className="w-3 h-3" />
+                                Click here to Start Analysis
+                            </button>
+                        </div>
+                    )}
+
+                    {!hasContext && !hasSelectedItems && (
+                        <div className="absolute -top-10 left-0 right-0 flex justify-center pointer-events-none">
                             <span className="bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-xs px-3 py-1 rounded-full border border-amber-200 dark:border-amber-800 shadow-sm font-medium flex items-center gap-1.5 backdrop-blur-sm">
                                 <AlertCircle className="w-3 h-3" />
                                 Add papers to start chat
@@ -387,8 +429,8 @@ export default function ChatPanel({
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={handleKeyDown}
-                            disabled={!sessionId || isStreaming || !hasContext}
-                            placeholder={hasContext ? (t('ask_ai_placeholder') || 'Ask a question about the papers...') : 'Waiting for papers...'}
+                            disabled={!sessionId || isStreaming || (!hasContext && !hasSelectedItems)}
+                            placeholder={hasContext ? (t('ask_ai_placeholder') || 'Ask a question about the papers...') : hasSelectedItems ? 'Type a question to start analyzing...' : 'Waiting for papers...'}
                             rows={1}
                             className="w-full pl-5 pr-14 py-3.5 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 focus:bg-white dark:focus:bg-slate-900 transition-all shadow-sm resize-none disabled:cursor-not-allowed"
                             style={{ minHeight: '52px', maxHeight: '160px' }}
@@ -400,7 +442,7 @@ export default function ChatPanel({
                         />
                         <button
                             onClick={handleSubmit}
-                            disabled={!input.trim() || !sessionId || isStreaming || !hasContext}
+                            disabled={!input.trim() || !sessionId || isStreaming || (!hasContext && !hasSelectedItems)}
                             className={`absolute right-2 bottom-2 p-2 rounded-xl flex items-center justify-center transition-all duration-200 ${input.trim() && !isStreaming
                                 ? 'bg-blue-600 text-white shadow-md hover:bg-blue-700 hover:scale-105 active:scale-95'
                                 : 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed'

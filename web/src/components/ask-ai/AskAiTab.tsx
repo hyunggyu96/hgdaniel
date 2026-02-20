@@ -145,7 +145,7 @@ export default function AskAiTab() {
     const hasContext = contextReady && sources.length > 0;
 
     return (
-        <div className="flex flex-col lg:flex-row gap-6 items-start h-[calc(100vh-140px)] lg:h-[calc(100vh-180px)]">
+        <div className="flex flex-col lg:flex-row gap-6 items-start h-[calc(100vh-120px)] lg:h-[calc(100vh-140px)] min-h-[800px]">
             {/* Left: Context Builder - Scrollable on desktop */}
             <div className="w-full lg:w-[380px] shrink-0 space-y-4 lg:h-full lg:overflow-y-auto lg:pr-2 custom-scrollbar">
                 {/* Paper Selector */}
@@ -362,6 +362,7 @@ export default function AskAiTab() {
                     uploadedFiles={uploadedFiles}
                     onRemovePaper={(id) => setSelectedPapers(prev => prev.filter(p => p.id !== id))}
                     onRemoveFile={(id) => setUploadedFiles(prev => prev.filter(f => f.id !== id))}
+                    onEmbed={handleEmbedPapers}
                 />
             </div>
         </div>
