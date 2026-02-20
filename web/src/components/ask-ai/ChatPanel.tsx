@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Loader2, Bot, User, AlertCircle, RefreshCw } from "lucide-react";
+import { Send, Loader2, Bot, User, AlertCircle, RefreshCw, Copy, Download } from "lucide-react";
 import { useLanguage } from "@/components/LanguageContext";
+import { toast } from "sonner";
 
 interface Message {
     id: string;
@@ -158,6 +159,26 @@ export default function ChatPanel({ sessionId, hasContext }: ChatPanelProps) {
         }
     };
 
+    const handleCopyChat = () => {
+        const text = messages.map(m => `[${m.role.toUpperCase()}]\n${m.content}`).join('\n\n');
+        navigator.clipboard.writeText(text);
+        toast.success("Chat copied to clipboard");
+    };
+
+    const handleExportChat = () => {
+        const text = messages.map(m => `[${m.role.toUpperCase()}]\n${m.content}`).join('\n\n');
+        const blob = new Blob([text], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `chat-export-${new Date().toISOString().slice(0, 10)}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        toast.success("Chat exported as text file");
+    };
+
     // Render source citations as clickable links
     const renderContent = (content: string, sources?: Message['sources']) => {
         if (!sources || sources.length === 0) return content;
@@ -206,70 +227,90 @@ export default function ChatPanel({ sessionId, hasContext }: ChatPanelProps) {
                         </p>
                     </div>
                 ) : (
-                    messages.map((msg) => (
-                        <div
-                            key={msg.id}
-                            className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                        >
-                            {msg.role === 'assistant' && (
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-1 shadow-sm ${msg.isError ? 'bg-red-100 text-red-500 border border-red-200' : 'bg-white dark:bg-slate-800 text-blue-600 border border-slate-100 dark:border-slate-700'}`}>
-                                    {msg.isError ? <AlertCircle className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
-                                </div>
-                            )}
+                    <>
+                        <div className="flex justify-end gap-2 mb-4 px-2">
+                            <button
+                                onClick={handleCopyChat}
+                                className="text-xs flex items-center gap-1 text-slate-400 hover:text-blue-500 transition-colors"
+                                title="Copy full conversation"
+                            >
+                                <Copy className="w-3.5 h-3.5" />
+                                Copy
+                            </button>
+                            <button
+                                onClick={handleExportChat}
+                                className="text-xs flex items-center gap-1 text-slate-400 hover:text-blue-500 transition-colors"
+                                title="Export as text file"
+                            >
+                                <Download className="w-3.5 h-3.5" />
+                                Export
+                            </button>
+                        </div>
+                        {messages.map((msg) => (
+                            <div
+                                key={msg.id}
+                                className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                            >
+                                {msg.role === 'assistant' && (
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-1 shadow-sm ${msg.isError ? 'bg-red-100 text-red-500 border border-red-200' : 'bg-white dark:bg-slate-800 text-blue-600 border border-slate-100 dark:border-slate-700'}`}>
+                                        {msg.isError ? <AlertCircle className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
+                                    </div>
+                                )}
 
-                            <div className={`relative max-w-[85%] lg:max-w-[75%] space-y-2 group`}>
-                                <div className={`px-5 py-3.5 shadow-sm text-sm leading-relaxed whitespace-pre-wrap ${msg.role === 'user'
-                                    ? 'bg-blue-600 text-white rounded-2xl rounded-tr-sm'
-                                    : msg.isError
-                                        ? 'bg-red-50 dark:bg-red-900/10 text-red-800 dark:text-red-200 border border-red-100 dark:border-red-900/30 rounded-2xl rounded-tl-sm'
-                                        : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-100 dark:border-slate-700 rounded-2xl rounded-tl-sm'
-                                    }`}>
-                                    {msg.role === 'assistant' && !msg.content && isStreaming ? (
-                                        <div className="flex items-center gap-2 py-1">
-                                            <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
-                                            <span className="text-slate-400 text-xs font-medium">Analyzing papers...</span>
+                                <div className={`relative max-w-[85%] lg:max-w-[75%] space-y-2 group`}>
+                                    <div className={`px-5 py-3.5 shadow-sm text-sm leading-relaxed whitespace-pre-wrap ${msg.role === 'user'
+                                        ? 'bg-blue-600 text-white rounded-2xl rounded-tr-sm'
+                                        : msg.isError
+                                            ? 'bg-red-50 dark:bg-red-900/10 text-red-800 dark:text-red-200 border border-red-100 dark:border-red-900/30 rounded-2xl rounded-tl-sm'
+                                            : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-100 dark:border-slate-700 rounded-2xl rounded-tl-sm'
+                                        }`}>
+                                        {msg.role === 'assistant' && !msg.content && isStreaming ? (
+                                            <div className="flex items-center gap-2 py-1">
+                                                <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                                                <span className="text-slate-400 text-xs font-medium">Analyzing papers...</span>
+                                            </div>
+                                        ) : (
+                                            renderContent(msg.content, msg.sources)
+                                        )}
+                                    </div>
+
+                                    {/* Source references block */}
+                                    {msg.sources && msg.sources.length > 0 && (
+                                        <div className="ml-2 bg-slate-100 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-700/50">
+                                            <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                                                <span className="w-1 h-1 rounded-full bg-slate-400"></span>
+                                                Cited Sources
+                                            </p>
+                                            <div className="grid gap-1.5">
+                                                {msg.sources.map(s => (
+                                                    <a
+                                                        key={s.index}
+                                                        href={s.link || '#'}
+                                                        target={s.link ? "_blank" : undefined}
+                                                        rel="noopener noreferrer"
+                                                        className="flex items-start gap-2 p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 transition-colors group/link"
+                                                    >
+                                                        <span className="flex items-center justify-center w-4 h-4 rounded text-[9px] font-bold bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5">
+                                                            {s.index}
+                                                        </span>
+                                                        <span className="text-xs text-slate-600 dark:text-slate-300 line-clamp-1 group-hover/link:text-blue-600 dark:group-hover/link:text-blue-400 transition-colors">
+                                                            {s.title}
+                                                        </span>
+                                                    </a>
+                                                ))}
+                                            </div>
                                         </div>
-                                    ) : (
-                                        renderContent(msg.content, msg.sources)
                                     )}
                                 </div>
 
-                                {/* Source references block */}
-                                {msg.sources && msg.sources.length > 0 && (
-                                    <div className="ml-2 bg-slate-100 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200 dark:border-slate-700/50">
-                                        <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                                            <span className="w-1 h-1 rounded-full bg-slate-400"></span>
-                                            Cited Sources
-                                        </p>
-                                        <div className="grid gap-1.5">
-                                            {msg.sources.map(s => (
-                                                <a
-                                                    key={s.index}
-                                                    href={s.link || '#'}
-                                                    target={s.link ? "_blank" : undefined}
-                                                    rel="noopener noreferrer"
-                                                    className="flex items-start gap-2 p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 transition-colors group/link"
-                                                >
-                                                    <span className="flex items-center justify-center w-4 h-4 rounded text-[9px] font-bold bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5">
-                                                        {s.index}
-                                                    </span>
-                                                    <span className="text-xs text-slate-600 dark:text-slate-300 line-clamp-1 group-hover/link:text-blue-600 dark:group-hover/link:text-blue-400 transition-colors">
-                                                        {s.title}
-                                                    </span>
-                                                </a>
-                                            ))}
-                                        </div>
+                                {msg.role === 'user' && (
+                                    <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center shrink-0 mt-1">
+                                        <User className="w-5 h-5 text-slate-500 dark:text-slate-300" />
                                     </div>
                                 )}
                             </div>
-
-                            {msg.role === 'user' && (
-                                <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center shrink-0 mt-1">
-                                    <User className="w-5 h-5 text-slate-500 dark:text-slate-300" />
-                                </div>
-                            )}
-                        </div>
-                    ))
+                        ))}
+                    </>
                 )}
                 <div ref={messagesEndRef} />
             </div>

@@ -2,11 +2,12 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Text } from "@tremor/react";
-import { SearchIcon, BookOpen, Calendar, Users, ArrowUpRight, Filter, GraduationCap, Bot, Lock } from "lucide-react";
+import { SearchIcon, BookOpen, Calendar, Users, ArrowUpRight, Filter, GraduationCap, Bot, Lock, Bookmark } from "lucide-react";
 import { useLanguage } from "@/components/LanguageContext";
 import AskAiTab from "@/components/ask-ai/AskAiTab";
 import { useUser } from "@/components/UserContext";
 import LoginButton from "@/components/LoginButton";
+import { toast } from "sonner";
 
 interface Paper {
     id: string;
@@ -17,6 +18,7 @@ interface Paper {
     journal: string;
     link: string;
     keywords: string[];
+    isBookmarked?: boolean;
 }
 
 const KEYWORDS = [
@@ -75,6 +77,45 @@ export default function InsightsPage() {
     const [totalPages, setTotalPages] = useState(1);
     const [totalCount, setTotalCount] = useState(0);
 
+    // Bookmarking Logic
+    useEffect(() => {
+        if (!userId) return;
+        const stored = localStorage.getItem(`hg_bookmarks_${userId}`);
+        if (stored) {
+            try {
+                // Ensure synchronization if papers are already loaded
+                // But normally we sync when rendering or setting papers
+            } catch (e) {
+                console.error("Failed to parse bookmarks", e);
+            }
+        }
+    }, [userId]);
+
+    const toggleBookmark = (paper: Paper) => {
+        if (!userId) return;
+
+        const storageKey = `hg_bookmarks_${userId}`;
+        const stored = localStorage.getItem(storageKey);
+        let bookmarks: Paper[] = stored ? JSON.parse(stored) : [];
+
+        const exists = bookmarks.find(b => b.id === paper.id);
+
+        if (exists) {
+            bookmarks = bookmarks.filter(b => b.id !== paper.id);
+            toast.info("Removed from bookmarks");
+        } else {
+            bookmarks.push({ ...paper, isBookmarked: true });
+            toast.success("Saved to your bookmarks");
+        }
+
+        localStorage.setItem(storageKey, JSON.stringify(bookmarks));
+
+        // Update local state to reflect UI change immediately
+        setPapers(prev => prev.map(p =>
+            p.id === paper.id ? { ...p, isBookmarked: !exists } : p
+        ));
+    };
+
     const fetchPapers = useCallback(async (targetPage: number) => {
         setLoading(true);
         setError(null);
@@ -92,7 +133,20 @@ export default function InsightsPage() {
 
             if (result.error) throw new Error(result.error);
 
-            setPapers(result.data || []);
+            // Sync with bookmarks
+            let fetchedPapers: Paper[] = result.data || [];
+            if (userId) {
+                const stored = localStorage.getItem(`hg_bookmarks_${userId}`);
+                if (stored) {
+                    const bookmarks: Paper[] = JSON.parse(stored);
+                    fetchedPapers = fetchedPapers.map(p => ({
+                        ...p,
+                        isBookmarked: bookmarks.some(b => b.id === p.id)
+                    }));
+                }
+            }
+
+            setPapers(fetchedPapers);
             setTotalPages(result.pagination?.totalPages || 1);
             setTotalCount(result.pagination?.total || 0);
         } catch (err) {
@@ -279,12 +333,24 @@ export default function InsightsPage() {
 
                             {/* Results List */}
                             {loading ? (
-                                <div className="flex flex-col items-center justify-center py-32 opacity-70">
-                                    <div className="relative w-16 h-16">
-                                        <div className="absolute inset-0 border-4 border-gray-100 rounded-full"></div>
-                                        <div className="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
-                                    </div>
-                                    <Text className="mt-4 text-gray-500 font-medium animate-pulse">{t('insights_loading')}</Text>
+                                <div className="space-y-4">
+                                    {[1, 2, 3, 4, 5].map((i) => (
+                                        <div key={i} className="bg-white dark:bg-gray-900 rounded-xl p-5 border border-gray-100 dark:border-gray-800 shadow-sm animate-pulse">
+                                            <div className="flex gap-4">
+                                                <div className="flex-1 space-y-3">
+                                                    <div className="flex gap-2">
+                                                        <div className="h-4 w-20 bg-gray-200 dark:bg-gray-800 rounded"></div>
+                                                        <div className="h-4 w-16 bg-gray-200 dark:bg-gray-800 rounded"></div>
+                                                    </div>
+                                                    <div className="h-6 w-3/4 bg-gray-200 dark:bg-gray-800 rounded"></div>
+                                                    <div className="space-y-2">
+                                                        <div className="h-4 w-full bg-gray-200 dark:bg-gray-800 rounded"></div>
+                                                        <div className="h-4 w-5/6 bg-gray-200 dark:bg-gray-800 rounded"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             ) : error ? (
                                 <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-gray-900 rounded-3xl border border-red-100 dark:border-red-900/30 shadow-sm p-8 text-center">
@@ -361,15 +427,32 @@ export default function InsightsPage() {
                                                     </div>
 
                                                     {/* Action Button */}
-                                                    <a
-                                                        href={paper.link}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white transition-all shadow-sm group-hover:scale-105"
-                                                        title="View Original Paper"
-                                                    >
-                                                        <ArrowUpRight className="w-4 h-4" />
-                                                    </a>
+                                                    <div className="flex flex-col gap-2 shrink-0">
+                                                        <a
+                                                            href={paper.link}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white transition-all shadow-sm group-hover:scale-105"
+                                                            title="View Original Paper"
+                                                        >
+                                                            <ArrowUpRight className="w-4 h-4" />
+                                                        </a>
+                                                        {userId && (
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    toggleBookmark(paper);
+                                                                }}
+                                                                className={`flex items-center justify-center w-8 h-8 rounded-full transition-all shadow-sm group-hover:scale-105 ${paper.isBookmarked
+                                                                    ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-500'
+                                                                    : 'bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20'
+                                                                    }`}
+                                                                title={paper.isBookmarked ? "Remove from bookmarks" : "Bookmark this paper"}
+                                                            >
+                                                                <Bookmark className={`w-4 h-4 ${paper.isBookmarked ? 'fill-current' : ''}`} />
+                                                            </button>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
                                         ))

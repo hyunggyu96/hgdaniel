@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { Bot, BookOpen, Upload, ChevronDown, ChevronUp, Loader2, Sparkles } from "lucide-react";
+import { Bot, BookOpen, Upload, ChevronDown, ChevronUp, Loader2, Sparkles, Bookmark } from "lucide-react";
+import { useUser } from "@/components/UserContext";
 import { useLanguage } from "@/components/LanguageContext";
 import PaperSelector from "./PaperSelector";
 import FileUploader, { type UploadedFile } from "./FileUploader";
@@ -40,8 +41,30 @@ export default function AskAiTab() {
     const [isEmbedding, setIsEmbedding] = useState(false);
     const [contextReady, setContextReady] = useState(false);
     const [showPaperSelector, setShowPaperSelector] = useState(true);
+    const [showSavedPapers, setShowSavedPapers] = useState(false);
     const [showFileUploader, setShowFileUploader] = useState(true);
     const [showSources, setShowSources] = useState(false);
+
+    // Saved papers logic
+    const { userId } = useUser();
+    const [savedPapers, setSavedPapers] = useState<Paper[]>([]);
+
+    useEffect(() => {
+        if (!userId) return;
+        try {
+            const stored = localStorage.getItem(`hg_bookmarks_${userId}`);
+            if (stored) {
+                setSavedPapers(JSON.parse(stored));
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }, [userId, showSavedPapers]); // Refresh when toggling
+
+    const handleAddSavedPaper = (paper: Paper) => {
+        if (selectedPapers.find(p => p.id === paper.id)) return;
+        setSelectedPapers(prev => [...prev, paper]);
+    };
 
     // Create session on mount
     useEffect(() => {
@@ -122,7 +145,7 @@ export default function AskAiTab() {
     const hasContext = contextReady && sources.length > 0;
 
     return (
-        <div className="flex flex-col lg:flex-row gap-6 items-start lg:h-[calc(100vh-180px)]">
+        <div className="flex flex-col lg:flex-row gap-6 items-start h-[calc(100vh-140px)] lg:h-[calc(100vh-180px)]">
             {/* Left: Context Builder - Scrollable on desktop */}
             <div className="w-full lg:w-[380px] shrink-0 space-y-4 lg:h-full lg:overflow-y-auto lg:pr-2 custom-scrollbar">
                 {/* Paper Selector */}
@@ -183,6 +206,75 @@ export default function AskAiTab() {
                         </div>
                     )}
                 </div>
+
+                {/* Saved Papers (My Library) */}
+                {userId && (
+                    <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
+                        <button
+                            onClick={() => setShowSavedPapers(!showSavedPapers)}
+                            className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                        >
+                            <div className="flex items-center gap-2.5">
+                                <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                                    <Bookmark className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                                </div>
+                                <div className="text-left">
+                                    <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                                        {'Saved Papers'}
+                                    </h3>
+                                    <p className="text-[10px] text-gray-400">
+                                        {savedPapers.length > 0 ? `${savedPapers.length} saved items` : 'No saved papers yet'}
+                                    </p>
+                                </div>
+                            </div>
+                            {showSavedPapers ? (
+                                <ChevronUp className="w-4 h-4 text-gray-400" />
+                            ) : (
+                                <ChevronDown className="w-4 h-4 text-gray-400" />
+                            )}
+                        </button>
+
+                        {showSavedPapers && (
+                            <div className="px-5 pb-4 space-y-3">
+                                {savedPapers.length === 0 ? (
+                                    <div className="text-center py-4 text-xs text-gray-400">
+                                        You haven't saved any papers yet.
+                                        <br />
+                                        Go to <b>Paper Search</b> and click the bookmark icon.
+                                    </div>
+                                ) : (
+                                    <div className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
+                                        {savedPapers.map(paper => {
+                                            const isSelected = selectedPapers.some(p => p.id === paper.id);
+                                            return (
+                                                <div key={paper.id} className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-100 dark:border-gray-700 shadow-sm hover:border-blue-200 transition-colors">
+                                                    <h4 className="font-bold text-xs text-slate-800 dark:text-slate-100 line-clamp-2 mb-1">
+                                                        {paper.title}
+                                                    </h4>
+                                                    <div className="flex items-center justify-between mt-2">
+                                                        <span className="text-[10px] text-slate-500 bg-slate-100 dark:bg-slate-700/50 px-1.5 py-0.5 rounded">
+                                                            {paper.journal}
+                                                        </span>
+                                                        <button
+                                                            onClick={() => handleAddSavedPaper(paper)}
+                                                            disabled={isSelected || isEmbedding}
+                                                            className={`text-[10px] px-2 py-1 rounded font-semibold transition-colors ${isSelected
+                                                                ? 'bg-green-100 text-green-700 cursor-default'
+                                                                : 'bg-blue-600 text-white hover:bg-blue-700'
+                                                                }`}
+                                                        >
+                                                            {isSelected ? 'Added' : 'Add to Context'}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {/* File Uploader */}
                 <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
@@ -261,8 +353,8 @@ export default function AskAiTab() {
                 )}
             </div>
 
-            {/* Right: Chat Panel - Fixed height on desktop */}
-            <div className="flex-1 w-full lg:min-w-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden lg:h-full flex flex-col min-h-[600px] lg:min-h-0">
+            {/* Right: Chat Panel - Fixed height */}
+            <div className="flex-1 w-full lg:min-w-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden h-full flex flex-col">
                 <ChatPanel sessionId={sessionId} hasContext={hasContext} />
             </div>
         </div>

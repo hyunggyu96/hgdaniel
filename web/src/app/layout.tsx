@@ -15,6 +15,7 @@ import { LanguageProvider } from '@/components/LanguageContext';
 import { ThemeProvider } from '@/components/ThemeContext';
 import ThemeToggle from '@/components/ThemeToggle';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { Toaster } from 'sonner';
 
 const noto = Noto_Sans_KR({
   subsets: ["latin"],
@@ -81,6 +82,7 @@ export default function RootLayout({
 
                   {/* Bottom: Navigation */}
                   <MainNav />
+                  <Toaster position="top-center" richColors />
                 </header>
 
                 {children}
