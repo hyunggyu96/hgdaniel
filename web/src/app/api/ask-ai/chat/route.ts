@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import Groq from 'groq-sdk';
-import { searchSimilarChunks, getSourcesForSession } from '@/lib/embedding';
+import { searchSimilarChunks, getSourcesForSession, getChunksForSession } from '@/lib/embedding';
 
 export async function POST(request: Request) {
     try {
@@ -28,6 +28,15 @@ export async function POST(request: Request) {
         } catch (searchError) {
             console.warn('RAG search failed, continuing without context:', searchError);
             // Don't fail the request, just proceed with empty chunks
+        }
+
+        // Fallback for broad queries (e.g. "summarize briefly") where similarity search can return 0 results.
+        if (chunks.length === 0) {
+            try {
+                chunks = await getChunksForSession(session_id, 10);
+            } catch (fallbackError) {
+                console.warn('Fallback chunk load failed:', fallbackError);
+            }
         }
 
         // 2. Get source metadata
@@ -66,6 +75,13 @@ export async function POST(request: Request) {
             journal: v.source.paper_journal || null,
             link: v.source.paper_link || null,
         }));
+
+        if (sourceRefs.length === 0) {
+            return NextResponse.json(
+                { error: 'No context found. Please add papers/files again and retry.' },
+                { status: 400 }
+            );
+        }
 
         // 5. Build chat history for Groq
         const chatHistory = (history || []).map((msg: any) => ({

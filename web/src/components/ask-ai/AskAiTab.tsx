@@ -8,6 +8,7 @@ import PaperSelector from "./PaperSelector";
 import FileUploader, { type UploadedFile } from "./FileUploader";
 import ChatPanel from "./ChatPanel";
 import SourcePanel from "./SourcePanel";
+import { toast } from "sonner";
 
 interface Paper {
     id: string;
@@ -114,6 +115,9 @@ export default function AskAiTab() {
             setShowPaperSelector(false);
         } catch (err: any) {
             console.error('Failed to embed papers:', err);
+            const message = err?.message || 'Failed to process papers. Please try again.';
+            toast.error(message);
+            throw err;
         } finally {
             setIsEmbedding(false);
         }
@@ -186,7 +190,9 @@ export default function AskAiTab() {
                             />
                             {selectedPapers.length > 0 && (
                                 <button
-                                    onClick={handleEmbedPapers}
+                                    onClick={() => {
+                                        void handleEmbedPapers().catch(() => { });
+                                    }}
                                     disabled={isEmbedding}
                                     className="w-full py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                                 >

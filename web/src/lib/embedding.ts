@@ -2,6 +2,12 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { supabaseAdmin } from './supabaseAdmin';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+const EMBEDDING_MODELS = ['gemini-embedding-001', 'text-embedding-004'] as const;
+
+function isModelNotFoundError(error: unknown): boolean {
+    const message = error instanceof Error ? error.message : String(error);
+    return message.includes('404') || message.includes('is not found');
+}
 
 // --- Text chunking ---
 
@@ -35,19 +41,28 @@ export function chunkText(text: string, maxChars = 800, overlap = 200): string[]
 // --- Embedding generation ---
 
 export async function generateEmbedding(text: string): Promise<number[]> {
-    // Use text-embedding-004 as it's the current recommended model
-    const model = genAI.getGenerativeModel({ model: 'text-embedding-004' });
-    try {
-        const result = await model.embedContent({
-            content: { role: 'user', parts: [{ text }] },
-            outputDimensionality: 768
-        } as any);
-        return result.embedding.values;
-    } catch (error) {
-        console.error('Embedding generation failed:', error);
-        // Fallback or rethrow? Rethrow for now to be handled upstream or show error.
-        throw error;
+    if (!process.env.GEMINI_API_KEY?.trim()) {
+        throw new Error('Server configuration error: Missing GEMINI_API_KEY');
     }
+
+    for (const modelName of EMBEDDING_MODELS) {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        try {
+            const result = await model.embedContent({
+                content: { role: 'user', parts: [{ text }] },
+                outputDimensionality: 768,
+            } as any);
+            return result.embedding.values;
+        } catch (error) {
+            if (isModelNotFoundError(error) && modelName !== EMBEDDING_MODELS[EMBEDDING_MODELS.length - 1]) {
+                continue;
+            }
+            console.error('Embedding generation failed:', error);
+            throw error;
+        }
+    }
+
+    throw new Error('Embedding generation failed: no compatible embedding model available');
 }
 
 export async function generateEmbeddings(texts: string[]): Promise<number[][]> {
@@ -183,6 +198,22 @@ export async function searchSimilarChunks(
     });
 
     if (error) throw new Error(`Search failed: ${error.message}`);
+    return data || [];
+}
+
+export async function getChunksForSession(
+    sessionId: string,
+    limit = 10
+): Promise<Array<{ id: string; source_id: string; content: string; chunk_index: number }>> {
+    const { data, error } = await supabaseAdmin
+        .from('ask_ai_chunks')
+        .select('id, source_id, content, chunk_index')
+        .eq('session_id', sessionId)
+        .order('source_id', { ascending: true })
+        .order('chunk_index', { ascending: true })
+        .limit(limit);
+
+    if (error) throw new Error(`Failed to get fallback chunks: ${error.message}`);
     return data || [];
 }
 
