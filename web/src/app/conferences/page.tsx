@@ -111,6 +111,7 @@ function getCountryColor(country: string) {
 
 const CONTINENT_LABELS: Record<string, { ko: string; en: string }> = {
     Asia: { ko: '\uC544\uC2DC\uC544', en: 'Asia' },
+    MENA: { ko: '\uC911\uB3D9\u00B7\uBD81\uC544\uD504\uB9AC\uCE74', en: 'MENA' },
     Europe: { ko: '\uC720\uB7FD', en: 'Europe' },
     'North America': { ko: '\uBD81\uBBF8', en: 'North America' },
     'South America': { ko: '\uB0A8\uBBF8', en: 'South America' },
@@ -130,7 +131,16 @@ const COUNTRY_TO_CONTINENT_EN: Record<string, keyof typeof CONTINENT_LABELS> = {
     Singapore: 'Asia',
     'Hong Kong': 'Asia',
     India: 'Asia',
-    UAE: 'Asia',
+    UAE: 'MENA',
+    'Saudi Arabia': 'MENA',
+    Qatar: 'MENA',
+    Bahrain: 'MENA',
+    Kuwait: 'MENA',
+    Oman: 'MENA',
+    Egypt: 'MENA',
+    Morocco: 'MENA',
+    Tunisia: 'MENA',
+    Algeria: 'MENA',
     France: 'Europe',
     Monaco: 'Europe',
     Italy: 'Europe',
@@ -1288,7 +1298,7 @@ export default function ConferencesPage() {
                     {/* RIGHT COLUMN: Filters - Span 5 */}
                     <div className="lg:col-span-4 flex flex-col gap-6">
                         {/* Country Filter */}
-                        <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <div className="order-2 bg-white dark:bg-gray-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
                             <div className="flex items-center justify-between gap-2 mb-3">
                                 <div className="flex items-center gap-2">
                                     <MapPin className="w-4 h-4 text-gray-400" />
@@ -1323,7 +1333,7 @@ export default function ConferencesPage() {
                         </div>
 
                         {/* Continent Filter */}
-                        <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <div className="order-1 bg-white dark:bg-gray-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
                             <div className="flex items-center justify-between gap-2 mb-3">
                                 <div className="flex items-center gap-2">
                                     <Globe className="w-4 h-4 text-gray-400" />
@@ -1358,7 +1368,7 @@ export default function ConferencesPage() {
                         </div>
 
                         {/* Series Filter */}
-                        <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <div className="order-3 bg-white dark:bg-gray-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
                             <div className="flex items-center justify-between gap-2 mb-3">
                                 <div className="flex items-center gap-2">
                                     <Filter className="w-4 h-4 text-gray-400" />
