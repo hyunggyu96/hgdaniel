@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { createPortal } from 'react-dom';
 import { ShieldCheck, X } from 'lucide-react';
 import AuthForm, { type AuthMode } from './AuthForm';
+import { useLanguage } from '@/components/LanguageContext';
 
 interface AuthModalProps {
     isOpen: boolean;
@@ -19,6 +20,8 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
     const [mounted, setMounted] = useState(false);
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const { language } = useLanguage();
+    const isEnglish = language === 'en';
 
     useEffect(() => {
         setMounted(true);
@@ -88,8 +91,14 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
                                     <ShieldCheck className="w-4 h-4 text-blue-500" />
                                 </div>
                                 <div>
-                                    <h3 className="text-base font-bold text-foreground leading-none">로그인/회원가입</h3>
-                                    <p className="text-[11px] text-muted-foreground mt-1 leading-none">개인 컬렉션과 Ask AI를 이용할 수 있습니다.</p>
+                                    <h3 className="text-base font-bold text-foreground leading-none">
+                                        {isEnglish ? 'Login / Register' : '로그인/회원가입'}
+                                    </h3>
+                                    <p className="text-[11px] text-muted-foreground mt-1 leading-none">
+                                        {isEnglish
+                                            ? 'Sign in to use personal collections and Ask AI.'
+                                            : '개인 컬렉션과 Ask AI를 이용할 수 있습니다.'}
+                                    </p>
                                 </div>
                             </div>
                             <button
@@ -117,7 +126,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
                                 onClick={onClose}
                                 className="text-xs font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                             >
-                                전체 페이지에서 진행하기
+                                {isEnglish ? 'Continue on full page' : '전체 페이지에서 진행하기'}
                             </Link>
                         </div>
                     </motion.div>
