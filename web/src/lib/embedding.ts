@@ -35,8 +35,13 @@ export function chunkText(text: string, maxChars = 800, overlap = 200): string[]
 // --- Embedding generation ---
 
 export async function generateEmbedding(text: string): Promise<number[]> {
-    const model = genAI.getGenerativeModel({ model: 'text-embedding-004' });
-    const result = await model.embedContent(text);
+    // text-embedding-004 is deprecated/unavailable in v1beta.
+    // referencing gemini-embedding-001 with outputDimensionality 768 to maintain compatibility.
+    const model = genAI.getGenerativeModel({ model: 'gemini-embedding-001' });
+    const result = await model.embedContent({
+        content: { role: 'user', parts: [{ text }] },
+        outputDimensionality: 768
+    } as any);
     return result.embedding.values;
 }
 
