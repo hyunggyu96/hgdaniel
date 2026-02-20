@@ -13,6 +13,7 @@ const financialData: Record<string, any> = require('@/data/financial_data.json')
 
 type CompanyStatus = 'KOSPI' | 'KOSDAQ' | 'Unlisted' | 'Global_Listed' | 'Global_Private';
 type CompanyCategory = 'korean' | 'global';
+type KoreanMarketFilter = 'listed' | 'unlisted';
 
 interface CompanyData {
     id: number;
@@ -88,6 +89,7 @@ export default function CompanyPage() {
     const [rankings, setRankings] = useState<Record<string, number>>({});
     const [searchQuery, setSearchQuery] = useState("");
     const [companies, setCompanies] = useState<CompanyData[]>(allCompanies);
+    const [koreanMarketFilter, setKoreanMarketFilter] = useState<KoreanMarketFilter>('listed');
 
     const initialCategory = searchParams?.get('tab') === 'global' ? 'global' : 'korean';
     const [activeCategory, setActiveCategory] = useState<'korean' | 'global'>(initialCategory);
@@ -136,16 +138,27 @@ export default function CompanyPage() {
     }, []);
 
     const filteredCompanies = companies
-        .filter(company =>
-            company.category === activeCategory &&
-            (searchQuery === "" ||
+        .filter((company) => {
+            if (company.category !== activeCategory) return false;
+
+            if (activeCategory === 'korean') {
+                const isListed = company.status === 'KOSPI' || company.status === 'KOSDAQ';
+                if (koreanMarketFilter === 'listed' && !isListed) return false;
+                if (koreanMarketFilter === 'unlisted' && company.status !== 'Unlisted') return false;
+            }
+
+            if (searchQuery === "") return true;
+            return (
                 company.name.en.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                company.name.ko.includes(searchQuery))
-        )
+                company.name.ko.includes(searchQuery)
+            );
+        })
         .sort((a, b) => a.name[lang].localeCompare(b.name[lang], lang === 'ko' ? 'ko' : 'en'));
 
     const koreanCount = companies.filter(c => c.category === 'korean').length;
     const globalCount = companies.filter(c => c.category === 'global').length;
+    const koreanListedCount = companies.filter(c => c.category === 'korean' && (c.status === 'KOSPI' || c.status === 'KOSDAQ')).length;
+    const koreanUnlistedCount = companies.filter(c => c.category === 'korean' && c.status === 'Unlisted').length;
 
     return (
         <main className="min-h-screen bg-gray-50/50 dark:bg-gray-950 p-6 md:p-12 pb-24 transition-colors duration-300">
@@ -221,6 +234,29 @@ export default function CompanyPage() {
                         />
                     </div>
                 </div>
+
+                {activeCategory === 'korean' && (
+                    <div className="bg-white/80 dark:bg-gray-900/60 backdrop-blur-md p-1.5 rounded-xl border border-white/50 dark:border-gray-800 shadow-sm ring-1 ring-gray-200/50 dark:ring-gray-800 flex w-full md:w-fit">
+                        <button
+                            onClick={() => setKoreanMarketFilter('listed')}
+                            className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${koreanMarketFilter === 'listed'
+                                ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-md ring-1 ring-gray-100 dark:ring-gray-700'
+                                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200'
+                                }`}
+                        >
+                            {`KOSPI·KOSDAQ (${koreanListedCount})`}
+                        </button>
+                        <button
+                            onClick={() => setKoreanMarketFilter('unlisted')}
+                            className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${koreanMarketFilter === 'unlisted'
+                                ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-md ring-1 ring-gray-100 dark:ring-gray-700'
+                                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200'
+                                }`}
+                        >
+                            {lang === 'ko' ? `\uBE44\uC0C1\uC7A5 (${koreanUnlistedCount})` : `Unlisted (${koreanUnlistedCount})`}
+                        </button>
+                    </div>
+                )}
 
                 {/* Company Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">

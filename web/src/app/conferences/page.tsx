@@ -109,6 +109,48 @@ function getCountryColor(country: string) {
     return COUNTRY_COLORS[country] || DEFAULT_COUNTRY_COLOR;
 }
 
+const CONTINENT_LABELS: Record<string, { ko: string; en: string }> = {
+    Asia: { ko: '\uC544\uC2DC\uC544', en: 'Asia' },
+    Europe: { ko: '\uC720\uB7FD', en: 'Europe' },
+    'North America': { ko: '\uBD81\uBBF8', en: 'North America' },
+    'South America': { ko: '\uB0A8\uBBF8', en: 'South America' },
+    Oceania: { ko: '\uC624\uC138\uC544\uB2C8\uC544', en: 'Oceania' },
+    Africa: { ko: '\uC544\uD504\uB9AC\uCE74', en: 'Africa' },
+    Other: { ko: '\uAE30\uD0C0', en: 'Other' },
+};
+
+const COUNTRY_TO_CONTINENT_EN: Record<string, keyof typeof CONTINENT_LABELS> = {
+    'South Korea': 'Asia',
+    Japan: 'Asia',
+    China: 'Asia',
+    Taiwan: 'Asia',
+    Thailand: 'Asia',
+    Vietnam: 'Asia',
+    Indonesia: 'Asia',
+    Singapore: 'Asia',
+    'Hong Kong': 'Asia',
+    India: 'Asia',
+    UAE: 'Asia',
+    France: 'Europe',
+    Monaco: 'Europe',
+    Italy: 'Europe',
+    Portugal: 'Europe',
+    Spain: 'Europe',
+    Austria: 'Europe',
+    'United Kingdom': 'Europe',
+    USA: 'North America',
+    Brazil: 'South America',
+    Colombia: 'South America',
+};
+
+function getContinentByCountry(countryEn: string) {
+    const continentKey = COUNTRY_TO_CONTINENT_EN[countryEn] || 'Other';
+    return {
+        key: continentKey,
+        ...CONTINENT_LABELS[continentKey],
+    };
+}
+
 // Conference Data (2025-2026 Verified)
 const CONFERENCES: ConferenceEvent[] = [
     {
@@ -897,6 +939,7 @@ export default function ConferencesPage() {
     const [selectedEvent, setSelectedEvent] = useState<ConferenceEvent | null>(null);
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [selectedSeries, setSelectedSeries] = useState<string[]>([]);
+    const [selectedContinents, setSelectedContinents] = useState<string[]>([]);
     const [selectedCountriesEn, setSelectedCountriesEn] = useState<string[]>([]);
 
     // Pagination Removed as per user request
@@ -914,6 +957,21 @@ export default function ConferencesPage() {
         const locale = lang === 'ko' ? 'ko' : 'en';
         return Array.from(countryMap.values()).sort((a, b) => a[lang].localeCompare(b[lang], locale));
     }, [conferences, lang]);
+    const continentOptions = useMemo(() => {
+        const continentMap = new Map<string, { ko: string; en: string }>();
+        conferences.forEach((c) => {
+            const continent = getContinentByCountry(c.country.en);
+            if (!continentMap.has(continent.en)) {
+                continentMap.set(continent.en, { ko: continent.ko, en: continent.en });
+            }
+        });
+        const locale = lang === 'ko' ? 'ko' : 'en';
+        return Array.from(continentMap.values()).sort((a, b) => a[lang].localeCompare(b[lang], locale));
+    }, [conferences, lang]);
+    const filteredCountryOptions = useMemo(() => {
+        if (selectedContinents.length === 0) return countryOptions;
+        return countryOptions.filter((country) => selectedContinents.includes(getContinentByCountry(country.en).en));
+    }, [countryOptions, selectedContinents]);
 
     useEffect(() => {
         const fetchConferences = async () => {
@@ -959,17 +1017,27 @@ export default function ConferencesPage() {
         fetchConferences();
     }, []);
 
+    useEffect(() => {
+        if (selectedContinents.length === 0) return;
+        setSelectedCountriesEn((prev) =>
+            prev.filter((countryEn) => selectedContinents.includes(getContinentByCountry(countryEn).en))
+        );
+    }, [selectedContinents]);
+
     // Filtered conferences
     const filteredConferences = useMemo(() => {
         let result = conferences;
         if (selectedSeries.length > 0) {
             result = result.filter((c) => selectedSeries.includes(c.series));
         }
+        if (selectedContinents.length > 0) {
+            result = result.filter((c) => selectedContinents.includes(getContinentByCountry(c.country.en).en));
+        }
         if (selectedCountriesEn.length > 0) {
             result = result.filter((c) => selectedCountriesEn.includes(c.country.en));
         }
         return result;
-    }, [conferences, selectedSeries, selectedCountriesEn]);
+    }, [conferences, selectedSeries, selectedContinents, selectedCountriesEn]);
 
     const upcomingEvents = useMemo(() => {
         const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -1219,6 +1287,76 @@ export default function ConferencesPage() {
 
                     {/* RIGHT COLUMN: Filters - Span 5 */}
                     <div className="lg:col-span-4 flex flex-col gap-6">
+                        {/* Country Filter */}
+                        <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                            <div className="flex items-center justify-between gap-2 mb-3">
+                                <div className="flex items-center gap-2">
+                                    <MapPin className="w-4 h-4 text-gray-400" />
+                                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                                        {lang === 'ko' ? '국가 필터' : 'Filter by Country'}
+                                    </h3>
+                                </div>
+                                <button
+                                    onClick={() => { setSelectedCountriesEn([]); setSelectedEvent(null); }}
+                                    className="text-[10px] text-gray-400 hover:text-blue-500"
+                                >
+                                    Reset
+                                </button>
+                            </div>
+
+                            <FilterSection
+                                items={filteredCountryOptions}
+                                selected={selectedCountriesEn}
+                                onSelect={(c) => {
+                                    setSelectedCountriesEn((prev) => (
+                                        prev.includes(c)
+                                            ? prev.filter((item) => item !== c)
+                                            : [...prev, c]
+                                    ));
+                                    setSelectedEvent(null);
+                                }}
+                                type="country"
+                                lang={lang}
+                                valueKey="en"
+                                labelKey={lang}
+                            />
+                        </div>
+
+                        {/* Continent Filter */}
+                        <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                            <div className="flex items-center justify-between gap-2 mb-3">
+                                <div className="flex items-center gap-2">
+                                    <Globe className="w-4 h-4 text-gray-400" />
+                                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                                        {lang === 'ko' ? '\uB300\uB959 \uD544\uD130' : 'Filter by Continent'}
+                                    </h3>
+                                </div>
+                                <button
+                                    onClick={() => { setSelectedContinents([]); setSelectedCountriesEn([]); setSelectedEvent(null); }}
+                                    className="text-[10px] text-gray-400 hover:text-blue-500"
+                                >
+                                    Reset
+                                </button>
+                            </div>
+
+                            <FilterSection
+                                items={continentOptions}
+                                selected={selectedContinents}
+                                onSelect={(continentEn) => {
+                                    setSelectedContinents((prev) => (
+                                        prev.includes(continentEn)
+                                            ? prev.filter((item) => item !== continentEn)
+                                            : [...prev, continentEn]
+                                    ));
+                                    setSelectedEvent(null);
+                                }}
+                                type="text"
+                                lang={lang}
+                                valueKey="en"
+                                labelKey={lang}
+                            />
+                        </div>
+
                         {/* Series Filter */}
                         <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
                             <div className="flex items-center justify-between gap-2 mb-3">
@@ -1249,41 +1387,6 @@ export default function ConferencesPage() {
                                 }}
                                 type="text"
                                 lang={lang}
-                            />
-                        </div>
-
-                        {/* Country Filter */}
-                        <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                            <div className="flex items-center justify-between gap-2 mb-3">
-                                <div className="flex items-center gap-2">
-                                    <MapPin className="w-4 h-4 text-gray-400" />
-                                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">
-                                        {lang === 'ko' ? '국가 필터' : 'Filter by Country'}
-                                    </h3>
-                                </div>
-                                <button
-                                    onClick={() => { setSelectedCountriesEn([]); setSelectedEvent(null); }}
-                                    className="text-[10px] text-gray-400 hover:text-blue-500"
-                                >
-                                    Reset
-                                </button>
-                            </div>
-
-                            <FilterSection
-                                items={countryOptions}
-                                selected={selectedCountriesEn}
-                                onSelect={(c) => {
-                                    setSelectedCountriesEn((prev) => (
-                                        prev.includes(c)
-                                            ? prev.filter((item) => item !== c)
-                                            : [...prev, c]
-                                    ));
-                                    setSelectedEvent(null);
-                                }}
-                                type="country"
-                                lang={lang}
-                                valueKey="en"
-                                labelKey={lang}
                             />
                         </div>
                     </div>
