@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Card, Text } from "@tremor/react";
-import { SearchIcon, BookOpen, Calendar, Users, ArrowUpRight, Filter, GraduationCap } from "lucide-react";
-
+import { Text } from "@tremor/react";
+import { SearchIcon, BookOpen, Calendar, Users, ArrowUpRight, Filter, GraduationCap, Bot } from "lucide-react";
 import { useLanguage } from "@/components/LanguageContext";
+import AskAiTab from "@/components/ask-ai/AskAiTab";
 
 interface Paper {
     id: string;
@@ -34,6 +34,7 @@ const KEYWORDS = [
 
 export default function InsightsPage() {
     const { t } = useLanguage();
+    const [activeTab, setActiveTab] = useState<'search' | 'ask-ai'>('search');
     const [papers, setPapers] = useState<Paper[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -74,9 +75,11 @@ export default function InsightsPage() {
 
     // Fetch when keyword changes — reset to page 1
     useEffect(() => {
-        setPage(1);
-        fetchPapers(1);
-    }, [selectedKeyword]); // eslint-disable-line react-hooks/exhaustive-deps
+        if (activeTab === 'search') {
+            setPage(1);
+            fetchPapers(1);
+        }
+    }, [selectedKeyword, activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -139,202 +142,235 @@ export default function InsightsPage() {
                     <div className="absolute bottom-0 left-10 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl translate-y-1/2 pointer-events-none" />
                 </div>
 
-                <div className="flex flex-col lg:flex-row gap-8 items-start">
-                    {/* Sidebar Filters */}
-                    <aside className="w-full lg:w-64 shrink-0 space-y-4">
-                        <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 lg:sticky lg:top-8">
-                            <div className="flex items-center gap-2 mb-4 text-gray-900 dark:text-gray-100 font-semibold px-1">
-                                <Filter className="w-4 h-4 text-blue-600" />
-                                <span>Categories</span>
-                            </div>
+                {/* Tab Navigation */}
+                <div className="flex items-center gap-1 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-1.5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 w-fit">
+                    <button
+                        onClick={() => setActiveTab('search')}
+                        className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+                            activeTab === 'search'
+                                ? 'bg-slate-900 dark:bg-white text-white dark:text-gray-900 shadow-md'
+                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
+                        }`}
+                    >
+                        <SearchIcon className="w-4 h-4" />
+                        {t('ask_ai_tab_search') || 'Paper Search'}
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('ask-ai')}
+                        className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+                            activeTab === 'ask-ai'
+                                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
+                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
+                        }`}
+                    >
+                        <Bot className="w-4 h-4" />
+                        {t('ask_ai_tab_ai') || 'Ask AI'}
+                    </button>
+                </div>
 
-                            <div className="flex flex-wrap lg:flex-col gap-2">
-                                <button
-                                    onClick={() => setSelectedKeyword("")}
-                                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-left ${selectedKeyword === ""
-                                        ? 'bg-slate-800 text-white shadow-md'
-                                        : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200'
-                                        }`}
-                                >
-                                    {t('insights_all_topics')}
-                                </button>
+                {/* Tab Content */}
+                {activeTab === 'search' ? (
+                    // Paper Search Tab (existing content)
+                    <div className="flex flex-col lg:flex-row gap-8 items-start">
+                        {/* Sidebar Filters */}
+                        <aside className="w-full lg:w-64 shrink-0 space-y-4">
+                            <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 lg:sticky lg:top-8">
+                                <div className="flex items-center gap-2 mb-4 text-gray-900 dark:text-gray-100 font-semibold px-1">
+                                    <Filter className="w-4 h-4 text-blue-600" />
+                                    <span>Categories</span>
+                                </div>
 
-                                {KEYWORDS.map(kw => (
+                                <div className="flex flex-wrap lg:flex-col gap-2">
                                     <button
-                                        key={kw}
-                                        onClick={() => setSelectedKeyword(kw)}
-                                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 capitalize text-left ${selectedKeyword === kw
-                                            ? 'bg-blue-600 text-white shadow-md'
-                                            : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-blue-200 dark:hover:border-blue-700 hover:text-blue-600 hover:bg-blue-50/30 dark:hover:bg-blue-900/20'
+                                        onClick={() => setSelectedKeyword("")}
+                                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-left ${selectedKeyword === ""
+                                            ? 'bg-slate-800 text-white shadow-md'
+                                            : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200'
                                             }`}
                                     >
-                                        {kw}
+                                        {t('insights_all_topics')}
                                     </button>
-                                ))}
-                            </div>
-                        </div>
-                    </aside>
 
-                    {/* Main Content */}
-                    <section className="flex-1 min-w-0 space-y-6">
-
-                        {/* Search Bar */}
-                        <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-2 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
-                            <form onSubmit={handleSearch} className="relative w-full">
-                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                    <SearchIcon className="h-5 w-5 text-gray-400" />
-                                </div>
-                                <input
-                                    type="text"
-                                    className="block w-full pl-12 pr-32 py-3 bg-transparent border-none rounded-xl text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-0"
-                                    placeholder={t('insights_search_placeholder')}
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                />
-                                <button
-                                    type="submit"
-                                    className="absolute right-2 top-2 bottom-2 bg-slate-900 text-white px-5 py-1.5 rounded-lg hover:bg-slate-800 transition-colors text-xs font-bold uppercase tracking-wider"
-                                >
-                                    {t('search')}
-                                </button>
-                            </form>
-                        </div>
-
-                        {/* Results List */}
-                        {loading ? (
-                            <div className="flex flex-col items-center justify-center py-32 opacity-70">
-                                <div className="relative w-16 h-16">
-                                    <div className="absolute inset-0 border-4 border-gray-100 rounded-full"></div>
-                                    <div className="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
-                                </div>
-                                <Text className="mt-4 text-gray-500 font-medium animate-pulse">{t('insights_loading')}</Text>
-                            </div>
-                        ) : error ? (
-                            <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-gray-900 rounded-3xl border border-red-100 dark:border-red-900/30 shadow-sm p-8 text-center">
-                                <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mb-4">
-                                    <span className="text-2xl">⚠️</span>
-                                </div>
-                                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">Error Loading Data</h3>
-                                <Text className="text-gray-500 mb-6 max-w-md">{error}</Text>
-                                <button
-                                    onClick={() => fetchPapers(page)}
-                                    className="px-6 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 transition-colors text-sm font-medium shadow-sm"
-                                >
-                                    {t('retry')}
-                                </button>
-                            </div>
-                        ) : (
-                            <div className="space-y-4 animate-fade-in-up">
-                                {papers.length > 0 ? (
-                                    papers.map((paper) => (
-                                        <div
-                                            key={paper.id}
-                                            className="group relative bg-white dark:bg-gray-900 rounded-xl p-5 border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md hover:border-blue-100 dark:hover:border-blue-900 transition-all duration-300"
+                                    {KEYWORDS.map(kw => (
+                                        <button
+                                            key={kw}
+                                            onClick={() => setSelectedKeyword(kw)}
+                                            className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 capitalize text-left ${selectedKeyword === kw
+                                                ? 'bg-blue-600 text-white shadow-md'
+                                                : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-blue-200 dark:hover:border-blue-700 hover:text-blue-600 hover:bg-blue-50/30 dark:hover:bg-blue-900/20'
+                                                }`}
                                         >
-                                            <div className="flex flex-col md:flex-row justify-between items-start gap-4">
-                                                <div className="flex-1 space-y-2.5">
-                                                    {/* Top Meta */}
-                                                    <div className="flex flex-wrap items-center gap-2 text-[11px]">
-                                                        <span className="flex items-center gap-1 text-blue-700 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded border border-blue-100 dark:border-blue-800">
-                                                            <BookOpen className="w-3 h-3" />
-                                                            {paper.journal || 'Journal'}
-                                                        </span>
-                                                        <span className="flex items-center gap-1 text-slate-600 dark:text-slate-400 font-bold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">
-                                                            <Calendar className="w-3 h-3" />
-                                                            {paper.publication_date || 'N/A'}
-                                                        </span>
-                                                    </div>
+                                            {kw}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </aside>
 
-                                                    {/* Title */}
-                                                    <a href={paper.link} target="_blank" rel="noopener noreferrer" className="block outline-none">
-                                                        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 leading-snug group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
-                                                            <Highlight text={paper.title} keyword={searchQuery} />
-                                                        </h3>
-                                                    </a>
+                        {/* Main Content */}
+                        <section className="flex-1 min-w-0 space-y-6">
 
-                                                    {/* Abstract: REMOVED HOVER EXPANSION */}
-                                                    <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-3 transition-all duration-500">
-                                                        <Highlight text={paper.abstract} keyword={searchQuery} />
-                                                    </p>
+                            {/* Search Bar */}
+                            <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-2 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+                                <form onSubmit={handleSearch} className="relative w-full">
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <SearchIcon className="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        className="block w-full pl-12 pr-32 py-3 bg-transparent border-none rounded-xl text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-0"
+                                        placeholder={t('insights_search_placeholder')}
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                    />
+                                    <button
+                                        type="submit"
+                                        className="absolute right-2 top-2 bottom-2 bg-slate-900 text-white px-5 py-1.5 rounded-lg hover:bg-slate-800 transition-colors text-xs font-bold uppercase tracking-wider"
+                                    >
+                                        {t('search')}
+                                    </button>
+                                </form>
+                            </div>
 
-                                                    {/* Footer Meta */}
-                                                    <div className="flex flex-wrap items-center justify-between gap-3 pt-2 mt-1 border-t border-gray-50">
-                                                        <div className="flex items-center gap-1.5 text-xs text-gray-600">
-                                                            <Users className="w-3.5 h-3.5 text-gray-400" />
-                                                            <span className="font-semibold text-gray-700 dark:text-gray-300 italic truncate max-w-[200px] md:max-w-md">
-                                                                {paper.authors?.slice(0, 3).map((author, idx) => (
-                                                                    <span key={idx}>
-                                                                        <Highlight text={author} keyword={searchQuery} />
-                                                                        {idx < Math.min(paper.authors.length, 3) - 1 ? ", " : ""}
-                                                                    </span>
-                                                                ))}
-                                                                {paper.authors?.length > 3 && " et al."}
+                            {/* Results List */}
+                            {loading ? (
+                                <div className="flex flex-col items-center justify-center py-32 opacity-70">
+                                    <div className="relative w-16 h-16">
+                                        <div className="absolute inset-0 border-4 border-gray-100 rounded-full"></div>
+                                        <div className="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
+                                    </div>
+                                    <Text className="mt-4 text-gray-500 font-medium animate-pulse">{t('insights_loading')}</Text>
+                                </div>
+                            ) : error ? (
+                                <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-gray-900 rounded-3xl border border-red-100 dark:border-red-900/30 shadow-sm p-8 text-center">
+                                    <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mb-4">
+                                        <span className="text-2xl">⚠️</span>
+                                    </div>
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">Error Loading Data</h3>
+                                    <Text className="text-gray-500 mb-6 max-w-md">{error}</Text>
+                                    <button
+                                        onClick={() => fetchPapers(page)}
+                                        className="px-6 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 transition-colors text-sm font-medium shadow-sm"
+                                    >
+                                        {t('retry')}
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="space-y-4 animate-fade-in-up">
+                                    {papers.length > 0 ? (
+                                        papers.map((paper) => (
+                                            <div
+                                                key={paper.id}
+                                                className="group relative bg-white dark:bg-gray-900 rounded-xl p-5 border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md hover:border-blue-100 dark:hover:border-blue-900 transition-all duration-300"
+                                            >
+                                                <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+                                                    <div className="flex-1 space-y-2.5">
+                                                        {/* Top Meta */}
+                                                        <div className="flex flex-wrap items-center gap-2 text-[11px]">
+                                                            <span className="flex items-center gap-1 text-blue-700 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded border border-blue-100 dark:border-blue-800">
+                                                                <BookOpen className="w-3 h-3" />
+                                                                {paper.journal || 'Journal'}
+                                                            </span>
+                                                            <span className="flex items-center gap-1 text-slate-600 dark:text-slate-400 font-bold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">
+                                                                <Calendar className="w-3 h-3" />
+                                                                {paper.publication_date || 'N/A'}
                                                             </span>
                                                         </div>
 
-                                                        {/* Keywords */}
-                                                        <div className="hidden md:flex gap-1.5">
-                                                            {paper.keywords?.slice(0, 3).map(k => (
-                                                                <span key={k} className="text-[10px] text-gray-500 bg-gray-50 dark:bg-gray-800 px-1.5 py-0.5 rounded border border-gray-100 dark:border-gray-700">
-                                                                    #{k}
+                                                        {/* Title */}
+                                                        <a href={paper.link} target="_blank" rel="noopener noreferrer" className="block outline-none">
+                                                            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 leading-snug group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
+                                                                <Highlight text={paper.title} keyword={searchQuery} />
+                                                            </h3>
+                                                        </a>
+
+                                                        {/* Abstract */}
+                                                        <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-3 transition-all duration-500">
+                                                            <Highlight text={paper.abstract} keyword={searchQuery} />
+                                                        </p>
+
+                                                        {/* Footer Meta */}
+                                                        <div className="flex flex-wrap items-center justify-between gap-3 pt-2 mt-1 border-t border-gray-50">
+                                                            <div className="flex items-center gap-1.5 text-xs text-gray-600">
+                                                                <Users className="w-3.5 h-3.5 text-gray-400" />
+                                                                <span className="font-semibold text-gray-700 dark:text-gray-300 italic truncate max-w-[200px] md:max-w-md">
+                                                                    {paper.authors?.slice(0, 3).map((author, idx) => (
+                                                                        <span key={idx}>
+                                                                            <Highlight text={author} keyword={searchQuery} />
+                                                                            {idx < Math.min(paper.authors.length, 3) - 1 ? ", " : ""}
+                                                                        </span>
+                                                                    ))}
+                                                                    {paper.authors?.length > 3 && " et al."}
                                                                 </span>
-                                                            ))}
+                                                            </div>
+
+                                                            {/* Keywords */}
+                                                            <div className="hidden md:flex gap-1.5">
+                                                                {paper.keywords?.slice(0, 3).map(k => (
+                                                                    <span key={k} className="text-[10px] text-gray-500 bg-gray-50 dark:bg-gray-800 px-1.5 py-0.5 rounded border border-gray-100 dark:border-gray-700">
+                                                                        #{k}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
                                                         </div>
                                                     </div>
+
+                                                    {/* Action Button */}
+                                                    <a
+                                                        href={paper.link}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white transition-all shadow-sm group-hover:scale-105"
+                                                        title="View Original Paper"
+                                                    >
+                                                        <ArrowUpRight className="w-4 h-4" />
+                                                    </a>
                                                 </div>
-
-                                                {/* Action Button */}
-                                                <a
-                                                    href={paper.link}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white transition-all shadow-sm group-hover:scale-105"
-                                                    title="View Original Paper"
-                                                >
-                                                    <ArrowUpRight className="w-4 h-4" />
-                                                </a>
                                             </div>
+                                        ))
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-gray-900 rounded-3xl border border-dashed border-gray-200 dark:border-gray-700">
+                                            <SearchIcon className="w-12 h-12 text-gray-200 mb-4" />
+                                            <Text className="text-gray-500 font-medium mb-1">{t('insights_no_papers')}</Text>
+                                            <p className="text-sm text-gray-400">{t('insights_no_papers_hint')}</p>
                                         </div>
-                                    ))
-                                ) : (
-                                    <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-gray-900 rounded-3xl border border-dashed border-gray-200 dark:border-gray-700">
-                                        <SearchIcon className="w-12 h-12 text-gray-200 mb-4" />
-                                        <Text className="text-gray-500 font-medium mb-1">{t('insights_no_papers')}</Text>
-                                        <p className="text-sm text-gray-400">{t('insights_no_papers_hint')}</p>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        {/* Pagination */}
-                        {papers.length > 0 && (
-                            <div className="flex justify-center items-center gap-6 pt-8 pb-4">
-                                <button
-                                    onClick={() => handlePageChange(page - 1)}
-                                    disabled={page === 1 || loading}
-                                    className="flex items-center px-5 py-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                                >
-                                    ← {t('insights_previous')}
-                                </button>
-                                <div className="flex flex-col items-center">
-                                    <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                        Page {page}
-                                    </span>
-                                    <span className="text-[10px] text-gray-400 uppercase tracking-wider">
-                                        of {totalPages}
-                                    </span>
+                                    )}
                                 </div>
-                                <button
-                                    onClick={() => handlePageChange(page + 1)}
-                                    disabled={page === totalPages || loading}
-                                    className="flex items-center px-5 py-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                                >
-                                    {t('insights_next')} →
-                                </button>
-                            </div>
-                        )}
-                    </section>
-                </div>
+                            )}
+
+                            {/* Pagination */}
+                            {papers.length > 0 && (
+                                <div className="flex justify-center items-center gap-6 pt-8 pb-4">
+                                    <button
+                                        onClick={() => handlePageChange(page - 1)}
+                                        disabled={page === 1 || loading}
+                                        className="flex items-center px-5 py-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                    >
+                                        ← {t('insights_previous')}
+                                    </button>
+                                    <div className="flex flex-col items-center">
+                                        <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                            Page {page}
+                                        </span>
+                                        <span className="text-[10px] text-gray-400 uppercase tracking-wider">
+                                            of {totalPages}
+                                        </span>
+                                    </div>
+                                    <button
+                                        onClick={() => handlePageChange(page + 1)}
+                                        disabled={page === totalPages || loading}
+                                        className="flex items-center px-5 py-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                    >
+                                        {t('insights_next')} →
+                                    </button>
+                                </div>
+                            )}
+                        </section>
+                    </div>
+                ) : (
+                    // Ask AI Tab
+                    <AskAiTab />
+                )}
             </div>
         </main>
     );
