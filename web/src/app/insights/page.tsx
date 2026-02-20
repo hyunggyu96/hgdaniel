@@ -178,23 +178,39 @@ export default function InsightsPage() {
                     <button
                         onClick={() => setActiveTab('search')}
                         className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${activeTab === 'search'
-                                ? 'bg-slate-900 dark:bg-white text-white dark:text-gray-900 shadow-md'
-                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
+                            ? 'bg-slate-900 dark:bg-white text-white dark:text-gray-900 shadow-md'
+                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
                             }`}
                     >
                         <SearchIcon className="w-4 h-4" />
                         {t('ask_ai_tab_search') || 'Paper Search'}
                     </button>
-                    <button
-                        onClick={() => setActiveTab('ask-ai')}
-                        className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${activeTab === 'ask-ai'
+
+                    {userId ? (
+                        <button
+                            onClick={() => setActiveTab('ask-ai')}
+                            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${activeTab === 'ask-ai'
                                 ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
                                 : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
-                            }`}
-                    >
-                        <Bot className="w-4 h-4" />
-                        {t('ask_ai_tab_ai') || 'Ask AI'}
-                    </button>
+                                }`}
+                        >
+                            <Bot className="w-4 h-4" />
+                            {t('ask_ai_tab_ai') || 'Ask AI'}
+                        </button>
+                    ) : (
+                        <div className="relative group">
+                            <button
+                                disabled
+                                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-gray-400 cursor-not-allowed bg-gray-50 dark:bg-gray-800/50"
+                            >
+                                <Lock className="w-3.5 h-3.5" />
+                                {t('ask_ai_tab_ai') || 'Ask AI'}
+                            </button>
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 text-xs text-white bg-slate-900 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                                Login required
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Tab Content */}

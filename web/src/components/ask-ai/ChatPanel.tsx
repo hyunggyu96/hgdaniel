@@ -29,11 +29,14 @@ export default function ChatPanel({ sessionId, hasContext }: ChatPanelProps) {
     const [input, setInput] = useState("");
     const [isStreaming, setIsStreaming] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const messagesContainerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
     // Auto-scroll to bottom
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        if (messagesContainerRef.current) {
+            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+        }
     };
 
     useEffect(() => {
@@ -62,6 +65,7 @@ export default function ChatPanel({ sessionId, hasContext }: ChatPanelProps) {
         // Reset height
         if (inputRef.current) {
             inputRef.current.style.height = 'auto';
+            inputRef.current.focus({ preventScroll: true });
         }
 
         try {
@@ -149,6 +153,8 @@ export default function ChatPanel({ sessionId, hasContext }: ChatPanelProps) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             handleSubmit();
+            // Prevent scroll on Enter
+            return false;
         }
     };
 
@@ -183,7 +189,7 @@ export default function ChatPanel({ sessionId, hasContext }: ChatPanelProps) {
     return (
         <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-950/50">
             {/* Messages area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-6 scroll-smooth">
+            <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-6 scroll-smooth">
                 {messages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-center p-8 opacity-80">
                         <div className="w-16 h-16 bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-center mb-6 animate-pulse-slow">
@@ -213,10 +219,10 @@ export default function ChatPanel({ sessionId, hasContext }: ChatPanelProps) {
 
                             <div className={`relative max-w-[85%] lg:max-w-[75%] space-y-2 group`}>
                                 <div className={`px-5 py-3.5 shadow-sm text-sm leading-relaxed whitespace-pre-wrap ${msg.role === 'user'
-                                        ? 'bg-blue-600 text-white rounded-2xl rounded-tr-sm'
-                                        : msg.isError
-                                            ? 'bg-red-50 dark:bg-red-900/10 text-red-800 dark:text-red-200 border border-red-100 dark:border-red-900/30 rounded-2xl rounded-tl-sm'
-                                            : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-100 dark:border-slate-700 rounded-2xl rounded-tl-sm'
+                                    ? 'bg-blue-600 text-white rounded-2xl rounded-tr-sm'
+                                    : msg.isError
+                                        ? 'bg-red-50 dark:bg-red-900/10 text-red-800 dark:text-red-200 border border-red-100 dark:border-red-900/30 rounded-2xl rounded-tl-sm'
+                                        : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-100 dark:border-slate-700 rounded-2xl rounded-tl-sm'
                                     }`}>
                                     {msg.role === 'assistant' && !msg.content && isStreaming ? (
                                         <div className="flex items-center gap-2 py-1">
@@ -302,8 +308,8 @@ export default function ChatPanel({ sessionId, hasContext }: ChatPanelProps) {
                             onClick={handleSubmit}
                             disabled={!input.trim() || !sessionId || isStreaming || !hasContext}
                             className={`absolute right-2 bottom-2 p-2 rounded-xl flex items-center justify-center transition-all duration-200 ${input.trim() && !isStreaming
-                                    ? 'bg-blue-600 text-white shadow-md hover:bg-blue-700 hover:scale-105 active:scale-95'
-                                    : 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed'
+                                ? 'bg-blue-600 text-white shadow-md hover:bg-blue-700 hover:scale-105 active:scale-95'
+                                : 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed'
                                 }`}
                         >
                             {isStreaming ? (
