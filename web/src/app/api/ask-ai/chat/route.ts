@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import Groq from 'groq-sdk';
 import { searchSimilarChunks, getSourcesForSession } from '@/lib/embedding';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+// Initialize Groq client
+const groq = new Groq({
+    apiKey: process.env.GROQ_API_KEY,
+});
 
 export async function POST(request: Request) {
     try {
@@ -15,8 +18,8 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'message required' }, { status: 400 });
         }
 
-        if (!process.env.GEMINI_API_KEY) {
-            console.error('GEMINI_API_KEY is missing');
+        if (!process.env.GROQ_API_KEY) {
+            console.error('GROQ_API_KEY is missing');
             return NextResponse.json({ error: 'Server configuration error: Missing API Key' }, { status: 500 });
         }
 
@@ -66,10 +69,10 @@ export async function POST(request: Request) {
             link: v.source.paper_link || null,
         }));
 
-        // 5. Build chat history for Gemini
+        // 5. Build chat history for Groq
         const chatHistory = (history || []).map((msg: any) => ({
-            role: msg.role === 'user' ? 'user' : 'model',
-            parts: [{ text: msg.content }],
+            role: msg.role === 'user' ? 'user' : 'assistant', // Groq uses 'assistant' not 'model'
+            content: msg.content,
         }));
 
         // 6. Create RAG prompt
@@ -86,28 +89,26 @@ ${contextStr || 'No context sources available. Please inform the user to add pap
 ## Source References:
 ${sourceRefs.map(s => `[Source ${s.index}] ${s.title}${s.journal ? ` (${s.journal})` : ''}`).join('\n')}`;
 
-        // 7. Stream response from Gemini
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-        const chat = model.startChat({
-            history: chatHistory,
-            generationConfig: {
-                temperature: 0.3,
-                maxOutputTokens: 2048,
-            },
+        // 7. Stream response from Groq
+        const completion = await groq.chat.completions.create({
+            messages: [
+                { role: 'system', content: systemPrompt },
+                ...chatHistory,
+                { role: 'user', content: message }
+            ],
+            model: 'llama-3.3-70b-versatile',
+            temperature: 0.3,
+            max_tokens: 2048,
+            stream: true,
         });
-
-        const result = await chat.sendMessageStream([
-            { text: systemPrompt },
-            { text: `\n\nUser question: ${message}` },
-        ]);
 
         // Create a ReadableStream for streaming response
         const encoder = new TextEncoder();
         const stream = new ReadableStream({
             async start(controller) {
                 try {
-                    for await (const chunk of result.stream) {
-                        const text = chunk.text();
+                    for await (const chunk of completion) {
+                        const text = chunk.choices[0]?.delta?.content || '';
                         if (text) {
                             controller.enqueue(
                                 encoder.encode(`data: ${JSON.stringify({ text })}\n\n`)

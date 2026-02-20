@@ -298,15 +298,7 @@ export default function ChatPanel({
                             }
                         </p>
 
-                        {!hasContext && hasSelectedItems && onEmbed && (
-                            <button
-                                onClick={onEmbed}
-                                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-all shadow-md hover:scale-105 active:scale-95 flex items-center gap-2"
-                            >
-                                <Sparkles className="w-4 h-4" />
-                                Start Analysis
-                            </button>
-                        )}
+
                     </div>
                 ) : (
                     <>
@@ -401,17 +393,8 @@ export default function ChatPanel({
             <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
                 <div className={`relative flex flex-col gap-2 transition-all duration-300 ${!hasContext ? 'opacity-60 grayscale-[0.5]' : ''}`}>
                     {/* Status bar inside input area */}
-                    {/* Status bar inside input area */}
                     {!hasContext && hasSelectedItems && (
-                        <div className="absolute -top-12 left-0 right-0 flex justify-center pointer-events-none z-10">
-                            <button
-                                onClick={onEmbed}
-                                className="pointer-events-auto bg-blue-600 hover:bg-blue-700 text-white text-xs px-4 py-1.5 rounded-full shadow-lg font-bold flex items-center gap-1.5 transition-all animate-bounce-slow"
-                            >
-                                <Sparkles className="w-3 h-3" />
-                                Click here to Start Analysis
-                            </button>
-                        </div>
+                        <div className="absolute -top-12 left-0 right-0 flex justify-center pointer-events-none z-10 opacity-0"></div>
                     )}
 
                     {!hasContext && !hasSelectedItems && (
