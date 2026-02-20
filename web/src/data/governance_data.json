@@ -322,5 +322,77 @@
     "subsidiaries": "",
     "source": "Teoxane 공식 홈페이지",
     "source_date": ""
+  },
+  "FINE MEC": {
+    "largest_shareholder": "",
+    "ceo": "",
+    "parent_group": "",
+    "governance_type": "",
+    "subsidiaries": "",
+    "source": "",
+    "source_date": ""
+  },
+  "H2MEDI": {
+    "largest_shareholder": "",
+    "ceo": "\uAE40\uBCD1\uD638",
+    "parent_group": "",
+    "governance_type": "\uBE44\uC0C1\uC7A5",
+    "subsidiaries": "",
+    "source": "LHALALA official site (https://www.lhalala.co.kr), TradeKorea profile (https://h2medi.tradekorea.com/company.do)",
+    "source_date": "2026.02"
+  },
+  "UNION MEDICAL": {
+    "largest_shareholder": "",
+    "ceo": "\uAE40\uCD98\uC601",
+    "parent_group": "",
+    "governance_type": "\uBE44\uC0C1\uC7A5",
+    "subsidiaries": "\uC11C\uC6B8\uC9C0\uC0AC, \uB0A8\uBD80\uC9C0\uC0AC(\uBD80\uC0B0)",
+    "source": "UNION MEDICAL greeting/branch pages (https://www.unionmedical.com/inc_html/sub1_1.html, https://www.unionmedical.com/inc_html/sub1_3.html)",
+    "source_date": "2026.02"
+  },
+  "\uB300\uC2E0\uC5D4\uD130\uD504\uB77C\uC774\uC988": {
+    "largest_shareholder": "",
+    "ceo": "\uAE40\uADDC",
+    "parent_group": "",
+    "governance_type": "\uBE44\uC0C1\uC7A5",
+    "subsidiaries": "",
+    "source": "NeoJect official site (operator: DSE INC, representative: Kim Gyu) https://www.neoject.kr/",
+    "source_date": "2026.02"
+  },
+  "\uD604\uB300\uBA54\uB514\uD14D": {
+    "largest_shareholder": "",
+    "ceo": "\uC1A1\uBBF8\uD76C",
+    "parent_group": "",
+    "governance_type": "\uBE44\uC0C1\uC7A5",
+    "subsidiaries": "",
+    "source": "Hyundae Meditech info page (https://hyundaemed-sample.codextyle.com/certificate), Daum article (https://v.daum.net/v/20260126000852369)",
+    "source_date": "2026.02"
+  },
+  "\uC5D4\uD30C\uC778\uB354\uC2A4": {
+    "largest_shareholder": "",
+    "ceo": "\uC774\uACBD\uC900",
+    "parent_group": "",
+    "governance_type": "\uBE44\uC0C1\uC7A5",
+    "subsidiaries": "",
+    "source": "N-Finders contact page (https://nfinders.com/eng/eng_contact/), MEDI:GATE interview (https://medigatenews.com/news/1372606286)",
+    "source_date": "2026.02"
+  },
+  "SHENB": {
+    "largest_shareholder": "",
+    "ceo": "Kang Seon Young",
+    "parent_group": "",
+    "governance_type": "\uBE44\uC0C1\uC7A5",
+    "subsidiaries": "",
+    "source": "SHENB contact page (https://www.shenb.com/eng/contactus/direction.php), MFDS posting (https://www.mfds.go.kr/eng/brd/m_41/view.do?seq=70025)",
+    "source_date": "2026.02"
+  },
+  "\uD150\uD14D": {
+    "largest_shareholder": "",
+    "ceo": "\uD55C\uB3D9\uC625",
+    "parent_group": "",
+    "governance_type": "\uBE44\uC0C1\uC7A5",
+    "subsidiaries": "",
+    "source": "TENTECH company info (https://tentechmall.co.kr/), LinkedIn company page (https://kr.linkedin.com/company/tentechinc)",
+    "source_date": "2026.02"
   }
 }

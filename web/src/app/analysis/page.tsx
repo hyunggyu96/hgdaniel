@@ -26,6 +26,40 @@ try {
 }
 
 const YEARS = ['2022', '2023', '2024', '2025'] as const;
+const EXTRA_NEUTRAL_OVERVIEWS: Record<string, string> = {
+    'FINE MEC': 'FINE MEC\uB294 \uC758\uB8CC\uAE30\uAE30 \uAD00\uB828 \uC81C\uD488\uC744 \uC548\uB0B4\uD558\uACE0 \uC788\uC73C\uBA70, \uC138\uBD80 \uC0AC\uC5C5 \uAD6C\uC870\uB294 \uACF5\uC2DC\uB098 \uAE30\uC5C5 \uC790\uB8CC \uD655\uC778\uC774 \uD544\uC694\uD569\uB2C8\uB2E4.',
+    'H2MEDI': 'H2MEDI\uB294 \uBBF8\uC6A9/\uC758\uB8CC \uAD00\uB828 \uC81C\uD488\uC744 \uCDE8\uAE09\uD558\uB294 \uC5C5\uCCB4\uB85C \uC548\uB0B4\uB418\uBA70, \uC8FC\uC694 \uC81C\uD488 \uAD70\uACFC \uB9E4\uCD9C \uAD6C\uC131\uC740 \uCD94\uAC00 \uACF5\uAC1C \uC790\uB8CC \uD655\uC778\uC774 \uD544\uC694\uD569\uB2C8\uB2E4.',
+    'UNION MEDICAL': 'UNION MEDICAL\uC740 \uC758\uB8CC\uAE30\uAE30 \uC81C\uC870/\uC720\uD1B5 \uAD00\uB828 \uD65C\uB3D9\uC744 \uC548\uB0B4\uD558\uACE0 \uC788\uC73C\uBA70, \uC81C\uD488\uBCC4 \uBE44\uC911\uACFC \uC2DC\uC7A5 \uBE44\uC911\uC740 \uACF5\uC2DD \uC790\uB8CC \uD655\uC778\uC774 \uD544\uC694\uD569\uB2C8\uB2E4.',
+    '\uB300\uC2E0\uC5D4\uD130\uD504\uB77C\uC774\uC988': '\uB300\uC2E0\uC5D4\uD130\uD504\uB77C\uC774\uC988\uB294 \uC758\uB8CC\uAE30\uAE30 \uAD00\uB828 \uC0AC\uC5C5\uC744 \uC218\uD589\uD558\uB294 \uBC95\uC778\uC73C\uB85C \uC548\uB0B4\uB418\uBA70, \uC81C\uD488 \uAD6C\uC131 \uBC0F \uC0AC\uC5C5 \uADDC\uBAA8\uB294 \uACF5\uC2DC/\uAE30\uC5C5 \uC790\uB8CC \uAE30\uC900 \uD655\uC778\uC774 \uD544\uC694\uD569\uB2C8\uB2E4.',
+    '\uC5D4\uD30C\uC778\uB354\uC2A4': '\uC5D4\uD30C\uC778\uB354\uC2A4\uB294 \uC758\uB8CC \uAD00\uB828 \uC81C\uD488 \uAC1C\uBC1C/\uD310\uB9E4 \uD65C\uB3D9\uC744 \uC548\uB0B4\uD558\uACE0 \uC788\uC73C\uBA70, \uC7AC\uBB34 \uBC0F \uC138\uBD80 \uC0AC\uC5C5 \uC815\uBCF4\uB294 \uCD94\uAC00 \uC790\uB8CC \uD655\uC778\uC774 \uD544\uC694\uD569\uB2C8\uB2E4.',
+    '\uD604\uB300\uBA54\uB514\uD14D': '\uD604\uB300\uBA54\uB514\uD14D\uC740 \uC758\uB8CC\uAE30\uAE30 \uAD00\uB828 \uC81C\uD488\uC744 \uC548\uB0B4\uD558\uACE0 \uC788\uC73C\uBA70, \uC8FC\uC694 \uD488\uBAA9 \uBC0F \uC2E4\uC801 \uBE44\uC911\uC740 \uACF5\uC2DD \uC790\uB8CC \uAE30\uC900 \uD655\uC778\uC774 \uD544\uC694\uD569\uB2C8\uB2E4.',
+    'SHENB': 'SHENB\uB294 \uC758\uB8CC/\uBBF8\uC6A9 \uAD00\uB828 \uC81C\uD488 \uC0AC\uC5C5\uC744 \uC548\uB0B4\uD558\uACE0 \uC788\uC73C\uBA70, \uC81C\uD488 \uC778\uD5C8\uAC00 \uBC94\uC704\uC640 \uC2E4\uC81C \uB9E4\uCD9C \uAD6C\uC131\uC740 \uACF5\uC2DD \uC790\uB8CC \uD655\uC778\uC774 \uD544\uC694\uD569\uB2C8\uB2E4.',
+    '\uD150\uD14D': '\uD150\uD14D\uC740 \uBBF8\uC6A9/\uC758\uB8CC\uAE30\uAE30 \uAD00\uB828 \uC81C\uD488\uC744 \uC548\uB0B4\uD558\uACE0 \uC788\uC73C\uBA70, \uC8FC\uC694 \uC81C\uD488\uAD70\uACFC \uC0AC\uC5C5 \uAD6C\uC131\uC740 \uAE30\uC5C5 \uACF5\uAC1C \uC790\uB8CC\uB85C \uD655\uC778\uD558\uB294 \uAC83\uC774 \uC801\uC808\uD569\uB2C8\uB2E4.',
+};
+
+function buildNeutralFallbackSummary(name: string): string {
+    return `${name}\uB294 \uC758\uB8CC\uAE30\uAE30 \uBC0F \uBC14\uC774\uC624 \uD5EC\uC2A4\uCF00\uC5B4 \uAD00\uB828 \uC0AC\uC5C5\uC744 \uC601\uC704\uD558\uB294 \uAE30\uC5C5\uC73C\uB85C \uC548\uB0B4\uB429\uB2C8\uB2E4. \uC8FC\uC694 \uC81C\uD488, \uB9E4\uCD9C \uBE44\uC911, \uC2DC\uC7A5 \uD3C9\uAC00\uB294 \uACF5\uC2DC/IR/\uAE30\uC5C5 \uC790\uB8CC \uD655\uC778\uC774 \uD544\uC694\uD569\uB2C8\uB2E4.`;
+}
+
+function normalizeOverviewTone(text: string, companyName: string): string {
+    if (!text?.trim()) {
+        return buildNeutralFallbackSummary(companyName);
+    }
+
+    const normalized = text
+        .replace(/혁신적인 기술력을 보유한 선도 기업입니다\.?/g, '\uC758\uB8CC\uAE30\uAE30 \uBC0F \uBC14\uC774\uC624 \uD5EC\uC2A4\uCF00\uC5B4 \uAD00\uB828 \uC0AC\uC5C5\uC744 \uC601\uC704\uD558\uB294 \uAE30\uC5C5\uC785\uB2C8\uB2E4.')
+        .replace(/지속적인 R&D 투자와 글로벌 시장 확대를 통해 안정적인 성장을 이어가고 있으며,?\s*/g, '')
+        .replace(/특히[^.]*강력한 경쟁력을 입증하고 있습니다\.?/g, '')
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+
+    return normalized || buildNeutralFallbackSummary(companyName);
+}
+
+function getNeutralOverview(name: string, financialSummary?: string): string {
+    const overview = EXTRA_NEUTRAL_OVERVIEWS[name] || financialSummary || COMPANY_OVERVIEWS[name] || '';
+    return normalizeOverviewTone(overview, name);
+}
 
 export default function AnalysisPage() {
     const searchParams = useSearchParams();
@@ -121,7 +155,7 @@ export default function AnalysisPage() {
                 "name": name,
                 "stock_code": companyInfo.code
             },
-            "company_summary": `${name}은(는) 의료기기 및 바이오 헬스케어 분야에서 혁신적인 기술력을 보유한 선도 기업입니다. 지속적인 R&D 투자와 글로벌 시장 확대를 통해 안정적인 성장을 이어가고 있으며, 특히 에스테틱 및 치료용 의료기기 시장에서 강력한 경쟁력을 입증하고 있습니다.`,
+            "company_summary": getNeutralOverview(name, realData?.company_summary),
             "financial_history": (realData && realData.financial_history && Object.keys(realData.financial_history).length > 0)
                 ? realData.financial_history
                 : {
@@ -300,7 +334,7 @@ export default function AnalysisPage() {
                                 <div className="flex-1 min-w-[200px]">
                                     <span className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold tracking-wide">Overview</span>
                                     <p className="text-sm text-gray-700 dark:text-gray-300 mt-1 leading-snug line-clamp-2">
-                                        {COMPANY_OVERVIEWS[companyName] || result.company_summary || "회사 개요 정보가 없습니다."}
+                                        {result.company_summary || "회사 개요 정보가 없습니다."}
                                     </p>
                                 </div>
                             </div>

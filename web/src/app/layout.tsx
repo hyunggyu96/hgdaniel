@@ -15,6 +15,7 @@ import { LanguageProvider } from '@/components/LanguageContext';
 import { ThemeProvider } from '@/components/ThemeContext';
 import ThemeToggle from '@/components/ThemeToggle';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { Toaster } from 'sonner';
 
 const noto = Noto_Sans_KR({
   subsets: ["latin"],
@@ -42,7 +43,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" suppressHydrationWarning>
+    <html lang="ko" suppressHydrationWarning style={{ zoom: 0.85 }}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})()` }} />
       </head>
@@ -81,6 +82,7 @@ export default function RootLayout({
 
                   {/* Bottom: Navigation */}
                   <MainNav />
+                  <Toaster position="top-center" richColors />
                 </header>
 
                 {children}
