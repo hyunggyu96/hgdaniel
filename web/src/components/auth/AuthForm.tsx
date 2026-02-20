@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { Eye, EyeOff, LockKeyhole, UserRound } from 'lucide-react';
@@ -16,6 +16,21 @@ interface AuthFormProps {
 type ValidateResult =
     | { ok: false; error: string }
     | { ok: true; normalized: string };
+
+function mapAuthError(message?: string): string {
+    const text = (message || '').toLowerCase();
+
+    if (!text) return '인증 처리 중 문제가 발생했습니다.';
+    if (text.includes('invalid credentials')) return '아이디 또는 비밀번호가 올바르지 않습니다.';
+    if (text.includes('username already exists')) return '이미 사용 중인 아이디입니다.';
+    if (text.includes('username and password are required')) return '아이디와 비밀번호를 입력해주세요.';
+    if (text.includes('password must be at least 8')) return '비밀번호는 8자 이상이어야 합니다.';
+    if (text.includes('username must be 3-32')) return '아이디 형식이 올바르지 않습니다.';
+    if (text.includes('register failed')) return '회원가입에 실패했습니다. 잠시 후 다시 시도해주세요.';
+    if (text.includes('login failed')) return '로그인에 실패했습니다. 잠시 후 다시 시도해주세요.';
+
+    return message || '인증 처리 중 문제가 발생했습니다.';
+}
 
 export default function AuthForm({
     initialMode = 'login',
@@ -46,15 +61,19 @@ export default function AuthForm({
 
     const validate = (): ValidateResult => {
         const normalized = username.trim().toLowerCase();
+
         if (!/^[a-z0-9._-]{3,32}$/.test(normalized)) {
             return { ok: false, error: '아이디는 3-32자, 영문 소문자/숫자/._- 만 사용할 수 있습니다.' };
         }
+
         if (password.length < 8) {
             return { ok: false, error: '비밀번호는 8자 이상이어야 합니다.' };
         }
+
         if (mode === 'register' && password !== confirmPassword) {
             return { ok: false, error: '비밀번호 확인이 일치하지 않습니다.' };
         }
+
         return { ok: true, normalized };
     };
 
@@ -72,11 +91,13 @@ export default function AuthForm({
         try {
             const authAction = mode === 'login' ? login : register;
             const result = await authAction(check.normalized, password);
+
             if (!result.ok) {
-                setError(result.error || '인증에 실패했습니다.');
+                setError(mapAuthError(result.error));
                 return;
             }
-            setUsername(check.normalized);
+
+            setUsername('');
             setPassword('');
             setConfirmPassword('');
             onSuccess?.(mode);
@@ -197,7 +218,7 @@ export default function AuthForm({
             </form>
 
             <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-[11px] leading-relaxed text-gray-500 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-400">
-                아이디는 소문자로 저장됩니다. 비밀번호는 안전하게 해시 처리되어 저장됩니다.
+                아이디는 소문자로 저장됩니다. 비밀번호는 해시 처리되어 저장됩니다.
             </div>
         </div>
     );
