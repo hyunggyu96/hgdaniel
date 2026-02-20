@@ -44,7 +44,7 @@ export default function TrendChartInner() {
         'Exosome': '#ec4899', // Pink
         'PDRN/PN': '#8b5cf6', // Purple
         'Skinboosters/Threads': '#06b6d4', // Cyan
-        'Machines (EBD)': '#f97316', // Orange
+        'Energy-Based Devices': '#f97316', // Orange
         'Corporate News': '#94a3b8', // Slate (Gray)
     };
 

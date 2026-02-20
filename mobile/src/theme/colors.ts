@@ -5,7 +5,7 @@ export const CATEGORY_COLORS: Record<string, string> = {
   Exosome: "#ec4899",
   "PDRN/PN": "#8b5cf6",
   "Skinboosters/Threads": "#06b6d4",
-  "Machines (EBD)": "#f97316",
+  "Energy-Based Devices": "#f97316",
   "Corporate News": "#94a3b8",
 };
 

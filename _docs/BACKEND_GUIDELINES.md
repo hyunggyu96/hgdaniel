@@ -89,7 +89,7 @@ git pull
 
 - Filler (29종), Toxin (24종), PDRN/PN (9종)
 - Exosome (6종), Collagen Stimulator (24종)
-- Skinboosters/Threads (22종), Machines/EBD (32종)
+- Skinboosters/Threads (22종), Energy-Based Devices (32종)
 - Corporate/Other (26종)
 
 **주의사항**:
