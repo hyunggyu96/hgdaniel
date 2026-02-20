@@ -18,6 +18,9 @@ export default function SearchBar() {
 
         const params = new URLSearchParams(searchParams?.toString() || '');
         if (value.trim()) {
+            // Search should run globally, independent of sidebar category/collection filters.
+            params.delete('category');
+            params.delete('collections');
             params.set('search', value.trim());
             params.delete('page'); // Reset to page 1 when searching
         } else {
