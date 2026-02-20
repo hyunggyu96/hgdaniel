@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
+import { createPortal } from 'react-dom';
 import { ShieldCheck, X } from 'lucide-react';
 import AuthForm, { type AuthMode } from './AuthForm';
 
@@ -15,21 +16,38 @@ interface AuthModalProps {
 
 export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalProps) {
     const [mode, setMode] = useState<AuthMode>(initialMode);
+    const [mounted, setMounted] = useState(false);
     const pathname = usePathname();
     const searchParams = useSearchParams();
+
+    useEffect(() => {
+        setMounted(true);
+        return () => setMounted(false);
+    }, []);
 
     useEffect(() => {
         if (isOpen) setMode(initialMode);
     }, [isOpen, initialMode]);
 
+    useEffect(() => {
+        if (!isOpen || !mounted) return;
+        const originalOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = originalOverflow;
+        };
+    }, [isOpen, mounted]);
+
     const currentQuery = searchParams?.toString();
     const currentPath = `${pathname || '/'}${currentQuery ? `?${currentQuery}` : ''}`;
     const next = encodeURIComponent(currentPath);
 
-    return (
+    if (!mounted) return null;
+
+    return createPortal((
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 pointer-events-none">
+                <div className="fixed left-0 top-0 z-[1300] h-[100dvh] w-screen flex items-center justify-center p-4 pointer-events-none">
                     <motion.button
                         type="button"
                         initial={{ opacity: 0 }}
@@ -88,5 +106,5 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
                 </div>
             )}
         </AnimatePresence>
-    );
+    ), document.body);
 }
