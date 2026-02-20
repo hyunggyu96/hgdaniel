@@ -355,7 +355,14 @@ export default function AskAiTab() {
 
             {/* Right: Chat Panel - Fixed height */}
             <div className="flex-1 w-full lg:min-w-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden h-full flex flex-col">
-                <ChatPanel sessionId={sessionId} hasContext={hasContext} />
+                <ChatPanel
+                    sessionId={sessionId}
+                    hasContext={hasContext}
+                    selectedPapers={selectedPapers}
+                    uploadedFiles={uploadedFiles}
+                    onRemovePaper={(id) => setSelectedPapers(prev => prev.filter(p => p.id !== id))}
+                    onRemoveFile={(id) => setUploadedFiles(prev => prev.filter(f => f.id !== id))}
+                />
             </div>
         </div>
     );
