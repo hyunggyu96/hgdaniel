@@ -31,7 +31,9 @@ KEYWORDS = [
 ]
 
 KEYWORD_MAPPING = {
-    'hyaluronic filler': 'HA filler'
+    'hyaluronic filler': 'HA filler',
+    'polynucleotide(PN)': 'PN (polynucleotide)',
+    'polydeoxyribonucleotide (pdrn)': 'PDRN (polydeoxyribonucleotide)',
 }
 
 TARGET_COUNT = 5000

@@ -2,11 +2,6 @@ import { NextResponse } from 'next/server';
 import Groq from 'groq-sdk';
 import { searchSimilarChunks, getSourcesForSession } from '@/lib/embedding';
 
-// Initialize Groq client
-const groq = new Groq({
-    apiKey: process.env.GROQ_API_KEY,
-});
-
 export async function POST(request: Request) {
     try {
         const { session_id, message, history } = await request.json();
@@ -18,10 +13,13 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'message required' }, { status: 400 });
         }
 
-        if (!process.env.GROQ_API_KEY) {
+        const groqApiKey = process.env.GROQ_API_KEY?.trim();
+        if (!groqApiKey) {
             console.error('GROQ_API_KEY is missing');
             return NextResponse.json({ error: 'Server configuration error: Missing API Key' }, { status: 500 });
         }
+
+        const groq = new Groq({ apiKey: groqApiKey });
 
         // 1. Search similar chunks (with error handling)
         let chunks: any[] = [];

@@ -1,7 +1,6 @@
-import calendar
 import os
 import time
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 from urllib.error import HTTPError
 
 from Bio import Entrez
@@ -12,32 +11,28 @@ from supabase import Client, create_client
 load_dotenv("web/.env.local")
 load_dotenv("backend/.env")
 
-# Configuration
 PUBMED_API_KEY = os.getenv("PUBMED_API_KEY", "")
 PUBMED_EMAIL = os.getenv("PUBMED_EMAIL", "")
 SUPABASE_URL = os.getenv("NEXT_PUBLIC_SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
-TARGET_QUERY = "polycaprolactone"
-TARGET_LABEL = "PCL (polycaprolactone)"
+TARGET_QUERY = '("PDRN"[Title/Abstract] OR "polydeoxyribonucleotide"[Title/Abstract])'
+TARGET_LABEL = "PDRN (polydeoxyribonucleotide)"
 
-# PubMed limit:
+# PubMed limits:
 # - with API key: <= 10 req/sec
 # - without API key: <= 3 req/sec
 REQUEST_INTERVAL = 0.125 if PUBMED_API_KEY else 0.34
 MAX_RETRIES = 5
-
-# User requirement: split search results by 9,900
-ESEARCH_BATCH_SIZE = 9900
+ESEARCH_PAGE_SIZE = 10000
 EFETCH_CHUNK_SIZE = 200
 
 Entrez.email = PUBMED_EMAIL
 Entrez.api_key = PUBMED_API_KEY
-Entrez.tool = "AestheticIntelligence_PCLCollector"
+Entrez.tool = "AestheticIntelligence_PDRNCollector"
 
 
 def safe_api_call(func, retries: int = MAX_RETRIES, **kwargs):
-    """Call Entrez API with throttling and retry/backoff."""
     for attempt in range(retries):
         handle = None
         try:
@@ -79,131 +74,46 @@ def init_supabase() -> Client:
     return create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
-def count_ids(term: str, mindate: Optional[str] = None, maxdate: Optional[str] = None) -> int:
-    kwargs: Dict[str, str] = {
-        "db": "pubmed",
-        "term": term,
-        "retmax": "0",
-    }
-    if mindate and maxdate:
-        kwargs["mindate"] = mindate
-        kwargs["maxdate"] = maxdate
-        kwargs["datetype"] = "pdat"
-    result = safe_api_call(Entrez.esearch, **kwargs)
-    if not result:
-        return 0
-    try:
-        return int(result.get("Count", 0))
-    except Exception:
-        return 0
-
-
-def fetch_ids_for_window(
-    term: str, label: str, mindate: Optional[str] = None, maxdate: Optional[str] = None
-) -> List[str]:
-    kwargs: Dict[str, str] = {
-        "db": "pubmed",
-        "term": term,
-        "retmax": str(ESEARCH_BATCH_SIZE),
-        "sort": "date",
-    }
-    if mindate and maxdate:
-        kwargs["mindate"] = mindate
-        kwargs["maxdate"] = maxdate
-        kwargs["datetype"] = "pdat"
-
-    result = safe_api_call(Entrez.esearch, **kwargs)
-    if not result:
+def fetch_all_pubmed_ids(term: str) -> List[str]:
+    first = safe_api_call(
+        Entrez.esearch,
+        db="pubmed",
+        term=term,
+        retmax="0",
+    )
+    if not first:
         return []
 
-    ids = result.get("IdList", [])
-    count = int(result.get("Count", 0))
-    if count > ESEARCH_BATCH_SIZE:
-        print(
-            f"  Warning: {label} has {count} results; fetched only first {len(ids)}. "
-            "Consider further splitting."
-        )
-    else:
-        print(f"  {label}: fetched {len(ids)} IDs.")
-    return ids
-
-
-def fetch_all_pubmed_ids(term: str) -> List[str]:
-    total_count = count_ids(term)
-    print(f"Total count on PubMed for '{term}': {total_count}")
-    if total_count == 0:
+    total = int(first.get("Count", 0))
+    print(f"Total count on PubMed for query: {total}")
+    if total == 0:
         return []
 
     all_ids: List[str] = []
-    current_year = time.gmtime().tm_year + 1
-    start_year = 1900
-
-    for year in range(current_year, start_year - 1, -1):
-        year_start = f"{year}/01/01"
-        year_end = f"{year}/12/31"
-        year_count = count_ids(term, year_start, year_end)
-
-        if year_count == 0:
+    for start in range(0, total, ESEARCH_PAGE_SIZE):
+        res = safe_api_call(
+            Entrez.esearch,
+            db="pubmed",
+            term=term,
+            retstart=str(start),
+            retmax=str(ESEARCH_PAGE_SIZE),
+            sort="date",
+        )
+        if not res:
             continue
-
-        print(f"Year {year}: {year_count} records.")
-        if year_count <= ESEARCH_BATCH_SIZE:
-            all_ids.extend(
-                fetch_ids_for_window(term, f"Year {year}", year_start, year_end)
-            )
-            continue
-
-        for month in range(12, 0, -1):
-            days_in_month = calendar.monthrange(year, month)[1]
-            month_start = f"{year}/{month:02d}/01"
-            month_end = f"{year}/{month:02d}/{days_in_month:02d}"
-            month_count = count_ids(term, month_start, month_end)
-
-            if month_count == 0:
-                continue
-
-            if month_count <= ESEARCH_BATCH_SIZE:
-                all_ids.extend(
-                    fetch_ids_for_window(
-                        term,
-                        f"{year}-{month:02d}",
-                        month_start,
-                        month_end,
-                    )
-                )
-                continue
-
-            print(
-                f"  Month {year}-{month:02d} has {month_count} records. "
-                "Splitting by day."
-            )
-            for day in range(days_in_month, 0, -1):
-                day_str = f"{year}/{month:02d}/{day:02d}"
-                day_count = count_ids(term, day_str, day_str)
-                if day_count == 0:
-                    continue
-                all_ids.extend(
-                    fetch_ids_for_window(
-                        term,
-                        f"{year}-{month:02d}-{day:02d}",
-                        day_str,
-                        day_str,
-                    )
-                )
+        ids = res.get("IdList", [])
+        all_ids.extend(ids)
+        print(f"  fetched IDs: {len(all_ids)}/{total}")
 
     seen = set()
     unique_ids: List[str] = []
-    duplicate_count = 0
     for pid in all_ids:
-        if pid in seen:
-            duplicate_count += 1
-            continue
-        seen.add(pid)
-        unique_ids.append(pid)
+        if pid not in seen:
+            seen.add(pid)
+            unique_ids.append(pid)
 
     print(
-        f"Collected {len(all_ids)} IDs, removed {duplicate_count} duplicates, "
-        f"{len(unique_ids)} unique IDs remain."
+        f"Collected {len(all_ids)} IDs, deduplicated to {len(unique_ids)} unique IDs."
     )
     return unique_ids
 
@@ -220,12 +130,12 @@ def merge_keywords(existing: List[str], new_keyword: str) -> List[str]:
 
 def process_existing_papers(supabase: Client, pmids: List[str]) -> List[str]:
     existing_ids = set()
-    updates: List[Tuple[str, List[str]]] = []
     chunk_size = 1000
+    updated_existing = 0
 
     print(f"Checking {len(pmids)} PMIDs against Supabase...")
     for i in range(0, len(pmids), chunk_size):
-        chunk = pmids[i : i + chunk_size]
+        chunk = pmids[i: i + chunk_size]
         try:
             res = (
                 supabase.table("pubmed_papers")
@@ -239,27 +149,21 @@ def process_existing_papers(supabase: Client, pmids: List[str]) -> List[str]:
                 kws = row.get("keywords") or []
                 existing_ids.add(pid)
                 if TARGET_LABEL not in kws:
-                    updates.append((pid, merge_keywords(kws, TARGET_LABEL)))
+                    new_kws = merge_keywords(kws, TARGET_LABEL)
+                    (
+                        supabase.table("pubmed_papers")
+                        .update({"keywords": new_kws})
+                        .eq("id", pid)
+                        .execute()
+                    )
+                    updated_existing += 1
         except Exception as e:
-            print(f"  Failed to check chunk {i // chunk_size + 1}: {e}")
-
-    if updates:
-        print(f"Updating keyword for {len(updates)} existing papers...")
-        for pid, new_kws in updates:
-            try:
-                (
-                    supabase.table("pubmed_papers")
-                    .update({"keywords": new_kws})
-                    .eq("id", pid)
-                    .execute()
-                )
-            except Exception as e:
-                print(f"  Failed to update keywords for PMID {pid}: {e}")
+            print(f"  Failed to process chunk {i // chunk_size + 1}: {e}")
 
     new_pmids = [pid for pid in pmids if pid not in existing_ids]
     print(
-        f"Supabase check done: total={len(pmids)}, existing={len(existing_ids)}, "
-        f"new={len(new_pmids)}"
+        f"Supabase check done: existing={len(existing_ids)}, "
+        f"updated_existing={updated_existing}, new={len(new_pmids)}"
     )
     return new_pmids
 
@@ -304,9 +208,7 @@ def extract_pub_date(article: Dict) -> str:
         pass
 
     try:
-        pub_date = (
-            article["MedlineCitation"]["Article"]["Journal"]["JournalIssue"]["PubDate"]
-        )
+        pub_date = article["MedlineCitation"]["Article"]["Journal"]["JournalIssue"]["PubDate"]
         year = str(pub_date.get("Year", ""))
         month = normalize_month(str(pub_date.get("Month", "")))
         day = str(pub_date.get("Day", "")).zfill(2) if pub_date.get("Day") else ""
@@ -349,6 +251,7 @@ def parse_article(article: Dict) -> Optional[Dict]:
         journal = article_info.get("Journal", {}).get("Title", "")
         if not journal:
             journal = str(article_info.get("BookTitle") or article_info.get("PublisherName") or "")
+
         pub_date = extract_pub_date(article)
         link = f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/"
 
@@ -379,7 +282,7 @@ def fetch_details_and_save(supabase: Client, pmids: List[str]):
     print(f"Fetching details for {total} new PMIDs...")
 
     for i in range(0, total, EFETCH_CHUNK_SIZE):
-        chunk = pmids[i : i + EFETCH_CHUNK_SIZE]
+        chunk = pmids[i: i + EFETCH_CHUNK_SIZE]
         chunk_num = i // EFETCH_CHUNK_SIZE + 1
         total_chunks = (total + EFETCH_CHUNK_SIZE - 1) // EFETCH_CHUNK_SIZE
         print(f"  Fetching efetch chunk {chunk_num}/{total_chunks} ({len(chunk)} IDs)")
@@ -396,6 +299,7 @@ def fetch_details_and_save(supabase: Client, pmids: List[str]):
         articles = records.get("PubmedArticle", [])
         book_articles = records.get("PubmedBookArticle", [])
         all_records = list(articles) + list(book_articles)
+
         papers = []
         for article in all_records:
             paper = parse_article(article)
@@ -416,14 +320,13 @@ def fetch_details_and_save(supabase: Client, pmids: List[str]):
 
 
 def main():
-    print("=== PubMed Collector: Polycaprolactone ===")
+    print("=== PubMed Collector: PDRN ===")
     print(f"Query: {TARGET_QUERY}")
     print(f"Label: {TARGET_LABEL}")
     print(
         f"Rate limit: {REQUEST_INTERVAL:.3f}s/request "
         f"({1 / REQUEST_INTERVAL:.2f} req/sec)"
     )
-    print(f"Esearch split size: {ESEARCH_BATCH_SIZE}")
     print(f"API key set: {'YES' if PUBMED_API_KEY else 'NO'}")
     print(f"Email set: {'YES' if PUBMED_EMAIL else 'NO'}")
 

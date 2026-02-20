@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
+import { buildInsightsKeywordOrFilter } from '@/lib/insightsKeywords';
 
 function sanitizeSearchQuery(input: string): string {
     return input.replace(/[%_\\]/g, '\\$&').slice(0, 200);
@@ -27,7 +28,10 @@ export async function GET(request: Request) {
         .range(from, to);
 
     if (keyword) {
-        dbQuery = dbQuery.contains('keywords', [keyword]);
+        const keywordFilter = buildInsightsKeywordOrFilter(keyword);
+        if (keywordFilter) {
+            dbQuery = dbQuery.or(keywordFilter);
+        }
     }
 
     if (query) {

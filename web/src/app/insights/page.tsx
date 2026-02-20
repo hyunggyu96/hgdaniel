@@ -8,6 +8,7 @@ import AskAiTab from "@/components/ask-ai/AskAiTab";
 import { useUser } from "@/components/UserContext";
 import LoginButton from "@/components/LoginButton";
 import { toast } from "sonner";
+import { INSIGHTS_KEYWORDS } from "@/lib/insightsKeywords";
 
 interface Paper {
     id: string;
@@ -20,21 +21,6 @@ interface Paper {
     keywords: string[];
     isBookmarked?: boolean;
 }
-
-const KEYWORDS = [
-    'botulinum toxin',
-    'HA filler',
-    'dermal filler',
-    'PN (polynucleotide)',
-    'PDRN (polydeoxyribonucleotide)',
-    'exosome',
-    'PLLA',
-    'PCL (polycaprolactone)',
-    'PDLLA',
-    'CaHA',
-    'HIFU',
-    'RF (radiofrequency)'
-];
 
 export default function InsightsPage() {
     const { t } = useLanguage();
@@ -264,7 +250,7 @@ export default function InsightsPage() {
                                         {t('insights_all_topics')}
                                     </button>
 
-                                    {KEYWORDS.map(kw => (
+                                    {INSIGHTS_KEYWORDS.map(kw => (
                                         <button
                                             key={kw}
                                             onClick={() => setSelectedKeyword(kw)}

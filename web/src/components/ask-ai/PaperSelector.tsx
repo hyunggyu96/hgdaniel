@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { SearchIcon, BookOpen, Calendar, Check, Loader2, X } from "lucide-react";
 import { useLanguage } from "@/components/LanguageContext";
+import { INSIGHTS_KEYWORDS } from "@/lib/insightsKeywords";
 
 interface Paper {
     id: string;
@@ -14,12 +15,6 @@ interface Paper {
     link: string;
     keywords: string[];
 }
-
-const KEYWORDS = [
-    'botulinum toxin', 'HA filler', 'dermal filler',
-    'PN (polynucleotide)', 'PDRN', 'exosome', 'PLLA', 'PCL',
-    'PDLLA', 'CaHA', 'HIFU', 'RF'
-];
 
 interface PaperSelectorProps {
     selectedPapers: Paper[];
@@ -128,7 +123,7 @@ export default function PaperSelector({
 
                 {/* Keyword tags */}
                 <div className="flex flex-wrap gap-1.5">
-                    {KEYWORDS.map(kw => (
+                    {INSIGHTS_KEYWORDS.map(kw => (
                         <button
                             key={kw}
                             onClick={() => handleKeywordClick(kw)}
