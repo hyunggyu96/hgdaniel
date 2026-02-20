@@ -1,41 +1,86 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+
+interface AuthResult {
+    ok: boolean;
+    error?: string;
+}
 
 interface UserContextType {
     userId: string | null;
-    login: (id: string) => void;
-    logout: () => void;
+    isLoading: boolean;
+    login: (username: string, password: string) => Promise<AuthResult>;
+    register: (username: string, password: string) => Promise<AuthResult>;
+    logout: () => Promise<void>;
+    refreshUser: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
+async function parseUserFromMe(): Promise<string | null> {
+    const res = await fetch('/api/auth/me', { cache: 'no-store' });
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json?.user?.username || null;
+}
+
 export function UserProvider({ children }: { children: React.ReactNode }) {
     const [userId, setUserId] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-    // Initial load from localStorage
-    useEffect(() => {
-        const storedUserId = localStorage.getItem('hg_user_id');
-        if (storedUserId) {
-            setUserId(storedUserId);
-        }
-    }, []);
-
-    const login = (id: string) => {
-        const trimmedId = id.trim();
-        if (trimmedId) {
-            setUserId(trimmedId);
-            localStorage.setItem('hg_user_id', trimmedId);
+    const refreshUser = async () => {
+        try {
+            const username = await parseUserFromMe();
+            setUserId(username);
+        } catch (error) {
+            console.error('[UserContext] refreshUser failed', error);
+            setUserId(null);
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const logout = () => {
-        setUserId(null);
-        localStorage.removeItem('hg_user_id');
+    useEffect(() => {
+        void refreshUser();
+    }, []);
+
+    const login = async (username: string, password: string): Promise<AuthResult> => {
+        const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password }),
+        });
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok) return { ok: false, error: json?.error || 'Login failed' };
+        setUserId(json?.user?.username || null);
+        return { ok: true };
+    };
+
+    const register = async (username: string, password: string): Promise<AuthResult> => {
+        const res = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password }),
+        });
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok) return { ok: false, error: json?.error || 'Register failed' };
+        setUserId(json?.user?.username || null);
+        return { ok: true };
+    };
+
+    const logout = async () => {
+        try {
+            await fetch('/api/auth/logout', { method: 'POST' });
+        } catch (error) {
+            console.error('[UserContext] logout failed', error);
+        } finally {
+            setUserId(null);
+        }
     };
 
     return (
-        <UserContext.Provider value={{ userId, login, logout }}>
+        <UserContext.Provider value={{ userId, isLoading, login, register, logout, refreshUser }}>
             {children}
         </UserContext.Provider>
     );

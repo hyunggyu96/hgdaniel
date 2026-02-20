@@ -1,0 +1,204 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { Eye, EyeOff, LockKeyhole, UserRound } from 'lucide-react';
+import { useUser } from '@/components/UserContext';
+
+export type AuthMode = 'login' | 'register';
+
+interface AuthFormProps {
+    initialMode?: AuthMode;
+    onSuccess?: (mode: AuthMode) => void;
+    onModeChange?: (mode: AuthMode) => void;
+    className?: string;
+}
+
+type ValidateResult =
+    | { ok: false; error: string }
+    | { ok: true; normalized: string };
+
+export default function AuthForm({
+    initialMode = 'login',
+    onSuccess,
+    onModeChange,
+    className = '',
+}: AuthFormProps) {
+    const { login, register } = useUser();
+    const [mode, setMode] = useState<AuthMode>(initialMode);
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [submitting, setSubmitting] = useState(false);
+
+    useEffect(() => {
+        setMode(initialMode);
+    }, [initialMode]);
+
+    useEffect(() => {
+        setError(null);
+        setPassword('');
+        setConfirmPassword('');
+        onModeChange?.(mode);
+    }, [mode, onModeChange]);
+
+    const validate = (): ValidateResult => {
+        const normalized = username.trim().toLowerCase();
+        if (!/^[a-z0-9._-]{3,32}$/.test(normalized)) {
+            return { ok: false, error: '아이디는 3-32자, 영문 소문자/숫자/._- 만 사용할 수 있습니다.' };
+        }
+        if (password.length < 8) {
+            return { ok: false, error: '비밀번호는 8자 이상이어야 합니다.' };
+        }
+        if (mode === 'register' && password !== confirmPassword) {
+            return { ok: false, error: '비밀번호 확인이 일치하지 않습니다.' };
+        }
+        return { ok: true, normalized };
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError(null);
+
+        const check = validate();
+        if (!check.ok) {
+            setError(check.error);
+            return;
+        }
+
+        setSubmitting(true);
+        try {
+            const authAction = mode === 'login' ? login : register;
+            const result = await authAction(check.normalized, password);
+            if (!result.ok) {
+                setError(result.error || '인증에 실패했습니다.');
+                return;
+            }
+            setUsername(check.normalized);
+            setPassword('');
+            setConfirmPassword('');
+            onSuccess?.(mode);
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    return (
+        <div className={`space-y-4 ${className}`}>
+            <div className="inline-flex w-full rounded-xl bg-gray-100 p-1 dark:bg-gray-800">
+                <button
+                    type="button"
+                    onClick={() => setMode('login')}
+                    className={`flex-1 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
+                        mode === 'login'
+                            ? 'bg-white text-blue-600 shadow-sm dark:bg-gray-900'
+                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                    }`}
+                >
+                    로그인
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setMode('register')}
+                    className={`flex-1 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
+                        mode === 'register'
+                            ? 'bg-white text-blue-600 shadow-sm dark:bg-gray-900'
+                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                    }`}
+                >
+                    회원가입
+                </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-3">
+                <label className="block">
+                    <span className="mb-1.5 block text-[11px] font-semibold text-gray-600 dark:text-gray-300">
+                        아이디
+                    </span>
+                    <div className="flex items-center rounded-xl border border-gray-200 bg-white px-3 dark:border-gray-700 dark:bg-gray-900">
+                        <UserRound className="mr-2 h-4 w-4 text-gray-400" />
+                        <input
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            placeholder="영문 소문자 아이디"
+                            autoComplete="username"
+                            className="h-10 w-full bg-transparent text-sm outline-none placeholder:text-gray-400"
+                        />
+                    </div>
+                </label>
+
+                <label className="block">
+                    <span className="mb-1.5 block text-[11px] font-semibold text-gray-600 dark:text-gray-300">
+                        비밀번호
+                    </span>
+                    <div className="flex items-center rounded-xl border border-gray-200 bg-white px-3 dark:border-gray-700 dark:bg-gray-900">
+                        <LockKeyhole className="mr-2 h-4 w-4 text-gray-400" />
+                        <input
+                            type={showPassword ? 'text' : 'password'}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="8자 이상"
+                            autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
+                            className="h-10 w-full bg-transparent text-sm outline-none placeholder:text-gray-400"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword((prev) => !prev)}
+                            className="ml-2 rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+                            aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
+                        >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                    </div>
+                </label>
+
+                {mode === 'register' && (
+                    <label className="block">
+                        <span className="mb-1.5 block text-[11px] font-semibold text-gray-600 dark:text-gray-300">
+                            비밀번호 확인
+                        </span>
+                        <div className="flex items-center rounded-xl border border-gray-200 bg-white px-3 dark:border-gray-700 dark:bg-gray-900">
+                            <LockKeyhole className="mr-2 h-4 w-4 text-gray-400" />
+                            <input
+                                type={showConfirmPassword ? 'text' : 'password'}
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                placeholder="비밀번호를 다시 입력"
+                                autoComplete="new-password"
+                                className="h-10 w-full bg-transparent text-sm outline-none placeholder:text-gray-400"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                                className="ml-2 rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+                                aria-label={showConfirmPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
+                            >
+                                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </button>
+                        </div>
+                    </label>
+                )}
+
+                {error && (
+                    <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-600 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-300">
+                        {error}
+                    </p>
+                )}
+
+                <button
+                    type="submit"
+                    disabled={submitting}
+                    className="h-11 w-full rounded-xl bg-[#3182f6] text-sm font-bold text-white transition-colors hover:bg-[#1b64da] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                    {submitting ? '처리 중...' : mode === 'login' ? '로그인' : '회원가입'}
+                </button>
+            </form>
+
+            <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-[11px] leading-relaxed text-gray-500 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-400">
+                아이디는 소문자로 저장됩니다. 비밀번호는 안전하게 해시 처리되어 저장됩니다.
+            </div>
+        </div>
+    );
+}

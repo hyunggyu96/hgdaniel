@@ -51,15 +51,43 @@ export default function AskAiTab() {
     const [savedPapers, setSavedPapers] = useState<Paper[]>([]);
 
     useEffect(() => {
-        if (!userId) return;
-        try {
-            const stored = localStorage.getItem(`hg_bookmarks_${userId}`);
-            if (stored) {
-                setSavedPapers(JSON.parse(stored));
+        const loadSavedPapers = async () => {
+            if (!userId) {
+                setSavedPapers([]);
+                return;
             }
-        } catch (e) {
-            console.error(e);
-        }
+            try {
+                const res = await fetch('/api/collections?type=paper', { cache: 'no-store' });
+                if (!res.ok) {
+                    setSavedPapers([]);
+                    return;
+                }
+                const rows = await res.json();
+                if (!Array.isArray(rows)) {
+                    setSavedPapers([]);
+                    return;
+                }
+
+                const mapped: Paper[] = rows.map((row: any) => {
+                    const metadata = row?.metadata || {};
+                    return {
+                        id: String(row.item_key),
+                        title: metadata.title || row.title || 'Untitled',
+                        abstract: metadata.abstract || '',
+                        authors: Array.isArray(metadata.authors) ? metadata.authors : [],
+                        publication_date: metadata.publication_date || '',
+                        journal: metadata.journal || '',
+                        link: metadata.link || row.url || '',
+                        keywords: Array.isArray(metadata.keywords) ? metadata.keywords : [],
+                    };
+                });
+                setSavedPapers(mapped);
+            } catch (e) {
+                console.error(e);
+                setSavedPapers([]);
+            }
+        };
+        void loadSavedPapers();
     }, [userId, showSavedPapers]); // Refresh when toggling
 
     const handleAddSavedPaper = (paper: Paper) => {

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import Link from "next/link";
 import { Text } from "@tremor/react";
 import { SearchIcon, BookOpen, Calendar, Users, ArrowUpRight, Filter, GraduationCap, Bot, Lock, Bookmark } from "lucide-react";
 import { useLanguage } from "@/components/LanguageContext";
@@ -36,44 +37,95 @@ export default function InsightsPage() {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [totalCount, setTotalCount] = useState(0);
+    const [paperBookmarks, setPaperBookmarks] = useState<Paper[]>([]);
+    const bookmarkedPaperIds = useMemo(() => new Set(paperBookmarks.map((p) => p.id)), [paperBookmarks]);
 
-    // Bookmarking Logic
-    useEffect(() => {
-        if (!userId) return;
-        const stored = localStorage.getItem(`hg_bookmarks_${userId}`);
-        if (stored) {
-            try {
-                // Ensure synchronization if papers are already loaded
-                // But normally we sync when rendering or setting papers
-            } catch (e) {
-                console.error("Failed to parse bookmarks", e);
+    const loadPaperBookmarks = useCallback(async () => {
+        if (!userId) {
+            setPaperBookmarks([]);
+            return;
+        }
+        try {
+            const res = await fetch('/api/collections?type=paper', { cache: 'no-store' });
+            if (!res.ok) {
+                setPaperBookmarks([]);
+                return;
             }
+            const rows = await res.json();
+            if (!Array.isArray(rows)) {
+                setPaperBookmarks([]);
+                return;
+            }
+            const mapped: Paper[] = rows.map((row: any) => {
+                const metadata = row?.metadata || {};
+                return {
+                    id: String(row.item_key),
+                    title: metadata.title || row.title || 'Untitled',
+                    abstract: metadata.abstract || '',
+                    authors: Array.isArray(metadata.authors) ? metadata.authors : [],
+                    publication_date: metadata.publication_date || '',
+                    journal: metadata.journal || '',
+                    link: metadata.link || row.url || '',
+                    keywords: Array.isArray(metadata.keywords) ? metadata.keywords : [],
+                    isBookmarked: true,
+                };
+            });
+            setPaperBookmarks(mapped);
+        } catch (error) {
+            console.error('Failed to load paper bookmarks', error);
+            setPaperBookmarks([]);
         }
     }, [userId]);
 
-    const toggleBookmark = (paper: Paper) => {
+    useEffect(() => {
+        void loadPaperBookmarks();
+    }, [loadPaperBookmarks]);
+
+    const toggleBookmark = async (paper: Paper) => {
         if (!userId) return;
+        const exists = bookmarkedPaperIds.has(paper.id);
+        try {
+            const res = await fetch('/api/collections', {
+                method: exists ? 'DELETE' : 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: 'paper',
+                    itemKey: paper.id,
+                    link: paper.link,
+                    title: paper.title,
+                    url: paper.link,
+                    metadata: {
+                        id: paper.id,
+                        title: paper.title,
+                        abstract: paper.abstract,
+                        authors: paper.authors,
+                        publication_date: paper.publication_date,
+                        journal: paper.journal,
+                        link: paper.link,
+                        keywords: paper.keywords,
+                    },
+                }),
+            });
+            if (!res.ok) {
+                toast.error('Failed to update bookmark');
+                return;
+            }
 
-        const storageKey = `hg_bookmarks_${userId}`;
-        const stored = localStorage.getItem(storageKey);
-        let bookmarks: Paper[] = stored ? JSON.parse(stored) : [];
+            if (exists) {
+                setPaperBookmarks((prev) => prev.filter((p) => p.id !== paper.id));
+                toast.info("Removed from bookmarks");
+            } else {
+                setPaperBookmarks((prev) => [{ ...paper, isBookmarked: true }, ...prev.filter((p) => p.id !== paper.id)]);
+                toast.success("Saved to your bookmarks");
+            }
 
-        const exists = bookmarks.find(b => b.id === paper.id);
-
-        if (exists) {
-            bookmarks = bookmarks.filter(b => b.id !== paper.id);
-            toast.info("Removed from bookmarks");
-        } else {
-            bookmarks.push({ ...paper, isBookmarked: true });
-            toast.success("Saved to your bookmarks");
+            setPapers((prev) => prev.map((p) => (
+                p.id === paper.id ? { ...p, isBookmarked: !exists } : p
+            )));
+        } catch (error) {
+            console.error('toggleBookmark failed', error);
+            toast.error('Failed to update bookmark');
         }
-
-        localStorage.setItem(storageKey, JSON.stringify(bookmarks));
-
-        // Update local state to reflect UI change immediately
-        setPapers(prev => prev.map(p =>
-            p.id === paper.id ? { ...p, isBookmarked: !exists } : p
-        ));
     };
 
     const fetchPapers = useCallback(async (targetPage: number) => {
@@ -93,18 +145,11 @@ export default function InsightsPage() {
 
             if (result.error) throw new Error(result.error);
 
-            // Sync with bookmarks
             let fetchedPapers: Paper[] = result.data || [];
-            if (userId) {
-                const stored = localStorage.getItem(`hg_bookmarks_${userId}`);
-                if (stored) {
-                    const bookmarks: Paper[] = JSON.parse(stored);
-                    fetchedPapers = fetchedPapers.map(p => ({
-                        ...p,
-                        isBookmarked: bookmarks.some(b => b.id === p.id)
-                    }));
-                }
-            }
+            fetchedPapers = fetchedPapers.map(p => ({
+                ...p,
+                isBookmarked: bookmarkedPaperIds.has(p.id)
+            }));
 
             setPapers(fetchedPapers);
             setTotalPages(result.pagination?.totalPages || 1);
@@ -116,7 +161,14 @@ export default function InsightsPage() {
         } finally {
             setLoading(false);
         }
-    }, [selectedKeyword, searchQuery, t]);
+    }, [selectedKeyword, searchQuery, t, bookmarkedPaperIds]);
+
+    useEffect(() => {
+        setPapers(prev => prev.map((p) => ({
+            ...p,
+            isBookmarked: bookmarkedPaperIds.has(p.id),
+        })));
+    }, [bookmarkedPaperIds]);
 
     // Fetch when keyword changes — reset to page 1
     useEffect(() => {
@@ -212,20 +264,27 @@ export default function InsightsPage() {
                             {t('ask_ai_tab_ai') || 'Ask AI'}
                         </button>
                     ) : (
-                        <div className="relative group">
-                            <button
-                                disabled
-                                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-gray-400 cursor-not-allowed bg-gray-50 dark:bg-gray-800/50"
-                            >
-                                <Lock className="w-3.5 h-3.5" />
-                                {t('ask_ai_tab_ai') || 'Ask AI'}
-                            </button>
-                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 text-xs text-white bg-slate-900 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                                Login required
-                            </div>
-                        </div>
+                        <Link
+                            href="/auth?mode=login&next=%2Finsights"
+                            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                        >
+                            <Lock className="w-3.5 h-3.5" />
+                            {t('ask_ai_tab_ai') || 'Ask AI'}
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300">
+                                Login
+                            </span>
+                        </Link>
                     )}
                 </div>
+
+                {!userId && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Ask AI 기능은 로그인 후 사용할 수 있습니다.
+                        <Link href="/auth?mode=register&next=%2Finsights" className="ml-1 font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                            회원가입하기
+                        </Link>
+                    </p>
+                )}
 
                 {/* Tab Content */}
                 {activeTab === 'search' ? (

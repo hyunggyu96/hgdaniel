@@ -1,95 +1,119 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { GoogleSpreadsheet } from 'google-spreadsheet';
-import { JWT } from 'google-auth-library';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { getAuthUserFromCookieHeader } from '@/lib/authSession';
 
-const SHEET_ID = process.env.GOOGLE_SHEET_ID_LOGINS || '';
-const SERVICE_ACCOUNT_KEY_B64 = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_B64 || '';
-const TARGET_SHEET_TITLE = 'UserCollections_v2'; // Upgraded with IP tracking
+type CollectionType = 'news' | 'paper';
 
-async function getDoc() {
-    try {
-        const jsonStr = Buffer.from(SERVICE_ACCOUNT_KEY_B64, 'base64').toString('utf-8');
-        const creds = JSON.parse(jsonStr);
-        const serviceAccountAuth = new JWT({
-            email: creds.client_email,
-            key: creds.private_key,
-            scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-        });
-        const doc = new GoogleSpreadsheet(SHEET_ID, serviceAccountAuth);
-        await doc.loadInfo();
-        return doc;
-    } catch (e) {
-        console.error('Auth Error:', e);
-        throw new Error('Auth Failed');
+function resolveType(raw: unknown): CollectionType {
+    if (raw === 'paper') return 'paper';
+    return 'news';
+}
+
+function getBody(req: NextApiRequest) {
+    if (typeof req.body === 'string') {
+        try {
+            return JSON.parse(req.body);
+        } catch {
+            return {};
+        }
     }
+    return req.body || {};
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const { userId } = req.method === 'GET' ? req.query : req.body;
-    
-    if (!userId) return res.status(400).json({ error: 'Missing userId' });
-    
+    const authUser = await getAuthUserFromCookieHeader(req.headers.cookie);
+    if (!authUser) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const type = resolveType(req.method === 'GET' ? req.query.type : getBody(req).type);
+
     try {
-        const doc = await getDoc();
-        let sheet = doc.sheetsByTitle[TARGET_SHEET_TITLE];
-        
-        // Auto-create unified sheet
-        if (!sheet) {
-            sheet = await doc.addSheet({ title: TARGET_SHEET_TITLE, headerValues: ['UserID', 'IP', 'Title', 'URL', 'Date', 'AddedAt'] });
-        }
-
-        // GET: Filter rows by UserID
         if (req.method === 'GET') {
-            const rows = await sheet.getRows();
-            const userRows = rows.filter(r => r.get('UserID') === userId);
-            const links = userRows.map(r => r.get('URL')).filter(Boolean);
-            return res.status(200).json(links);
+            const { data, error } = await supabaseAdmin
+                .from('user_collections')
+                .select('item_key, title, url, metadata, created_at')
+                .eq('user_id', authUser.id)
+                .eq('item_type', type)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                return res.status(500).json({ error: 'Failed to fetch collections' });
+            }
+
+            if (type === 'news') {
+                const links = (data || []).map((row) => row.item_key);
+                return res.status(200).json(links);
+            }
+
+            return res.status(200).json(data || []);
         }
 
-        // POST: Add row with UserID & IP
         if (req.method === 'POST') {
-            const { link, title } = req.body;
-            if (!link) return res.status(400).json({ error: 'Missing link' });
-            
-            // Capture IP
-            let ip = ((req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim()) || '';
-            if (!ip && typeof req.headers['x-real-ip'] === 'string') ip = req.headers['x-real-ip'];
-            if (!ip) ip = 'unknown';
+            const body = getBody(req);
+            const metadata = body.metadata && typeof body.metadata === 'object' ? body.metadata : {};
 
-            // Check existence for THIS user
-            const rows = await sheet.getRows();
-            const exists = rows.find(r => r.get('UserID') === userId && r.get('URL') === link);
-            
-            if (!exists) {
-                const now = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
-                // @ts-ignore
-                await sheet.addRow({
-                    'UserID': userId,
-                    'IP': ip,
-                    'Title': title || 'No Title',
-                    'URL': link,
-                    'Date': new Date().toISOString().split('T')[0],
-                    'AddedAt': now
-                }, { insert: true });
+            const itemKey =
+                type === 'news'
+                    ? String(body.link || body.itemKey || '')
+                    : String(body.itemKey || body.paperId || body.id || body.link || '');
+
+            if (!itemKey) {
+                return res.status(400).json({ error: 'Missing item key' });
             }
-            return res.status(200).json({ success: true });
+
+            const title = body.title ? String(body.title) : null;
+            const url = body.url ? String(body.url) : (body.link ? String(body.link) : null);
+
+            const { error } = await supabaseAdmin
+                .from('user_collections')
+                .upsert(
+                    {
+                        user_id: authUser.id,
+                        item_type: type,
+                        item_key: itemKey,
+                        title,
+                        url,
+                        metadata,
+                    },
+                    { onConflict: 'user_id,item_type,item_key' }
+                );
+
+            if (error) {
+                return res.status(500).json({ error: 'Failed to save collection item' });
+            }
+
+            return res.status(200).json({ ok: true });
         }
 
-        // DELETE: Remove row for THIS user
         if (req.method === 'DELETE') {
-            const { link } = req.body;
-            const rows = await sheet.getRows();
-            const rowToDelete = rows.find(r => r.get('UserID') === userId && r.get('URL') === link);
-            if (rowToDelete) {
-                await rowToDelete.delete();
+            const body = getBody(req);
+            const itemKey =
+                type === 'news'
+                    ? String(body.link || body.itemKey || '')
+                    : String(body.itemKey || body.paperId || body.id || body.link || '');
+
+            if (!itemKey) {
+                return res.status(400).json({ error: 'Missing item key' });
             }
-            return res.status(200).json({ success: true });
+
+            const { error } = await supabaseAdmin
+                .from('user_collections')
+                .delete()
+                .eq('user_id', authUser.id)
+                .eq('item_type', type)
+                .eq('item_key', itemKey);
+
+            if (error) {
+                return res.status(500).json({ error: 'Failed to delete collection item' });
+            }
+
+            return res.status(200).json({ ok: true });
         }
 
         return res.status(405).json({ error: 'Method not allowed' });
-
-    } catch (e: any) {
-        console.error('Collections API Error:', e);
-        return res.status(500).json({ error: e.message });
+    } catch (error) {
+        console.error('[collections api] error', error);
+        return res.status(500).json({ error: 'Internal server error' });
     }
 }
