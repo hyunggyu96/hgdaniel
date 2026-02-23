@@ -7,7 +7,6 @@ import {
     Stethoscope, Syringe, Sparkles, LayoutGrid
 } from "lucide-react";
 import { useLanguage } from "@/components/LanguageContext";
-import MfdsPermitTable from "@/components/MfdsPermitTable";
 import NedrugToxinTable from "@/components/NedrugToxinTable";
 import { koreaPolicyProfile } from "@/data/korea_policy_profile";
 import { vietnamPolicyProfile } from "@/data/vietnam_policy_profile";
@@ -221,13 +220,6 @@ const DetailView = ({
                 </div>
             )}
 
-
-            {/* MFDS Permit Database - Korea Device Tab Only */}
-            {countryId === 'kr' && activeTab === 'device' && (
-                <div className="space-y-4 pt-6 border-t border-gray-100 dark:border-gray-800">
-                    <MfdsPermitTable companyName="제테마" showFilters={true} onlyWithBrands={true} />
-                </div>
-            )}
 
             {/* Nedrug Toxin Database - Korea Drug Tab Only */}
             {countryId === 'kr' && activeTab === 'drug' && (
