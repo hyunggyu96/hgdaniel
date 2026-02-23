@@ -28,9 +28,10 @@ interface MfdsPermitTableProps {
     companyId?: number;
     companyName?: string;
     showFilters?: boolean;
+    onlyWithBrands?: boolean;
 }
 
-export default function MfdsPermitTable({ companyId, companyName, showFilters = true }: MfdsPermitTableProps) {
+export default function MfdsPermitTable({ companyId, companyName, showFilters = true, onlyWithBrands = false }: MfdsPermitTableProps) {
     const { language } = useLanguage();
     const [items, setItems] = useState<MfdsProduct[]>([]);
     const [loading, setLoading] = useState(true);
@@ -52,6 +53,7 @@ export default function MfdsPermitTable({ companyId, companyName, showFilters = 
             params.set('limit', String(itemsPerPage));
             if (companyId) params.set('company_id', String(companyId));
             if (companyName) params.set('company_name', companyName);
+            if (onlyWithBrands) params.set('has_brands', 'true');
             if (statusFilter !== 'all') params.set('status', statusFilter);
             if (searchQuery.trim()) params.set('query', searchQuery.trim());
 
@@ -73,7 +75,7 @@ export default function MfdsPermitTable({ companyId, companyName, showFilters = 
         } finally {
             setLoading(false);
         }
-    }, [companyId, companyName, statusFilter, searchQuery]);
+    }, [companyId, companyName, onlyWithBrands, statusFilter, searchQuery]);
 
     useEffect(() => {
         setCurrentPage(1);

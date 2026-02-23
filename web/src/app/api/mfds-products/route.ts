@@ -34,6 +34,9 @@ export async function GET(request: Request) {
     } else if (status === 'cancelled') {
         dbQuery = dbQuery.eq('status', 'cancelled');
     }
+    if (searchParams.get('has_brands') === 'true') {
+        dbQuery = dbQuery.not('brand_names', 'is', null);
+    }
     if (query) {
         const sanitized = query.replace(/[%_\\]/g, '\\$&').slice(0, 200);
         dbQuery = dbQuery.or(

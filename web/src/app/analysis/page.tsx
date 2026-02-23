@@ -7,6 +7,7 @@ import { API_ENDPOINTS } from '@/lib/apiConfig';
 import { COMPANY_OVERVIEWS } from '@/data/companyOverviews';
 import { isGlobalCompany } from '@/data/companyCategories';
 import CompetitorTable from '@/components/CompetitorTable';
+import MfdsPermitTable from '@/components/MfdsPermitTable';
 import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import governanceData from '@/data/governance_data.json';
 
@@ -676,7 +677,14 @@ export default function AnalysisPage() {
 
                         <div className="border-t border-gray-200 dark:border-gray-800 my-8"></div>
 
-                        {/* 4. Competitor Permit Status (MFDS Data) */}
+                        {/* 4. MFDS Permit Database (per company) */}
+                        <div className="mt-8 animate-fade-in-up" style={{ animationDelay: '0.15s' }}>
+                            <MfdsPermitTable companyName={companyName} showFilters={true} />
+                        </div>
+
+                        <div className="border-t border-gray-200 dark:border-gray-800 my-8"></div>
+
+                        {/* 5. Competitor Permit Status (MFDS Data) */}
                         <div className="mt-8 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
                             {(() => {
                                 // OPTIMIZATION: Filter items on SERVER side
