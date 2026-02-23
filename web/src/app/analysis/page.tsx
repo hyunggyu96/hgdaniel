@@ -680,7 +680,7 @@ export default function AnalysisPage() {
 
                         {/* 4. MFDS Permit Database (per company) */}
                         <div className="mt-8 animate-fade-in-up" style={{ animationDelay: '0.15s' }}>
-                            <MfdsPermitTable companyName={companyName} showFilters={true} />
+                            <MfdsPermitTable companyName={companyName} showFilters={true} onlyWithBrands={true} />
                         </div>
 
                         <div className="border-t border-gray-200 dark:border-gray-800 my-8"></div>
