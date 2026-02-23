@@ -135,12 +135,24 @@ class PubMedService:
                         # Skip malformed articles
                         continue
 
-                # Upsert to Supabase
-                for p in papers_to_upsert:
+                # Upsert to Supabase (merge keywords with existing records)
+                if papers_to_upsert:
+                    paper_ids = [p['id'] for p in papers_to_upsert]
+                    existing = {}
                     try:
-                         self.supabase.table("pubmed_papers").upsert(p).execute()
-                    except Exception as e:
-                        print(f"Error upserting {p['id']}: {e}")
+                        result = self.supabase.table("pubmed_papers").select("id, keywords").in_("id", paper_ids).execute()
+                        for row in (result.data or []):
+                            existing[row['id']] = row.get('keywords') or []
+                    except Exception:
+                        pass
+
+                    for p in papers_to_upsert:
+                        try:
+                            if p['id'] in existing:
+                                p['keywords'] = list(set(existing[p['id']] + p['keywords']))
+                            self.supabase.table("pubmed_papers").upsert(p).execute()
+                        except Exception as e:
+                            print(f"Error upserting {p['id']}: {e}")
 
             except Exception as e:
                 print(f"Error fetching details for chunk {i}: {e}")
