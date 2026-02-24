@@ -17,14 +17,24 @@ COMPANY_MAP = {
     "메디톡스": 10,
     "휴온스바이오파마": 6,   # maps to 휴온스 group
     "파마리서치바이오": 12,  # maps to 파마리서치
-    "휴젤": 9,
-    "입센코리아": None,      # global (Ipsen)
-    "한국앨러간": None,      # global (Allergan)
-    "뉴메코": None,
-    "갈더마코리아": None,    # global (Galderma)
+    "휴젤주식회사": 9,       # 휴젤
+    "제테마": 3,
+    "휴메딕스": 8,
+    "한국비엔씨": 4,
     "종근당바이오": 5,
     "한스바이오메드": 1,
-    "한국비엔씨": 4,
+    "한국애브비": 34,        # 앨러간 (AbbVie = Allergan Aesthetics)
+    "멀츠아시아퍼시픽피티이엘티디": 33,  # 멀츠
+    "입센코리아": None,      # global (Ipsen)
+    "뉴메코": None,
+    "메디카코리아": None,
+    "에이티지씨": None,
+    "이니바이오": None,
+    "종근당": None,          # 종근당 ≠ 종근당바이오
+    "프로톡스": None,
+    "한국비엠아이": None,
+    "대웅바이오": None,
+    "제네톡스": None,
 }
 
 
