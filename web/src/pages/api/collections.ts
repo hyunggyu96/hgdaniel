@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { getAuthUserFromCookieHeader } from '@/lib/authSession';
+import { hasFeature } from '@/lib/tiers';
 
 type CollectionType = 'news' | 'paper';
 
@@ -24,6 +25,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const authUser = await getAuthUserFromCookieHeader(req.headers.cookie);
     if (!authUser) {
         return res.status(401).json({ error: 'Unauthorized' });
+    }
+    if (!hasFeature(authUser.tier, 'collections')) {
+        return res.status(403).json({ error: 'Upgrade required', code: 'TIER_REQUIRED' });
     }
 
     const type = resolveType(req.method === 'GET' ? req.query.type : getBody(req).type);

@@ -7,6 +7,7 @@ import { SearchIcon, BookOpen, Calendar, Users, ArrowUpRight, Filter, Graduation
 import { useLanguage } from "@/components/LanguageContext";
 import AskAiTab from "@/components/ask-ai/AskAiTab";
 import { useUser } from "@/components/UserContext";
+import { useTier } from "@/hooks/useTier";
 import LoginButton from "@/components/LoginButton";
 import { toast } from "sonner";
 import { INSIGHTS_KEYWORDS } from "@/lib/insightsKeywords";
@@ -26,6 +27,7 @@ interface Paper {
 export default function InsightsPage() {
     const { t } = useLanguage();
     const { userId } = useUser();
+    const { can } = useTier();
     const [activeTab, setActiveTab] = useState<'search' | 'ask-ai'>('search');
 
 
@@ -252,7 +254,7 @@ export default function InsightsPage() {
                         {t('ask_ai_tab_search') || 'Paper Search'}
                     </button>
 
-                    {userId ? (
+                    {can('ask_ai') ? (
                         <button
                             onClick={() => setActiveTab('ask-ai')}
                             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${activeTab === 'ask-ai'
@@ -264,25 +266,19 @@ export default function InsightsPage() {
                             {t('ask_ai_tab_ai') || 'Ask AI'}
                         </button>
                     ) : (
-                        <Link
-                            href="/auth?mode=login&next=%2Finsights"
-                            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                        >
+                        <div className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800/50 cursor-not-allowed">
                             <Lock className="w-3.5 h-3.5" />
                             {t('ask_ai_tab_ai') || 'Ask AI'}
                             <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300">
-                                Login
+                                Pro
                             </span>
-                        </Link>
+                        </div>
                     )}
                 </div>
 
-                {!userId && (
+                {!can('ask_ai') && (
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Ask AI 기능은 로그인 후 사용할 수 있습니다.
-                        <Link href="/auth?mode=register&next=%2Finsights" className="ml-1 font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
-                            회원가입하기
-                        </Link>
+                        {t('tier_locked_desc')}
                     </p>
                 )}
 

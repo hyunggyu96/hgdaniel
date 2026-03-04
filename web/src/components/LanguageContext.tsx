@@ -107,6 +107,19 @@ export const translations = {
         ask_ai_add_context: '논문 또는 파일을 추가하면 AI 채팅이 활성화됩니다',
         ask_ai_placeholder: '논문에 대해 질문하세요...',
         ask_ai_thinking: '생각 중...',
+
+        // Tier
+        tier_free: '무료',
+        tier_pro: '프로',
+        tier_enterprise: '엔터프라이즈',
+        tier_locked_title: '프리미엄 기능',
+        tier_locked_desc: '이 기능은 Pro 이상 플랜에서 사용할 수 있습니다.',
+        tier_required: '플랜 필요',
+        tier_upgrade: '업그레이드',
+        tier_current: '현재 플랜',
+        tier_news_limited: '최근 3일간의 뉴스만 표시됩니다.',
+        tier_news_upgrade: '전체 뉴스를 보려면 Pro로 업그레이드하세요.',
+        tier_login_required: '로그인이 필요합니다.',
     },
     en: {
         // Nav
@@ -202,6 +215,19 @@ export const translations = {
         ask_ai_add_context: 'Add papers or files to enable AI chat',
         ask_ai_placeholder: 'Ask a question about your papers...',
         ask_ai_thinking: 'Thinking...',
+
+        // Tier
+        tier_free: 'Free',
+        tier_pro: 'Pro',
+        tier_enterprise: 'Enterprise',
+        tier_locked_title: 'Premium Feature',
+        tier_locked_desc: 'This feature is available on Pro plan and above.',
+        tier_required: 'Plan Required',
+        tier_upgrade: 'Upgrade',
+        tier_current: 'Current Plan',
+        tier_news_limited: 'Showing news from the last 3 days only.',
+        tier_news_upgrade: 'Upgrade to Pro to access the full news archive.',
+        tier_login_required: 'Login required.',
     }
 };
 

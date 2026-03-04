@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { addUploadSource } from '@/lib/embedding';
+import { getAuthUserFromCookieHeader } from '@/lib/authSession';
+import { requireFeature } from '@/lib/tierGuard';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
@@ -29,6 +31,11 @@ async function extractText(file: File): Promise<string> {
 
 export async function POST(request: Request) {
     try {
+        // Enterprise-only feature
+        const user = await getAuthUserFromCookieHeader(request.headers.get('cookie'));
+        const featureCheck = requireFeature(user, 'ask_ai_upload');
+        if (featureCheck) return featureCheck;
+
         const formData = await request.formData();
         const sessionId = formData.get('session_id') as string;
         const file = formData.get('file') as File;

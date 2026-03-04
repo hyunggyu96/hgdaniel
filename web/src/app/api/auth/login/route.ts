@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
 
         const { data, error } = await supabaseAdmin
             .from('accounts')
-            .select('id, username, password_hash')
+            .select('id, username, password_hash, tier')
             .eq('username', username)
             .maybeSingle();
 
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 
         const token = createSessionToken(data.id, data.username);
         const response = NextResponse.json({
-            user: { id: data.id, username: data.username },
+            user: { id: data.id, username: data.username, tier: data.tier || 'free' },
         });
         response.headers.set('Set-Cookie', buildSessionCookie(token));
         return response;

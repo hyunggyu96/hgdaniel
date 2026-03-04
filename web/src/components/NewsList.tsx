@@ -5,6 +5,8 @@ import { useNews } from '@/hooks/useNews';
 import { groupNewsByCategory, CATEGORIES_CONFIG } from '@/lib/constants';
 import NewsListContainer from './NewsListContainer';
 import { useLanguage } from './LanguageContext';
+import { useTier } from '@/hooks/useTier';
+import { Lock } from 'lucide-react';
 
 interface NewsListProps {
     selectedCategory?: string | null;
@@ -16,6 +18,7 @@ interface NewsListProps {
 export default function NewsList({ selectedCategory, currentPage = 1, searchQuery, showCollections }: NewsListProps) {
     const { news: allNews, isLoading, isError } = useNews();
     const { t } = useLanguage();
+    const { config: tierConfig } = useTier();
 
     if (isLoading) {
         return (
@@ -62,10 +65,27 @@ export default function NewsList({ selectedCategory, currentPage = 1, searchQuer
         );
     }
 
+    // Tier-based date filter: free users only see recent articles
+    if (tierConfig.newsDaysLimit) {
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - tierConfig.newsDaysLimit);
+        filteredNews = filteredNews.filter(article => {
+            const pubDate = article.published_at ? new Date(article.published_at) : null;
+            return pubDate && pubDate >= cutoffDate;
+        });
+    }
+
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
     const isLandingPage = !selectedCategory && !searchQuery && !showCollections;
 
     return (
+        <>
+        {tierConfig.newsDaysLimit && (
+            <div className="mx-4 mb-3 px-4 py-2 bg-yellow-500/10 border border-yellow-500/30 rounded-lg flex items-center gap-2 text-sm text-yellow-400">
+                <Lock className="w-4 h-4 flex-shrink-0" />
+                <span>{t('tier_news_limited')}</span>
+            </div>
+        )}
         <NewsListContainer
             allNews={allNews}
             newsByCategory={newsByCategory}
@@ -77,5 +97,6 @@ export default function NewsList({ selectedCategory, currentPage = 1, searchQuer
             isLandingPage={isLandingPage}
             CATEGORIES_CONFIG={CATEGORIES_CONFIG}
         />
+        </>
     );
 }

@@ -1,9 +1,30 @@
 import { NextResponse } from 'next/server';
 import Groq from 'groq-sdk';
 import { searchSimilarChunks, getSourcesForSession, getChunksForSession } from '@/lib/embedding';
+import { getAuthUserFromCookieHeader } from '@/lib/authSession';
+import { requireFeature } from '@/lib/tierGuard';
+import { getTierConfig } from '@/lib/tiers';
+import { getDailyUsageCount, recordUsage } from '@/lib/usage';
 
 export async function POST(request: Request) {
     try {
+        // Auth + tier check
+        const user = await getAuthUserFromCookieHeader(request.headers.get('cookie'));
+        const featureCheck = requireFeature(user, 'ask_ai');
+        if (featureCheck) return featureCheck;
+
+        // Daily limit check
+        const config = getTierConfig(user!.tier);
+        if (config.askAiQueriesPerDay !== null) {
+            const used = await getDailyUsageCount(user!.id, 'ask_ai_query');
+            if (used >= config.askAiQueriesPerDay) {
+                return NextResponse.json(
+                    { error: 'Daily query limit reached', code: 'LIMIT_REACHED', limit: config.askAiQueriesPerDay },
+                    { status: 429 }
+                );
+            }
+        }
+
         const { session_id, message, history } = await request.json();
 
         if (!session_id) {
@@ -142,6 +163,9 @@ ${sourceRefs.map(s => `[Source ${s.index}] ${s.title}${s.journal ? ` (${s.journa
                 }
             },
         });
+
+        // Record usage for quota tracking
+        await recordUsage(user!.id, 'ask_ai_query');
 
         return new Response(stream, {
             headers: {

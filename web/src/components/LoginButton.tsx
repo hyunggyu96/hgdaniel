@@ -2,11 +2,13 @@
 
 import React, { useState } from 'react';
 import { useUser } from './UserContext';
+import { useTier } from '@/hooks/useTier';
 import { User, LogIn, LogOut } from 'lucide-react';
 import AuthModal from './auth/AuthModal';
 
 export default function LoginButton() {
     const { userId, logout, isLoading } = useUser();
+    const { tier } = useTier();
     const [showAuthModal, setShowAuthModal] = useState(false);
 
     if (isLoading) {
@@ -22,6 +24,15 @@ export default function LoginButton() {
                     <User className="w-3 h-3 text-blue-500" />
                 </div>
                 <span className="text-[11px] font-bold text-foreground uppercase tracking-wider">{userId}</span>
+                {tier !== 'free' && (
+                    <span className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                        tier === 'enterprise'
+                            ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
+                            : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                    }`}>
+                        {tier === 'enterprise' ? 'ENT' : 'PRO'}
+                    </span>
+                )}
                 <button
                     onClick={() => void logout()}
                     aria-label="Logout"
