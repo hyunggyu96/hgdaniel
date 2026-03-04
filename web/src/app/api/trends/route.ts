@@ -1,19 +1,9 @@
-import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabaseClient';
 import { CATEGORIES_CONFIG } from '@/lib/constants';
 
-// Trends API: 실시간 반영을 위해 캐싱 제거
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
-
-// supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-
-const supabase = createClient(
-    supabaseUrl || 'https://placeholder.supabase.co',
-    supabaseServiceKey || 'placeholder_key'
-);
 
 export async function GET() {
     try {

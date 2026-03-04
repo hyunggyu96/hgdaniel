@@ -1,5 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabaseClient';
 import { buildInsightsKeywordOrFilter } from '@/lib/insightsKeywords';
 
 function sanitizeSearchQuery(input: string): string {
@@ -12,11 +12,6 @@ export async function GET(request: Request) {
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '20') || 20));
     const keyword = searchParams.get('keyword') || '';
     const query = searchParams.get('query') || '';
-
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
-    const supabase = createClient(supabaseUrl, supabaseKey);
 
     const from = (page - 1) * limit;
     const to = from + limit - 1;

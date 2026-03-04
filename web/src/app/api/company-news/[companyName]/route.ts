@@ -1,8 +1,8 @@
-import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabaseClient';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 0; // No cache for real-time news
+export const revalidate = 0;
 
 export async function GET(
     request: Request,
@@ -10,17 +10,7 @@ export async function GET(
 ) {
     const companyName = decodeURIComponent(params.companyName);
 
-    // Supabase Client Setup
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
     try {
-        // Query 'articles' table
-        // Filter: Title or content contains companyName
-        // Exclude: NOISE
-        // Order: Newest first
-        // Limit: 10
         const { data, error } = await supabase
             .from('articles')
             .select('title, published_at, link, id')  // Select specific fields needed

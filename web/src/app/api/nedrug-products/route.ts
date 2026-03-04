@@ -1,5 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabaseClient';
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
@@ -10,10 +10,6 @@ export async function GET(request: Request) {
     const status = searchParams.get('status') || 'all';
     const query = searchParams.get('query') || '';
     const ingredientType = searchParams.get('ingredient_type') || '';
-
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-    const supabase = createClient(supabaseUrl, supabaseKey);
 
     const from = (page - 1) * limit;
     const to = from + limit - 1;

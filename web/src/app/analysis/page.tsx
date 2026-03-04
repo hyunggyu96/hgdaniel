@@ -7,25 +7,20 @@ import TierGate from '@/components/TierGate';
 import { API_ENDPOINTS } from '@/lib/apiConfig';
 import { COMPANY_OVERVIEWS } from '@/data/companyOverviews';
 import { isGlobalCompany } from '@/data/companyCategories';
-import CompetitorTable from '@/components/CompetitorTable';
-import MfdsPermitTable from '@/components/MfdsPermitTable';
-import NedrugToxinTable from '@/components/NedrugToxinTable';
+import dynamic from 'next/dynamic';
 import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+
+const CompetitorTable = dynamic(() => import('@/components/CompetitorTable'), { ssr: false });
+const MfdsPermitTable = dynamic(() => import('@/components/MfdsPermitTable'), { ssr: false });
+const NedrugToxinTable = dynamic(() => import('@/components/NedrugToxinTable'), { ssr: false });
 import governanceData from '@/data/governance_data.json';
 
-// Safely require MFDS Data (might be missing initially)
-// Safely require MFDS Data (prioritize filtered small set)
+// Load pre-filtered MFDS competitor data (small set only)
 let competitorData = { items: [] };
 try {
-    // Try loading the small filtered file first (for Repo/Production)
     competitorData = require('@/data/mfds_competitors_small.json');
-} catch (e1) {
-    try {
-        // Fallback to full DB (local dev environment)
-        competitorData = require('@/data/mfds_competitors.json');
-    } catch (e2) {
-        console.warn("MFDS Data not found, using empty set");
-    }
+} catch {
+    console.warn("MFDS competitor data not found, using empty set");
 }
 
 const YEARS = ['2022', '2023', '2024', '2025'] as const;
