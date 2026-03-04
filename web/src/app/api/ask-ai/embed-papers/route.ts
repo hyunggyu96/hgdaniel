@@ -1,9 +1,15 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { addPaperSources } from '@/lib/embedding';
+import { getAuthUserFromCookieHeader } from '@/lib/authSession';
+import { requireFeature } from '@/lib/tierGuard';
 
 export async function POST(request: Request) {
     try {
+        const user = await getAuthUserFromCookieHeader(request.headers.get('cookie'));
+        const featureCheck = requireFeature(user, 'ask_ai');
+        if (featureCheck) return featureCheck;
+
         const { session_id, paper_ids } = await request.json();
 
         if (!session_id) {

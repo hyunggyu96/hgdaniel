@@ -2,15 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import type { Tier } from '@/lib/authSession';
 
-const ADMIN_SECRET = process.env.ADMIN_SECRET || '';
 const VALID_TIERS: Tier[] = ['free', 'pro', 'enterprise'];
 
 export async function POST(request: NextRequest) {
     try {
+        const adminSecret = process.env.ADMIN_SECRET;
+        if (!adminSecret) {
+            console.error('[admin/set-tier] ADMIN_SECRET env var is not configured');
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
+
         const body = await request.json();
         const { username, tier, secret } = body;
 
-        if (!ADMIN_SECRET || secret !== ADMIN_SECRET) {
+        if (!secret || secret !== adminSecret) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 

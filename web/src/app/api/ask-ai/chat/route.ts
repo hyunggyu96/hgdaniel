@@ -10,13 +10,16 @@ export async function POST(request: Request) {
     try {
         // Auth + tier check
         const user = await getAuthUserFromCookieHeader(request.headers.get('cookie'));
+        if (!user) {
+            return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+        }
         const featureCheck = requireFeature(user, 'ask_ai');
         if (featureCheck) return featureCheck;
 
         // Daily limit check
-        const config = getTierConfig(user!.tier);
+        const config = getTierConfig(user.tier);
         if (config.askAiQueriesPerDay !== null) {
-            const used = await getDailyUsageCount(user!.id, 'ask_ai_query');
+            const used = await getDailyUsageCount(user.id, 'ask_ai_query');
             if (used >= config.askAiQueriesPerDay) {
                 return NextResponse.json(
                     { error: 'Daily query limit reached', code: 'LIMIT_REACHED', limit: config.askAiQueriesPerDay },
@@ -165,7 +168,7 @@ ${sourceRefs.map(s => `[Source ${s.index}] ${s.title}${s.journal ? ` (${s.journa
         });
 
         // Record usage for quota tracking
-        await recordUsage(user!.id, 'ask_ai_query');
+        await recordUsage(user.id, 'ask_ai_query');
 
         return new Response(stream, {
             headers: {
@@ -176,6 +179,6 @@ ${sourceRefs.map(s => `[Source ${s.index}] ${s.title}${s.journal ? ` (${s.journa
         });
     } catch (err: any) {
         console.error('[chat] Error:', err);
-        return NextResponse.json({ error: err.message }, { status: 500 });
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
