@@ -1521,9 +1521,9 @@ export default function ConferencesPage() {
                             ))}
                         </div>
 
-                        <div className="grid grid-cols-7 bg-white dark:bg-gray-900 flex-1">
+                        <div className="grid grid-cols-7 gap-[1px] bg-gray-100 dark:bg-gray-800 flex-1">
                             {Array.from({ length: firstDay }).map((_, i) => (
-                                <div key={`empty-${i}`} className="min-h-[60px] md:min-h-[80px] bg-gray-50/20 dark:bg-gray-800/20 border-b border-r border-gray-50 dark:border-gray-800" />
+                                <div key={`empty-${i}`} className="min-h-[60px] md:min-h-[80px] bg-gray-50 dark:bg-gray-900" />
                             ))}
                             {Array.from({ length: daysInMonth }).map((_, i) => {
                                 const day = i + 1;
@@ -1542,9 +1542,9 @@ export default function ConferencesPage() {
                                                 if (el) el.scrollIntoView({ behavior: 'smooth' });
                                             }
                                         }}
-                                        className={`min-h-[60px] md:min-h-[80px] border-b border-r border-gray-100 dark:border-gray-800 py-1 transition-all hover:bg-blue-50/30 dark:hover:bg-gray-800/50 flex flex-col gap-0.5 group relative cursor-pointer
-                                            ${today ? 'bg-blue-50/20 dark:bg-blue-900/10' : ''}
-                                            ${selectedDate && selectedDate.getDate() === day && selectedDate.getMonth() === month && selectedDate.getFullYear() === year ? 'bg-blue-50 dark:bg-gray-800 ring-1 ring-inset ring-blue-500' : ''}
+                                        className={`min-h-[60px] md:min-h-[80px] py-1 transition-all hover:bg-blue-50/50 dark:hover:bg-gray-800/80 flex flex-col gap-0.5 group relative cursor-pointer
+                                            ${today ? 'bg-blue-50 dark:bg-blue-950/30' : 'bg-white dark:bg-gray-900'}
+                                            ${selectedDate && selectedDate.getDate() === day && selectedDate.getMonth() === month && selectedDate.getFullYear() === year ? '!bg-blue-50 dark:!bg-gray-800 ring-1 ring-inset ring-blue-500' : ''}
                                         `}
                                     >
                                         <div className="flex justify-between items-start px-1">
@@ -1614,7 +1614,7 @@ export default function ConferencesPage() {
                                 );
                             })}
                             {Array.from({ length: (7 - ((firstDay + daysInMonth) % 7)) % 7 }).map((_, i) => (
-                                <div key={`empty-end-${i}`} className="min-h-[60px] md:min-h-[80px] bg-gray-50/20 border-b border-r border-gray-50" />
+                                <div key={`empty-end-${i}`} className="min-h-[60px] md:min-h-[80px] bg-gray-50 dark:bg-gray-900" />
                             ))}
                         </div>
                     </div>
