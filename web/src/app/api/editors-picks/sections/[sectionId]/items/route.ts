@@ -31,14 +31,14 @@ export async function POST(request: NextRequest, { params }: { params: { section
             return NextResponse.json({ error: 'Section not found' }, { status: 404 });
         }
 
-        // Check max 5 items per section
+        // Check max 7 items per section
         const { count } = await supabaseAdmin
             .from('editors_picks_items')
             .select('*', { count: 'exact', head: true })
             .eq('section_id', sectionId);
 
-        if ((count || 0) >= 5) {
-            return NextResponse.json({ error: 'Maximum 5 articles per section' }, { status: 400 });
+        if ((count || 0) >= 7) {
+            return NextResponse.json({ error: 'Maximum 7 articles per section' }, { status: 400 });
         }
 
         const displayOrder = (count || 0);

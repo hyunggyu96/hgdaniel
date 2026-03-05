@@ -272,7 +272,7 @@ function AdminModal({
         optimisticAction(
             secs => secs.map(s => {
                 if (s.id !== activeSection) return s;
-                if (s.items.length >= 5) return s;
+                if (s.items.length >= 7) return s;
                 if (s.items.some(i => i.article_link === articleLink)) return s;
                 return { ...s, items: [...s.items, {
                     id: Date.now(),
@@ -424,7 +424,7 @@ function AdminModal({
                         {currentSection && (
                             <div className="px-5 py-3">
                                 <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mb-2">
-                                    {currentSection.name} ({currentSection.items.length}/5)
+                                    {currentSection.name} ({currentSection.items.length}/7)
                                 </p>
                                 <div className="space-y-1">
                                     {[...currentSection.items]
@@ -493,7 +493,7 @@ function AdminModal({
                                             >
                                                 <button
                                                     onClick={() => isAdded ? removeArticle(article.link) : addArticle(article.link)}
-                                                    disabled={!isAdded && currentSection.items.length >= 5}
+                                                    disabled={!isAdded && currentSection.items.length >= 7}
                                                     className={`shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-all ${
                                                         isAdded
                                                             ? 'bg-blue-500 border-blue-500 text-white'
@@ -508,6 +508,15 @@ function AdminModal({
                                                         {article.source} · {article.published_at?.slice(0, 10)}
                                                     </p>
                                                 </div>
+                                                <a
+                                                    href={article.link}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    onClick={e => e.stopPropagation()}
+                                                    className="shrink-0 p-1 text-gray-300 hover:text-blue-500 transition-colors"
+                                                >
+                                                    <ExternalLink className="w-3.5 h-3.5" />
+                                                </a>
                                             </div>
                                         );
                                     })}
