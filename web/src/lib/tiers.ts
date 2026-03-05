@@ -15,8 +15,8 @@ export type Feature =
 // 로그인 없이 접근 가능한 기능 (주석 해제로 활성화)
 // Features accessible without login (uncomment to enable)
 export const PUBLIC_FEATURES = new Set<Feature>([
-    // 'company',  // 기업브리핑
-    // 'policy',   // 정책/규제
+    'company',  // 기업브리핑
+    'policy',   // 정책/규제
 ]);
 
 export const TIER_CONFIG = {
