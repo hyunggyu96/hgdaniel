@@ -11,9 +11,13 @@ export type Feature =
     | 'ask_ai_upload'
     | 'collections';
 
+// ─── Prototype Mode ───
+// true = 모든 유료 기능 해제 (프로토타입용)
+// false = 티어별 접근 제어 활성화 (유료화 시 false로 변경)
+export const TIER_BYPASS = true;
+
 // ─── Public Features ───
-// 로그인 없이 접근 가능한 기능 (주석 해제로 활성화)
-// Features accessible without login (uncomment to enable)
+// TIER_BYPASS=false일 때, 로그인 없이도 접근 가능한 기능
 export const PUBLIC_FEATURES = new Set<Feature>([
     'company',  // 기업브리핑
     'policy',   // 정책/규제
@@ -63,12 +67,14 @@ export const TIER_CONFIG = {
 } as const;
 
 export function hasFeature(tier: Tier | null | undefined, feature: Feature): boolean {
+    if (TIER_BYPASS) return true;
     if (PUBLIC_FEATURES.has(feature)) return true;
     if (!tier) return false;
     return TIER_CONFIG[tier].features.has(feature);
 }
 
 export function getTierConfig(tier: Tier | null | undefined) {
+    if (TIER_BYPASS) return TIER_CONFIG['enterprise'];
     return TIER_CONFIG[tier || 'free'];
 }
 
