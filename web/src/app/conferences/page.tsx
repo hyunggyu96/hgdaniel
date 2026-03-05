@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useLanguage } from '@/components/LanguageContext';
-import { Globe, Calendar as CalendarIcon, MapPin, ExternalLink, X, Filter, ChevronRight, ChevronDown, ChevronUp, ChevronLeft, Star } from "lucide-react";
+import { Globe, Calendar as CalendarIcon, MapPin, ExternalLink, X, Filter, ChevronRight, ChevronDown, ChevronUp, ChevronLeft, Star, Search } from "lucide-react";
 import { supabase } from '@/lib/supabaseClient';
 import { useUser } from '@/components/UserContext';
 
@@ -1288,6 +1288,7 @@ export default function ConferencesPage() {
     const [selectedSeries, setSelectedSeries] = useState<string[]>([]);
     const [selectedContinents, setSelectedContinents] = useState<string[]>([]);
     const [selectedCountriesEn, setSelectedCountriesEn] = useState<string[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
 
     // Pagination Removed as per user request
     const monthNames = lang === 'ko' ? MONTH_NAMES_KO : MONTH_NAMES_EN;
@@ -1374,6 +1375,19 @@ export default function ConferencesPage() {
     // Filtered conferences
     const filteredConferences = useMemo(() => {
         let result = conferences;
+        if (searchQuery.trim()) {
+            const q = searchQuery.trim().toLowerCase();
+            result = result.filter((c) =>
+                c.name.ko.toLowerCase().includes(q) ||
+                c.name.en.toLowerCase().includes(q) ||
+                c.series.toLowerCase().includes(q) ||
+                c.city.ko.toLowerCase().includes(q) ||
+                c.city.en.toLowerCase().includes(q) ||
+                c.country.ko.toLowerCase().includes(q) ||
+                c.country.en.toLowerCase().includes(q) ||
+                c.venue.toLowerCase().includes(q)
+            );
+        }
         if (selectedSeries.length > 0) {
             result = result.filter((c) => selectedSeries.includes(c.series));
         }
@@ -1384,7 +1398,7 @@ export default function ConferencesPage() {
             result = result.filter((c) => selectedCountriesEn.includes(c.country.en));
         }
         return result;
-    }, [conferences, selectedSeries, selectedContinents, selectedCountriesEn]);
+    }, [conferences, searchQuery, selectedSeries, selectedContinents, selectedCountriesEn]);
 
     const upcomingEvents = useMemo(() => {
         const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -1466,6 +1480,26 @@ export default function ConferencesPage() {
                             </div>
                         </div>
                     </div>
+                </div>
+
+                {/* Search Bar */}
+                <div className="relative">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                    <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder={lang === 'ko' ? '컨퍼런스 검색 (이름, 도시, 국가, 시리즈...)' : 'Search conferences (name, city, country, series...)'}
+                        className="w-full h-11 pl-11 pr-10 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/40 transition-all shadow-sm"
+                    />
+                    {searchQuery && (
+                        <button
+                            onClick={() => setSearchQuery('')}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                        >
+                            <X className="w-3.5 h-3.5" />
+                        </button>
+                    )}
                 </div>
 
                 {selectedEvent && (
