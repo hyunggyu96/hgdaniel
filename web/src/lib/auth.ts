@@ -6,6 +6,7 @@ export const SESSION_TTL_SECONDS = 60 * 60 * 24 * 14; // 14 days
 type SessionPayload = {
     uid: string;
     un: string;
+    sv: number; // session_version — incremented on each login to invalidate old sessions
     iat: number;
     exp: number;
 };
@@ -109,11 +110,12 @@ export async function verifyPassword(password: string, storedHash: string): Prom
     }
 }
 
-export function createSessionToken(userId: string, username: string): string {
+export function createSessionToken(userId: string, username: string, sessionVersion = 0): string {
     const now = Math.floor(Date.now() / 1000);
     const payload: SessionPayload = {
         uid: userId,
         un: username,
+        sv: sessionVersion,
         iat: now,
         exp: now + SESSION_TTL_SECONDS,
     };

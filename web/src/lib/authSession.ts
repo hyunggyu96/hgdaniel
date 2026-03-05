@@ -25,6 +25,12 @@ async function getUserFromSessionToken(token?: string | null): Promise<AuthUser 
         .maybeSingle();
 
     if (error || !data) return null;
+
+    // Verify session_version matches — if the user logged in elsewhere, previous sessions are invalidated
+    const dbVersion = data.session_version ?? 0;
+    const tokenVersion = payload.sv ?? 0;
+    if (tokenVersion !== dbVersion) return null;
+
     return { id: data.id, username: data.username, tier: data.tier || 'free', isAdmin: !!data.is_admin };
 }
 

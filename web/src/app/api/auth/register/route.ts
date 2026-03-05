@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Failed to create account' }, { status: 500 });
         }
 
-        const token = createSessionToken(data.id, data.username);
+        const token = createSessionToken(data.id, data.username, data.session_version ?? 0);
         const response = NextResponse.json({
             user: { id: data.id, username: data.username, tier: data.tier || 'free', isAdmin: !!data.is_admin },
         });

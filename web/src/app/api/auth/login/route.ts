@@ -42,7 +42,14 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
         }
 
-        const token = createSessionToken(data.id, data.username);
+        // Increment session_version to invalidate all previous sessions (single-session enforcement)
+        const newVersion = (data.session_version ?? 0) + 1;
+        await supabaseAdmin
+            .from('accounts')
+            .update({ session_version: newVersion })
+            .eq('id', data.id);
+
+        const token = createSessionToken(data.id, data.username, newVersion);
         const response = NextResponse.json({
             user: { id: data.id, username: data.username, tier: data.tier || 'free', isAdmin: !!data.is_admin },
         });

@@ -16,7 +16,7 @@ export async function POST(request: Request) {
         const featureCheck = requireFeature(user, 'ask_ai');
         if (featureCheck) return featureCheck;
 
-        // Daily limit check
+        // Daily limit check — record usage BEFORE expensive operation to prevent race condition
         const config = getTierConfig(user.tier);
         if (config.askAiQueriesPerDay !== null) {
             const used = await getDailyUsageCount(user.id, 'ask_ai_query');
@@ -26,6 +26,7 @@ export async function POST(request: Request) {
                     { status: 429 }
                 );
             }
+            await recordUsage(user.id, 'ask_ai_query');
         }
 
         const { session_id, message, history } = await request.json();
@@ -167,9 +168,6 @@ ${sourceRefs.map(s => `[Source ${s.index}] ${s.title}${s.journal ? ` (${s.journa
                 }
             },
         });
-
-        // Record usage for quota tracking
-        await recordUsage(user.id, 'ask_ai_query');
 
         return new Response(stream, {
             headers: {

@@ -1,5 +1,10 @@
--- Security: Enable RLS on all sensitive tables
+-- Security: Enable RLS on all sensitive tables + single-session enforcement
 -- Run in Supabase SQL Editor
+
+-- ============================================
+-- 0. Add session_version for single-session enforcement
+-- ============================================
+ALTER TABLE public.accounts ADD COLUMN IF NOT EXISTS session_version INT NOT NULL DEFAULT 0;
 
 -- ============================================
 -- 1. accounts table — prevent anon key from modifying is_admin
