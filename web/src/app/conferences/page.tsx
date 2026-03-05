@@ -1575,6 +1575,16 @@ export default function ConferencesPage() {
                                                 const isSel = selectedEvent?.id === event.id;
                                                 const pos = getEventDayPosition(event, year, month, day);
                                                 const showLabel = pos === 'start' || pos === 'single';
+                                                const colors = isSel
+                                                    ? { backgroundColor: cc.color, color: '#fff', borderColor: cc.color }
+                                                    : { backgroundColor: cc.bgColor, color: cc.color, borderColor: cc.borderColor };
+                                                const barStyle = pos === 'start'
+                                                    ? { ...colors, width: 'calc(100% + 1px)' }
+                                                    : pos === 'middle'
+                                                    ? { ...colors, width: 'calc(100% + 2px)', marginLeft: '-1px' }
+                                                    : pos === 'end'
+                                                    ? { ...colors, width: 'calc(100% + 1px)', marginLeft: '-1px' }
+                                                    : colors;
                                                 return (
                                                     <button
                                                         key={event.id}
@@ -1583,17 +1593,14 @@ export default function ConferencesPage() {
                                                             setSelectedEvent(selectedEvent?.id === event.id ? null : event);
                                                             window.scrollTo({ top: 100, behavior: 'smooth' });
                                                         }}
-                                                        className={`w-full text-left text-[9px] font-bold py-0.5 truncate transition-all duration-200 flex items-center gap-1 leading-none
-                                                            ${pos === 'single' ? 'rounded-[4px] px-1 border' : ''}
-                                                            ${pos === 'start' ? 'rounded-l-[4px] rounded-r-none pl-1 -mr-[1px] border-y border-l' : ''}
-                                                            ${pos === 'end' ? 'rounded-r-[4px] rounded-l-none pr-1 -ml-[1px] border-y border-r' : ''}
-                                                            ${pos === 'middle' ? 'rounded-none -mx-[1px] border-y' : ''}
+                                                        className={`text-left text-[9px] font-bold py-0.5 truncate transition-all duration-200 flex items-center gap-1 leading-none
+                                                            ${pos === 'single' ? 'w-full rounded-[4px] px-1 border' : ''}
+                                                            ${pos === 'start' ? 'rounded-l-[4px] rounded-r-none pl-1 border-y border-l' : ''}
+                                                            ${pos === 'end' ? 'rounded-r-[4px] rounded-l-none pr-1 border-y border-r' : ''}
+                                                            ${pos === 'middle' ? 'rounded-none border-y' : ''}
                                                             ${isSel ? 'shadow-md z-10 brightness-110' : pos === 'single' ? 'hover:scale-105 hover:shadow-sm hover:z-10 hover:brightness-110' : 'hover:brightness-110'}
                                                         `}
-                                                        style={isSel
-                                                            ? { backgroundColor: cc.color, color: '#fff', borderColor: cc.color }
-                                                            : { backgroundColor: cc.bgColor, color: cc.color, borderColor: cc.borderColor }
-                                                        }
+                                                        style={barStyle}
                                                     >
                                                         {showLabel ? (
                                                             <>
