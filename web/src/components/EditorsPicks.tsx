@@ -179,8 +179,8 @@ function AdminModal({
         ).slice(0, 50);
     }, [allNews, searchQuery]);
 
-    // Fire-and-forget API call with optimistic SWR update
-    // Uses callback form of mutate to always read the latest cache (not stale closure)
+    // Optimistic SWR update + API call. Only revalidates on error (rollback).
+    // Successful ops trust the optimistic data; 60s refreshInterval handles eventual sync.
     const optimisticAction = async (
         updater: (current: EditorsPickSection[]) => EditorsPickSection[],
         url: string,
@@ -198,12 +198,12 @@ function AdminModal({
             if (!res.ok) {
                 const data = await res.json().catch(() => ({}));
                 alert(data.error || 'Operation failed');
+                mutate(); // Rollback: refetch server state
             }
         } catch {
             alert('Network error');
+            mutate(); // Rollback: refetch server state
         }
-        // Revalidate to sync with server
-        mutate();
     };
 
     const addSection = async () => {
