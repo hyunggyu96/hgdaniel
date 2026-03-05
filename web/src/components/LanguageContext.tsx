@@ -120,6 +120,17 @@ export const translations = {
         tier_news_limited: '최근 3일간의 뉴스만 표시됩니다.',
         tier_news_upgrade: '전체 뉴스를 보려면 Pro로 업그레이드하세요.',
         tier_login_required: '로그인이 필요합니다.',
+
+        // Editor's Pick
+        editors_picks_curated: '큐레이션',
+        editors_picks_settings: '에디터스 픽 설정',
+        editors_picks_add_section: '섹션 추가',
+        editors_picks_max_sections: '최대 3개 섹션',
+        editors_picks_section_name: '섹션 이름을 입력하세요',
+        editors_picks_add_articles: '기사 추가',
+        editors_picks_search_articles: '기사 검색...',
+        editors_picks_no_sections: '섹션이 없습니다. 설정에서 추가하세요.',
+        confirm: '확인',
     },
     en: {
         // Nav
@@ -228,6 +239,17 @@ export const translations = {
         tier_news_limited: 'Showing news from the last 3 days only.',
         tier_news_upgrade: 'Upgrade to Pro to access the full news archive.',
         tier_login_required: 'Login required.',
+
+        // Editor's Pick
+        editors_picks_curated: 'CURATED',
+        editors_picks_settings: 'Editor\'s Pick Settings',
+        editors_picks_add_section: 'Add Section',
+        editors_picks_max_sections: 'Max 3 sections',
+        editors_picks_section_name: 'Enter section name',
+        editors_picks_add_articles: 'Add Articles',
+        editors_picks_search_articles: 'Search articles...',
+        editors_picks_no_sections: 'No sections yet. Add one in settings.',
+        confirm: 'Confirm',
     }
 };
 

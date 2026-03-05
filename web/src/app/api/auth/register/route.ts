@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
                 username,
                 password_hash: passwordHash,
             })
-            .select('id, username, tier')
+            .select('id, username, tier, is_admin')
             .single();
 
         if (error || !data) {
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
 
         const token = createSessionToken(data.id, data.username);
         const response = NextResponse.json({
-            user: { id: data.id, username: data.username, tier: data.tier || 'free' },
+            user: { id: data.id, username: data.username, tier: data.tier || 'free', isAdmin: !!data.is_admin },
         });
         response.headers.set('Set-Cookie', buildSessionCookie(token));
         return response;

@@ -8,6 +8,7 @@ export type AuthUser = {
     id: string;
     username: string;
     tier: Tier;
+    isAdmin: boolean;
 };
 
 async function getUserFromSessionToken(token?: string | null): Promise<AuthUser | null> {
@@ -16,13 +17,13 @@ async function getUserFromSessionToken(token?: string | null): Promise<AuthUser 
 
     const { data, error } = await supabaseAdmin
         .from('accounts')
-        .select('id, username, tier')
+        .select('id, username, tier, is_admin')
         .eq('id', payload.uid)
         .eq('username', payload.un)
         .maybeSingle();
 
     if (error || !data) return null;
-    return { id: data.id, username: data.username, tier: data.tier || 'free' };
+    return { id: data.id, username: data.username, tier: data.tier || 'free', isAdmin: !!data.is_admin };
 }
 
 export async function getAuthUserFromCookieHeader(cookieHeader?: string | null) {

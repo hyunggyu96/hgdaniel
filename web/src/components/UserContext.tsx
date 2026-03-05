@@ -11,6 +11,7 @@ interface AuthResult {
 interface UserContextType {
     userId: string | null;
     userTier: Tier;
+    isAdmin: boolean;
     isLoading: boolean;
     login: (username: string, password: string) => Promise<AuthResult>;
     register: (username: string, password: string) => Promise<AuthResult>;
@@ -20,30 +21,34 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-async function parseUserFromMe(): Promise<{ username: string | null; tier: Tier }> {
+async function parseUserFromMe(): Promise<{ username: string | null; tier: Tier; isAdmin: boolean }> {
     const res = await fetch('/api/auth/me', { cache: 'no-store' });
-    if (!res.ok) return { username: null, tier: 'free' };
+    if (!res.ok) return { username: null, tier: 'free', isAdmin: false };
     const json = await res.json();
     return {
         username: json?.user?.username || null,
         tier: json?.user?.tier || 'free',
+        isAdmin: !!json?.user?.isAdmin,
     };
 }
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
     const [userId, setUserId] = useState<string | null>(null);
     const [userTier, setUserTier] = useState<Tier>('free');
+    const [isAdmin, setIsAdmin] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
     const refreshUser = async () => {
         try {
-            const { username, tier } = await parseUserFromMe();
+            const { username, tier, isAdmin: admin } = await parseUserFromMe();
             setUserId(username);
             setUserTier(tier);
+            setIsAdmin(admin);
         } catch (error) {
             console.error('[UserContext] refreshUser failed', error);
             setUserId(null);
             setUserTier('free');
+            setIsAdmin(false);
         } finally {
             setIsLoading(false);
         }
@@ -63,6 +68,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         if (!res.ok) return { ok: false, error: json?.error || 'Login failed' };
         setUserId(json?.user?.username || null);
         setUserTier(json?.user?.tier || 'free');
+        setIsAdmin(!!json?.user?.isAdmin);
         return { ok: true };
     };
 
@@ -76,6 +82,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         if (!res.ok) return { ok: false, error: json?.error || 'Register failed' };
         setUserId(json?.user?.username || null);
         setUserTier(json?.user?.tier || 'free');
+        setIsAdmin(!!json?.user?.isAdmin);
         return { ok: true };
     };
 
@@ -87,11 +94,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         } finally {
             setUserId(null);
             setUserTier('free');
+            setIsAdmin(false);
         }
     };
 
     return (
-        <UserContext.Provider value={{ userId, userTier, isLoading, login, register, logout, refreshUser }}>
+        <UserContext.Provider value={{ userId, userTier, isAdmin, isLoading, login, register, logout, refreshUser }}>
             {children}
         </UserContext.Provider>
     );
