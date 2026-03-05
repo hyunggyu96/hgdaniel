@@ -9,5 +9,11 @@
     },
     "buildCommand": "cd web && npm run build",
     "installCommand": "cd web && npm install",
-    "outputDirectory": "web/.next"
+    "outputDirectory": "web/.next",
+    "crons": [
+        {
+            "path": "/api/cron/snapshot-editors-picks",
+            "schedule": "0 13 * * *"
+        }
+    ]
 }

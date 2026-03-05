@@ -12,6 +12,35 @@ interface EditorsPicksProps {
     allNews: any[];
 }
 
+// Format ordinal suffix (1st, 2nd, 3rd, 4th, ...)
+function getOrdinalSuffix(day: number): string {
+    if (day > 3 && day < 21) return 'th';
+    switch (day % 10) {
+        case 1: return 'st';
+        case 2: return 'nd';
+        case 3: return 'rd';
+        default: return 'th';
+    }
+}
+
+// Format today's date in KST as "Mar 5th, 2026"
+function formatTodayDateKST(): string {
+    const now = new Date();
+    const tz: Intl.DateTimeFormatOptions = { timeZone: 'Asia/Seoul' };
+    const month = now.toLocaleDateString('en-US', { ...tz, month: 'short' });
+    const day = parseInt(now.toLocaleDateString('en-US', { ...tz, day: 'numeric' }));
+    const year = now.toLocaleDateString('en-US', { ...tz, year: 'numeric' });
+    return `${month} ${day}${getOrdinalSuffix(day)}, ${year}`;
+}
+
+// Auto-format section name: "Editor's Pick" → "Today AI Pick (Mar 5th, 2026)"
+function formatSectionDisplayName(name: string): string {
+    if (name === "Editor's Pick" || name === "Today AI Pick") {
+        return `Today AI Pick (${formatTodayDateKST()})`;
+    }
+    return name;
+}
+
 // =============================================
 // PUBLIC DISPLAY
 // =============================================
@@ -62,7 +91,7 @@ export default function EditorsPicks({ allNews }: EditorsPicksProps) {
                                 style={{ backgroundColor: section.color }}
                             >
                                 <span className="text-[11px] font-black text-white uppercase tracking-[0.1em]">
-                                    {section.name}
+                                    {formatSectionDisplayName(section.name)}
                                 </span>
                             </div>
                             {/* Items */}

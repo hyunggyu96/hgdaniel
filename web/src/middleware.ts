@@ -62,6 +62,11 @@ export function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
+    // Skip rate limiting for Vercel Cron (authenticated by CRON_SECRET in the handler)
+    if (pathname.startsWith('/api/cron/')) {
+        return NextResponse.next();
+    }
+
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
         || request.headers.get('x-real-ip')
         || 'unknown';
