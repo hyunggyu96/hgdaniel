@@ -1727,13 +1727,13 @@ export default function ConferencesPage() {
                 </div>
 
                 {/* Bottom Section: Upcoming Events (Master-Detail View) */}
-                <div className="pt-8 space-y-5">
-                    <div className="flex items-center justify-between mb-2">
+                <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-xl ring-1 ring-black/5 p-6 space-y-5">
+                    <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 border-l-4 border-blue-600 pl-3">
                                 {lang === 'ko' ? '다가오는 일정' : 'Upcoming Events'}
                             </h3>
-                            <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                            <span className="text-xs font-semibold text-gray-500 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">
                                 Total {upcomingEvents.length}
                             </span>
                         </div>
