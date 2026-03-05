@@ -710,6 +710,27 @@ function isToday(year: number, month: number, day: number): boolean {
     return now.getFullYear() === year && now.getMonth() === month && now.getDate() === day;
 }
 
+// Determine visual position of an event within a day for connected multi-day bars
+function getEventDayPosition(event: ConferenceEvent, year: number, month: number, day: number): 'start' | 'middle' | 'end' | 'single' {
+    const current = new Date(year, month, day);
+    const s = new Date(event.startDate);
+    const e = new Date(event.endDate);
+    current.setHours(0, 0, 0, 0); s.setHours(0, 0, 0, 0); e.setHours(0, 0, 0, 0);
+
+    const dow = current.getDay(); // 0=Sun, 6=Sat
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    // Visual start: actual start, first day of week row (Sun), or first day of visible month
+    const isVisualStart = current.getTime() === s.getTime() || dow === 0 || day === 1;
+    // Visual end: actual end, last day of week row (Sat), or last day of visible month
+    const isVisualEnd = current.getTime() === e.getTime() || dow === 6 || day === daysInMonth;
+
+    if (isVisualStart && isVisualEnd) return 'single';
+    if (isVisualStart) return 'start';
+    if (isVisualEnd) return 'end';
+    return 'middle';
+}
+
 // ─── Component: Event Detail Panel ───
 function EventDetailPanel({ event, onClose, lang }: {
     event: ConferenceEvent; onClose: () => void; lang: 'ko' | 'en';
@@ -1329,11 +1350,13 @@ export default function ConferencesPage() {
                                             )}
                                         </div>
 
-                                        {/* Desktop View: Full Bars */}
+                                        {/* Desktop View: Connected Multi-day Bars */}
                                         <div className="hidden md:flex flex-col gap-0.5 mt-0.5">
                                             {events.slice(0, 2).map((event) => {
                                                 const cc = getCountryColor(event.country[lang]);
                                                 const isSel = selectedEvent?.id === event.id;
+                                                const pos = getEventDayPosition(event, year, month, day);
+                                                const showLabel = pos === 'start' || pos === 'single';
                                                 return (
                                                     <button
                                                         key={event.id}
@@ -1342,15 +1365,26 @@ export default function ConferencesPage() {
                                                             setSelectedEvent(selectedEvent?.id === event.id ? null : event);
                                                             window.scrollTo({ top: 100, behavior: 'smooth' });
                                                         }}
-                                                        className={`w-full text-left text-[9px] font-bold px-1 py-0.5 rounded-[4px] truncate transition-all duration-200 border flex items-center gap-1 leading-none
-                                                        ${isSel ? 'scale-105 shadow-md z-10 brightness-110' : 'hover:scale-105 hover:shadow-sm hover:z-10 hover:brightness-110'}`}
+                                                        className={`w-full text-left text-[9px] font-bold py-0.5 truncate transition-all duration-200 flex items-center gap-1 leading-none
+                                                            ${pos === 'single' ? 'rounded-[4px] px-1 border' : ''}
+                                                            ${pos === 'start' ? 'rounded-l-[4px] rounded-r-none pl-1 pr-0 -mr-1 border-y border-l' : ''}
+                                                            ${pos === 'end' ? 'rounded-r-[4px] rounded-l-none pr-1 pl-0 -ml-1 border-y border-r' : ''}
+                                                            ${pos === 'middle' ? 'rounded-none px-0 -mx-1 border-y border-x-0' : ''}
+                                                            ${isSel ? 'shadow-md z-10 brightness-110' : pos === 'single' ? 'hover:scale-105 hover:shadow-sm hover:z-10 hover:brightness-110' : 'hover:brightness-110'}
+                                                        `}
                                                         style={isSel
                                                             ? { backgroundColor: cc.color, color: '#fff', borderColor: cc.color }
                                                             : { backgroundColor: cc.bgColor, color: cc.color, borderColor: cc.borderColor }
                                                         }
                                                     >
-                                                        <span className="shrink-0"><FlagIcon country={event.country[lang]} size={9} /></span>
-                                                        <span className="truncate">{event.name[lang].replace(/ 2026.*/, '')}</span>
+                                                        {showLabel ? (
+                                                            <>
+                                                                <span className="shrink-0"><FlagIcon country={event.country[lang]} size={9} /></span>
+                                                                <span className="truncate">{event.name[lang].replace(/ 2026.*/, '')}</span>
+                                                            </>
+                                                        ) : (
+                                                            <span className="w-full">&nbsp;</span>
+                                                        )}
                                                     </button>
                                                 );
                                             })}
