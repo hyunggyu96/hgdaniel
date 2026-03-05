@@ -158,12 +158,11 @@ function AdminModal({
     onClose: () => void;
     sections: EditorsPickSection[];
     allNews: any[];
-    mutate: () => void;
+    mutate: any;
 }) {
     const { t } = useLanguage();
     const [activeSection, setActiveSection] = useState<number | null>(sections[0]?.id || null);
     const [searchQuery, setSearchQuery] = useState('');
-    const [loading, setLoading] = useState(false);
     const [editingName, setEditingName] = useState<number | null>(null);
     const [editNameValue, setEditNameValue] = useState('');
 
@@ -180,8 +179,15 @@ function AdminModal({
         ).slice(0, 50);
     }, [allNews, searchQuery]);
 
-    const apiCall = async (url: string, method: string, body?: any) => {
-        setLoading(true);
+    // Fire-and-forget API call with optimistic SWR update
+    const optimisticAction = async (
+        optimisticSections: EditorsPickSection[],
+        url: string,
+        method: string,
+        body?: any,
+    ) => {
+        // Instant UI update
+        mutate({ sections: optimisticSections }, { revalidate: false });
         try {
             const res = await fetch(url, {
                 method,
@@ -191,48 +197,89 @@ function AdminModal({
             if (!res.ok) {
                 const data = await res.json().catch(() => ({}));
                 alert(data.error || 'Operation failed');
-                return null;
             }
-            const data = await res.json();
-            mutate();
-            return data;
         } catch {
             alert('Network error');
-            return null;
-        } finally {
-            setLoading(false);
         }
+        // Revalidate to sync with server
+        mutate();
     };
 
     const addSection = async () => {
         const name = prompt(t('editors_picks_section_name'));
         if (!name?.trim()) return;
-        const data = await apiCall('/api/editors-picks', 'POST', { name: name.trim() });
-        if (data?.section) setActiveSection(data.section.id);
+        // For add, we don't know the ID yet — just call API and revalidate
+        try {
+            const res = await fetch('/api/editors-picks', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name.trim() }),
+            });
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                alert(data.error || 'Failed to create section');
+                return;
+            }
+            const data = await res.json();
+            if (data?.section) setActiveSection(data.section.id);
+            mutate();
+        } catch {
+            alert('Network error');
+        }
     };
 
     const deleteSection = async (id: number) => {
         if (!confirm('Delete this section?')) return;
-        await apiCall(`/api/editors-picks/sections/${id}`, 'DELETE');
+        const optimistic = sections.filter(s => s.id !== id);
         if (activeSection === id) {
-            setActiveSection(sections.find(s => s.id !== id)?.id || null);
+            setActiveSection(optimistic[0]?.id || null);
         }
+        optimisticAction(optimistic, `/api/editors-picks/sections/${id}`, 'DELETE');
     };
 
     const renameSection = async (id: number) => {
         if (!editNameValue.trim()) return;
-        await apiCall(`/api/editors-picks/sections/${id}`, 'PUT', { name: editNameValue.trim() });
+        const newName = editNameValue.trim();
+        const optimistic = sections.map(s =>
+            s.id === id ? { ...s, name: newName } : s
+        );
         setEditingName(null);
+        optimisticAction(optimistic, `/api/editors-picks/sections/${id}`, 'PUT', { name: newName });
     };
 
     const addArticle = async (articleLink: string) => {
-        if (!activeSection) return;
-        await apiCall(`/api/editors-picks/sections/${activeSection}/items`, 'POST', { article_link: articleLink });
+        if (!activeSection || !currentSection) return;
+        if (currentSection.items.length >= 5) return;
+        // Find article metadata from allNews for optimistic display
+        const newsArticle = allNews.find(a => a.link === articleLink);
+        const optimisticItem = {
+            id: Date.now(), // temp ID
+            article_link: articleLink,
+            display_order: currentSection.items.length,
+            article: newsArticle ? {
+                title: newsArticle.title,
+                description: newsArticle.description,
+                published_at: newsArticle.published_at,
+                link: newsArticle.link,
+                source: newsArticle.source,
+            } : null,
+        };
+        const optimistic = sections.map(s =>
+            s.id === activeSection
+                ? { ...s, items: [...s.items, optimisticItem] }
+                : s
+        );
+        optimisticAction(optimistic, `/api/editors-picks/sections/${activeSection}/items`, 'POST', { article_link: articleLink });
     };
 
     const removeArticle = async (articleLink: string) => {
         if (!activeSection) return;
-        await apiCall(`/api/editors-picks/sections/${activeSection}/items`, 'DELETE', { article_link: articleLink });
+        const optimistic = sections.map(s =>
+            s.id === activeSection
+                ? { ...s, items: s.items.filter(i => i.article_link !== articleLink) }
+                : s
+        );
+        optimisticAction(optimistic, `/api/editors-picks/sections/${activeSection}/items`, 'DELETE', { article_link: articleLink });
     };
 
     const moveItem = async (articleLink: string, direction: 'up' | 'down') => {
@@ -243,12 +290,23 @@ function AdminModal({
         const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
         if (swapIdx < 0 || swapIdx >= items.length) return;
 
-        const newItems = items.map((item, i) => ({
+        // Swap display_order
+        const updatedItems = items.map((item, i) => {
+            if (i === idx) return { ...item, display_order: items[swapIdx].display_order };
+            if (i === swapIdx) return { ...item, display_order: items[idx].display_order };
+            return item;
+        });
+
+        const optimistic = sections.map(s =>
+            s.id === currentSection.id ? { ...s, items: updatedItems } : s
+        );
+
+        const newItemsPayload = updatedItems.map(item => ({
             article_link: item.article_link,
-            display_order: i === idx ? items[swapIdx].display_order : i === swapIdx ? items[idx].display_order : item.display_order,
+            display_order: item.display_order,
         }));
 
-        await apiCall(`/api/editors-picks/sections/${currentSection.id}/items`, 'PUT', { items: newItems });
+        optimisticAction(optimistic, `/api/editors-picks/sections/${currentSection.id}/items`, 'PUT', { items: newItemsPayload });
     };
 
     return (
@@ -269,7 +327,7 @@ function AdminModal({
                 exit={{ opacity: 0, scale: 0.95, y: 10 }}
                 className="fixed inset-4 z-[101] flex items-center justify-center pointer-events-none"
             >
-                <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl w-[70vw] h-[70vh] flex flex-col overflow-hidden pointer-events-auto">
+                <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl w-[85vw] h-[85vh] flex flex-col overflow-hidden pointer-events-auto">
                     {/* Header */}
                     <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center shrink-0">
                         <h3 className="text-sm font-bold text-foreground">{t('editors_picks_settings')}</h3>
@@ -366,21 +424,20 @@ function AdminModal({
                                                 <div className="flex items-center gap-0.5 shrink-0">
                                                     <button
                                                         onClick={() => moveItem(item.article_link, 'up')}
-                                                        disabled={idx === 0 || loading}
+                                                        disabled={idx === 0}
                                                         className="p-0.5 text-gray-400 hover:text-foreground disabled:opacity-30 transition-colors"
                                                     >
                                                         <ChevronUp className="w-3 h-3" />
                                                     </button>
                                                     <button
                                                         onClick={() => moveItem(item.article_link, 'down')}
-                                                        disabled={idx === currentSection.items.length - 1 || loading}
+                                                        disabled={idx === currentSection.items.length - 1}
                                                         className="p-0.5 text-gray-400 hover:text-foreground disabled:opacity-30 transition-colors"
                                                     >
                                                         <ChevronDown className="w-3 h-3" />
                                                     </button>
                                                     <button
                                                         onClick={() => removeArticle(item.article_link)}
-                                                        disabled={loading}
                                                         className="p-0.5 text-gray-400 hover:text-red-500 transition-colors ml-1"
                                                     >
                                                         <Trash2 className="w-3 h-3" />
@@ -393,7 +450,7 @@ function AdminModal({
                         )}
 
                         {/* News List for Adding */}
-                        {currentSection && currentSection.items.length < 5 && (
+                        {currentSection && (
                             <div className="px-5 py-3 border-t border-gray-100 dark:border-gray-800">
                                 <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mb-2">
                                     {t('editors_picks_add_articles')}
@@ -408,7 +465,7 @@ function AdminModal({
                                         className="w-full pl-8 pr-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-blue-500/50 transition-colors"
                                     />
                                 </div>
-                                <div className="max-h-60 overflow-y-auto space-y-0.5 custom-scrollbar">
+                                <div className="max-h-[40vh] overflow-y-auto space-y-0.5 custom-scrollbar">
                                     {filteredNews.map(article => {
                                         const isAdded = currentLinks.has(article.link);
                                         return (
@@ -422,7 +479,7 @@ function AdminModal({
                                             >
                                                 <button
                                                     onClick={() => isAdded ? removeArticle(article.link) : addArticle(article.link)}
-                                                    disabled={loading || (!isAdded && currentSection.items.length >= 5)}
+                                                    disabled={!isAdded && currentSection.items.length >= 5}
                                                     className={`shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-all ${
                                                         isAdded
                                                             ? 'bg-blue-500 border-blue-500 text-white'
