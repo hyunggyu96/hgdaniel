@@ -180,14 +180,15 @@ function AdminModal({
     }, [allNews, searchQuery]);
 
     // Fire-and-forget API call with optimistic SWR update
+    // Uses callback form of mutate to always read the latest cache (not stale closure)
     const optimisticAction = async (
-        optimisticSections: EditorsPickSection[],
+        updater: (current: EditorsPickSection[]) => EditorsPickSection[],
         url: string,
         method: string,
         body?: any,
     ) => {
-        // Instant UI update
-        mutate({ sections: optimisticSections }, { revalidate: false });
+        // Instant UI update from latest cache
+        mutate((prev: any) => ({ sections: updater(prev?.sections || []) }), { revalidate: false });
         try {
             const res = await fetch(url, {
                 method,
@@ -230,83 +231,88 @@ function AdminModal({
 
     const deleteSection = async (id: number) => {
         if (!confirm('Delete this section?')) return;
-        const optimistic = sections.filter(s => s.id !== id);
         if (activeSection === id) {
-            setActiveSection(optimistic[0]?.id || null);
+            const next = sections.find(s => s.id !== id);
+            setActiveSection(next?.id || null);
         }
-        optimisticAction(optimistic, `/api/editors-picks/sections/${id}`, 'DELETE');
+        optimisticAction(
+            secs => secs.filter(s => s.id !== id),
+            `/api/editors-picks/sections/${id}`, 'DELETE',
+        );
     };
 
     const renameSection = async (id: number) => {
         if (!editNameValue.trim()) return;
         const newName = editNameValue.trim();
-        const optimistic = sections.map(s =>
-            s.id === id ? { ...s, name: newName } : s
-        );
         setEditingName(null);
-        optimisticAction(optimistic, `/api/editors-picks/sections/${id}`, 'PUT', { name: newName });
+        optimisticAction(
+            secs => secs.map(s => s.id === id ? { ...s, name: newName } : s),
+            `/api/editors-picks/sections/${id}`, 'PUT', { name: newName },
+        );
     };
 
     const addArticle = async (articleLink: string) => {
-        if (!activeSection || !currentSection) return;
-        if (currentSection.items.length >= 5) return;
-        // Find article metadata from allNews for optimistic display
+        if (!activeSection) return;
         const newsArticle = allNews.find(a => a.link === articleLink);
-        const optimisticItem = {
-            id: Date.now(), // temp ID
-            article_link: articleLink,
-            display_order: currentSection.items.length,
-            article: newsArticle ? {
-                title: newsArticle.title,
-                description: newsArticle.description,
-                published_at: newsArticle.published_at,
-                link: newsArticle.link,
-                source: newsArticle.source,
-            } : null,
-        };
-        const optimistic = sections.map(s =>
-            s.id === activeSection
-                ? { ...s, items: [...s.items, optimisticItem] }
-                : s
+        const article = newsArticle ? {
+            title: newsArticle.title,
+            description: newsArticle.description,
+            published_at: newsArticle.published_at,
+            link: newsArticle.link,
+            source: newsArticle.source,
+        } : null;
+        optimisticAction(
+            secs => secs.map(s => {
+                if (s.id !== activeSection) return s;
+                if (s.items.length >= 5) return s;
+                if (s.items.some(i => i.article_link === articleLink)) return s;
+                return { ...s, items: [...s.items, {
+                    id: Date.now(),
+                    article_link: articleLink,
+                    display_order: s.items.length,
+                    article,
+                }] };
+            }),
+            `/api/editors-picks/sections/${activeSection}/items`, 'POST', { article_link: articleLink },
         );
-        optimisticAction(optimistic, `/api/editors-picks/sections/${activeSection}/items`, 'POST', { article_link: articleLink });
     };
 
     const removeArticle = async (articleLink: string) => {
         if (!activeSection) return;
-        const optimistic = sections.map(s =>
-            s.id === activeSection
-                ? { ...s, items: s.items.filter(i => i.article_link !== articleLink) }
-                : s
+        optimisticAction(
+            secs => secs.map(s =>
+                s.id === activeSection
+                    ? { ...s, items: s.items.filter(i => i.article_link !== articleLink) }
+                    : s
+            ),
+            `/api/editors-picks/sections/${activeSection}/items`, 'DELETE', { article_link: articleLink },
         );
-        optimisticAction(optimistic, `/api/editors-picks/sections/${activeSection}/items`, 'DELETE', { article_link: articleLink });
     };
 
     const moveItem = async (articleLink: string, direction: 'up' | 'down') => {
         if (!currentSection) return;
+        const sectionId = currentSection.id;
         const items = [...currentSection.items].sort((a, b) => a.display_order - b.display_order);
         const idx = items.findIndex(i => i.article_link === articleLink);
         if (idx < 0) return;
         const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
         if (swapIdx < 0 || swapIdx >= items.length) return;
 
-        // Swap display_order
         const updatedItems = items.map((item, i) => {
             if (i === idx) return { ...item, display_order: items[swapIdx].display_order };
             if (i === swapIdx) return { ...item, display_order: items[idx].display_order };
             return item;
         });
 
-        const optimistic = sections.map(s =>
-            s.id === currentSection.id ? { ...s, items: updatedItems } : s
-        );
-
         const newItemsPayload = updatedItems.map(item => ({
             article_link: item.article_link,
             display_order: item.display_order,
         }));
 
-        optimisticAction(optimistic, `/api/editors-picks/sections/${currentSection.id}/items`, 'PUT', { items: newItemsPayload });
+        optimisticAction(
+            secs => secs.map(s => s.id === sectionId ? { ...s, items: updatedItems } : s),
+            `/api/editors-picks/sections/${sectionId}/items`, 'PUT', { items: newItemsPayload },
+        );
     };
 
     return (
