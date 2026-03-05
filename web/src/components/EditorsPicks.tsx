@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, X, Plus, Trash2, ChevronUp, ChevronDown, Check, Search, Pencil } from 'lucide-react';
+import { Settings, X, Plus, Trash2, ChevronUp, ChevronDown, Check, Search, Pencil, ExternalLink } from 'lucide-react';
 import { useEditorsPicks, type EditorsPickSection } from '@/hooks/useEditorsPicks';
 import { useUser } from './UserContext';
 import { useLanguage } from './LanguageContext';
@@ -103,6 +103,14 @@ export default function EditorsPicks({ allNews }: EditorsPicksProps) {
                                                         {item.article.source}
                                                     </div>
                                                 </div>
+                                                <a
+                                                    href={item.article.link}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="shrink-0 p-1 text-gray-300 hover:text-blue-500 transition-colors"
+                                                >
+                                                    <ExternalLink className="w-3.5 h-3.5" />
+                                                </a>
                                             </div>
                                         </div>
                                     );
