@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
                 username,
                 password_hash: passwordHash,
             })
-            .select('id, username, tier, is_admin')
+            .select('*')
             .single();
 
         if (error || !data) {

@@ -17,7 +17,7 @@ async function getUserFromSessionToken(token?: string | null): Promise<AuthUser 
 
     const { data, error } = await supabaseAdmin
         .from('accounts')
-        .select('id, username, tier, is_admin')
+        .select('*')
         .eq('id', payload.uid)
         .eq('username', payload.un)
         .maybeSingle();
