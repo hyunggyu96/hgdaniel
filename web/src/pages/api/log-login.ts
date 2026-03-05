@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { JWT } from 'google-auth-library';
+import { getAuthUserFromCookieHeader } from '@/lib/authSession';
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID_LOGINS || '';
 const SERVICE_ACCOUNT_KEY_B64 = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_B64 || '';
@@ -26,15 +27,14 @@ async function getDoc() {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-    // Frontend (LoginButton) will send: { userId, provider }
-    // Or LoginTracker sends { userId, title, link } for clicks.
-    // We should handle both or at least the Login one effectively.
+    // Validate user from session cookie instead of trusting body.userId
+    const authUser = await getAuthUserFromCookieHeader(req.headers.cookie);
+    if (!authUser) {
+        return res.status(401).json({ error: 'Authentication required' });
+    }
+    const userId = authUser.username;
 
-    // Let's support generic logging.
     const body = req.body;
-    const userId = body.userId || body.email;
-
-    if (!userId) return res.status(400).json({ error: 'Missing userId' });
 
     try {
         const doc = await getDoc();
@@ -69,6 +69,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(200).json({ success: true });
     } catch (e: any) {
         console.error('Log Error:', e);
-        return res.status(500).json({ error: e.message });
+        return res.status(500).json({ error: 'Internal server error' });
     }
 }

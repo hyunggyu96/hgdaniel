@@ -21,7 +21,7 @@ export default function KeywordSuggestionModal({ isOpen, onClose }: { isOpen: bo
             const res = await fetch('/api/suggest', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ keyword, category, reason, userId }),
+                body: JSON.stringify({ keyword, category, reason }),
             });
 
             if (res.ok) {

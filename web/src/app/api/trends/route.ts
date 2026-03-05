@@ -102,6 +102,6 @@ export async function GET() {
         });
     } catch (e: any) {
         console.error("Trend API Error:", e);
-        return NextResponse.json({ error: e.message }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to fetch trends' }, { status: 500 });
     }
 }

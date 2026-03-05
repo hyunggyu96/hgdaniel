@@ -31,7 +31,8 @@ export async function POST(request: NextRequest) {
             .single();
 
         if (error || !data) {
-            return NextResponse.json({ error: error?.message || 'User not found' }, { status: 404 });
+            console.error('[admin/set-tier] Error:', error);
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
 
         return NextResponse.json({ ok: true, user: data });

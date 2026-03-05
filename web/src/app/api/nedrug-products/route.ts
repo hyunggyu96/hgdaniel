@@ -24,7 +24,8 @@ export async function GET(request: Request) {
         dbQuery = dbQuery.eq('company_id', parseInt(companyId));
     }
     if (companyName) {
-        dbQuery = dbQuery.ilike('company_name', `%${companyName}%`);
+        const sanitizedName = companyName.replace(/[%_\\]/g, '\\$&').slice(0, 200);
+        dbQuery = dbQuery.ilike('company_name', `%${sanitizedName}%`);
     }
     if (status === 'active') {
         dbQuery = dbQuery.eq('status', 'active');
@@ -44,7 +45,8 @@ export async function GET(request: Request) {
     const { data, error, count } = await dbQuery;
 
     if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.error('[nedrug-products] Query error:', error);
+        return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
     }
 
     return NextResponse.json({

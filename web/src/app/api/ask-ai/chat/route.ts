@@ -159,8 +159,9 @@ ${sourceRefs.map(s => `[Source ${s.index}] ${s.title}${s.journal ? ` (${s.journa
                     );
                     controller.close();
                 } catch (err: any) {
+                    console.error('[chat] Stream error:', err);
                     controller.enqueue(
-                        encoder.encode(`data: ${JSON.stringify({ error: err.message })}\n\n`)
+                        encoder.encode(`data: ${JSON.stringify({ error: 'Stream interrupted' })}\n\n`)
                     );
                     controller.close();
                 }

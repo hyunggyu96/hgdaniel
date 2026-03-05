@@ -16,12 +16,14 @@ export async function POST(request: Request) {
             .single();
 
         if (error) {
-            return NextResponse.json({ error: error.message }, { status: 500 });
+            console.error('[sessions] Create error:', error);
+            return NextResponse.json({ error: 'Failed to create session' }, { status: 500 });
         }
 
         return NextResponse.json({ session_id: data.id, created_at: data.created_at });
     } catch (err: any) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+        console.error('[sessions] Error:', err);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
 
@@ -46,11 +48,13 @@ export async function DELETE(request: Request) {
             .eq('user_id', user.id);
 
         if (error) {
-            return NextResponse.json({ error: error.message }, { status: 500 });
+            console.error('[sessions] Delete error:', error);
+            return NextResponse.json({ error: 'Failed to delete session' }, { status: 500 });
         }
 
         return NextResponse.json({ success: true });
     } catch (err: any) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+        console.error('[sessions] Error:', err);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }

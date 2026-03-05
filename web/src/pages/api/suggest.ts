@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { JWT } from 'google-auth-library';
+import { getAuthUserFromCookieHeader } from '@/lib/authSession';
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID_MARKET || '';
 const SERVICE_ACCOUNT_KEY_B64 = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_B64 || '';
@@ -27,10 +28,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
     try {
-        const { keyword, category, reason, userId } = req.body;
+        // Validate user from session cookie instead of trusting body.userId
+        const authUser = await getAuthUserFromCookieHeader(req.headers.cookie);
+        if (!authUser) {
+            return res.status(401).json({ error: '로그인이 필요합니다.' });
+        }
+        const userId = authUser.username;
 
-        // 로그인 사용자만 제안 가능
-        if (!userId) return res.status(401).json({ error: '로그인이 필요합니다.' });
+        const { keyword, category, reason } = req.body;
         if (!keyword) return res.status(400).json({ error: 'Keyword is required' });
 
         const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
@@ -110,7 +115,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     } catch (e: any) {
         console.error('Suggest API Error:', e.message);
-        return res.status(500).json({ error: e.message });
+        return res.status(500).json({ error: 'Internal server error' });
     }
 }
 

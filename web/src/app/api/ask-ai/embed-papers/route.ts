@@ -29,7 +29,8 @@ export async function POST(request: Request) {
             .in('id', paper_ids);
 
         if (fetchErr) {
-            return NextResponse.json({ error: fetchErr.message }, { status: 500 });
+            console.error('[embed-papers] Fetch error:', fetchErr);
+            return NextResponse.json({ error: 'Failed to fetch papers' }, { status: 500 });
         }
         if (!papers || papers.length === 0) {
             return NextResponse.json({ error: 'No papers found for given IDs' }, { status: 404 });
@@ -45,6 +46,6 @@ export async function POST(request: Request) {
         });
     } catch (err: any) {
         console.error('[embed-papers] Error:', err);
-        return NextResponse.json({ error: err.message }, { status: 500 });
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
