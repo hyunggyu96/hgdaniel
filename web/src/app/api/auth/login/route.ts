@@ -6,9 +6,19 @@ import {
     normalizeUsername,
     verifyPassword,
 } from '@/lib/auth';
+import { rateLimit } from '@/lib/rateLimit';
 
 export async function POST(request: NextRequest) {
     try {
+        const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+        const { allowed, retryAfterMs } = rateLimit(`login:${ip}`, { maxRequests: 10, windowMs: 60_000 });
+        if (!allowed) {
+            return NextResponse.json(
+                { error: 'Too many login attempts. Please try again later.' },
+                { status: 429, headers: { 'Retry-After': String(Math.ceil(retryAfterMs / 1000)) } },
+            );
+        }
+
         const body = await request.json();
         const username = normalizeUsername(String(body?.username || ''));
         const password = String(body?.password || '');

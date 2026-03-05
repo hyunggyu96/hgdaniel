@@ -30,12 +30,21 @@ function fromBase64Url(input: string): Buffer {
     return Buffer.from(padded, 'base64');
 }
 
+let _warnedFallback = false;
+
 function getSessionSecret() {
-    const secret = process.env.AUTH_SESSION_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-    if (!secret) {
-        throw new Error('Missing AUTH_SESSION_SECRET (or SUPABASE_SERVICE_ROLE_KEY fallback)');
+    const dedicated = process.env.AUTH_SESSION_SECRET;
+    if (dedicated) return dedicated;
+
+    const fallback = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+    if (!fallback) {
+        throw new Error('Missing AUTH_SESSION_SECRET environment variable');
     }
-    return secret;
+    if (!_warnedFallback) {
+        _warnedFallback = true;
+        console.warn('[auth] WARNING: Using SUPABASE_SERVICE_ROLE_KEY as session secret. Set a dedicated AUTH_SESSION_SECRET for better security.');
+    }
+    return fallback;
 }
 
 export function normalizeUsername(raw: string) {

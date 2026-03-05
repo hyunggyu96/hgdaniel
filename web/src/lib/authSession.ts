@@ -15,6 +15,8 @@ async function getUserFromSessionToken(token?: string | null): Promise<AuthUser 
     const payload = verifySessionToken(token);
     if (!payload) return null;
 
+    // TODO: After running 20260305000000_editors_picks.sql migration,
+    // change to .select('id, username, tier, is_admin') to avoid loading password_hash
     const { data, error } = await supabaseAdmin
         .from('accounts')
         .select('*')

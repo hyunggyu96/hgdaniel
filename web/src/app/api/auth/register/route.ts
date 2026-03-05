@@ -7,9 +7,19 @@ import {
     validatePassword,
     validateUsername,
 } from '@/lib/auth';
+import { rateLimit } from '@/lib/rateLimit';
 
 export async function POST(request: NextRequest) {
     try {
+        const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+        const { allowed, retryAfterMs } = rateLimit(`register:${ip}`, { maxRequests: 5, windowMs: 60_000 });
+        if (!allowed) {
+            return NextResponse.json(
+                { error: 'Too many registration attempts. Please try again later.' },
+                { status: 429, headers: { 'Retry-After': String(Math.ceil(retryAfterMs / 1000)) } },
+            );
+        }
+
         const body = await request.json();
         const usernameRaw = String(body?.username || '');
         const password = String(body?.password || '');

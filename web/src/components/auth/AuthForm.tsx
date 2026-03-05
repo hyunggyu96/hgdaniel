@@ -228,8 +228,8 @@ export default function AuthForm({
 
             <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-[11px] leading-relaxed text-gray-500 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-400">
                 {isEnglish
-                    ? 'Username is saved in lowercase. Passwords are stored as secure hashes.'
-                    : '아이디는 소문자로 저장됩니다. 비밀번호는 해시 처리되어 저장됩니다.'}
+                    ? 'Username is saved in lowercase.'
+                    : '아이디는 소문자로 저장됩니다.'}
             </div>
         </div>
     );
