@@ -787,29 +787,29 @@ function EventDetailPanel({ event, onClose, lang }: {
                     {event.name[lang]}
                 </h3>
 
-                {/* Info Grid */}
-                <div className="grid grid-cols-2 gap-x-6 gap-y-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+                {/* Info Grid - 3-column compact layout */}
+                <div className="grid grid-cols-3 gap-x-4 gap-y-3 pt-4 border-t border-gray-100 dark:border-gray-800">
                     <div>
-                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">{lang === 'ko' ? '일정' : 'Schedule'}</h5>
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-0.5">{lang === 'ko' ? '일정' : 'Schedule'}</h5>
                         <p className="text-sm text-gray-600 dark:text-gray-400">{formatDateRange(event.startDate, event.endDate, lang)}</p>
-                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{durationDays}{lang === 'ko' ? '일간' : durationDays === 1 ? ' day' : ' days'}</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500">{durationDays}{lang === 'ko' ? '일간' : durationDays === 1 ? ' day' : ' days'}</p>
                     </div>
                     <div>
-                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">{lang === 'ko' ? '입장료' : 'Admission'}</h5>
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-0.5">{lang === 'ko' ? '입장료' : 'Admission'}</h5>
                         <p className="text-sm text-gray-600 dark:text-gray-400">{event.admission || (lang === 'ko' ? '공식 웹사이트 확인' : 'Check Official Website')}</p>
                     </div>
                     <div>
-                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">{lang === 'ko' ? '행사 유형' : 'Event Type'}</h5>
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-0.5">{lang === 'ko' ? '행사 유형' : 'Event Type'}</h5>
                         <p className="text-sm text-gray-600 dark:text-gray-400">{event.event_type || (lang === 'ko' ? '컨퍼런스 / 전시회' : 'Conference / Exhibition')}</p>
                     </div>
                     <div>
-                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">{lang === 'ko' ? '개최 주기' : 'Frequency'}</h5>
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-0.5">{lang === 'ko' ? '개최 주기' : 'Frequency'}</h5>
                         <p className="text-sm text-gray-600 dark:text-gray-400">{event.frequency || (lang === 'ko' ? '연 1회' : 'Annual')}</p>
                     </div>
                     <div className="col-span-2">
-                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">{lang === 'ko' ? '위치' : 'Location'}</h5>
-                        <div className="flex items-center gap-2">
-                            <FlagIcon country={event.country[lang]} size={18} />
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-0.5">{lang === 'ko' ? '위치' : 'Location'}</h5>
+                        <div className="flex items-center gap-1.5">
+                            <FlagIcon country={event.country[lang]} size={16} />
                             <p className="text-sm text-gray-600 dark:text-gray-400">{event.venue}, {event.city[lang]}, {event.country[lang]}</p>
                         </div>
                     </div>
@@ -903,13 +903,13 @@ function EmbeddedEventDetailPanel({ event, lang, allConferences }: {
                     {event.name[lang]}
                 </h3>
 
-                {/* Info Grid - 2-column layout */}
-                <div className="grid grid-cols-2 gap-x-6 gap-y-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+                {/* Info Grid - 3-column compact layout */}
+                <div className="grid grid-cols-3 gap-x-4 gap-y-3 pt-4 border-t border-gray-100 dark:border-gray-800">
                     {/* 일정 / Schedule */}
                     <div>
-                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">{lang === 'ko' ? '일정' : 'Schedule'}</h5>
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-0.5">{lang === 'ko' ? '일정' : 'Schedule'}</h5>
                         <p className="text-sm text-gray-600 dark:text-gray-400">{formatDateRange(event.startDate, event.endDate, lang)}</p>
-                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                        <p className="text-xs text-gray-400 dark:text-gray-500">
                             {durationDays}{lang === 'ko' ? '일간' : durationDays === 1 ? ' day' : ' days'}
                         </p>
                         {event.timing && <p className="text-xs text-gray-500">{event.timing}</p>}
@@ -917,7 +917,7 @@ function EmbeddedEventDetailPanel({ event, lang, allConferences }: {
 
                     {/* 입장료 / Admission */}
                     <div>
-                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">{lang === 'ko' ? '입장료' : 'Admission'}</h5>
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-0.5">{lang === 'ko' ? '입장료' : 'Admission'}</h5>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                             {event.admission || (lang === 'ko' ? '공식 웹사이트 확인' : 'Check Official Website')}
                         </p>
@@ -925,7 +925,7 @@ function EmbeddedEventDetailPanel({ event, lang, allConferences }: {
 
                     {/* 예상 규모 / Expected Turnout */}
                     <div>
-                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">{lang === 'ko' ? '예상 규모' : 'Expected Turnout'}</h5>
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-0.5">{lang === 'ko' ? '예상 규모' : 'Expected Turnout'}</h5>
                         {event.expected_visitors ? (
                             <>
                                 <p className="text-sm text-emerald-600">{event.expected_visitors} {lang === 'ko' ? '방문자' : 'visitors'}</p>
@@ -940,7 +940,7 @@ function EmbeddedEventDetailPanel({ event, lang, allConferences }: {
 
                     {/* 행사 유형 / Event Type */}
                     <div>
-                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">{lang === 'ko' ? '행사 유형' : 'Event Type'}</h5>
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-0.5">{lang === 'ko' ? '행사 유형' : 'Event Type'}</h5>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                             {event.event_type || (lang === 'ko' ? '컨퍼런스 / 전시회' : 'Conference / Exhibition')}
                         </p>
@@ -948,28 +948,28 @@ function EmbeddedEventDetailPanel({ event, lang, allConferences }: {
 
                     {/* 개최 이력 / Past Editions */}
                     <div>
-                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">{lang === 'ko' ? '개최 이력' : 'Past Editions'}</h5>
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-0.5">{lang === 'ko' ? '개최 이력' : 'Past Editions'}</h5>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                             {new Date(event.startDate).toLocaleDateString(lang === 'ko' ? 'ko-KR' : 'en-US', { month: 'short', year: 'numeric' })}
                         </p>
                         {editionCount > 1 && (
-                            <p className="text-xs text-blue-500 mt-0.5">+{editionCount - 1}{lang === 'ko' ? '회 개최' : ' more editions'}</p>
+                            <p className="text-xs text-blue-500">+{editionCount - 1}{lang === 'ko' ? '회 개최' : ' more editions'}</p>
                         )}
                     </div>
 
                     {/* 개최 주기 / Frequency */}
                     <div>
-                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">{lang === 'ko' ? '개최 주기' : 'Frequency'}</h5>
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-0.5">{lang === 'ko' ? '개최 주기' : 'Frequency'}</h5>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                             {event.frequency || (lang === 'ko' ? '연 1회' : 'Annual')}
                         </p>
                     </div>
 
                     {/* 위치 / Location */}
-                    <div className="col-span-2">
-                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">{lang === 'ko' ? '위치' : 'Location'}</h5>
-                        <div className="flex items-center gap-2">
-                            <FlagIcon country={event.country[lang]} size={18} />
+                    <div className="col-span-3">
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-0.5">{lang === 'ko' ? '위치' : 'Location'}</h5>
+                        <div className="flex items-center gap-1.5">
+                            <FlagIcon country={event.country[lang]} size={16} />
                             <p className="text-sm text-gray-600 dark:text-gray-400">{event.venue}, {event.city[lang]}, {event.country[lang]}</p>
                         </div>
                     </div>
