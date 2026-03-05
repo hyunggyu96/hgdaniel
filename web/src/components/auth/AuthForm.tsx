@@ -1,6 +1,7 @@
 ﻿'use client';
 
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { Eye, EyeOff, LockKeyhole, UserRound } from 'lucide-react';
 import { useUser } from '@/components/UserContext';
 import { useLanguage } from '@/components/LanguageContext';
@@ -117,14 +118,18 @@ export default function AuthForm({
 
     return (
         <div className={`space-y-4 ${className}`}>
-            <div className="inline-flex w-full rounded-xl bg-gray-100 p-1 dark:bg-gray-800">
+            <div className="relative inline-flex w-full rounded-xl bg-gray-100 p-1 dark:bg-gray-800">
+                <motion.div
+                    className="absolute top-1 bottom-1 rounded-lg bg-white shadow-sm dark:bg-gray-900"
+                    style={{ width: 'calc(50% - 4px)' }}
+                    animate={{ x: mode === 'login' ? 0 : 'calc(100% + 4px)' }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                />
                 <button
                     type="button"
                     onClick={() => setMode('login')}
-                    className={`flex-1 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
-                        mode === 'login'
-                            ? 'bg-white text-blue-600 shadow-sm dark:bg-gray-900'
-                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                    className={`relative z-10 flex-1 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
+                        mode === 'login' ? 'text-blue-600' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
                     }`}
                 >
                     {isEnglish ? 'Login' : '로그인'}
@@ -132,10 +137,8 @@ export default function AuthForm({
                 <button
                     type="button"
                     onClick={() => setMode('register')}
-                    className={`flex-1 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
-                        mode === 'register'
-                            ? 'bg-white text-blue-600 shadow-sm dark:bg-gray-900'
-                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                    className={`relative z-10 flex-1 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
+                        mode === 'register' ? 'text-blue-600' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
                     }`}
                 >
                     {isEnglish ? 'Register' : '회원가입'}
@@ -184,32 +187,36 @@ export default function AuthForm({
                     </div>
                 </label>
 
-                {mode === 'register' && (
-                    <label className="block">
-                        <span className="mb-1.5 block text-[11px] font-semibold text-gray-600 dark:text-gray-300">
-                            {isEnglish ? 'Confirm Password' : '비밀번호 확인'}
-                        </span>
-                        <div className="flex items-center rounded-xl border border-gray-200 bg-white px-3 dark:border-gray-700 dark:bg-gray-900">
-                            <LockKeyhole className="mr-2 h-4 w-4 text-gray-400" />
-                            <input
-                                type={showConfirmPassword ? 'text' : 'password'}
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                placeholder={isEnglish ? 're-enter password' : '비밀번호를 다시 입력'}
-                                autoComplete="new-password"
-                                className="h-10 w-full bg-transparent text-sm outline-none placeholder:text-gray-400"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowConfirmPassword((prev) => !prev)}
-                                className="ml-2 rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-200"
-                                aria-label={showConfirmPassword ? (isEnglish ? 'Hide password' : '비밀번호 숨기기') : (isEnglish ? 'Show password' : '비밀번호 보기')}
-                            >
-                                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                            </button>
-                        </div>
-                    </label>
-                )}
+                <div className="grid transition-[grid-template-rows] duration-300 ease-in-out" style={{ gridTemplateRows: mode === 'register' ? '1fr' : '0fr' }}>
+                    <div className="overflow-hidden">
+                        <label className="block pt-0.5">
+                            <span className="mb-1.5 block text-[11px] font-semibold text-gray-600 dark:text-gray-300">
+                                {isEnglish ? 'Confirm Password' : '비밀번호 확인'}
+                            </span>
+                            <div className="flex items-center rounded-xl border border-gray-200 bg-white px-3 dark:border-gray-700 dark:bg-gray-900">
+                                <LockKeyhole className="mr-2 h-4 w-4 text-gray-400" />
+                                <input
+                                    type={showConfirmPassword ? 'text' : 'password'}
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    placeholder={isEnglish ? 're-enter password' : '비밀번호를 다시 입력'}
+                                    autoComplete="new-password"
+                                    tabIndex={mode === 'register' ? 0 : -1}
+                                    className="h-10 w-full bg-transparent text-sm outline-none placeholder:text-gray-400"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowConfirmPassword((prev) => !prev)}
+                                    tabIndex={mode === 'register' ? 0 : -1}
+                                    className="ml-2 rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+                                    aria-label={showConfirmPassword ? (isEnglish ? 'Hide password' : '비밀번호 숨기기') : (isEnglish ? 'Show password' : '비밀번호 보기')}
+                                >
+                                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                </button>
+                            </div>
+                        </label>
+                    </div>
+                </div>
 
                 {error && (
                     <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-600 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-300">
