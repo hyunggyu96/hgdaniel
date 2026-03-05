@@ -12,28 +12,32 @@ from psycopg2.extras import execute_values
 DB_CONN = "postgresql://postgres.jwkdxygcpfdmavxcbcfe:AISapience111$@aws-1-ap-south-1.pooler.supabase.com:6543/postgres"
 
 # Company name mapping to company_id in companies table
+# clean name (without (주)/(유)) → company_id
 COMPANY_MAP = {
-    "대웅제약": 11,
-    "메디톡스": 10,
-    "휴온스바이오파마": 6,   # maps to 휴온스 group
-    "파마리서치바이오": 12,  # maps to 파마리서치
-    "휴젤주식회사": 9,       # 휴젤
+    # ── Mapped to companies table ──
+    "한스바이오메드": 1,
     "제테마": 3,
-    "휴메딕스": 8,
     "한국비엔씨": 4,
     "종근당바이오": 5,
-    "한스바이오메드": 1,
+    "휴온스바이오파마": 6,   # 휴온스 그룹
+    "휴메딕스": 8,
+    "휴젤주식회사": 9,       # 휴젤
+    "메디톡스": 10,
+    "대웅제약": 11,
+    "파마리서치바이오": 12,  # 파마리서치
     "한국애브비": 34,        # 앨러간 (AbbVie = Allergan Aesthetics)
     "멀츠아시아퍼시픽피티이엘티디": 33,  # 멀츠
-    "입센코리아": None,      # global (Ipsen)
+    # ── 자회사/관계사 매핑 ──
+    "대웅바이오": 11,        # 대웅제약 계열
+    "종근당": 5,             # 종근당바이오 모회사
+    # ── 외부 기업 (companies 테이블에 없음) ──
+    "입센코리아": None,      # Ipsen (글로벌)
     "뉴메코": None,
     "메디카코리아": None,
     "에이티지씨": None,
     "이니바이오": None,
-    "종근당": None,          # 종근당 ≠ 종근당바이오
     "프로톡스": None,
     "한국비엠아이": None,
-    "대웅바이오": None,
     "제네톡스": None,
 }
 

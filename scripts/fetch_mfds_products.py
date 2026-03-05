@@ -39,9 +39,40 @@ PRODUCT_API_URL = "https://apis.data.go.kr/1471000/MdeqPrdlstInfoService02/getMd
 # Rate limiting
 REQUEST_INTERVAL = 0.3  # seconds between API calls
 
-# Companies to process (extend this list for more companies)
+# Companies to process — Korean companies with MFDS device permits
 COMPANIES = [
+    {"name_ko": "한스바이오메드", "company_id": 1},
+    {"name_ko": "엘앤씨바이오", "company_id": 2},
     {"name_ko": "제테마", "company_id": 3},
+    {"name_ko": "한국비엔씨", "company_id": 4},
+    {"name_ko": "종근당바이오", "company_id": 5},
+    {"name_ko": "휴온스", "company_id": 6},
+    {"name_ko": "휴온스글로벌", "company_id": 7},
+    {"name_ko": "휴메딕스", "company_id": 8},
+    {"name_ko": "휴젤", "company_id": 9},
+    {"name_ko": "메디톡스", "company_id": 10},
+    {"name_ko": "대웅제약", "company_id": 11},
+    {"name_ko": "파마리서치", "company_id": 12},
+    {"name_ko": "클래시스", "company_id": 13},
+    {"name_ko": "케어젠", "company_id": 14},
+    {"name_ko": "원텍", "company_id": 15},
+    {"name_ko": "동방메디컬", "company_id": 16},
+    {"name_ko": "제이시스메디칼", "company_id": 17},
+    {"name_ko": "바이오비쥬", "company_id": 18},
+    {"name_ko": "바이오플러스", "company_id": 19},
+    {"name_ko": "비올", "company_id": 20},
+    {"name_ko": "하이로닉", "company_id": 21},
+    {"name_ko": "레이저옵텍", "company_id": 22},
+    {"name_ko": "유바이오로직스", "company_id": 23},
+    {"name_ko": "바임글로벌", "company_id": 24},
+    {"name_ko": "엑소코바이오", "company_id": 25},
+    {"name_ko": "알에프바이오", "company_id": 26},
+    {"name_ko": "차메디텍", "company_id": 27},
+    {"name_ko": "JW중외제약", "company_id": 28},
+    {"name_ko": "동국제약", "company_id": 29},
+    {"name_ko": "리젠바이오텍", "company_id": 30},
+    {"name_ko": "울트라브이", "company_id": 31},
+    {"name_ko": "제노스", "company_id": 32},
 ]
 
 
@@ -308,10 +339,10 @@ def process_company(supabase: Client, company_name: str, company_id: int):
 
 
 def main():
-    print(f"=== MFDS Product Data Fetch ===")
-    print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
-    print(f"API Key: {'SET' if DATA_GO_KR_API_KEY else 'NOT SET'}")
-    print(f"Companies: {[c['name_ko'] for c in COMPANIES]}")
+    print(f"=== MFDS Product Data Fetch ===", flush=True)
+    print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M')}", flush=True)
+    print(f"API Key: {'SET' if DATA_GO_KR_API_KEY else 'NOT SET'}", flush=True)
+    print(f"Companies: {len(COMPANIES)} total", flush=True)
 
     if not DATA_GO_KR_API_KEY:
         print("ERROR: DATA_GO_KR_API_KEY not set. Check .env.local")
