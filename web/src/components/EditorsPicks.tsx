@@ -269,7 +269,7 @@ function AdminModal({
                 exit={{ opacity: 0, scale: 0.95, y: 10 }}
                 className="fixed inset-4 z-[101] flex items-center justify-center pointer-events-none"
             >
-                <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden pointer-events-auto">
+                <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl w-[70vw] h-[70vh] flex flex-col overflow-hidden pointer-events-auto">
                     {/* Header */}
                     <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center shrink-0">
                         <h3 className="text-sm font-bold text-foreground">{t('editors_picks_settings')}</h3>

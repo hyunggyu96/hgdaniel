@@ -123,7 +123,7 @@ export const translations = {
 
         // Editor's Pick
         editors_picks_curated: '큐레이션',
-        editors_picks_settings: '에디터스 픽 설정',
+        editors_picks_settings: 'Editor\'s pick 설정',
         editors_picks_add_section: '섹션 추가',
         editors_picks_max_sections: '최대 3개 섹션',
         editors_picks_section_name: '섹션 이름을 입력하세요',
