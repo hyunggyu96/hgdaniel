@@ -2,8 +2,9 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useLanguage } from '@/components/LanguageContext';
-import { Globe, Calendar as CalendarIcon, MapPin, ExternalLink, X, Filter, ChevronRight, ChevronDown, ChevronUp, ChevronLeft } from "lucide-react";
+import { Globe, Calendar as CalendarIcon, MapPin, ExternalLink, X, Filter, ChevronRight, ChevronDown, ChevronUp, ChevronLeft, Star } from "lucide-react";
 import { supabase } from '@/lib/supabaseClient';
+import { useUser } from '@/components/UserContext';
 
 // ─── Types ───
 interface ConferenceEvent {
@@ -17,6 +18,13 @@ interface ConferenceEvent {
     venue: string;
     confirmed: boolean;
     url: string;
+    // Extended fields (from 10times-style template)
+    timing?: string;
+    admission?: string;
+    frequency?: string;
+    event_type?: string;
+    expected_visitors?: string;
+    expected_exhibitors?: string;
 }
 
 // ─── Country Flag ISO Codes ───
@@ -738,18 +746,19 @@ function EventDetailPanel({ event, onClose, lang }: {
     const isPast = new Date(event.endDate) < new Date();
     const isOngoing = new Date(event.startDate) <= new Date() && new Date(event.endDate) >= new Date();
     const cc = getCountryColor(event.country[lang]);
+    const durationDays = Math.ceil((new Date(event.endDate).getTime() - new Date(event.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1;
 
     const statusLabel = isOngoing ? { ko: '진행 중', en: 'LIVE' } : isPast ? { ko: '종료', en: 'ENDED' } : { ko: '예정', en: 'UPCOMING' };
     const statusStyle = isOngoing ? 'bg-emerald-100 text-emerald-700' : isPast ? 'bg-gray-100 text-gray-500' : 'bg-amber-50 text-amber-600';
 
     return (
-        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-xl border border-gray-200 dark:border-gray-700 ring-1 ring-black/5 p-6 animate-fade-in-down mb-8">
+        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-xl border border-gray-200 dark:border-gray-700 ring-1 ring-black/5 animate-fade-in-down mb-8">
             <div
                 className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/20 to-purple-500/20 blur-3xl rounded-full -translate-y-1/3 translate-x-1/3 pointer-events-none opacity-50 dark:opacity-30"
                 style={{ background: `radial-gradient(circle, ${cc.color}20 0%, transparent 70%)` }}
             />
 
-            <div className="relative z-10">
+            <div className="relative z-10 p-6">
                 {/* Header: Tags & Close */}
                 <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -773,66 +782,63 @@ function EventDetailPanel({ event, onClose, lang }: {
                     </button>
                 </div>
 
-                {/* Title & Website Button Row */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 leading-tight">
-                        {event.name[lang]}
-                    </h3>
+                {/* Title */}
+                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 leading-tight mb-5">
+                    {event.name[lang]}
+                </h3>
 
-                    {event.url && (
-                        <a
-                            href={event.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-white text-[10px] font-bold uppercase tracking-wide transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 shrink-0 self-start md:self-auto"
-                            style={{ backgroundColor: cc.color }}
-                        >
-                            {lang === 'ko' ? '공식 웹사이트' : 'Official Website'}
-                            <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
-                    )}
-                </div>
-
-                {/* Details Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 pt-4 border-t border-gray-100">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
-                            <CalendarIcon className="w-5 h-5" />
-                        </div>
-                        <div>
-                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{lang === 'ko' ? '일정' : 'Date'}</p>
-                            <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{formatDateRange(event.startDate, event.endDate, lang)}</p>
-                        </div>
+                {/* Info Grid - 10times style */}
+                <div className="grid grid-cols-2 gap-x-6 gap-y-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+                    <div>
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">{lang === 'ko' ? '타이밍' : 'Timing'}</h5>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{formatDateRange(event.startDate, event.endDate, lang)}</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{durationDays}{lang === 'ko' ? '일간' : durationDays === 1 ? ' day' : ' days'}</p>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center text-purple-600 shrink-0">
-                            <Globe className="w-5 h-5" />
-                        </div>
-                        <div>
-                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{lang === 'ko' ? '위치' : 'Location'}</p>
-                            <div className="flex items-center gap-1.5">
-                                <FlagIcon country={event.country[lang]} size={16} />
-                                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{event.city[lang]}, {event.country[lang]}</p>
-                            </div>
-                        </div>
+                    <div>
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">{lang === 'ko' ? '입장료' : 'Admission'}</h5>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{event.admission || 'Check Official Website'}</p>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
-                            <MapPin className="w-5 h-5" />
-                        </div>
-                        <div>
-                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{lang === 'ko' ? '장소' : 'Venue'}</p>
-                            <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{event.venue}</p>
+                    <div>
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">{lang === 'ko' ? '이벤트 종류' : 'Event Type'}</h5>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{event.event_type || (lang === 'ko' ? '컨퍼런스 / 전시회' : 'Conference / Exhibition')}</p>
+                    </div>
+                    <div>
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">Frequency</h5>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{event.frequency || (lang === 'ko' ? '연간' : 'Annual')}</p>
+                    </div>
+                    <div className="col-span-2">
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">{lang === 'ko' ? '위치' : 'Location'}</h5>
+                        <div className="flex items-center gap-2">
+                            <FlagIcon country={event.country[lang]} size={18} />
+                            <p className="text-sm text-gray-600 dark:text-gray-400">{event.venue}, {event.city[lang]}, {event.country[lang]}</p>
                         </div>
                     </div>
                 </div>
+
+                {/* Official Links */}
+                {event.url && (
+                    <div className="mt-5 pt-4 border-t border-gray-100 dark:border-gray-800">
+                        <div className="flex flex-wrap gap-2">
+                            <a href={event.url} target="_blank" rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300 hover:text-blue-600 transition-colors bg-white dark:bg-gray-800">
+                                <Globe className="w-3.5 h-3.5" />
+                                {lang === 'ko' ? '웹 사이트' : 'Website'}
+                            </a>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Review Section */}
+            <div className="px-6 pb-6">
+                <ConferenceReviewSection conferenceId={event.id} lang={lang} />
             </div>
         </div>
     );
 }
 
-function EmbeddedEventDetailPanel({ event, lang }: {
-    event: ConferenceEvent; lang: 'ko' | 'en';
+function EmbeddedEventDetailPanel({ event, lang, allConferences }: {
+    event: ConferenceEvent; lang: 'ko' | 'en'; allConferences: ConferenceEvent[];
 }) {
     const isPast = new Date(event.endDate) < new Date();
     const isOngoing = new Date(event.startDate) <= new Date() && new Date(event.endDate) >= new Date();
@@ -841,14 +847,35 @@ function EmbeddedEventDetailPanel({ event, lang }: {
     const statusLabel = isOngoing ? { ko: '진행 중', en: 'LIVE' } : isPast ? { ko: '종료', en: 'ENDED' } : { ko: '예정', en: 'UPCOMING' };
     const statusStyle = isOngoing ? 'bg-emerald-100 text-emerald-700' : isPast ? 'bg-gray-100 text-gray-500' : 'bg-amber-50 text-amber-600';
 
+    // Calculate days until event
+    const daysUntil = Math.ceil((new Date(event.startDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+    const durationDays = Math.ceil((new Date(event.endDate).getTime() - new Date(event.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1;
+
+    // Find events happening around the same time (within ±7 days overlap)
+    const alongsideEvents = useMemo(() => {
+        const s = new Date(event.startDate).getTime();
+        const e = new Date(event.endDate).getTime();
+        const margin = 7 * 24 * 60 * 60 * 1000;
+        return allConferences.filter(c =>
+            c.id !== event.id &&
+            new Date(c.startDate).getTime() <= e + margin &&
+            new Date(c.endDate).getTime() >= s - margin
+        ).slice(0, 4);
+    }, [event, allConferences]);
+
+    // Edition count (same series)
+    const editionCount = useMemo(() =>
+        allConferences.filter(c => c.series === event.series).length
+    , [event.series, allConferences]);
+
     return (
-        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-lg border border-gray-200 dark:border-gray-700 ring-1 ring-black/5 p-6 animate-fade-in h-fit sticky top-24">
+        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-lg border border-gray-200 dark:border-gray-700 ring-1 ring-black/5 animate-fade-in h-fit sticky top-24">
             <div
                 className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/20 to-purple-500/20 blur-3xl rounded-full -translate-y-1/3 translate-x-1/3 pointer-events-none opacity-50 dark:opacity-30"
                 style={{ background: `radial-gradient(circle, ${cc.color}20 0%, transparent 70%)` }}
             />
 
-            <div className="relative z-10 w-full min-w-0">
+            <div className="relative z-10 w-full min-w-0 p-6">
                 {/* Header: Tags */}
                 <div className="flex items-start justify-between mb-3 w-full">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -863,68 +890,285 @@ function EmbeddedEventDetailPanel({ event, lang }: {
                                 {lang === 'ko' ? '미확정' : 'TBC'}
                             </span>
                         )}
+                        {daysUntil > 0 && !isOngoing && (
+                            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                                D-{daysUntil}
+                            </span>
+                        )}
                     </div>
                 </div>
 
-                {/* Title & Website Button Row */}
-                <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 mb-6 w-full">
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 leading-tight break-words">
-                        {event.name[lang]}
-                    </h3>
+                {/* Title */}
+                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 leading-tight break-words mb-5">
+                    {event.name[lang]}
+                </h3>
 
-                    {event.url && (
-                        <a
-                            href={event.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-white text-[10px] font-bold uppercase tracking-wide transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 shrink-0 self-start xl:self-auto"
-                            style={{ backgroundColor: cc.color }}
-                        >
-                            {lang === 'ko' ? '공식 웹사이트' : 'Official Website'}
-                            <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
-                    )}
+                {/* Info Grid - 10times style 2-column layout */}
+                <div className="grid grid-cols-2 gap-x-6 gap-y-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+                    {/* 타이밍 / Timing */}
+                    <div>
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">{lang === 'ko' ? '타이밍' : 'Timing'}</h5>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{formatDateRange(event.startDate, event.endDate, lang)}</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                            {durationDays}{lang === 'ko' ? '일간' : durationDays === 1 ? ' day' : ' days'}
+                        </p>
+                        {event.timing && <p className="text-xs text-gray-500">{event.timing}</p>}
+                    </div>
+
+                    {/* 입장료 / Admission */}
+                    <div>
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">{lang === 'ko' ? '입장료' : 'Admission'}</h5>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                            {event.admission || (lang === 'ko' ? 'Check Official Website' : 'Check Official Website')}
+                        </p>
+                    </div>
+
+                    {/* 예상 투표율 / Expected Turnout */}
+                    <div>
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">{lang === 'ko' ? '예상 규모' : 'Expected Turnout'}</h5>
+                        {event.expected_visitors ? (
+                            <>
+                                <p className="text-sm text-emerald-600">{event.expected_visitors} {lang === 'ko' ? '방문자수' : 'visitors'}</p>
+                                {event.expected_exhibitors && (
+                                    <p className="text-sm text-emerald-600">{event.expected_exhibitors} {lang === 'ko' ? '참가 업체' : 'exhibitors'}</p>
+                                )}
+                            </>
+                        ) : (
+                            <p className="text-xs text-gray-400 italic">{lang === 'ko' ? '정보 없음' : 'Not available'}</p>
+                        )}
+                    </div>
+
+                    {/* 이벤트 종류 / Event Type */}
+                    <div>
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">{lang === 'ko' ? '이벤트 종류' : 'Event Type'}</h5>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                            {event.event_type || (lang === 'ko' ? '컨퍼런스 / 전시회' : 'Conference / Exhibition')}
+                        </p>
+                    </div>
+
+                    {/* 에디션 / Edition */}
+                    <div>
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">{lang === 'ko' ? '에디션' : 'Edition'}</h5>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                            {new Date(event.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                        </p>
+                        {editionCount > 1 && (
+                            <p className="text-xs text-blue-500 mt-0.5">+{editionCount - 1} {lang === 'ko' ? '개 에디션' : 'more editions'}</p>
+                        )}
+                    </div>
+
+                    {/* Frequency */}
+                    <div>
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">Frequency</h5>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                            {event.frequency || (lang === 'ko' ? '연간' : 'Annual')}
+                        </p>
+                    </div>
+
+                    {/* 위치 / Location */}
+                    <div className="col-span-2">
+                        <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-1">{lang === 'ko' ? '위치' : 'Location'}</h5>
+                        <div className="flex items-center gap-2">
+                            <FlagIcon country={event.country[lang]} size={18} />
+                            <p className="text-sm text-gray-600 dark:text-gray-400">{event.venue}, {event.city[lang]}, {event.country[lang]}</p>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Details Grid */}
-                <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 xl:gap-8 pt-4 border-t border-gray-100 w-full">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
-                            <CalendarIcon className="w-5 h-5" />
-                        </div>
-                        <div>
-                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{lang === 'ko' ? '일정' : 'Date'}</p>
-                            <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{formatDateRange(event.startDate, event.endDate, lang)}</p>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center text-purple-600 shrink-0">
-                            <Globe className="w-5 h-5" />
-                        </div>
-                        <div>
-                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{lang === 'ko' ? '위치' : 'Location'}</p>
-                            <div className="flex items-center gap-1.5">
-                                <FlagIcon country={event.country[lang]} size={16} />
-                                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{event.city[lang]}, {event.country[lang]}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
-                            <MapPin className="w-5 h-5" />
-                        </div>
-                        <div>
-                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{lang === 'ko' ? '장소' : 'Venue'}</p>
-                            <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 break-words">{event.venue}</p>
-                        </div>
+                {/* 공식 링크 / Official Links */}
+                <div className="mt-5 pt-4 border-t border-gray-100 dark:border-gray-800">
+                    <h5 className="text-xs font-bold text-gray-900 dark:text-gray-100 mb-2">{lang === 'ko' ? '공식 링크' : 'Official Links'}</h5>
+                    <div className="flex flex-wrap gap-2">
+                        {event.url && (
+                            <a href={event.url} target="_blank" rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300 hover:text-blue-600 transition-colors bg-white dark:bg-gray-800">
+                                <Globe className="w-3.5 h-3.5" />
+                                {lang === 'ko' ? '웹 사이트' : 'Website'}
+                            </a>
+                        )}
                     </div>
                 </div>
+
+                {/* Event Happening Alongside */}
+                {alongsideEvents.length > 0 && (
+                    <div className="mt-5 pt-4 border-t border-gray-100 dark:border-gray-800">
+                        <h5 className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-3">
+                            {lang === 'ko' ? '비슷한 시기 개최' : 'Event Happening Alongside'}
+                        </h5>
+                        <div className="grid grid-cols-2 gap-2">
+                            {alongsideEvents.map(ae => (
+                                <div key={ae.id} className="p-2.5 rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+                                    <p className="text-xs font-bold text-gray-900 dark:text-gray-100 truncate">{ae.name[lang]}</p>
+                                    <p className="text-[10px] text-gray-500 mt-0.5">{formatDateRange(ae.startDate, ae.endDate, lang)}</p>
+                                    <div className="flex items-center gap-1 mt-1">
+                                        <FlagIcon country={ae.country[lang]} size={10} />
+                                        <span className="text-[10px] text-gray-400">{ae.city[lang]}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Review Section */}
+            <div className="px-6 pb-6">
+                <ConferenceReviewSection conferenceId={event.id} lang={lang} />
             </div>
         </div>
     );
 }
 
-// ─── Filter Section Component ───
+// ─── Conference Review Section ───
+function ConferenceReviewSection({ conferenceId, lang }: { conferenceId: string; lang: 'ko' | 'en' }) {
+    const { userId } = useUser();
+    const [reviews, setReviews] = useState<{ id: number; username: string; rating: number; comment: string; created_at: string }[]>([]);
+    const [avgRating, setAvgRating] = useState(0);
+    const [hoverRating, setHoverRating] = useState(0);
+    const [myRating, setMyRating] = useState(0);
+    const [myComment, setMyComment] = useState('');
+    const [submitting, setSubmitting] = useState(false);
+    const [existingReview, setExistingReview] = useState<number | null>(null);
+
+    useEffect(() => {
+        fetchReviews();
+    }, [conferenceId]);
+
+    async function fetchReviews() {
+        const { data } = await supabase
+            .from('conference_reviews')
+            .select('id, username, rating, comment, created_at')
+            .eq('conference_id', conferenceId)
+            .order('created_at', { ascending: false });
+        if (data) {
+            setReviews(data);
+            if (data.length > 0) {
+                setAvgRating(data.reduce((sum, r) => sum + r.rating, 0) / data.length);
+            } else {
+                setAvgRating(0);
+            }
+            if (userId) {
+                const mine = data.find(r => r.username === userId);
+                if (mine) {
+                    setMyRating(mine.rating);
+                    setMyComment(mine.comment || '');
+                    setExistingReview(mine.id);
+                }
+            }
+        }
+    }
+
+    async function handleSubmit() {
+        if (!userId || myRating === 0) return;
+        setSubmitting(true);
+        if (existingReview) {
+            await supabase.from('conference_reviews').update({ rating: myRating, comment: myComment }).eq('id', existingReview);
+        } else {
+            await supabase.from('conference_reviews').insert({ conference_id: conferenceId, username: userId, rating: myRating, comment: myComment });
+        }
+        await fetchReviews();
+        setSubmitting(false);
+    }
+
+    return (
+        <div className="mt-6 pt-5 border-t border-gray-100 dark:border-gray-800">
+            <h4 className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-3">
+                {lang === 'ko' ? '리뷰' : 'Reviews'}
+                {reviews.length > 0 && (
+                    <span className="ml-2 text-xs font-normal text-gray-500">
+                        ({reviews.length}{lang === 'ko' ? '개' : ''})
+                    </span>
+                )}
+            </h4>
+
+            {/* Average Rating Display */}
+            {reviews.length > 0 && (
+                <div className="flex items-center gap-3 mb-4">
+                    <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">{avgRating.toFixed(1)}</span>
+                    <div className="flex items-center gap-0.5">
+                        {[1, 2, 3, 4, 5].map(s => (
+                            <Star key={s} className={`w-4 h-4 ${s <= Math.round(avgRating) ? 'fill-amber-400 text-amber-400' : 'text-gray-300 dark:text-gray-600'}`} />
+                        ))}
+                    </div>
+                    <span className="text-xs text-gray-500">{reviews.length} {lang === 'ko' ? '등급' : 'ratings'}</span>
+                </div>
+            )}
+
+            {/* Write Review */}
+            {userId ? (
+                <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 mb-4">
+                    <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">
+                        {existingReview ? (lang === 'ko' ? '내 리뷰 수정' : 'Edit your review') : (lang === 'ko' ? '리뷰 작성' : 'Write a review')}
+                    </p>
+                    <div className="flex items-center gap-1 mb-3">
+                        {[1, 2, 3, 4, 5].map(s => (
+                            <button
+                                key={s}
+                                onMouseEnter={() => setHoverRating(s)}
+                                onMouseLeave={() => setHoverRating(0)}
+                                onClick={() => setMyRating(s)}
+                                className="p-0.5 transition-transform hover:scale-110"
+                            >
+                                <Star className={`w-6 h-6 transition-colors ${s <= (hoverRating || myRating) ? 'fill-amber-400 text-amber-400' : 'text-gray-300 dark:text-gray-600'}`} />
+                            </button>
+                        ))}
+                        {myRating > 0 && <span className="text-xs text-gray-500 ml-2">{myRating}/5</span>}
+                    </div>
+                    <textarea
+                        value={myComment}
+                        onChange={e => setMyComment(e.target.value)}
+                        placeholder={lang === 'ko' ? '후기를 남겨주세요 (선택)' : 'Leave a comment (optional)'}
+                        rows={2}
+                        className="w-full text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-blue-400"
+                    />
+                    <button
+                        onClick={handleSubmit}
+                        disabled={myRating === 0 || submitting}
+                        className="mt-2 px-4 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    >
+                        {submitting ? '...' : existingReview ? (lang === 'ko' ? '수정' : 'Update') : (lang === 'ko' ? '등록' : 'Submit')}
+                    </button>
+                </div>
+            ) : (
+                <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 mb-4 text-center">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {lang === 'ko' ? '리뷰를 작성하려면 로그인하세요.' : 'Log in to write a review.'}
+                    </p>
+                </div>
+            )}
+
+            {/* Review List */}
+            {reviews.length > 0 ? (
+                <div className="space-y-3 max-h-[300px] overflow-y-auto custom-scrollbar">
+                    {reviews.map(r => (
+                        <div key={r.id} className="flex gap-3 text-sm">
+                            <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-300 shrink-0 uppercase">
+                                {r.username.charAt(0)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                    <span className="font-semibold text-gray-900 dark:text-gray-100 text-xs">{r.username}</span>
+                                    <div className="flex items-center gap-0.5">
+                                        {[1, 2, 3, 4, 5].map(s => (
+                                            <Star key={s} className={`w-3 h-3 ${s <= r.rating ? 'fill-amber-400 text-amber-400' : 'text-gray-300 dark:text-gray-600'}`} />
+                                        ))}
+                                    </div>
+                                    <span className="text-[10px] text-gray-400">{new Date(r.created_at).toLocaleDateString()}</span>
+                                </div>
+                                {r.comment && <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">{r.comment}</p>}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <p className="text-xs text-gray-400 dark:text-gray-500 text-center py-3">
+                    {lang === 'ko' ? '아직 리뷰가 없습니다. 첫 번째 리뷰를 남겨보세요!' : 'No reviews yet. Be the first to review!'}
+                </p>
+            )}
+        </div>
+    );
+}
+
 // ─── Filter Section Component ───
 function FilterSection({
     items,
@@ -1561,7 +1805,7 @@ export default function ConferencesPage() {
 
                                         <div className="flex items-center gap-4 pl-3 flex-1 min-w-0">
                                             <div className="flex flex-col items-center justify-center w-14 shrink-0 py-1.5 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100/50 dark:border-gray-700">
-                                                <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase leading-none mb-0.5">{lang === 'ko' ? `${startDate.getMonth() + 1}월` : MONTH_NAMES_EN[startDate.getMonth()].substring(0, 3)}</span>
+                                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase leading-none mb-0.5">{lang === 'ko' ? `${startDate.getMonth() + 1}월` : MONTH_NAMES_EN[startDate.getMonth()].substring(0, 3)}</span>
                                                 <span className="text-xl font-bold text-gray-900 dark:text-gray-100 leading-none">{startDate.getDate()}</span>
                                             </div>
 
@@ -1577,6 +1821,10 @@ export default function ConferencesPage() {
                                                 <h4 className={`text-base font-bold transition-colors truncate ${isFocused ? 'text-blue-700 dark:text-blue-400' : 'text-gray-900 dark:text-gray-100 group-hover:text-blue-700 dark:group-hover:text-blue-400'}`}>
                                                     {event.name[lang]}
                                                 </h4>
+                                                <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+                                                    <FlagIcon country={event.country[lang]} size={14} />
+                                                    <span>{event.city[lang]}, {event.country[lang]}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1587,7 +1835,7 @@ export default function ConferencesPage() {
                         {/* Right Detail Panel (Sticky) */}
                         <div className="hidden lg:block lg:col-span-6 lg:sticky lg:top-24">
                             {focusedEvent ? (
-                                <EmbeddedEventDetailPanel event={focusedEvent} lang={lang} />
+                                <EmbeddedEventDetailPanel event={focusedEvent} lang={lang} allConferences={conferences} />
                             ) : (
                                 <div className="h-64 flex items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/20 text-gray-400 dark:text-gray-500">
                                     {lang === 'ko' ? '일정을 선택하세요' : 'Select an event'}
