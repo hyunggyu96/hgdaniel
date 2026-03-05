@@ -435,6 +435,15 @@ function AdminModal({
                                                 <span className="text-xs text-foreground flex-1 line-clamp-1">
                                                     {item.article?.title || item.article_link}
                                                 </span>
+                                                <a
+                                                    href={item.article?.link || item.article_link}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    onClick={e => e.stopPropagation()}
+                                                    className="shrink-0 p-0.5 text-gray-300 hover:text-blue-500 transition-colors"
+                                                >
+                                                    <ExternalLink className="w-3 h-3" />
+                                                </a>
                                                 <div className="flex items-center gap-0.5 shrink-0">
                                                     <button
                                                         onClick={() => moveItem(item.article_link, 'up')}
