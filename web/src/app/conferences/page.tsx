@@ -1542,12 +1542,12 @@ export default function ConferencesPage() {
                                                 if (el) el.scrollIntoView({ behavior: 'smooth' });
                                             }
                                         }}
-                                        className={`min-h-[60px] md:min-h-[80px] border-b border-r border-gray-100 dark:border-gray-800 p-1 transition-all hover:bg-blue-50/30 dark:hover:bg-gray-800/50 flex flex-col gap-0.5 group relative cursor-pointer
+                                        className={`min-h-[60px] md:min-h-[80px] border-b border-r border-gray-100 dark:border-gray-800 py-1 transition-all hover:bg-blue-50/30 dark:hover:bg-gray-800/50 flex flex-col gap-0.5 group relative cursor-pointer overflow-hidden
                                             ${today ? 'bg-blue-50/20 dark:bg-blue-900/10' : ''}
                                             ${selectedDate && selectedDate.getDate() === day && selectedDate.getMonth() === month && selectedDate.getFullYear() === year ? 'bg-blue-50 dark:bg-gray-800 ring-1 ring-inset ring-blue-500' : ''}
                                         `}
                                     >
-                                        <div className="flex justify-between items-start">
+                                        <div className="flex justify-between items-start px-1">
                                             <span className={`w-5 h-5 flex items-center justify-center rounded-md text-xs font-bold transition-all ${today
                                                 ? 'bg-blue-600 text-white shadow-sm'
                                                 : dayOfWeek === 0 ? 'text-red-400 dark:text-red-300' : dayOfWeek === 6 ? 'text-blue-400 dark:text-blue-300' : 'text-gray-700 dark:text-gray-300'
@@ -1557,7 +1557,7 @@ export default function ConferencesPage() {
                                         </div>
 
                                         {/* Mobile View: Simple Dots */}
-                                        <div className="md:hidden flex flex-wrap justify-center gap-1 mt-1">
+                                        <div className="md:hidden flex flex-wrap justify-center gap-1 mt-1 px-1">
                                             {events.length > 0 && (
                                                 <>
                                                     {events.slice(0, 4).map((e) => (
@@ -1584,10 +1584,10 @@ export default function ConferencesPage() {
                                                             window.scrollTo({ top: 100, behavior: 'smooth' });
                                                         }}
                                                         className={`w-full text-left text-[9px] font-bold py-0.5 truncate transition-all duration-200 flex items-center gap-1 leading-none
-                                                            ${pos === 'single' ? 'rounded-[4px] px-1 border' : ''}
-                                                            ${pos === 'start' ? 'rounded-l-[4px] rounded-r-none pl-1 pr-0 -mr-1 border-y border-l' : ''}
-                                                            ${pos === 'end' ? 'rounded-r-[4px] rounded-l-none pr-1 pl-0 -ml-1 border-y border-r' : ''}
-                                                            ${pos === 'middle' ? 'rounded-none px-0 -mx-1 border-y border-x-0' : ''}
+                                                            ${pos === 'single' ? 'rounded-[4px] mx-1 px-1 border' : ''}
+                                                            ${pos === 'start' ? 'rounded-l-[4px] rounded-r-none ml-1 pl-1 pr-0 -mr-[1px] border-y border-l' : ''}
+                                                            ${pos === 'end' ? 'rounded-r-[4px] rounded-l-none mr-1 pr-1 pl-0 -ml-[1px] border-y border-r' : ''}
+                                                            ${pos === 'middle' ? 'rounded-none px-0 -mx-[1px] border-y border-x-0' : ''}
                                                             ${isSel ? 'shadow-md z-10 brightness-110' : pos === 'single' ? 'hover:scale-105 hover:shadow-sm hover:z-10 hover:brightness-110' : 'hover:brightness-110'}
                                                         `}
                                                         style={isSel
