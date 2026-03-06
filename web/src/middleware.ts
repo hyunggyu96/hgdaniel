@@ -1,33 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-// In-memory rate limiter for middleware (per Vercel instance)
-const windows = new Map<string, { count: number; resetAt: number }>();
-
-function rateLimitCheck(key: string, max: number, windowMs: number): { allowed: boolean; retryAfterMs: number } {
-    const now = Date.now();
-    const entry = windows.get(key);
-
-    if (!entry || entry.resetAt < now) {
-        windows.set(key, { count: 1, resetAt: now + windowMs });
-        return { allowed: true, retryAfterMs: 0 };
-    }
-    if (entry.count >= max) {
-        return { allowed: false, retryAfterMs: entry.resetAt - now };
-    }
-    entry.count++;
-    return { allowed: true, retryAfterMs: 0 };
-}
-
-// Periodic cleanup
-let lastCleanup = Date.now();
-function cleanup() {
-    const now = Date.now();
-    if (now - lastCleanup < 300_000) return;
-    lastCleanup = now;
-    windows.forEach((val, key) => {
-        if (val.resetAt < now) windows.delete(key);
-    });
-}
+import { rateLimit, getClientIp } from '@/lib/rateLimit';
 
 // Rate limit configs per route pattern
 const RATE_LIMITS: { pattern: RegExp; maxRequests: number; windowMs: number }[] = [
@@ -52,9 +24,7 @@ const RATE_LIMITS: { pattern: RegExp; maxRequests: number; windowMs: number }[] 
     { pattern: /^\/api\//, maxRequests: 60, windowMs: 60_000 },
 ];
 
-export function middleware(request: NextRequest) {
-    cleanup();
-
+export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
     // Only rate-limit API routes
@@ -67,19 +37,16 @@ export function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
-    // Validate IP format to reject garbage/injection in headers
-    const IP_RE = /^[\da-fA-F.:]+$/;
-    const fwd = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
-    const real = request.headers.get('x-real-ip')?.trim();
-    const ip = (fwd && IP_RE.test(fwd) ? fwd : null)
-        || (real && IP_RE.test(real) ? real : null)
-        || 'unknown';
+    const ip = getClientIp(request.headers);
 
     // Find matching rate limit config
     for (const cfg of RATE_LIMITS) {
         if (cfg.pattern.test(pathname)) {
             const key = `mw:${ip}:${cfg.pattern.source}`;
-            const { allowed, retryAfterMs } = rateLimitCheck(key, cfg.maxRequests, cfg.windowMs);
+            const { allowed, retryAfterMs } = await rateLimit(key, {
+                maxRequests: cfg.maxRequests,
+                windowMs: cfg.windowMs,
+            });
 
             if (!allowed) {
                 return NextResponse.json(

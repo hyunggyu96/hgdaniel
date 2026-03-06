@@ -1,6 +1,8 @@
-// Simple in-memory sliding-window rate limiter.
-// In serverless (Vercel), each instance has its own Map, so this provides
-// per-instance protection. For full distributed rate limiting, use Upstash Redis.
+// Distributed rate limiter using Upstash Redis.
+// Falls back to in-memory rate limiting if Upstash env vars are not configured.
+
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
 
 // IPv4 or IPv6 basic pattern check — rejects garbage / injection attempts
 const IP_PATTERN = /^[\da-fA-F.:]+$/;
@@ -21,9 +23,37 @@ export function getClientIp(headers: { get(name: string): string | null }): stri
     return 'unknown';
 }
 
-const windows = new Map<string, { count: number; resetAt: number }>();
+// --- Upstash Redis rate limiter ---
 
-// Clean up stale entries every 5 minutes
+const useRedis = !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
+
+const redis = useRedis
+    ? new Redis({
+          url: process.env.UPSTASH_REDIS_REST_URL!,
+          token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+      })
+    : null;
+
+// Cache of Ratelimit instances keyed by "maxRequests:windowMs"
+const limiters = new Map<string, Ratelimit>();
+
+function getRedisLimiter(maxRequests: number, windowMs: number): Ratelimit {
+    const cacheKey = `${maxRequests}:${windowMs}`;
+    let limiter = limiters.get(cacheKey);
+    if (!limiter) {
+        limiter = new Ratelimit({
+            redis: redis!,
+            limiter: Ratelimit.slidingWindow(maxRequests, `${windowMs} ms`),
+            prefix: 'rl',
+        });
+        limiters.set(cacheKey, limiter);
+    }
+    return limiter;
+}
+
+// --- In-memory fallback (for local dev without Upstash) ---
+
+const windows = new Map<string, { count: number; resetAt: number }>();
 const CLEANUP_INTERVAL = 5 * 60 * 1000;
 let lastCleanup = Date.now();
 
@@ -36,9 +66,10 @@ function cleanup() {
     });
 }
 
-export function rateLimit(
+function inMemoryRateLimit(
     key: string,
-    { maxRequests = 10, windowMs = 60_000 } = {},
+    maxRequests: number,
+    windowMs: number,
 ): { allowed: boolean; remaining: number; retryAfterMs: number } {
     cleanup();
     const now = Date.now();
@@ -55,4 +86,22 @@ export function rateLimit(
 
     entry.count++;
     return { allowed: true, remaining: maxRequests - entry.count, retryAfterMs: 0 };
+}
+
+// --- Unified rate limit function ---
+
+export async function rateLimit(
+    key: string,
+    { maxRequests = 10, windowMs = 60_000 } = {},
+): Promise<{ allowed: boolean; remaining: number; retryAfterMs: number }> {
+    if (useRedis) {
+        const limiter = getRedisLimiter(maxRequests, windowMs);
+        const result = await limiter.limit(key);
+        return {
+            allowed: result.success,
+            remaining: result.remaining,
+            retryAfterMs: result.success ? 0 : Math.max(0, result.reset - Date.now()),
+        };
+    }
+    return inMemoryRateLimit(key, maxRequests, windowMs);
 }

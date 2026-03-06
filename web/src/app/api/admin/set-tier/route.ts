@@ -10,7 +10,7 @@ const VALID_TIERS: Tier[] = ['free', 'pro', 'enterprise'];
 export async function POST(request: NextRequest) {
     try {
         const ip = getClientIp(request.headers);
-        const { allowed, retryAfterMs } = rateLimit(`admin:${ip}`, { maxRequests: 10, windowMs: 60_000 });
+        const { allowed, retryAfterMs } = await rateLimit(`admin:${ip}`, { maxRequests: 10, windowMs: 60_000 });
         if (!allowed) {
             return NextResponse.json(
                 { error: 'Too many requests' },

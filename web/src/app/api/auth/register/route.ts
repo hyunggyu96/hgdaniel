@@ -12,7 +12,7 @@ import { rateLimit, getClientIp } from '@/lib/rateLimit';
 export async function POST(request: NextRequest) {
     try {
         const ip = getClientIp(request.headers);
-        const { allowed, retryAfterMs } = rateLimit(`register:${ip}`, { maxRequests: 5, windowMs: 60_000 });
+        const { allowed, retryAfterMs } = await rateLimit(`register:${ip}`, { maxRequests: 5, windowMs: 60_000 });
         if (!allowed) {
             return NextResponse.json(
                 { error: 'Too many registration attempts. Please try again later.' },
