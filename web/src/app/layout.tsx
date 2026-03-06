@@ -54,28 +54,26 @@ export default function RootLayout({
               <CollectionProvider>
                 {/* Header / Brand (GNB) */}
                 {/* Header / Brand (GNB) */}
-                <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md sticky top-0 z-50 flex flex-col border-b border-transparent dark:border-gray-800 transition-colors duration-300">
-                  <div className="w-full max-w-[1600px] mx-auto flex items-center justify-between gap-4 md:gap-8 h-auto px-4 md:px-6 pt-6 pb-2">
+                <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md sticky top-0 z-50 flex flex-col border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
+                  <div className="w-full max-w-[1600px] mx-auto flex items-center justify-between gap-3 md:gap-6 h-auto px-4 md:px-6 py-1.5">
                     <Link href="/" prefetch={false} className="flex items-center shrink-0 hover:opacity-80 transition-opacity">
-                      <span className="font-black text-xl md:text-2xl tracking-tighter text-gray-900 dark:text-gray-100 leading-none">
+                      <span className="font-black text-base md:text-lg tracking-tighter text-gray-900 dark:text-gray-100 leading-none">
                         AESTHETIC INTELLIGENCE
                       </span>
                     </Link>
 
                     {/* Center: Search */}
-                    <div className="flex flex-1 justify-center max-w-2xl px-2 sm:px-4">
-                      <Suspense fallback={<div className="w-full max-w-md h-10 bg-gray-100 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 animate-pulse" />}>
+                    <div className="flex flex-1 justify-center max-w-xl px-2">
+                      <Suspense fallback={<div className="w-full max-w-md h-8 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 animate-pulse" />}>
                         <SearchBar />
                       </Suspense>
                     </div>
 
                     {/* Right: Actions */}
-                    <div className="flex items-center gap-3 shrink-0">
+                    <div className="flex items-center gap-2 shrink-0">
                       <ThemeToggle />
                       <LanguageSwitcher />
-                      <div>
-                        <HeaderStatus />
-                      </div>
+                      <HeaderStatus />
                       <LoginButton />
                     </div>
                   </div>

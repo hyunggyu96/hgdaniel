@@ -46,7 +46,7 @@ export default function SearchBar() {
                     value={searchQuery}
                     onChange={(e) => handleSearch(e.target.value)}
                     placeholder="뉴스 검색..."
-                    className="w-full pl-10 pr-10 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 focus:border-blue-500 transition-all shadow-sm hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50/50 dark:hover:bg-gray-700/50"
+                    className="w-full pl-9 pr-9 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-[13px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 focus:border-blue-500 transition-all hover:border-blue-300 dark:hover:border-blue-600"
                 />
                 {searchQuery && (
                     <button

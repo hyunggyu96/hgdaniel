@@ -121,6 +121,15 @@ export const translations = {
         tier_news_upgrade: '전체 뉴스를 보려면 Pro로 업그레이드하세요.',
         tier_login_required: '로그인이 필요합니다.',
 
+        // Category Tabs
+        tabs_overview: '전체',
+        tabs_collections: '북마크',
+        tabs_suggest: '키워드 제안',
+        card_view_all: '전체 보기',
+        card_no_articles: '기사 없음',
+        trend_title: '키워드 트렌드',
+        trend_7d: '7일',
+
         // Editor's Pick
         editors_picks_curated: '큐레이션',
         editors_picks_settings: 'Editor\'s pick 설정',
@@ -239,6 +248,15 @@ export const translations = {
         tier_news_limited: 'Showing news from the last 3 days only.',
         tier_news_upgrade: 'Upgrade to Pro to access the full news archive.',
         tier_login_required: 'Login required.',
+
+        // Category Tabs
+        tabs_overview: 'Overview',
+        tabs_collections: 'Collections',
+        tabs_suggest: 'Suggest Keyword',
+        card_view_all: 'View All',
+        card_no_articles: 'No articles',
+        trend_title: 'Keyword Trends',
+        trend_7d: '7D',
 
         // Editor's Pick
         editors_picks_curated: 'CURATED',

@@ -30,7 +30,7 @@ export default function MainNav() {
 
     return (
         <div className="w-full border-b border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm transition-colors duration-300">
-            <nav className="max-w-[1600px] mx-auto px-4 md:px-6 flex items-center justify-center gap-12 h-14 overflow-x-auto scrollbar-hide">
+            <nav className="max-w-[1600px] mx-auto px-4 md:px-6 flex items-center justify-center gap-6 md:gap-8 h-10 overflow-x-auto scrollbar-hide">
                 {NAV_ITEMS.map((item) => {
                     const isActive = item.href === '/'
                         ? pathname === '/'
@@ -42,7 +42,7 @@ export default function MainNav() {
                             key={item.href}
                             href={item.href}
                             className={cn(
-                                "relative h-full flex items-center gap-1.5 text-[15px] font-bold transition-colors whitespace-nowrap tracking-tight",
+                                "relative h-full flex items-center gap-1 text-[13px] font-bold transition-colors whitespace-nowrap tracking-tight",
                                 isActive
                                     ? "text-[#3182f6]"
                                     : isLocked

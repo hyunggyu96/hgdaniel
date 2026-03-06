@@ -1,13 +1,20 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import CollectionButton from './CollectionButton';
 import CollectionsView from './CollectionsView';
-import { LayoutGrid, Clock, SlidersHorizontal } from 'lucide-react';
+import { LayoutGrid, Clock, SlidersHorizontal, ChevronRight } from 'lucide-react';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { fmtDateKST, getYesterdayStr, toDateKey, uniqueKws } from '@/lib/utils';
+import { useLanguage } from './LanguageContext';
+import dynamic from 'next/dynamic';
+
+const TrendChartCompact = dynamic(() => import('./TrendChartCompact'), {
+    ssr: false,
+    loading: () => <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 h-[280px] animate-pulse" />,
+});
 
 interface Props {
     allNews: any[];
@@ -26,21 +33,18 @@ const YESTERDAY = getYesterdayStr();
 
 // --- Shared sub-components ---
 
-/** NEW / YDAY badge */
 function DateBadge({ isToday, isYesterday }: { isToday: boolean; isYesterday: boolean }) {
     if (isToday) return <span className="text-[8px] font-black text-white bg-red-500 px-1.5 py-0.5 rounded tracking-tighter uppercase inline-block leading-none shrink-0 border border-red-400/50">NEW</span>;
     if (isYesterday) return <span className="text-[8px] font-black text-amber-900 bg-amber-400 px-1.5 py-0.5 rounded tracking-tighter uppercase inline-block leading-none shrink-0 border border-amber-300/50">YDAY</span>;
     return null;
 }
 
-/** Inline NEW/YDAY badge for within title text */
 function InlineBadge({ isToday, isYesterday }: { isToday: boolean; isYesterday: boolean }) {
     if (isToday) return <span className="text-[8px] font-black text-white bg-red-500 px-1.5 py-0.5 rounded mr-1.5 align-middle">NEW</span>;
     if (isYesterday) return <span className="text-[8px] font-black text-amber-900 bg-amber-400 px-1.5 py-0.5 rounded mr-1.5 align-middle">YDAY</span>;
     return null;
 }
 
-/** Keyword badges row */
 function KwBadges({ kws, max, size = 'sm' }: { kws: string[]; max: number; size?: 'sm' | 'xs' }) {
     const cls = size === 'xs'
         ? "text-[9px] font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded uppercase tracking-tight border border-blue-200 dark:border-blue-800"
@@ -54,7 +58,6 @@ function KwBadges({ kws, max, size = 'sm' }: { kws: string[]; max: number; size?
     );
 }
 
-/** Date/time display with color coding */
 function TimeLabel({ dateStr, timeStr, isToday, isYesterday, size = 'sm' }: { dateStr: string; timeStr: string; isToday: boolean; isYesterday: boolean; size?: 'sm' | 'md' }) {
     const textSize = size === 'md' ? 'text-[11px]' : 'text-[9px]';
     return (
@@ -64,18 +67,16 @@ function TimeLabel({ dateStr, timeStr, isToday, isYesterday, size = 'sm' }: { da
     );
 }
 
-/** Load More button */
 function LoadMore({ remaining, onClick }: { remaining: number; onClick: () => void }) {
     return (
-        <div className="mt-12 flex justify-center">
+        <div className="mt-8 flex justify-center">
             <button
                 onClick={onClick}
-                className="group relative px-8 py-3 bg-white dark:bg-gray-800 hover:bg-[#3182f6] border border-gray-200 dark:border-gray-700 hover:border-[#3182f6] rounded-lg transition-all duration-300 overflow-hidden"
+                className="group px-6 py-2.5 bg-white dark:bg-gray-800 hover:bg-[#3182f6] border border-gray-200 dark:border-gray-700 hover:border-[#3182f6] rounded-lg transition-all duration-200"
             >
-                <span className="relative z-10 text-sm font-medium text-muted-foreground group-hover:text-white transition-colors">
+                <span className="text-[13px] font-medium text-muted-foreground group-hover:text-white transition-colors">
                     Load More ({remaining})
                 </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-[#3182f6]/0 via-[#3182f6]/10 to-[#3182f6]/0 opacity-0 group-hover:opacity-100 transition-opacity" />
             </button>
         </div>
     );
@@ -118,7 +119,6 @@ function getTags(article: any) {
     return { main, sub, summary, issue_nature };
 }
 
-/** Derive common article display data */
 function useArticleData(article: any, today: string) {
     const analysis = getTags(article);
     const pubDate = article.published_at ? new Date(article.published_at) : null;
@@ -135,12 +135,104 @@ function useArticleData(article: any, today: string) {
     return { isToday, isYesterday, dateStr, timeStr, summaryText, kws };
 }
 
+// --- Category Card (Naver-style) ---
+
+function CategoryCard({ category, articles, today, showBadges, showKeywords, index }: {
+    category: string;
+    articles: any[];
+    today: string;
+    showBadges: boolean;
+    showKeywords: boolean;
+    index: number;
+}) {
+    const { t } = useLanguage();
+
+    return (
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden flex flex-col">
+            {/* Card Header */}
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 dark:border-gray-700">
+                <Link
+                    href={`/?category=${encodeURIComponent(category)}`}
+                    className="group flex items-center gap-2"
+                >
+                    <h2 className="text-[13px] font-black text-foreground tracking-tight uppercase group-hover:text-[#3182f6] transition-colors">
+                        {category}
+                    </h2>
+                    <ChevronRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-[#3182f6] group-hover:translate-x-0.5 transition-all" />
+                </Link>
+                <span className="text-[10px] font-bold text-muted-foreground bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">
+                    {articles.length}
+                </span>
+            </div>
+
+            {/* Article List */}
+            <div className="flex-1 divide-y divide-gray-100 dark:divide-gray-700">
+                {articles.slice(0, 8).map((article, i) => (
+                    <CompactArticleRow
+                        key={article.id}
+                        article={article}
+                        index={i + 1}
+                        today={today}
+                        showBadges={showBadges}
+                        showKeywords={showKeywords}
+                    />
+                ))}
+                {articles.length === 0 && (
+                    <div className="py-8 text-center text-[10px] font-bold text-gray-300 dark:text-gray-600 uppercase tracking-widest">
+                        {t('card_no_articles')}
+                    </div>
+                )}
+            </div>
+
+            {/* Footer */}
+            {articles.length > 0 && (
+                <Link
+                    href={`/?category=${encodeURIComponent(category)}`}
+                    className="flex items-center justify-center gap-1 py-2 border-t border-gray-100 dark:border-gray-700 text-[11px] font-bold text-[#3182f6] hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                >
+                    {t('card_view_all')}
+                    <ChevronRight className="w-3 h-3" />
+                </Link>
+            )}
+        </div>
+    );
+}
+
+function CompactArticleRow({ article, index, today, showBadges, showKeywords }: {
+    article: any;
+    index: number;
+    today: string;
+    showBadges: boolean;
+    showKeywords: boolean;
+}) {
+    const { isToday, isYesterday, dateStr, timeStr } = useArticleData(article, today);
+
+    return (
+        <div className="group flex items-center gap-2 px-3 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <span className="text-[10px] font-bold text-gray-300 dark:text-gray-600 w-4 shrink-0 text-right">{index}</span>
+            {showBadges && <DateBadge isToday={isToday} isYesterday={isYesterday} />}
+            <a
+                href={article.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 min-w-0 text-[13px] font-medium text-foreground/90 group-hover:text-[#3182f6] transition-colors truncate leading-tight"
+            >
+                {article.title}
+            </a>
+            <span className="text-[9px] font-mono text-gray-300 dark:text-gray-500 shrink-0">
+                {isToday ? timeStr : dateStr}
+            </span>
+        </div>
+    );
+}
+
 // --- Main component ---
 
 export default function NewsListContainer({
     allNews, newsByCategory, filteredNews,
     selectedCategory, searchQuery, showCollections, today, isLandingPage, CATEGORIES_CONFIG
 }: Props) {
+    const { t } = useLanguage();
     const PAGE_SIZE = 20;
     const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
     const [viewMode, setViewMode] = useState<'category' | 'time'>('category');
@@ -170,109 +262,92 @@ export default function NewsListContainer({
     const loadMore = () => setDisplayCount(prev => prev + PAGE_SIZE);
 
     return (
-        <div className="flex-1 space-y-4">
-            {/* HERO SECTION — Compact */}
-            {isLandingPage ? (
-                <div className="pt-5 pb-4 px-4 md:px-6 lg:px-12 bg-white dark:bg-gray-900 transition-colors duration-300">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                            <h1 className="text-2xl md:text-3xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-500 dark:from-gray-100 dark:to-gray-400 uppercase">
-                                Market Intelligence
-                            </h1>
-                            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-800 px-2.5 py-1 rounded-full border border-gray-200 dark:border-gray-700">
+        <div className="flex-1 space-y-3">
+            {/* Toolbar */}
+            {isLandingPage && (
+                <div className="px-4 md:px-6 lg:px-8 py-2 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <h1 className="text-base font-black tracking-tighter text-foreground uppercase">
+                            {t('news_section_title')}
+                        </h1>
+                        <div className="flex items-center gap-1 text-[9px] font-bold text-cyan-600 bg-cyan-50 dark:bg-cyan-900/20 px-2 py-0.5 rounded-full border border-cyan-200 dark:border-cyan-800">
+                            {!reduceMotion && (
                                 <span className="relative flex h-1.5 w-1.5 shrink-0">
-                                    {!reduceMotion && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>}
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-cyan-500"></span>
                                 </span>
-                                <span className="text-[9px] font-bold text-cyan-600 uppercase tracking-[0.2em]">
-                                    AI-Powered
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            {/* Display Settings */}
-                            <div className="relative">
-                                <button
-                                    onClick={() => setShowSettings(prev => !prev)}
-                                    className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border transition-all duration-200 ${showSettings ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800 text-blue-600' : 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500 hover:text-gray-900 dark:hover:text-gray-200'}`}
-                                >
-                                    <SlidersHorizontal size={13} />
-                                    <span className="text-[10px] font-bold uppercase tracking-wider">Display</span>
-                                </button>
-                                {showSettings && (
-                                    <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 py-1">
-                                        <label className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
-                                            <input type="checkbox" checked={showBadges} onChange={() => setShowBadges(prev => !prev)} className="rounded border-gray-300 text-blue-500 focus:ring-blue-500 w-3.5 h-3.5" />
-                                            <span className="text-[11px] font-medium text-foreground">NEW / YDAY</span>
-                                        </label>
-                                        <label className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
-                                            <input type="checkbox" checked={showKeywords} onChange={() => setShowKeywords(prev => !prev)} className="rounded border-gray-300 text-blue-500 focus:ring-blue-500 w-3.5 h-3.5" />
-                                            <span className="text-[11px] font-medium text-foreground">Keywords</span>
-                                        </label>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* View Mode Toggle */}
-                            <div className="flex items-center p-0.5 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                                {([['category', LayoutGrid, 'Category'], ['time', Clock, 'Time']] as const).map(([mode, Icon, label]) => (
-                                    <button
-                                        key={mode}
-                                        onClick={() => setViewMode(mode as 'category' | 'time')}
-                                        className={`flex items-center gap-1 px-2.5 py-1 rounded-md transition-all duration-200 ${viewMode === mode
-                                            ? 'bg-blue-500 text-white shadow-sm'
-                                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                                            }`}
-                                    >
-                                        <Icon size={13} />
-                                        <span className="text-[10px] font-bold uppercase tracking-wider">{label}</span>
-                                    </button>
-                                ))}
-                            </div>
+                            )}
+                            {t('news_section_desc')}
                         </div>
                     </div>
-                </div>
-            ) : (
-                <div className="pt-6 md:pt-8 px-4 md:px-6 lg:px-12">
-                    <div className="flex flex-col gap-2 mb-2">
-                        <h1 className="text-xl md:text-2xl lg:text-4xl font-bold tracking-tighter text-foreground leading-tight uppercase">
-                            {showCollections ? 'Collections' : selectedCategory ? selectedCategory : 'Market Intelligence'}
-                        </h1>
-                        <div className="flex items-center gap-2">
-                            <span className="relative flex h-1.5 w-1.5 shrink-0">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#3182f6]"></span>
-                            </span>
-                            <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-[0.2em]">
-                                {selectedCategory ? `ACTIVE TRACKING: ${CATEGORIES_CONFIG.find(c => c.label === selectedCategory)?.keywords.length || 0}` : `Real-time Analysis`}
-                            </div>
+
+                    <div className="flex items-center gap-2">
+                        {/* Display Settings */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setShowSettings(prev => !prev)}
+                                className={`flex items-center gap-1 px-2 py-1 rounded-md border text-[10px] font-bold transition-all ${showSettings ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800 text-blue-600' : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-400 hover:text-gray-600'}`}
+                            >
+                                <SlidersHorizontal size={12} />
+                            </button>
+                            {showSettings && (
+                                <div className="absolute right-0 top-full mt-1 w-44 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 py-1">
+                                    <label className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
+                                        <input type="checkbox" checked={showBadges} onChange={() => setShowBadges(prev => !prev)} className="rounded border-gray-300 text-blue-500 focus:ring-blue-500 w-3.5 h-3.5" />
+                                        <span className="text-[11px] font-medium text-foreground">NEW / YDAY</span>
+                                    </label>
+                                    <label className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
+                                        <input type="checkbox" checked={showKeywords} onChange={() => setShowKeywords(prev => !prev)} className="rounded border-gray-300 text-blue-500 focus:ring-blue-500 w-3.5 h-3.5" />
+                                        <span className="text-[11px] font-medium text-foreground">Keywords</span>
+                                    </label>
+                                </div>
+                            )}
                         </div>
-                        {selectedCategory && (
-                            <div className="flex flex-wrap gap-1 mt-2 opacity-50">
-                                {CATEGORIES_CONFIG.find(c => c.label === selectedCategory)?.keywords.map((k: string, i: number) => (
-                                    <span key={i} className="text-[9px] text-muted-foreground border border-gray-200 px-1.5 py-0.5 rounded-full uppercase tracking-tight">{k}</span>
-                                ))}
-                            </div>
-                        )}
+
+                        {/* View Mode Toggle */}
+                        <div className="flex items-center p-0.5 bg-gray-100 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700">
+                            {([['category', LayoutGrid, 'Category'], ['time', Clock, 'Time']] as const).map(([mode, Icon, label]) => (
+                                <button
+                                    key={mode}
+                                    onClick={() => setViewMode(mode as 'category' | 'time')}
+                                    className={`flex items-center gap-1 px-2 py-0.5 rounded transition-all ${viewMode === mode
+                                        ? 'bg-blue-500 text-white shadow-sm'
+                                        : 'text-gray-400 hover:text-gray-600'
+                                        }`}
+                                >
+                                    <Icon size={12} />
+                                    <span className="text-[10px] font-bold uppercase tracking-wider hidden sm:inline">{label}</span>
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
             )}
 
-            <div className="px-4 md:px-6 lg:px-12 pb-24">
+            {/* Non-landing page header */}
+            {!isLandingPage && !showCollections && (
+                <div className="px-4 md:px-6 lg:px-8 pt-4">
+                    <div className="flex items-center gap-3 mb-1">
+                        <h1 className="text-lg font-black tracking-tighter text-foreground uppercase">
+                            {selectedCategory || 'Search Results'}
+                        </h1>
+                        <span className="text-[10px] font-bold text-muted-foreground bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">
+                            {filteredNews.length}
+                        </span>
+                    </div>
+                </div>
+            )}
+
+            <div className="px-4 md:px-6 lg:px-8 pb-16">
                 {showCollections ? (
                     <CollectionsView allNews={allNews} today={today} />
                 ) : selectedCategory || searchQuery ? (
                     <>
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-0 max-w-7xl"
-                        >
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-0 max-w-7xl">
                             {filteredNews.slice(0, displayCount).map((article) => (
                                 <NewsRow key={article.id} article={article} today={today} showBadges={showBadges} showKeywords={showKeywords} />
                             ))}
-                        </motion.div>
+                        </div>
                         {displayCount < filteredNews.length && (
                             <LoadMore remaining={filteredNews.length - displayCount} onClick={loadMore} />
                         )}
@@ -280,63 +355,27 @@ export default function NewsListContainer({
                 ) : (
                     <>
                         {viewMode === 'category' ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5 relative z-30">
-                                {CATEGORIES_CONFIG.map((config, idx) => {
-                                    const category = config.label;
-                                    const articles = newsByCategory[category] || [];
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {/* TrendChart as first card */}
+                                <div className="h-[280px]">
+                                    <TrendChartCompact />
+                                </div>
 
-                                    return (
-                                        <motion.div
-                                            key={category}
-                                            initial={{ opacity: 0, y: 30 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ duration: 0.5, delay: idx * 0.05 }}
-                                            className="group/theme glass-card rounded-[24px] p-5 relative overflow-hidden flex flex-col gap-4 h-full"
-                                        >
-                                            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/0 group-hover/theme:bg-blue-600/10 blur-[80px] rounded-full transition-all duration-700" />
-
-                                            <div className="relative z-10 w-full text-center border-b border-gray-100 pb-4">
-                                                <Link
-                                                    href={`/?category=${encodeURIComponent(category)}`}
-                                                    prefetch={true}
-                                                    className="group/link flex flex-col items-center justify-center gap-1.5 p-2 rounded-xl transition-all duration-300 hover:bg-gray-50"
-                                                >
-                                                    <h2 className="text-xl font-black text-foreground tracking-tighter uppercase transition-colors group-hover/link:text-blue-600 dark:group-hover/link:text-blue-400">
-                                                        {category}
-                                                    </h2>
-                                                    <div className="h-1 w-6 bg-blue-600 rounded-full transition-all duration-500 group-hover/link:w-16 group-hover/link:bg-blue-400" />
-                                                </Link>
-                                            </div>
-
-                                            <div className="relative z-10 flex flex-col divide-y divide-gray-200 dark:divide-gray-700">
-                                                <AnimatePresence mode="popLayout">
-                                                    {articles.slice(0, 8).map((article: any, i: number) => (
-                                                        <motion.div
-                                                            key={article.id}
-                                                            initial={{ opacity: 0, x: -10 }}
-                                                            animate={{ opacity: 1, x: 0 }}
-                                                            transition={{ delay: (idx * 0.05) + (i * 0.02) }}
-                                                            className="py-2.5 first:pt-0 last:pb-0"
-                                                        >
-                                                            <NewsCard article={article} today={today} showBadges={showBadges} showKeywords={showKeywords} />
-                                                        </motion.div>
-                                                    ))}
-                                                </AnimatePresence>
-                                                {articles.length === 0 && (
-                                                    <div className="py-12 text-center text-gray-300 text-[9px] uppercase font-bold tracking-[0.3em]">Awaiting Insight</div>
-                                                )}
-                                            </div>
-                                        </motion.div>
-                                    );
-                                })}
+                                {/* Category Cards */}
+                                {CATEGORIES_CONFIG.map((config, idx) => (
+                                    <CategoryCard
+                                        key={config.label}
+                                        category={config.label}
+                                        articles={newsByCategory[config.label] || []}
+                                        today={today}
+                                        showBadges={showBadges}
+                                        showKeywords={showKeywords}
+                                        index={idx}
+                                    />
+                                ))}
                             </div>
                         ) : (
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: 0.3 }}
-                                className="flex flex-col gap-0 w-full"
-                            >
+                            <div className="flex flex-col gap-0 w-full">
                                 {timeSortedNews.slice(0, displayCount).map((article: any, i: number) => (
                                     <NewsRow
                                         key={`${article.id}-${i}`}
@@ -348,14 +387,14 @@ export default function NewsListContainer({
                                     />
                                 ))}
                                 {timeSortedNews.length === 0 && (
-                                    <div className="col-span-full text-center py-20 text-muted-foreground">
+                                    <div className="text-center py-20 text-muted-foreground">
                                         No news available.
                                     </div>
                                 )}
                                 {displayCount < timeSortedNews.length && (
                                     <LoadMore remaining={timeSortedNews.length - displayCount} onClick={loadMore} />
                                 )}
-                            </motion.div>
+                            </div>
                         )}
                     </>
                 )}
@@ -364,49 +403,12 @@ export default function NewsListContainer({
     );
 }
 
-// --- Card & Row components ---
-
-const NewsCard = React.memo(function NewsCard({ article, today, showBadges = false, showKeywords = false }: { article: any, today: string, showBadges?: boolean, showKeywords?: boolean }) {
-    const { isToday, isYesterday, dateStr, timeStr, kws } = useArticleData(article, today);
-
-    return (
-        <motion.div
-            whileHover={{ x: 2 }}
-            className="group/card flex flex-col gap-0.5 relative transition-all duration-300 cursor-pointer"
-        >
-            <div className="flex items-start justify-between gap-2">
-                <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 mb-0.5">
-                        {showBadges && <DateBadge isToday={isToday} isYesterday={isYesterday} />}
-                        <a href={article.link} target="_blank" rel="noopener noreferrer" className="news-link text-[14px] font-bold text-foreground/90 group-hover/card:text-blue-600 transition-colors leading-tight line-clamp-2 block tracking-tight">
-                            {article.title}
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div className="flex items-center justify-between mt-0.5">
-                {showKeywords && (
-                    <div className="flex flex-wrap gap-1">
-                        {kws.slice(0, 2).map((k, i) => (
-                            <span key={i} className="text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded border border-blue-200 dark:border-blue-800 uppercase tracking-tight group-hover/card:border-blue-300 group-hover/card:text-blue-700 dark:group-hover/card:text-blue-300 transition-all">
-                                {k}
-                            </span>
-                        ))}
-                    </div>
-                )}
-                <div className="flex items-center gap-2 ml-auto">
-                    <TimeLabel dateStr={dateStr} timeStr={timeStr} isToday={isToday} isYesterday={isYesterday} />
-                    <CollectionButton newsLink={article.link} newsTitle={article.title} size={14} />
-                </div>
-            </div>
-        </motion.div>
-    );
-});
+// --- Row component (for time view & category/search pages) ---
 
 const NewsRow = React.memo(function NewsRow({ article, today, category, showBadges = false, showKeywords = false }: { article: any, today: string, category?: string, showBadges?: boolean, showKeywords?: boolean }) {
     const { isToday, isYesterday, dateStr, timeStr, kws } = useArticleData(article, today);
 
-    // Time View (landing page) - wide layout
+    // Time View (landing page)
     if (category) {
         return (
             <article className={`group py-3 sm:py-0.5 px-4 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-200 dark:border-gray-700 transition-all duration-200 ${isToday ? 'bg-blue-50/30 dark:bg-blue-900/10' : ''}`}>
@@ -459,7 +461,7 @@ const NewsRow = React.memo(function NewsRow({ article, today, category, showBadg
         );
     }
 
-    // Category Page layout
+    // Category/search page layout
     return (
         <article className={`group py-3 sm:py-1.5 px-4 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-200 dark:border-gray-700 transition-all duration-200 ${isToday ? 'bg-blue-50/30 dark:bg-blue-900/10' : ''}`}>
             {/* MOBILE */}
