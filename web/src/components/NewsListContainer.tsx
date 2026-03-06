@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import CollectionButton from './CollectionButton';
 import CollectionsView from './CollectionsView';
-import { LayoutGrid, Clock } from 'lucide-react';
+import { LayoutGrid, Clock, SlidersHorizontal } from 'lucide-react';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { fmtDateKST, getYesterdayStr, toDateKey, uniqueKws } from '@/lib/utils';
 
@@ -144,6 +144,9 @@ export default function NewsListContainer({
     const PAGE_SIZE = 20;
     const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
     const [viewMode, setViewMode] = useState<'category' | 'time'>('category');
+    const [showBadges, setShowBadges] = useState(false);
+    const [showKeywords, setShowKeywords] = useState(false);
+    const [showSettings, setShowSettings] = useState(false);
 
     const reduceMotion = useReducedMotion();
 
@@ -187,21 +190,46 @@ export default function NewsListContainer({
                             </div>
                         </div>
 
-                        {/* View Mode Toggle */}
-                        <div className="flex items-center p-0.5 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                            {([['category', LayoutGrid, 'Category'], ['time', Clock, 'Time']] as const).map(([mode, Icon, label]) => (
+                        <div className="flex items-center gap-2">
+                            {/* Display Settings */}
+                            <div className="relative">
                                 <button
-                                    key={mode}
-                                    onClick={() => setViewMode(mode as 'category' | 'time')}
-                                    className={`flex items-center gap-1 px-2.5 py-1 rounded-md transition-all duration-200 ${viewMode === mode
-                                        ? 'bg-blue-500 text-white shadow-sm'
-                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                                        }`}
+                                    onClick={() => setShowSettings(prev => !prev)}
+                                    className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border transition-all duration-200 ${showSettings ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800 text-blue-600' : 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500 hover:text-gray-900 dark:hover:text-gray-200'}`}
                                 >
-                                    <Icon size={13} />
-                                    <span className="text-[10px] font-bold uppercase tracking-wider">{label}</span>
+                                    <SlidersHorizontal size={13} />
+                                    <span className="text-[10px] font-bold uppercase tracking-wider">Display</span>
                                 </button>
-                            ))}
+                                {showSettings && (
+                                    <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 py-1">
+                                        <label className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
+                                            <input type="checkbox" checked={showBadges} onChange={() => setShowBadges(prev => !prev)} className="rounded border-gray-300 text-blue-500 focus:ring-blue-500 w-3.5 h-3.5" />
+                                            <span className="text-[11px] font-medium text-foreground">NEW / YDAY</span>
+                                        </label>
+                                        <label className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
+                                            <input type="checkbox" checked={showKeywords} onChange={() => setShowKeywords(prev => !prev)} className="rounded border-gray-300 text-blue-500 focus:ring-blue-500 w-3.5 h-3.5" />
+                                            <span className="text-[11px] font-medium text-foreground">Keywords</span>
+                                        </label>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* View Mode Toggle */}
+                            <div className="flex items-center p-0.5 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                                {([['category', LayoutGrid, 'Category'], ['time', Clock, 'Time']] as const).map(([mode, Icon, label]) => (
+                                    <button
+                                        key={mode}
+                                        onClick={() => setViewMode(mode as 'category' | 'time')}
+                                        className={`flex items-center gap-1 px-2.5 py-1 rounded-md transition-all duration-200 ${viewMode === mode
+                                            ? 'bg-blue-500 text-white shadow-sm'
+                                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                                            }`}
+                                    >
+                                        <Icon size={13} />
+                                        <span className="text-[10px] font-bold uppercase tracking-wider">{label}</span>
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -242,7 +270,7 @@ export default function NewsListContainer({
                             className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-0 max-w-7xl"
                         >
                             {filteredNews.slice(0, displayCount).map((article) => (
-                                <NewsRow key={article.id} article={article} today={today} />
+                                <NewsRow key={article.id} article={article} today={today} showBadges={showBadges} showKeywords={showKeywords} />
                             ))}
                         </motion.div>
                         {displayCount < filteredNews.length && (
@@ -289,7 +317,7 @@ export default function NewsListContainer({
                                                             animate={{ opacity: 1, x: 0 }}
                                                             transition={{ delay: (idx * 0.05) + (i * 0.02) }}
                                                         >
-                                                            <NewsCard article={article} today={today} />
+                                                            <NewsCard article={article} today={today} showBadges={showBadges} showKeywords={showKeywords} />
                                                         </motion.div>
                                                     ))}
                                                 </AnimatePresence>
@@ -314,6 +342,8 @@ export default function NewsListContainer({
                                         article={article}
                                         today={today}
                                         category={article.computedCategory}
+                                        showBadges={showBadges}
+                                        showKeywords={showKeywords}
                                     />
                                 ))}
                                 {timeSortedNews.length === 0 && (
@@ -335,7 +365,7 @@ export default function NewsListContainer({
 
 // --- Card & Row components ---
 
-const NewsCard = React.memo(function NewsCard({ article, today }: { article: any, today: string }) {
+const NewsCard = React.memo(function NewsCard({ article, today, showBadges = false, showKeywords = false }: { article: any, today: string, showBadges?: boolean, showKeywords?: boolean }) {
     const { isToday, isYesterday, dateStr, timeStr, kws } = useArticleData(article, today);
 
     return (
@@ -346,7 +376,7 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
             <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 mb-0.5">
-                        <DateBadge isToday={isToday} isYesterday={isYesterday} />
+                        {showBadges && <DateBadge isToday={isToday} isYesterday={isYesterday} />}
                         <a href={article.link} target="_blank" rel="noopener noreferrer" className="news-link text-[14px] font-bold text-foreground/90 group-hover/card:text-blue-600 transition-colors leading-tight line-clamp-2 block tracking-tight">
                             {article.title}
                         </a>
@@ -354,14 +384,16 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
                 </div>
             </div>
             <div className="flex items-center justify-between mt-0.5">
-                <div className="flex flex-wrap gap-1">
-                    {kws.slice(0, 2).map((k, i) => (
-                        <span key={i} className="text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded border border-blue-200 dark:border-blue-800 uppercase tracking-tight group-hover/card:border-blue-300 group-hover/card:text-blue-700 dark:group-hover/card:text-blue-300 transition-all">
-                            {k}
-                        </span>
-                    ))}
-                </div>
-                <div className="flex items-center gap-2">
+                {showKeywords && (
+                    <div className="flex flex-wrap gap-1">
+                        {kws.slice(0, 2).map((k, i) => (
+                            <span key={i} className="text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded border border-blue-200 dark:border-blue-800 uppercase tracking-tight group-hover/card:border-blue-300 group-hover/card:text-blue-700 dark:group-hover/card:text-blue-300 transition-all">
+                                {k}
+                            </span>
+                        ))}
+                    </div>
+                )}
+                <div className="flex items-center gap-2 ml-auto">
                     <TimeLabel dateStr={dateStr} timeStr={timeStr} isToday={isToday} isYesterday={isYesterday} />
                     <CollectionButton newsLink={article.link} newsTitle={article.title} size={14} />
                 </div>
@@ -370,7 +402,7 @@ const NewsCard = React.memo(function NewsCard({ article, today }: { article: any
     );
 });
 
-const NewsRow = React.memo(function NewsRow({ article, today, category }: { article: any, today: string, category?: string }) {
+const NewsRow = React.memo(function NewsRow({ article, today, category, showBadges = false, showKeywords = false }: { article: any, today: string, category?: string, showBadges?: boolean, showKeywords?: boolean }) {
     const { isToday, isYesterday, dateStr, timeStr, kws } = useArticleData(article, today);
 
     // Time View (landing page) - wide layout
@@ -387,12 +419,12 @@ const NewsRow = React.memo(function NewsRow({ article, today, category }: { arti
                         <div className="mt-0.5"><CollectionButton newsLink={article.link} newsTitle={article.title} size={16} /></div>
                         <a href={article.link} target="_blank" rel="noopener noreferrer" className="news-link flex-1 min-w-0 block">
                             <h3 className="text-[15px] font-bold text-gray-900 dark:text-gray-100 leading-snug tracking-tight group-hover:text-[#3182f6] transition-colors line-clamp-2">
-                                <InlineBadge isToday={isToday} isYesterday={isYesterday} />
+                                {showBadges && <InlineBadge isToday={isToday} isYesterday={isYesterday} />}
                                 {article.title}
                             </h3>
                         </a>
                     </div>
-                    {kws.length > 0 && (
+                    {showKeywords && kws.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-0.5 pl-6">
                             <KwBadges kws={kws} max={3} />
                         </div>
@@ -406,14 +438,16 @@ const NewsRow = React.memo(function NewsRow({ article, today, category }: { arti
                         <span className="inline-block text-[9px] font-black text-white bg-blue-500 px-1.5 py-0.5 rounded uppercase tracking-tight whitespace-nowrap">{category}</span>
                     </div>
                     <div className="flex-1 min-w-0 w-full">
-                        <div className="flex flex-wrap gap-1 mb-0.5">
-                            <KwBadges kws={kws} max={4} size="xs" />
-                        </div>
+                        {showKeywords && (
+                            <div className="flex flex-wrap gap-1 mb-0.5">
+                                <KwBadges kws={kws} max={4} size="xs" />
+                            </div>
+                        )}
                         <div className="flex items-center gap-1.5">
                             <div className="mt-0"><CollectionButton newsLink={article.link} newsTitle={article.title} size={14} /></div>
                             <a href={article.link} target="_blank" rel="noopener noreferrer" className="news-link flex-1 min-w-0 block">
                                 <h3 className="text-[13px] font-bold text-inherit group-hover:text-[#3182f6] transition-colors leading-tight truncate">
-                                    <InlineBadge isToday={isToday} isYesterday={isYesterday} />
+                                    {showBadges && <InlineBadge isToday={isToday} isYesterday={isYesterday} />}
                                     {article.title}
                                 </h3>
                             </a>
@@ -436,12 +470,12 @@ const NewsRow = React.memo(function NewsRow({ article, today, category }: { arti
                     <div className="mt-0.5"><CollectionButton newsLink={article.link} newsTitle={article.title} size={16} /></div>
                     <a href={article.link} target="_blank" rel="noopener noreferrer" className="news-link flex-1 min-w-0 block">
                         <h3 className="text-[15px] font-bold text-gray-900 dark:text-gray-100 leading-snug tracking-tight group-hover:text-[#3182f6] transition-colors line-clamp-2">
-                            <InlineBadge isToday={isToday} isYesterday={isYesterday} />
+                            {showBadges && <InlineBadge isToday={isToday} isYesterday={isYesterday} />}
                             {article.title}
                         </h3>
                     </a>
                 </div>
-                {kws.length > 0 && (
+                {showKeywords && kws.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-0.5 pl-6">
                         <KwBadges kws={kws} max={3} />
                     </div>
@@ -454,14 +488,16 @@ const NewsRow = React.memo(function NewsRow({ article, today, category }: { arti
                     <TimeLabel dateStr={dateStr} timeStr={timeStr} isToday={isToday} isYesterday={isYesterday} size="md" />
                 </div>
                 <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap gap-1 mb-0.5">
-                        <KwBadges kws={kws} max={4} size="xs" />
-                    </div>
+                    {showKeywords && (
+                        <div className="flex flex-wrap gap-1 mb-0.5">
+                            <KwBadges kws={kws} max={4} size="xs" />
+                        </div>
+                    )}
                     <div className="flex items-center gap-1.5">
                         <div className="mt-0"><CollectionButton newsLink={article.link} newsTitle={article.title} size={14} /></div>
                         <a href={article.link} target="_blank" rel="noopener noreferrer" className="news-link flex-1 min-w-0 block">
                             <h3 className="text-[13px] font-bold text-inherit group-hover:text-[#3182f6] transition-colors leading-tight truncate">
-                                <InlineBadge isToday={isToday} isYesterday={isYesterday} />
+                                {showBadges && <InlineBadge isToday={isToday} isYesterday={isYesterday} />}
                                 {article.title}
                             </h3>
                         </a>

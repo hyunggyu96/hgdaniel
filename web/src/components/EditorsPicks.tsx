@@ -60,24 +60,22 @@ export default function EditorsPicks({ allNews }: EditorsPicksProps) {
     return (
         <div className="mx-4 mb-6">
             {/* Header */}
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-end gap-2 mb-2">
                 <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.15em]">
                     {t('editors_picks_curated')}
                 </span>
-                <div className="flex items-center gap-2">
-                    <span className="text-[9px] text-muted-foreground/50">
-                        {new Date().toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul', month: 'long', day: 'numeric' })}
-                    </span>
-                    {isAdmin && (
-                        <button
-                            onClick={() => setShowAdmin(true)}
-                            className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-gray-400 hover:text-foreground"
-                            title={t('editors_picks_settings')}
-                        >
-                            <Settings className="w-3.5 h-3.5" />
-                        </button>
-                    )}
-                </div>
+                <span className="text-[9px] text-muted-foreground/50">
+                    {new Date().toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul', month: 'long', day: 'numeric' })}
+                </span>
+                {isAdmin && (
+                    <button
+                        onClick={() => setShowAdmin(true)}
+                        className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-gray-400 hover:text-foreground"
+                        title={t('editors_picks_settings')}
+                    >
+                        <Settings className="w-3.5 h-3.5" />
+                    </button>
+                )}
             </div>
 
             {/* Sections Table */}
