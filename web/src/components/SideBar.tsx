@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { CATEGORIES } from '@/lib/constants';
-import { ChevronRight, MessageSquarePlus, PanelLeftOpen, PanelLeftClose } from 'lucide-react';
+import { ChevronRight, MessageSquarePlus } from 'lucide-react';
 import CollectionCount from './CollectionCount';
 import KeywordSuggestionModal from './KeywordSuggestionModal';
 import { useState } from 'react';
@@ -25,21 +25,9 @@ export default function SideBar({ collapsed, onToggle }: SideBarProps) {
     const isOverview = !selectedCategory && !isCollections && !searchQuery;
 
     return (
-        <>
-            {/* Toggle button - always visible on lg+ */}
-            <button
-                onClick={onToggle}
-                className="hidden lg:flex fixed top-[73px] left-0 z-30 items-center justify-center w-8 h-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-r-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
-                style={{ left: collapsed ? 0 : '256px' }}
-                title={collapsed ? 'Show sidebar' : 'Hide sidebar'}
-            >
-                {collapsed ? <PanelLeftOpen className="w-4 h-4 text-gray-500" /> : <PanelLeftClose className="w-4 h-4 text-gray-500" />}
-            </button>
-
-            {/* Sidebar */}
-            <aside
-                className={`w-64 flex-shrink-0 border-r border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 p-6 transition-all duration-300 hidden ${collapsed ? 'lg:hidden' : 'lg:block'}`}
-            >
+        <aside
+            className={`w-64 flex-shrink-0 border-r border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 p-6 transition-all duration-300 hidden ${collapsed ? 'lg:hidden' : 'lg:block'}`}
+        >
                 <div className="space-y-8">
                     <div>
                         <h3 className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em] mb-6">
@@ -129,6 +117,5 @@ export default function SideBar({ collapsed, onToggle }: SideBarProps) {
                     onClose={() => setIsSuggestOpen(false)}
                 />
             </aside>
-        </>
     );
 }
