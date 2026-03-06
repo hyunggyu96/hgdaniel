@@ -244,7 +244,6 @@ export default function AnalysisPage() {
     };
 
     return (
-        <TierGate feature="analysis">
         <main className="min-h-screen bg-gray-50 dark:bg-gray-950 p-6 md:p-12 transition-colors duration-300">
             <div className="w-full px-4 md:px-8 space-y-6">
                 {/* Back to List Navigation - absolute top-left or wide container */}
@@ -716,6 +715,5 @@ export default function AnalysisPage() {
                 )}
             </div>
         </main>
-        </TierGate>
     );
 }

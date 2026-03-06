@@ -153,7 +153,6 @@ export default function RevenuePage() {
     }, [filteredRows]);
 
     return (
-        <TierGate feature="revenue">
         <main className="min-h-screen bg-gray-50/50 dark:bg-gray-950 p-6 md:p-12 pb-24 transition-colors duration-300">
             <div className="max-w-7xl mx-auto space-y-6">
 
@@ -357,6 +356,5 @@ export default function RevenuePage() {
                 </p>
             </div>
         </main>
-        </TierGate>
     );
 }
