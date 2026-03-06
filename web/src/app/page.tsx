@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import SideBar from '@/components/SideBar';
 import NewsList from '@/components/NewsList';
@@ -18,11 +18,12 @@ export default function Page() {
     const searchQuery = searchParams?.get('search') || undefined;
     const showCollections = searchParams?.get('collections') === 'true';
     const isLandingPage = !selectedCategory && !searchQuery && !showCollections;
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 
     return (
         <div className="flex min-h-screen bg-background">
             {/* Client Component: SideBar */}
-            <SideBar />
+            <SideBar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(prev => !prev)} />
 
             {/* Client Component: NewsList (with SWR) */}
             <main className="flex-1">

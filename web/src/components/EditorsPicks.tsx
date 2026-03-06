@@ -61,23 +61,23 @@ export default function EditorsPicks({ allNews }: EditorsPicksProps) {
         <div className="mx-4 mb-6">
             {/* Header */}
             <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.15em]">
+                    {t('editors_picks_curated')}
+                </span>
                 <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.15em]">
-                        {t('editors_picks_curated')}
-                    </span>
                     <span className="text-[9px] text-muted-foreground/50">
                         {new Date().toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul', month: 'long', day: 'numeric' })}
                     </span>
+                    {isAdmin && (
+                        <button
+                            onClick={() => setShowAdmin(true)}
+                            className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-gray-400 hover:text-foreground"
+                            title={t('editors_picks_settings')}
+                        >
+                            <Settings className="w-3.5 h-3.5" />
+                        </button>
+                    )}
                 </div>
-                {isAdmin && (
-                    <button
-                        onClick={() => setShowAdmin(true)}
-                        className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-gray-400 hover:text-foreground"
-                        title={t('editors_picks_settings')}
-                    >
-                        <Settings className="w-3.5 h-3.5" />
-                    </button>
-                )}
             </div>
 
             {/* Sections Table */}
@@ -120,9 +120,6 @@ export default function EditorsPicks({ allNews }: EditorsPicksProps) {
                                                             <span className="text-[7px] font-black text-white bg-red-500 px-1 py-0.5 rounded leading-none shrink-0">NEW</span>
                                                         )}
                                                     </div>
-                                                    <p className="text-[10px] text-muted-foreground line-clamp-1 leading-relaxed">
-                                                        {item.article.description}
-                                                    </p>
                                                 </div>
                                                 <div className="shrink-0 text-right">
                                                     <span className={`text-[9px] font-mono font-bold ${isToday ? 'text-red-500' : 'text-gray-400'}`}>
