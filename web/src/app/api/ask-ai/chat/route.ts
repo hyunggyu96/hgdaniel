@@ -53,7 +53,7 @@ export async function POST(request: Request) {
         const groqApiKey = process.env.GROQ_API_KEY?.trim();
         if (!groqApiKey) {
             console.error('GROQ_API_KEY is missing');
-            return NextResponse.json({ error: 'Server configuration error: Missing API Key' }, { status: 500 });
+            return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
         }
 
         const groq = new Groq({ apiKey: groqApiKey });

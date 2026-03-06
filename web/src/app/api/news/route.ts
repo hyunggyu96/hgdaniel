@@ -23,7 +23,7 @@ export async function GET() {
     } catch (error) {
         console.error('[API /api/news] Error:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch news', timestamp: new Date().toISOString() },
+            { error: 'Failed to fetch news' },
             { status: 500 }
         );
     }
