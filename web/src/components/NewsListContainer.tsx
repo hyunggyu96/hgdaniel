@@ -308,7 +308,7 @@ export default function NewsListContainer({
                                                 </Link>
                                             </div>
 
-                                            <div className="relative z-10 flex flex-col gap-3.5">
+                                            <div className="relative z-10 flex flex-col divide-y divide-gray-200 dark:divide-gray-700">
                                                 <AnimatePresence mode="popLayout">
                                                     {articles.slice(0, 8).map((article: any, i: number) => (
                                                         <motion.div
@@ -316,6 +316,7 @@ export default function NewsListContainer({
                                                             initial={{ opacity: 0, x: -10 }}
                                                             animate={{ opacity: 1, x: 0 }}
                                                             transition={{ delay: (idx * 0.05) + (i * 0.02) }}
+                                                            className="py-2.5 first:pt-0 last:pb-0"
                                                         >
                                                             <NewsCard article={article} today={today} showBadges={showBadges} showKeywords={showKeywords} />
                                                         </motion.div>
@@ -371,7 +372,7 @@ const NewsCard = React.memo(function NewsCard({ article, today, showBadges = fal
     return (
         <motion.div
             whileHover={{ x: 2 }}
-            className="group/card flex flex-col gap-0.5 pb-2 mb-2 border-b border-gray-200 dark:border-gray-700 last:border-0 last:pb-0 last:mb-0 relative transition-all duration-300 cursor-pointer"
+            className="group/card flex flex-col gap-0.5 relative transition-all duration-300 cursor-pointer"
         >
             <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
