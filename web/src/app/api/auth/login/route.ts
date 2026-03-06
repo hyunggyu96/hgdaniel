@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
         const { data, error } = await supabaseAdmin
             .from('accounts')
-            .select('*')
+            .select('id, username, password_hash, tier, is_admin, session_version')
             .eq('username', username)
             .maybeSingle();
 
