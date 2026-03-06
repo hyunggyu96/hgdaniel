@@ -371,7 +371,7 @@ const NewsCard = React.memo(function NewsCard({ article, today, showBadges = fal
     return (
         <motion.div
             whileHover={{ x: 2 }}
-            className="group/card flex flex-col gap-0.5 pb-1.5 border-b border-gray-100 dark:border-gray-700 last:border-0 last:pb-0 relative transition-all duration-300 cursor-pointer"
+            className="group/card flex flex-col gap-0.5 pb-2 mb-2 border-b border-gray-200 dark:border-gray-700 last:border-0 last:pb-0 last:mb-0 relative transition-all duration-300 cursor-pointer"
         >
             <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
@@ -408,7 +408,7 @@ const NewsRow = React.memo(function NewsRow({ article, today, category, showBadg
     // Time View (landing page) - wide layout
     if (category) {
         return (
-            <article className={`group py-3 sm:py-0.5 px-4 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-800 transition-all duration-200 ${isToday ? 'bg-blue-50/30 dark:bg-blue-900/10' : ''}`}>
+            <article className={`group py-3 sm:py-0.5 px-4 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-200 dark:border-gray-700 transition-all duration-200 ${isToday ? 'bg-blue-50/30 dark:bg-blue-900/10' : ''}`}>
                 {/* MOBILE */}
                 <div className="flex flex-col gap-2 sm:hidden">
                     <div className="flex items-center justify-between pb-1 border-b border-dashed border-gray-100/50">
@@ -460,7 +460,7 @@ const NewsRow = React.memo(function NewsRow({ article, today, category, showBadg
 
     // Category Page layout
     return (
-        <article className={`group py-3 sm:py-1.5 px-4 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-800 transition-all duration-200 ${isToday ? 'bg-blue-50/30 dark:bg-blue-900/10' : ''}`}>
+        <article className={`group py-3 sm:py-1.5 px-4 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-200 dark:border-gray-700 transition-all duration-200 ${isToday ? 'bg-blue-50/30 dark:bg-blue-900/10' : ''}`}>
             {/* MOBILE */}
             <div className="flex flex-col gap-2 sm:hidden">
                 <div className="flex items-center justify-end pb-1 border-b border-dashed border-gray-100/50">
