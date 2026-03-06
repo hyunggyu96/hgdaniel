@@ -55,6 +55,7 @@ export async function POST(request: NextRequest) {
             .single();
 
         if (error || !data) {
+            console.error('[auth/register] insert error:', error);
             return NextResponse.json({ error: 'Failed to create account' }, { status: 500 });
         }
 
