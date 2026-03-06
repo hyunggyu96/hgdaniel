@@ -123,8 +123,8 @@ export default function EditorsPicks({ allNews }: EditorsPicksProps) {
                                                     <span className={`text-[9px] font-mono font-bold ${isToday ? 'text-red-500' : 'text-gray-400'}`}>
                                                         {dateStr}
                                                     </span>
-                                                    <div className="text-[8px] text-muted-foreground/50">
-                                                        {item.article.source}
+                                                    <div className={`text-[8px] font-mono ${isToday ? 'text-red-400' : 'text-muted-foreground/50'}`}>
+                                                        {fmtDateKST(pubDateObj).timeStr}
                                                     </div>
                                                 </div>
                                                 <a
@@ -538,7 +538,7 @@ function AdminModal({
                                                 <div className="flex-1 min-w-0">
                                                     <p className="text-[11px] font-medium text-foreground line-clamp-1">{article.title}</p>
                                                     <p className="text-[9px] text-muted-foreground">
-                                                        {article.source} · {article.published_at?.slice(0, 10)}
+                                                        {article.published_at?.slice(0, 16).replace('T', ' ')}
                                                     </p>
                                                 </div>
                                                 <a

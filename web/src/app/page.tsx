@@ -19,7 +19,7 @@ export default function Page() {
     const searchQuery = searchParams?.get('search') || undefined;
     const showCollections = searchParams?.get('collections') === 'true';
     const isLandingPage = !selectedCategory && !searchQuery && !showCollections;
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
     return (
         <div className="flex min-h-screen bg-background">
