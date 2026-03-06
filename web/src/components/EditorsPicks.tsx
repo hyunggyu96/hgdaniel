@@ -119,13 +119,10 @@ export default function EditorsPicks({ allNews }: EditorsPicksProps) {
                                                         )}
                                                     </div>
                                                 </div>
-                                                <div className="shrink-0 text-right">
+                                                <div className="shrink-0">
                                                     <span className={`text-[9px] font-mono font-bold ${isToday ? 'text-red-500' : 'text-gray-400'}`}>
-                                                        {dateStr}
+                                                        {dateStr} {fmtDateKST(pubDateObj).timeStr}
                                                     </span>
-                                                    <div className={`text-[8px] font-mono ${isToday ? 'text-red-400' : 'text-muted-foreground/50'}`}>
-                                                        {fmtDateKST(pubDateObj).timeStr}
-                                                    </div>
                                                 </div>
                                                 <a
                                                     href={item.article.link}
