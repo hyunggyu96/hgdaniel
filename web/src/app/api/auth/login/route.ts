@@ -6,11 +6,11 @@ import {
     normalizeUsername,
     verifyPassword,
 } from '@/lib/auth';
-import { rateLimit } from '@/lib/rateLimit';
+import { rateLimit, getClientIp } from '@/lib/rateLimit';
 
 export async function POST(request: NextRequest) {
     try {
-        const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+        const ip = getClientIp(request.headers);
         const { allowed, retryAfterMs } = rateLimit(`login:${ip}`, { maxRequests: 10, windowMs: 60_000 });
         if (!allowed) {
             return NextResponse.json(

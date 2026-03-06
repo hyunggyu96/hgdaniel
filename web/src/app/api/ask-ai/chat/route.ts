@@ -5,6 +5,7 @@ import { getAuthUserFromCookieHeader } from '@/lib/authSession';
 import { requireFeature } from '@/lib/tierGuard';
 import { getTierConfig } from '@/lib/tiers';
 import { getDailyUsageCount, recordUsage } from '@/lib/usage';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
 export async function POST(request: Request) {
     try {
@@ -36,6 +37,17 @@ export async function POST(request: Request) {
         }
         if (!message) {
             return NextResponse.json({ error: 'message required' }, { status: 400 });
+        }
+
+        // Verify user owns this session
+        const { data: sessionOwner, error: sessionError } = await supabaseAdmin
+            .from('ask_ai_sessions')
+            .select('user_id')
+            .eq('id', session_id)
+            .single();
+
+        if (sessionError || !sessionOwner || sessionOwner.user_id !== user.id) {
+            return NextResponse.json({ error: 'Session not found' }, { status: 403 });
         }
 
         const groqApiKey = process.env.GROQ_API_KEY?.trim();

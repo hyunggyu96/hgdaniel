@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { getAuthUserFromNextRequest } from '@/lib/authSession';
 import { requireAdmin } from '@/lib/adminGuard';
-import { rateLimit } from '@/lib/rateLimit';
+import { rateLimit, getClientIp } from '@/lib/rateLimit';
 import type { Tier } from '@/lib/authSession';
 
 const VALID_TIERS: Tier[] = ['free', 'pro', 'enterprise'];
 
 export async function POST(request: NextRequest) {
     try {
-        const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+        const ip = getClientIp(request.headers);
         const { allowed, retryAfterMs } = rateLimit(`admin:${ip}`, { maxRequests: 10, windowMs: 60_000 });
         if (!allowed) {
             return NextResponse.json(

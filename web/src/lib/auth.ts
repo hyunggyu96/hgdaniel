@@ -31,21 +31,15 @@ function fromBase64Url(input: string): Buffer {
     return Buffer.from(padded, 'base64');
 }
 
-let _warnedFallback = false;
-
 function getSessionSecret() {
-    const dedicated = process.env.AUTH_SESSION_SECRET;
-    if (dedicated) return dedicated;
-
-    const fallback = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-    if (!fallback) {
-        throw new Error('Missing AUTH_SESSION_SECRET environment variable');
+    const secret = process.env.AUTH_SESSION_SECRET;
+    if (!secret) {
+        throw new Error(
+            'Missing AUTH_SESSION_SECRET environment variable. ' +
+            'Generate one with: node -e "console.log(require(\'crypto\').randomBytes(48).toString(\'base64url\'))"'
+        );
     }
-    if (!_warnedFallback) {
-        _warnedFallback = true;
-        console.warn('[auth] WARNING: Using SUPABASE_SERVICE_ROLE_KEY as session secret. Set a dedicated AUTH_SESSION_SECRET for better security.');
-    }
-    return fallback;
+    return secret;
 }
 
 export function normalizeUsername(raw: string) {

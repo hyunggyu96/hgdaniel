@@ -2,6 +2,25 @@
 // In serverless (Vercel), each instance has its own Map, so this provides
 // per-instance protection. For full distributed rate limiting, use Upstash Redis.
 
+// IPv4 or IPv6 basic pattern check — rejects garbage / injection attempts
+const IP_PATTERN = /^[\da-fA-F.:]+$/;
+
+/**
+ * Extract client IP from request headers with validation.
+ * On Vercel/Cloudflare, x-forwarded-for is set by the edge and cannot be spoofed
+ * by end users. We still validate format to reject garbage values.
+ */
+export function getClientIp(headers: { get(name: string): string | null }): string {
+    const forwarded = headers.get('x-forwarded-for');
+    if (forwarded) {
+        const first = forwarded.split(',')[0]?.trim();
+        if (first && IP_PATTERN.test(first)) return first;
+    }
+    const realIp = headers.get('x-real-ip')?.trim();
+    if (realIp && IP_PATTERN.test(realIp)) return realIp;
+    return 'unknown';
+}
+
 const windows = new Map<string, { count: number; resetAt: number }>();
 
 // Clean up stale entries every 5 minutes

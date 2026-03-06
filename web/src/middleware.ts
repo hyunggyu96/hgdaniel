@@ -67,8 +67,12 @@ export function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-        || request.headers.get('x-real-ip')
+    // Validate IP format to reject garbage/injection in headers
+    const IP_RE = /^[\da-fA-F.:]+$/;
+    const fwd = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
+    const real = request.headers.get('x-real-ip')?.trim();
+    const ip = (fwd && IP_RE.test(fwd) ? fwd : null)
+        || (real && IP_RE.test(real) ? real : null)
         || 'unknown';
 
     // Find matching rate limit config
