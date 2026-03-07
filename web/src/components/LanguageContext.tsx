@@ -129,6 +129,7 @@ export const translations = {
         card_no_articles: '기사 없음',
         trend_title: '키워드 트렌드',
         trend_7d: '7일',
+        display_classic: '과거 뉴스피드',
 
         // Editor's Pick
         editors_picks_curated: '큐레이션',
@@ -257,6 +258,7 @@ export const translations = {
         card_no_articles: 'No articles',
         trend_title: 'Keyword Trends',
         trend_7d: '7D',
+        display_classic: 'Classic Feed',
 
         // Editor's Pick
         editors_picks_curated: 'CURATED',

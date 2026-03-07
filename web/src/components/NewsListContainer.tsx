@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import CollectionButton from './CollectionButton';
 import CollectionsView from './CollectionsView';
 import { LayoutGrid, Clock, SlidersHorizontal, ChevronRight } from 'lucide-react';
@@ -227,6 +227,45 @@ function CompactArticleRow({ article, index, today, showBadges, showKeywords }: 
     );
 }
 
+// --- Classic NewsCard (from main branch) ---
+
+function ClassicNewsCard({ article, today, showBadges = false, showKeywords = false }: { article: any; today: string; showBadges?: boolean; showKeywords?: boolean }) {
+    const { isToday, isYesterday, dateStr, timeStr, kws } = useArticleData(article, today);
+
+    return (
+        <motion.div
+            whileHover={{ x: 2 }}
+            className="group/card flex flex-col gap-0.5 relative transition-all duration-300 cursor-pointer"
+        >
+            <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                        {showBadges && <DateBadge isToday={isToday} isYesterday={isYesterday} />}
+                        <a href={article.link} target="_blank" rel="noopener noreferrer" className="news-link text-[14px] font-bold text-foreground/90 group-hover/card:text-blue-600 transition-colors leading-tight line-clamp-2 block tracking-tight">
+                            {article.title}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div className="flex items-center justify-between mt-0.5">
+                {showKeywords && (
+                    <div className="flex flex-wrap gap-1">
+                        {kws.slice(0, 2).map((k, i) => (
+                            <span key={i} className="text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded border border-blue-200 dark:border-blue-800 uppercase tracking-tight group-hover/card:border-blue-300 group-hover/card:text-blue-700 dark:group-hover/card:text-blue-300 transition-all">
+                                {k}
+                            </span>
+                        ))}
+                    </div>
+                )}
+                <div className="flex items-center gap-2 ml-auto">
+                    <TimeLabel dateStr={dateStr} timeStr={timeStr} isToday={isToday} isYesterday={isYesterday} />
+                    <CollectionButton newsLink={article.link} newsTitle={article.title} size={14} />
+                </div>
+            </div>
+        </motion.div>
+    );
+}
+
 // --- Main component ---
 
 export default function NewsListContainer({
@@ -240,6 +279,7 @@ export default function NewsListContainer({
     const [showBadges, setShowBadges] = useState(false);
     const [showKeywords, setShowKeywords] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
+    const [classicLayout, setClassicLayout] = useState(false);
 
     const reduceMotion = useReducedMotion();
 
@@ -307,6 +347,11 @@ export default function NewsListContainer({
                                         <input type="checkbox" checked={showKeywords} onChange={() => setShowKeywords(prev => !prev)} className="rounded border-gray-300 text-blue-500 focus:ring-blue-500 w-3.5 h-3.5" />
                                         <span className="text-[11px] font-medium text-foreground">Keywords</span>
                                     </label>
+                                    <div className="border-t border-gray-100 dark:border-gray-700 my-0.5" />
+                                    <label className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
+                                        <input type="checkbox" checked={classicLayout} onChange={() => setClassicLayout(prev => !prev)} className="rounded border-gray-300 text-blue-500 focus:ring-blue-500 w-3.5 h-3.5" />
+                                        <span className="text-[11px] font-medium text-foreground">{t('display_classic')}</span>
+                                    </label>
                                 </div>
                             )}
                         </div>
@@ -362,25 +407,80 @@ export default function NewsListContainer({
                 ) : (
                     <>
                         {viewMode === 'category' ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {/* TrendChart as first card */}
-                                <div className="h-[280px]">
-                                    <TrendChartCompact />
-                                </div>
+                            classicLayout ? (
+                                /* Classic (main branch) glass-card grid */
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5 relative z-30">
+                                    {CATEGORIES_CONFIG.map((config, idx) => {
+                                        const category = config.label;
+                                        const articles = newsByCategory[category] || [];
 
-                                {/* Category Cards */}
-                                {CATEGORIES_CONFIG.map((config, idx) => (
-                                    <CategoryCard
-                                        key={config.label}
-                                        category={config.label}
-                                        articles={newsByCategory[config.label] || []}
-                                        today={today}
-                                        showBadges={showBadges}
-                                        showKeywords={showKeywords}
-                                        index={idx}
-                                    />
-                                ))}
-                            </div>
+                                        return (
+                                            <motion.div
+                                                key={category}
+                                                initial={reduceMotion ? false : { opacity: 0, y: 30 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ duration: 0.5, delay: idx * 0.05 }}
+                                                className="group/theme glass-card rounded-[24px] p-5 relative overflow-hidden flex flex-col gap-4 h-full"
+                                            >
+                                                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/0 group-hover/theme:bg-blue-600/10 blur-[80px] rounded-full transition-all duration-700" />
+
+                                                <div className="relative z-10 w-full text-center border-b border-gray-100 pb-4">
+                                                    <Link
+                                                        href={`/?category=${encodeURIComponent(category)}`}
+                                                        prefetch={true}
+                                                        className="group/link flex flex-col items-center justify-center gap-1.5 p-2 rounded-xl transition-all duration-300 hover:bg-gray-50"
+                                                    >
+                                                        <h2 className="text-xl font-black text-foreground tracking-tighter uppercase transition-colors group-hover/link:text-blue-600 dark:group-hover/link:text-blue-400">
+                                                            {category}
+                                                        </h2>
+                                                        <div className="h-1 w-6 bg-blue-600 rounded-full transition-all duration-500 group-hover/link:w-16 group-hover/link:bg-blue-400" />
+                                                    </Link>
+                                                </div>
+
+                                                <div className="relative z-10 flex flex-col divide-y divide-gray-200 dark:divide-gray-700">
+                                                    <AnimatePresence mode="popLayout">
+                                                        {articles.slice(0, 8).map((article: any, i: number) => (
+                                                            <motion.div
+                                                                key={article.id}
+                                                                initial={reduceMotion ? false : { opacity: 0, x: -10 }}
+                                                                animate={{ opacity: 1, x: 0 }}
+                                                                transition={{ delay: (idx * 0.05) + (i * 0.02) }}
+                                                                className="py-2.5 first:pt-0 last:pb-0"
+                                                            >
+                                                                <ClassicNewsCard article={article} today={today} showBadges={showBadges} showKeywords={showKeywords} />
+                                                            </motion.div>
+                                                        ))}
+                                                    </AnimatePresence>
+                                                    {articles.length === 0 && (
+                                                        <div className="py-12 text-center text-gray-300 text-[9px] uppercase font-bold tracking-[0.3em]">Awaiting Insight</div>
+                                                    )}
+                                                </div>
+                                            </motion.div>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                /* Naver-style compact grid */
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {/* TrendChart as first card */}
+                                    <div className="h-[280px]">
+                                        <TrendChartCompact />
+                                    </div>
+
+                                    {/* Category Cards */}
+                                    {CATEGORIES_CONFIG.map((config, idx) => (
+                                        <CategoryCard
+                                            key={config.label}
+                                            category={config.label}
+                                            articles={newsByCategory[config.label] || []}
+                                            today={today}
+                                            showBadges={showBadges}
+                                            showKeywords={showKeywords}
+                                            index={idx}
+                                        />
+                                    ))}
+                                </div>
+                            )
                         ) : (
                             <div className="flex flex-col gap-0 w-full">
                                 {timeSortedNews.slice(0, displayCount).map((article: any, i: number) => (
