@@ -27,6 +27,10 @@ interface Props {
     isLandingPage: boolean;
     CATEGORIES_CONFIG: any[];
     newsDaysLimit?: number | null;
+    showBadges: boolean;
+    setShowBadges: (fn: (prev: boolean) => boolean) => void;
+    showKeywords: boolean;
+    setShowKeywords: (fn: (prev: boolean) => boolean) => void;
 }
 
 // Shared yesterday string (computed once per render cycle)
@@ -273,14 +277,13 @@ function ClassicNewsCard({ article, today, showBadges = false, showKeywords = fa
 
 export default function NewsListContainer({
     allNews, newsByCategory, filteredNews,
-    selectedCategory, searchQuery, showCollections, today, isLandingPage, CATEGORIES_CONFIG, newsDaysLimit
+    selectedCategory, searchQuery, showCollections, today, isLandingPage, CATEGORIES_CONFIG, newsDaysLimit,
+    showBadges, setShowBadges, showKeywords, setShowKeywords
 }: Props) {
     const { t } = useLanguage();
     const PAGE_SIZE = 20;
     const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
     const [viewMode, setViewMode] = useState<'category' | 'time'>('category');
-    const [showBadges, setShowBadges] = useState(false);
-    const [showKeywords, setShowKeywords] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
     const [classicLayout, setClassicLayout] = useState(false);
 

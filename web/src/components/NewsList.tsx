@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNews } from '@/hooks/useNews';
 import { groupNewsByCategory, CATEGORIES_CONFIG } from '@/lib/constants';
 import NewsListContainer from './NewsListContainer';
@@ -20,6 +20,8 @@ export default function NewsList({ selectedCategory, currentPage = 1, searchQuer
     const { news: allNews, isLoading, isError } = useNews();
     const { t } = useLanguage();
     const { config: tierConfig } = useTier();
+    const [showBadges, setShowBadges] = useState(false);
+    const [showKeywords, setShowKeywords] = useState(false);
 
     if (isLoading) {
         return (
@@ -81,7 +83,7 @@ export default function NewsList({ selectedCategory, currentPage = 1, searchQuer
 
     return (
         <>
-        {isLandingPage && <EditorsPicks allNews={allNews} />}
+        {isLandingPage && <EditorsPicks allNews={allNews} showBadges={showBadges} showKeywords={showKeywords} />}
         <NewsListContainer
             allNews={allNews}
             newsByCategory={newsByCategory}
@@ -93,6 +95,10 @@ export default function NewsList({ selectedCategory, currentPage = 1, searchQuer
             isLandingPage={isLandingPage}
             CATEGORIES_CONFIG={CATEGORIES_CONFIG}
             newsDaysLimit={tierConfig.newsDaysLimit || null}
+            showBadges={showBadges}
+            setShowBadges={setShowBadges}
+            showKeywords={showKeywords}
+            setShowKeywords={setShowKeywords}
         />
         </>
     );

@@ -6,10 +6,12 @@ import { Settings, X, Plus, Trash2, ChevronUp, ChevronDown, Check, Search, Penci
 import { useEditorsPicks, type EditorsPickSection } from '@/hooks/useEditorsPicks';
 import { useUser } from './UserContext';
 import { useLanguage } from './LanguageContext';
-import { fmtDateKST } from '@/lib/utils';
+import { fmtDateKST, getYesterdayStr, toDateKey, uniqueKws } from '@/lib/utils';
 
 interface EditorsPicksProps {
     allNews: any[];
+    showBadges?: boolean;
+    showKeywords?: boolean;
 }
 
 // Format ordinal suffix (1st, 2nd, 3rd, 4th, ...)
@@ -45,7 +47,7 @@ function formatSectionDisplayName(name: string): string {
 // PUBLIC DISPLAY
 // =============================================
 
-export default function EditorsPicks({ allNews }: EditorsPicksProps) {
+export default function EditorsPicks({ allNews, showBadges = false, showKeywords = false }: EditorsPicksProps) {
     const { sections, isLoading, mutate } = useEditorsPicks();
     const { isAdmin } = useUser();
     const { t } = useLanguage();
@@ -56,6 +58,7 @@ export default function EditorsPicks({ allNews }: EditorsPicksProps) {
     if (isLoading || (sectionsWithItems.length === 0 && !isAdmin)) return null;
 
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
+    const yesterday = getYesterdayStr();
 
     return (
         <div className="mx-4 mb-6">
@@ -97,33 +100,50 @@ export default function EditorsPicks({ allNews }: EditorsPicksProps) {
                                 {section.items.map((item) => {
                                     if (!item.article) return null;
                                     const pubDateObj = item.article.published_at ? new Date(item.article.published_at) : null;
-                                    const { dateStr } = fmtDateKST(pubDateObj);
-                                    const pubDate = item.article.published_at?.slice(0, 10) || '';
-                                    const isToday = pubDate === today;
+                                    const { dateStr, timeStr } = fmtDateKST(pubDateObj);
+                                    const dateKey = toDateKey(pubDateObj);
+                                    const isToday = dateKey === today;
+                                    const isYesterday = dateKey === yesterday && !isToday;
+
+                                    // Extract keywords from full article data
+                                    const fullArticle = allNews.find((a: any) => a.link === item.article_link);
+                                    const articleKws: string[] = [];
+                                    if (fullArticle?.main_keywords?.length > 0) {
+                                        const firstTag = fullArticle.main_keywords[0];
+                                        if (firstTag.startsWith('[') && firstTag.endsWith(']')) {
+                                            const parts = firstTag.slice(1, -1).split('|').map((s: string) => s.trim()).filter((s: string) => s && s !== '-');
+                                            articleKws.push(...parts.slice(0, 1));
+                                        } else {
+                                            articleKws.push(...fullArticle.main_keywords.slice(0, 2));
+                                        }
+                                    }
+                                    if (articleKws.length === 0 && fullArticle?.keywords?.length > 0) {
+                                        articleKws.push(...fullArticle.keywords.slice(0, 2));
+                                    }
 
                                     return (
                                         <div key={item.id} className="px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                            <div className="flex items-start gap-3">
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center gap-2 mb-0.5">
-                                                        <a
-                                                            href={item.article.link}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="text-[14px] font-extrabold text-black dark:text-white hover:text-[#3182f6] transition-colors line-clamp-1"
-                                                        >
-                                                            {item.article.title}
-                                                        </a>
-                                                        {isToday && (
-                                                            <span className="text-[7px] font-black text-white bg-red-500 px-1 py-0.5 rounded leading-none shrink-0">NEW</span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                <div className="shrink-0">
-                                                    <span className={`text-[9px] font-mono font-bold ${isToday ? 'text-red-500' : 'text-gray-400'}`}>
-                                                        {dateStr} {fmtDateKST(pubDateObj).timeStr}
-                                                    </span>
-                                                </div>
+                                            <div className="flex items-center gap-2">
+                                                {showBadges && isToday && (
+                                                    <span className="text-[8px] font-black text-white bg-red-500 px-1.5 py-0.5 rounded leading-none shrink-0 border border-red-400/50">NEW</span>
+                                                )}
+                                                {showBadges && isYesterday && (
+                                                    <span className="text-[8px] font-black text-amber-900 bg-amber-400 px-1.5 py-0.5 rounded leading-none shrink-0 border border-amber-300/50">YDAY</span>
+                                                )}
+                                                {showKeywords && articleKws.length > 0 && articleKws.map((k, i) => (
+                                                    <span key={i} className="text-[9px] font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded uppercase tracking-tight border border-blue-200 dark:border-blue-800 shrink-0">{k}</span>
+                                                ))}
+                                                <a
+                                                    href={item.article.link}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex-1 min-w-0 text-[14px] font-extrabold text-black dark:text-white hover:text-[#3182f6] transition-colors truncate"
+                                                >
+                                                    {item.article.title}
+                                                </a>
+                                                <span className={`text-[9px] font-mono font-bold shrink-0 ${isToday ? 'text-red-500' : isYesterday ? 'text-amber-500' : 'text-gray-400'}`}>
+                                                    {dateStr} {timeStr}
+                                                </span>
                                                 <a
                                                     href={item.article.link}
                                                     target="_blank"
