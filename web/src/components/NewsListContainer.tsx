@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import CollectionButton from './CollectionButton';
 import CollectionsView from './CollectionsView';
-import { LayoutGrid, Clock, SlidersHorizontal, ChevronRight } from 'lucide-react';
+import { LayoutGrid, Clock, ChevronRight } from 'lucide-react';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { fmtDateKST, getYesterdayStr, toDateKey, uniqueKws } from '@/lib/utils';
 import { useLanguage } from './LanguageContext';
@@ -284,7 +284,6 @@ export default function NewsListContainer({
     const PAGE_SIZE = 20;
     const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
     const [viewMode, setViewMode] = useState<'category' | 'time'>('category');
-    const [showSettings, setShowSettings] = useState(false);
     const [classicLayout, setClassicLayout] = useState(false);
 
     const reduceMotion = useReducedMotion();
@@ -333,34 +332,37 @@ export default function NewsListContainer({
                         )}
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        {/* Display Settings */}
-                        <div className="relative">
-                            <button
-                                onClick={() => setShowSettings(prev => !prev)}
-                                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border transition-all duration-200 ${showSettings ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800 text-blue-600' : 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500 hover:text-gray-900 dark:hover:text-gray-200'}`}
-                            >
-                                <SlidersHorizontal size={13} />
-                                <span className="text-[10px] font-bold uppercase tracking-wider">Display</span>
-                            </button>
-                            {showSettings && (
-                                <div className="absolute right-0 top-full mt-1 w-44 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 py-1">
-                                    <label className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
-                                        <input type="checkbox" checked={showBadges} onChange={() => setShowBadges(prev => !prev)} className="rounded border-gray-300 text-blue-500 focus:ring-blue-500 w-3.5 h-3.5" />
-                                        <span className="text-[11px] font-medium text-foreground">NEW / YDAY</span>
-                                    </label>
-                                    <label className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
-                                        <input type="checkbox" checked={showKeywords} onChange={() => setShowKeywords(prev => !prev)} className="rounded border-gray-300 text-blue-500 focus:ring-blue-500 w-3.5 h-3.5" />
-                                        <span className="text-[11px] font-medium text-foreground">Keywords</span>
-                                    </label>
-                                    <div className="border-t border-gray-100 dark:border-gray-700 my-0.5" />
-                                    <label className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
-                                        <input type="checkbox" checked={classicLayout} onChange={() => setClassicLayout(prev => !prev)} className="rounded border-gray-300 text-blue-500 focus:ring-blue-500 w-3.5 h-3.5" />
-                                        <span className="text-[11px] font-medium text-foreground">{t('display_classic')}</span>
-                                    </label>
-                                </div>
-                            )}
-                        </div>
+                    <div className="flex items-center gap-1.5">
+                        {/* Toggle Buttons */}
+                        <button
+                            onClick={() => setShowBadges(prev => !prev)}
+                            className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 border ${showBadges
+                                ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800'
+                                : 'bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-700 hover:text-gray-600 dark:hover:text-gray-300'
+                            }`}
+                        >
+                            NEW
+                        </button>
+                        <button
+                            onClick={() => setShowKeywords(prev => !prev)}
+                            className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 border ${showKeywords
+                                ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800'
+                                : 'bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-700 hover:text-gray-600 dark:hover:text-gray-300'
+                            }`}
+                        >
+                            Keywords
+                        </button>
+                        <button
+                            onClick={() => setClassicLayout(prev => !prev)}
+                            className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 border ${classicLayout
+                                ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800'
+                                : 'bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-700 hover:text-gray-600 dark:hover:text-gray-300'
+                            }`}
+                        >
+                            {t('display_classic')}
+                        </button>
+
+                        <div className="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-0.5" />
 
                         {/* View Mode Toggle */}
                         <div className="flex items-center p-0.5 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
