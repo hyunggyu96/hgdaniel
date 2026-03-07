@@ -286,10 +286,10 @@ export default function NewsListContainer({
                         <div className="relative">
                             <button
                                 onClick={() => setShowSettings(prev => !prev)}
-                                className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider shadow-sm transition-all ${showSettings ? 'bg-blue-500 text-white shadow-md border-blue-500' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500 hover:text-black dark:hover:text-white'}`}
+                                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border transition-all duration-200 ${showSettings ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800 text-blue-600' : 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500 hover:text-gray-900 dark:hover:text-gray-200'}`}
                             >
-                                <SlidersHorizontal size={12} />
-                                <span className="hidden sm:inline">Display</span>
+                                <SlidersHorizontal size={13} />
+                                <span className="text-[10px] font-bold uppercase tracking-wider">Display</span>
                             </button>
                             {showSettings && (
                                 <div className="absolute right-0 top-full mt-1 w-44 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 py-1">
@@ -306,17 +306,17 @@ export default function NewsListContainer({
                         </div>
 
                         {/* View Mode Toggle */}
-                        <div className="flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-full border border-gray-200/60 dark:border-gray-700 shadow-inner">
+                        <div className="flex items-center p-0.5 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                             {([['category', LayoutGrid, 'Category'], ['time', Clock, 'Time']] as const).map(([mode, Icon, label]) => (
                                 <button
                                     key={mode}
                                     onClick={() => setViewMode(mode as 'category' | 'time')}
-                                    className={`flex items-center gap-1.5 px-3 py-1 rounded-full transition-all ${viewMode === mode
-                                        ? 'bg-blue-500 text-white shadow-md'
-                                        : 'text-gray-500 hover:text-black dark:hover:text-white'
+                                    className={`flex items-center gap-1 px-2.5 py-1 rounded-md transition-all duration-200 ${viewMode === mode
+                                        ? 'bg-blue-500 text-white shadow-sm'
+                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                                         }`}
                                 >
-                                    <Icon size={12} />
+                                    <Icon size={13} />
                                     <span className="text-[10px] font-bold uppercase tracking-wider hidden sm:inline">{label}</span>
                                 </button>
                             ))}
