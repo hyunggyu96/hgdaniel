@@ -36,7 +36,7 @@ export default function CategoryTabs() {
         `shrink-0 px-3 py-2 text-[12px] font-bold tracking-tight whitespace-nowrap transition-colors border-b-2 ${
             active
                 ? 'border-[#3182f6] text-[#3182f6]'
-                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300'
+                : 'border-transparent text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white hover:border-gray-300'
         }`;
 
     return (
