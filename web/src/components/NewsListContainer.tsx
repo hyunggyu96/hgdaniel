@@ -208,10 +208,13 @@ function CompactArticleRow({ article, index, today, showBadges, showKeywords }: 
 }) {
     const { isToday, isYesterday, dateStr, timeStr } = useArticleData(article, today);
 
+    const { kws } = useArticleData(article, today);
+
     return (
-        <div className="group flex items-center gap-2 px-3 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+        <div className="group flex items-center gap-1.5 px-3 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
             <span className="text-[10px] font-bold text-gray-300 dark:text-gray-600 w-4 shrink-0 text-right">{index}</span>
             {showBadges && <DateBadge isToday={isToday} isYesterday={isYesterday} />}
+            {showKeywords && kws.length > 0 && <KwBadges kws={kws} max={2} size="xs" />}
             <a
                 href={article.link}
                 target="_blank"
@@ -525,20 +528,16 @@ const NewsRow = React.memo(function NewsRow({ article, today, category, showBadg
                         <span className="text-[9px] font-black text-white bg-blue-500 px-1.5 py-0.5 rounded uppercase tracking-tight whitespace-nowrap">{category}</span>
                         <TimeLabel dateStr={dateStr} timeStr={timeStr} isToday={isToday} isYesterday={isYesterday} size="md" />
                     </div>
-                    <div className="flex items-start gap-2">
-                        <div className="mt-0.5"><CollectionButton newsLink={article.link} newsTitle={article.title} size={16} /></div>
+                    <div className="flex items-center gap-2">
+                        {showBadges && <DateBadge isToday={isToday} isYesterday={isYesterday} />}
+                        {showKeywords && kws.length > 0 && <KwBadges kws={kws} max={2} size="xs" />}
+                        <div className="mt-0.5 shrink-0"><CollectionButton newsLink={article.link} newsTitle={article.title} size={16} /></div>
                         <a href={article.link} target="_blank" rel="noopener noreferrer" className="news-link flex-1 min-w-0 block">
-                            <h3 className="text-[16px] font-black text-black dark:text-white leading-snug tracking-tight group-hover:text-[#3182f6] transition-colors line-clamp-2">
-                                {showBadges && <InlineBadge isToday={isToday} isYesterday={isYesterday} />}
+                            <h3 className="text-[16px] font-black text-black dark:text-white leading-snug tracking-tight group-hover:text-[#3182f6] transition-colors truncate">
                                 {article.title}
                             </h3>
                         </a>
                     </div>
-                    {showKeywords && kws.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-0.5 pl-6">
-                            <KwBadges kws={kws} max={3} />
-                        </div>
-                    )}
                 </div>
 
                 {/* DESKTOP */}
@@ -548,16 +547,12 @@ const NewsRow = React.memo(function NewsRow({ article, today, category, showBadg
                         <span className="inline-block text-[9px] font-black text-white bg-blue-500 px-1.5 py-0.5 rounded uppercase tracking-tight whitespace-nowrap">{category}</span>
                     </div>
                     <div className="flex-1 min-w-0 w-full">
-                        {showKeywords && (
-                            <div className="flex flex-wrap gap-1 mb-0.5">
-                                <KwBadges kws={kws} max={4} size="xs" />
-                            </div>
-                        )}
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                            <div className="mt-0"><CollectionButton newsLink={article.link} newsTitle={article.title} size={15} /></div>
+                        <div className="flex items-center gap-1.5">
+                            {showBadges && <DateBadge isToday={isToday} isYesterday={isYesterday} />}
+                            {showKeywords && kws.length > 0 && <KwBadges kws={kws} max={3} size="xs" />}
+                            <div className="mt-0 shrink-0"><CollectionButton newsLink={article.link} newsTitle={article.title} size={15} /></div>
                             <a href={article.link} target="_blank" rel="noopener noreferrer" className="news-link flex-1 min-w-0 block">
                                 <h3 className="text-[15px] font-extrabold text-black dark:text-white group-hover:text-[#3182f6] transition-colors leading-tight truncate">
-                                    {showBadges && <InlineBadge isToday={isToday} isYesterday={isYesterday} />}
                                     {article.title}
                                 </h3>
                             </a>
@@ -576,20 +571,16 @@ const NewsRow = React.memo(function NewsRow({ article, today, category, showBadg
                 <div className="flex items-center justify-end pb-1 border-b border-dashed border-gray-100/50">
                     <TimeLabel dateStr={dateStr} timeStr={timeStr} isToday={isToday} isYesterday={isYesterday} size="md" />
                 </div>
-                <div className="flex items-start gap-2">
-                    <div className="mt-0.5"><CollectionButton newsLink={article.link} newsTitle={article.title} size={16} /></div>
+                <div className="flex items-center gap-2">
+                    {showBadges && <DateBadge isToday={isToday} isYesterday={isYesterday} />}
+                    {showKeywords && kws.length > 0 && <KwBadges kws={kws} max={2} size="xs" />}
+                    <div className="mt-0.5 shrink-0"><CollectionButton newsLink={article.link} newsTitle={article.title} size={16} /></div>
                     <a href={article.link} target="_blank" rel="noopener noreferrer" className="news-link flex-1 min-w-0 block">
-                        <h3 className="text-[16px] font-black text-black dark:text-white leading-snug tracking-tight group-hover:text-[#3182f6] transition-colors line-clamp-2">
-                            {showBadges && <InlineBadge isToday={isToday} isYesterday={isYesterday} />}
+                        <h3 className="text-[16px] font-black text-black dark:text-white leading-snug tracking-tight group-hover:text-[#3182f6] transition-colors truncate">
                             {article.title}
                         </h3>
                     </a>
                 </div>
-                {showKeywords && kws.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-0.5 pl-6">
-                        <KwBadges kws={kws} max={3} />
-                    </div>
-                )}
             </div>
 
             {/* DESKTOP */}
@@ -598,16 +589,12 @@ const NewsRow = React.memo(function NewsRow({ article, today, category, showBadg
                     <TimeLabel dateStr={dateStr} timeStr={timeStr} isToday={isToday} isYesterday={isYesterday} size="md" />
                 </div>
                 <div className="flex-1 min-w-0">
-                    {showKeywords && (
-                        <div className="flex flex-wrap gap-1 mb-0.5">
-                            <KwBadges kws={kws} max={4} size="xs" />
-                        </div>
-                    )}
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                        <div className="mt-0"><CollectionButton newsLink={article.link} newsTitle={article.title} size={15} /></div>
+                    <div className="flex items-center gap-1.5">
+                        {showBadges && <DateBadge isToday={isToday} isYesterday={isYesterday} />}
+                        {showKeywords && kws.length > 0 && <KwBadges kws={kws} max={4} size="xs" />}
+                        <div className="mt-0 shrink-0"><CollectionButton newsLink={article.link} newsTitle={article.title} size={15} /></div>
                         <a href={article.link} target="_blank" rel="noopener noreferrer" className="news-link flex-1 min-w-0 block">
                             <h3 className="text-[15px] font-extrabold text-black dark:text-white group-hover:text-[#3182f6] transition-colors leading-tight truncate">
-                                {showBadges && <InlineBadge isToday={isToday} isYesterday={isYesterday} />}
                                 {article.title}
                             </h3>
                         </a>
