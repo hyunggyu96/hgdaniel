@@ -82,12 +82,6 @@ export default function NewsList({ selectedCategory, currentPage = 1, searchQuer
     return (
         <>
         {isLandingPage && <EditorsPicks allNews={allNews} />}
-        {tierConfig.newsDaysLimit && (
-            <div className="mx-4 mb-3 px-4 py-2 bg-yellow-500/10 border border-yellow-500/30 rounded-lg flex items-center gap-2 text-sm text-yellow-400">
-                <Lock className="w-4 h-4 flex-shrink-0" />
-                <span>{t('tier_news_limited')}</span>
-            </div>
-        )}
         <NewsListContainer
             allNews={allNews}
             newsByCategory={newsByCategory}
@@ -98,6 +92,7 @@ export default function NewsList({ selectedCategory, currentPage = 1, searchQuer
             today={today}
             isLandingPage={isLandingPage}
             CATEGORIES_CONFIG={CATEGORIES_CONFIG}
+            newsDaysLimit={tierConfig.newsDaysLimit || null}
         />
         </>
     );

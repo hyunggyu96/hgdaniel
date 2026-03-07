@@ -26,6 +26,7 @@ interface Props {
     today: string;
     isLandingPage: boolean;
     CATEGORIES_CONFIG: any[];
+    newsDaysLimit?: number | null;
 }
 
 // Shared yesterday string (computed once per render cycle)
@@ -230,7 +231,7 @@ function CompactArticleRow({ article, index, today, showBadges, showKeywords }: 
 
 export default function NewsListContainer({
     allNews, newsByCategory, filteredNews,
-    selectedCategory, searchQuery, showCollections, today, isLandingPage, CATEGORIES_CONFIG
+    selectedCategory, searchQuery, showCollections, today, isLandingPage, CATEGORIES_CONFIG, newsDaysLimit
 }: Props) {
     const { t } = useLanguage();
     const PAGE_SIZE = 20;
@@ -279,6 +280,11 @@ export default function NewsListContainer({
                             )}
                             {t('news_section_desc')}
                         </div>
+                        {newsDaysLimit && (
+                            <span className="text-[10px] text-gray-400 dark:text-gray-500">
+                                * {t('tier_news_limited')}
+                            </span>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-2">
