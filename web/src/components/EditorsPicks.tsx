@@ -80,7 +80,7 @@ export default function EditorsPicks({ allNews }: EditorsPicksProps) {
 
             {/* Sections Table */}
             {sectionsWithItems.length > 0 && (
-                <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                <div className="border border-gray-100 dark:border-gray-700 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden bg-white dark:bg-gray-800">
                     {sectionsWithItems.map((section, idx) => (
                         <div key={section.id}>
                             {/* Section Header */}
@@ -110,7 +110,7 @@ export default function EditorsPicks({ allNews }: EditorsPicksProps) {
                                                             href={item.article.link}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="text-xs font-bold text-foreground hover:text-blue-500 transition-colors line-clamp-1"
+                                                            className="text-[14px] font-extrabold text-black dark:text-white hover:text-[#3182f6] transition-colors line-clamp-1"
                                                         >
                                                             {item.article.title}
                                                         </a>
@@ -119,13 +119,10 @@ export default function EditorsPicks({ allNews }: EditorsPicksProps) {
                                                         )}
                                                     </div>
                                                 </div>
-                                                <div className="shrink-0 text-right">
+                                                <div className="shrink-0">
                                                     <span className={`text-[9px] font-mono font-bold ${isToday ? 'text-red-500' : 'text-gray-400'}`}>
-                                                        {dateStr}
+                                                        {dateStr} {fmtDateKST(pubDateObj).timeStr}
                                                     </span>
-                                                    <div className="text-[8px] text-muted-foreground/50">
-                                                        {item.article.source}
-                                                    </div>
                                                 </div>
                                                 <a
                                                     href={item.article.link}
@@ -298,12 +295,14 @@ function AdminModal({
                 if (s.id !== activeSection) return s;
                 if (s.items.length >= 7) return s;
                 if (s.items.some(i => i.article_link === articleLink)) return s;
-                return { ...s, items: [...s.items, {
-                    id: Date.now(),
-                    article_link: articleLink,
-                    display_order: s.items.length,
-                    article,
-                }] };
+                return {
+                    ...s, items: [...s.items, {
+                        id: Date.now(),
+                        article_link: articleLink,
+                        display_order: s.items.length,
+                        article,
+                    }]
+                };
             }),
             `/api/editors-picks/sections/${activeSection}/items`, 'POST', { article_link: articleLink },
         );
@@ -383,11 +382,10 @@ function AdminModal({
                                     <button
                                         key={sec.id}
                                         onClick={() => setActiveSection(sec.id)}
-                                        className={`group flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all border ${
-                                            activeSection === sec.id
+                                        className={`group flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all border ${activeSection === sec.id
                                                 ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800'
                                                 : 'bg-white dark:bg-gray-800 text-gray-500 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
-                                        }`}
+                                            }`}
                                     >
                                         <span
                                             className="w-2 h-2 rounded-full shrink-0"
@@ -518,20 +516,18 @@ function AdminModal({
                                         return (
                                             <div
                                                 key={article.link}
-                                                className={`flex items-center gap-2 py-1.5 px-3 rounded-lg transition-colors ${
-                                                    isAdded
+                                                className={`flex items-center gap-2 py-1.5 px-3 rounded-lg transition-colors ${isAdded
                                                         ? 'bg-blue-50 dark:bg-blue-900/20'
                                                         : 'hover:bg-gray-50 dark:hover:bg-gray-800'
-                                                }`}
+                                                    }`}
                                             >
                                                 <button
                                                     onClick={() => isAdded ? removeArticle(article.link) : addArticle(article.link)}
                                                     disabled={!isAdded && currentSection.items.length >= 7}
-                                                    className={`shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-all ${
-                                                        isAdded
+                                                    className={`shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-all ${isAdded
                                                             ? 'bg-blue-500 border-blue-500 text-white'
                                                             : 'border-gray-300 dark:border-gray-600 hover:border-blue-400'
-                                                    }`}
+                                                        }`}
                                                 >
                                                     {isAdded && <Check className="w-3 h-3" />}
                                                 </button>
