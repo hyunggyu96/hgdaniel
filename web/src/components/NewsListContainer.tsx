@@ -72,9 +72,9 @@ function LoadMore({ remaining, onClick }: { remaining: number; onClick: () => vo
         <div className="mt-8 flex justify-center">
             <button
                 onClick={onClick}
-                className="group px-6 py-2.5 bg-white dark:bg-gray-800 hover:bg-[#3182f6] border border-gray-200 dark:border-gray-700 hover:border-[#3182f6] rounded-lg transition-all duration-200"
+                className="group px-8 py-3 bg-white dark:bg-gray-800 hover:bg-[#3182f6] border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:border-[#3182f6] rounded-full transition-all duration-300 transform hover:-translate-y-0.5"
             >
-                <span className="text-[13px] font-medium text-muted-foreground group-hover:text-white transition-colors">
+                <span className="text-[14px] font-bold text-gray-700 dark:text-gray-300 group-hover:text-white transition-colors">
                     Load More ({remaining})
                 </span>
             </button>
@@ -148,14 +148,14 @@ function CategoryCard({ category, articles, today, showBadges, showKeywords, ind
     const { t } = useLanguage();
 
     return (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden flex flex-col">
+        <div className="bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden flex flex-col">
             {/* Card Header */}
             <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 dark:border-gray-700">
                 <Link
                     href={`/?category=${encodeURIComponent(category)}`}
                     className="group flex items-center gap-2"
                 >
-                    <h2 className="text-[13px] font-black text-foreground tracking-tight uppercase group-hover:text-[#3182f6] transition-colors">
+                    <h2 className="text-[14px] font-black text-black dark:text-white tracking-tight uppercase group-hover:text-[#3182f6] transition-colors">
                         {category}
                     </h2>
                     <ChevronRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-[#3182f6] group-hover:translate-x-0.5 transition-all" />
@@ -215,7 +215,7 @@ function CompactArticleRow({ article, index, today, showBadges, showKeywords }: 
                 href={article.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 min-w-0 text-[13px] font-medium text-foreground/90 group-hover:text-[#3182f6] transition-colors truncate leading-tight"
+                className="flex-1 min-w-0 text-[13px] font-bold text-black dark:text-white group-hover:text-[#3182f6] transition-colors truncate leading-tight"
             >
                 {article.title}
             </a>
@@ -286,9 +286,10 @@ export default function NewsListContainer({
                         <div className="relative">
                             <button
                                 onClick={() => setShowSettings(prev => !prev)}
-                                className={`flex items-center gap-1 px-2 py-1 rounded-md border text-[10px] font-bold transition-all ${showSettings ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800 text-blue-600' : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-400 hover:text-gray-600'}`}
+                                className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider shadow-sm transition-all ${showSettings ? 'bg-blue-500 text-white shadow-md border-blue-500' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500 hover:text-black dark:hover:text-white'}`}
                             >
                                 <SlidersHorizontal size={12} />
+                                <span className="hidden sm:inline">Display</span>
                             </button>
                             {showSettings && (
                                 <div className="absolute right-0 top-full mt-1 w-44 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 py-1">
@@ -305,14 +306,14 @@ export default function NewsListContainer({
                         </div>
 
                         {/* View Mode Toggle */}
-                        <div className="flex items-center p-0.5 bg-gray-100 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700">
+                        <div className="flex items-center p-1 bg-gray-100 dark:bg-gray-800 rounded-full border border-gray-200/60 dark:border-gray-700 shadow-inner">
                             {([['category', LayoutGrid, 'Category'], ['time', Clock, 'Time']] as const).map(([mode, Icon, label]) => (
                                 <button
                                     key={mode}
                                     onClick={() => setViewMode(mode as 'category' | 'time')}
-                                    className={`flex items-center gap-1 px-2 py-0.5 rounded transition-all ${viewMode === mode
-                                        ? 'bg-blue-500 text-white shadow-sm'
-                                        : 'text-gray-400 hover:text-gray-600'
+                                    className={`flex items-center gap-1.5 px-3 py-1 rounded-full transition-all ${viewMode === mode
+                                        ? 'bg-blue-500 text-white shadow-md'
+                                        : 'text-gray-500 hover:text-black dark:hover:text-white'
                                         }`}
                                 >
                                     <Icon size={12} />
@@ -421,7 +422,7 @@ const NewsRow = React.memo(function NewsRow({ article, today, category, showBadg
                     <div className="flex items-start gap-2">
                         <div className="mt-0.5"><CollectionButton newsLink={article.link} newsTitle={article.title} size={16} /></div>
                         <a href={article.link} target="_blank" rel="noopener noreferrer" className="news-link flex-1 min-w-0 block">
-                            <h3 className="text-[15px] font-bold text-gray-900 dark:text-gray-100 leading-snug tracking-tight group-hover:text-[#3182f6] transition-colors line-clamp-2">
+                            <h3 className="text-[16px] font-black text-black dark:text-white leading-snug tracking-tight group-hover:text-[#3182f6] transition-colors line-clamp-2">
                                 {showBadges && <InlineBadge isToday={isToday} isYesterday={isYesterday} />}
                                 {article.title}
                             </h3>
@@ -446,10 +447,10 @@ const NewsRow = React.memo(function NewsRow({ article, today, category, showBadg
                                 <KwBadges kws={kws} max={4} size="xs" />
                             </div>
                         )}
-                        <div className="flex items-center gap-1.5">
-                            <div className="mt-0"><CollectionButton newsLink={article.link} newsTitle={article.title} size={14} /></div>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="mt-0"><CollectionButton newsLink={article.link} newsTitle={article.title} size={15} /></div>
                             <a href={article.link} target="_blank" rel="noopener noreferrer" className="news-link flex-1 min-w-0 block">
-                                <h3 className="text-[13px] font-bold text-inherit group-hover:text-[#3182f6] transition-colors leading-tight truncate">
+                                <h3 className="text-[15px] font-extrabold text-black dark:text-white group-hover:text-[#3182f6] transition-colors leading-tight truncate">
                                     {showBadges && <InlineBadge isToday={isToday} isYesterday={isYesterday} />}
                                     {article.title}
                                 </h3>
@@ -472,7 +473,7 @@ const NewsRow = React.memo(function NewsRow({ article, today, category, showBadg
                 <div className="flex items-start gap-2">
                     <div className="mt-0.5"><CollectionButton newsLink={article.link} newsTitle={article.title} size={16} /></div>
                     <a href={article.link} target="_blank" rel="noopener noreferrer" className="news-link flex-1 min-w-0 block">
-                        <h3 className="text-[15px] font-bold text-gray-900 dark:text-gray-100 leading-snug tracking-tight group-hover:text-[#3182f6] transition-colors line-clamp-2">
+                        <h3 className="text-[16px] font-black text-black dark:text-white leading-snug tracking-tight group-hover:text-[#3182f6] transition-colors line-clamp-2">
                             {showBadges && <InlineBadge isToday={isToday} isYesterday={isYesterday} />}
                             {article.title}
                         </h3>
@@ -496,10 +497,10 @@ const NewsRow = React.memo(function NewsRow({ article, today, category, showBadg
                             <KwBadges kws={kws} max={4} size="xs" />
                         </div>
                     )}
-                    <div className="flex items-center gap-1.5">
-                        <div className="mt-0"><CollectionButton newsLink={article.link} newsTitle={article.title} size={14} /></div>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                        <div className="mt-0"><CollectionButton newsLink={article.link} newsTitle={article.title} size={15} /></div>
                         <a href={article.link} target="_blank" rel="noopener noreferrer" className="news-link flex-1 min-w-0 block">
-                            <h3 className="text-[13px] font-bold text-inherit group-hover:text-[#3182f6] transition-colors leading-tight truncate">
+                            <h3 className="text-[15px] font-extrabold text-black dark:text-white group-hover:text-[#3182f6] transition-colors leading-tight truncate">
                                 {showBadges && <InlineBadge isToday={isToday} isYesterday={isYesterday} />}
                                 {article.title}
                             </h3>
