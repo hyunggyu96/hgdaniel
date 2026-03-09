@@ -6,6 +6,7 @@ import { Settings, X, Plus, Trash2, ChevronUp, ChevronDown, Check, Search, Penci
 import { useEditorsPicks, type EditorsPickSection } from '@/hooks/useEditorsPicks';
 import { useUser } from './UserContext';
 import { useLanguage } from './LanguageContext';
+import CollectionButton from './CollectionButton';
 import { fmtDateKST, getYesterdayStr, toDateKey, uniqueKws } from '@/lib/utils';
 
 interface EditorsPicksProps {
@@ -144,6 +145,7 @@ export default function EditorsPicks({ allNews, showBadges = false, showKeywords
                                                 <span className={`text-[9px] font-mono font-bold shrink-0 ${isToday ? 'text-red-500' : isYesterday ? 'text-amber-500' : 'text-gray-400'}`}>
                                                     {dateStr} {timeStr}
                                                 </span>
+                                                <div className="shrink-0"><CollectionButton newsLink={item.article.link} newsTitle={item.article.title || ''} size={14} /></div>
                                                 <a
                                                     href={item.article.link}
                                                     target="_blank"

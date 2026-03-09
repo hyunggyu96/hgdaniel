@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNews } from '@/hooks/useNews';
 import { groupNewsByCategory, CATEGORIES_CONFIG } from '@/lib/constants';
 import NewsListContainer from './NewsListContainer';
 import EditorsPicks from './EditorsPicks';
 import { useLanguage } from './LanguageContext';
 import { useTier } from '@/hooks/useTier';
-import { Lock } from 'lucide-react';
+import { useUser } from './UserContext';
 
 interface NewsListProps {
     selectedCategory?: string | null;
@@ -16,12 +16,102 @@ interface NewsListProps {
     showCollections?: boolean;
 }
 
+interface DisplayPrefs {
+    showBadges: boolean;
+    showKeywords: boolean;
+    viewMode: 'category' | 'time';
+    classicLayout: boolean;
+}
+
+const DEFAULT_PREFS: DisplayPrefs = {
+    showBadges: false,
+    showKeywords: false,
+    viewMode: 'category',
+    classicLayout: false,
+};
+
 export default function NewsList({ selectedCategory, currentPage = 1, searchQuery, showCollections }: NewsListProps) {
     const { news: allNews, isLoading, isError } = useNews();
     const { t } = useLanguage();
     const { config: tierConfig } = useTier();
+    const { userId } = useUser();
+
     const [showBadges, setShowBadges] = useState(false);
     const [showKeywords, setShowKeywords] = useState(false);
+    const [viewMode, setViewMode] = useState<'category' | 'time'>('category');
+    const [classicLayout, setClassicLayout] = useState(false);
+    const [prefsLoaded, setPrefsLoaded] = useState(false);
+    const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    // Load preferences on mount (if logged in)
+    useEffect(() => {
+        if (!userId) {
+            setPrefsLoaded(true);
+            return;
+        }
+        let cancelled = false;
+        (async () => {
+            try {
+                const res = await fetch('/api/user/preferences', { cache: 'no-store' });
+                if (!res.ok || cancelled) return;
+                const json = await res.json();
+                const p = json?.preferences || {};
+                if (cancelled) return;
+                if (typeof p.showBadges === 'boolean') setShowBadges(p.showBadges);
+                if (typeof p.showKeywords === 'boolean') setShowKeywords(p.showKeywords);
+                if (p.viewMode === 'category' || p.viewMode === 'time') setViewMode(p.viewMode);
+                if (typeof p.classicLayout === 'boolean') setClassicLayout(p.classicLayout);
+            } catch {
+                // ignore — use defaults
+            } finally {
+                if (!cancelled) setPrefsLoaded(true);
+            }
+        })();
+        return () => { cancelled = true; };
+    }, [userId]);
+
+    // Debounced save preferences on change
+    const savePrefs = useCallback((prefs: Partial<DisplayPrefs>) => {
+        if (!userId) return;
+        if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+        saveTimerRef.current = setTimeout(() => {
+            void fetch('/api/user/preferences', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ preferences: prefs }),
+            });
+        }, 500);
+    }, [userId]);
+
+    // Wrap setters to also save
+    const handleSetShowBadges = useCallback((fn: (prev: boolean) => boolean) => {
+        setShowBadges((prev) => {
+            const next = fn(prev);
+            savePrefs({ showBadges: next });
+            return next;
+        });
+    }, [savePrefs]);
+
+    const handleSetShowKeywords = useCallback((fn: (prev: boolean) => boolean) => {
+        setShowKeywords((prev) => {
+            const next = fn(prev);
+            savePrefs({ showKeywords: next });
+            return next;
+        });
+    }, [savePrefs]);
+
+    const handleSetViewMode = useCallback((mode: 'category' | 'time') => {
+        setViewMode(mode);
+        savePrefs({ viewMode: mode });
+    }, [savePrefs]);
+
+    const handleSetClassicLayout = useCallback((fn: (prev: boolean) => boolean) => {
+        setClassicLayout((prev) => {
+            const next = fn(prev);
+            savePrefs({ classicLayout: next });
+            return next;
+        });
+    }, [savePrefs]);
 
     if (isLoading) {
         return (
@@ -96,9 +186,13 @@ export default function NewsList({ selectedCategory, currentPage = 1, searchQuer
             CATEGORIES_CONFIG={CATEGORIES_CONFIG}
             newsDaysLimit={tierConfig.newsDaysLimit || null}
             showBadges={showBadges}
-            setShowBadges={setShowBadges}
+            setShowBadges={handleSetShowBadges}
             showKeywords={showKeywords}
-            setShowKeywords={setShowKeywords}
+            setShowKeywords={handleSetShowKeywords}
+            viewMode={viewMode}
+            setViewMode={handleSetViewMode}
+            classicLayout={classicLayout}
+            setClassicLayout={handleSetClassicLayout}
         />
         </>
     );

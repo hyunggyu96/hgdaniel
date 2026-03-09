@@ -31,6 +31,10 @@ interface Props {
     setShowBadges: (fn: (prev: boolean) => boolean) => void;
     showKeywords: boolean;
     setShowKeywords: (fn: (prev: boolean) => boolean) => void;
+    viewMode: 'category' | 'time';
+    setViewMode: (mode: 'category' | 'time') => void;
+    classicLayout: boolean;
+    setClassicLayout: (fn: (prev: boolean) => boolean) => void;
 }
 
 // Shared yesterday string (computed once per render cycle)
@@ -217,6 +221,7 @@ function CompactArticleRow({ article, index, today, showBadges, showKeywords }: 
     return (
         <div className="group flex items-center gap-1.5 px-3 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
             <span className="text-[10px] font-bold text-gray-300 dark:text-gray-600 w-4 shrink-0 text-right">{index}</span>
+            <div className="shrink-0"><CollectionButton newsLink={article.link} newsTitle={article.title} size={12} /></div>
             {showBadges && <DateBadge isToday={isToday} isYesterday={isYesterday} />}
             {showKeywords && kws.length > 0 && <KwBadges kws={kws} max={2} size="xs" />}
             <a
@@ -278,13 +283,12 @@ function ClassicNewsCard({ article, today, showBadges = false, showKeywords = fa
 export default function NewsListContainer({
     allNews, newsByCategory, filteredNews,
     selectedCategory, searchQuery, showCollections, today, isLandingPage, CATEGORIES_CONFIG, newsDaysLimit,
-    showBadges, setShowBadges, showKeywords, setShowKeywords
+    showBadges, setShowBadges, showKeywords, setShowKeywords,
+    viewMode, setViewMode, classicLayout, setClassicLayout,
 }: Props) {
     const { t } = useLanguage();
     const PAGE_SIZE = 20;
     const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
-    const [viewMode, setViewMode] = useState<'category' | 'time'>('category');
-    const [classicLayout, setClassicLayout] = useState(false);
 
     const reduceMotion = useReducedMotion();
 

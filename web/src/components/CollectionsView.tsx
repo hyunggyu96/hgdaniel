@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { FileText, Trash2 } from 'lucide-react';
+import { FileText, Trash2, Search, ChevronDown } from 'lucide-react';
 import { useCollection } from './CollectionContext';
 import { useUser } from './UserContext';
 import { useLanguage } from './LanguageContext';
@@ -31,18 +31,65 @@ interface PaperCollectionItem {
     createdAt: string;
 }
 
+type SortMode = 'newest' | 'oldest' | 'az' | 'za';
+
+const SORT_LABELS: Record<string, Record<SortMode, string>> = {
+    ko: { newest: '최신순', oldest: '오래된순', az: '가나다순', za: '역가나다순' },
+    en: { newest: 'Newest', oldest: 'Oldest', az: 'A → Z', za: 'Z → A' },
+};
+
 export default function CollectionsView({ allNews, today }: CollectionsViewProps) {
     const { collections, isLoading } = useCollection();
     const { userId } = useUser();
     const { language } = useLanguage();
     const isEnglish = language === 'en';
+    const lang = isEnglish ? 'en' : 'ko';
 
     const [paperRows, setPaperRows] = useState<PaperCollectionRow[]>([]);
     const [paperLoading, setPaperLoading] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [sortMode, setSortMode] = useState<SortMode>('newest');
+    const [showSortMenu, setShowSortMenu] = useState(false);
 
-    const collectedNews = allNews.filter((article) => collections.includes(article.link));
-    const visibleLinks = new Set(collectedNews.map((article) => article.link));
-    const missingCollectionLinks = collections.filter((link) => !visibleLinks.has(link));
+    const collectedNewsRaw = allNews.filter((article) => collections.includes(article.link));
+    const visibleLinks = new Set(collectedNewsRaw.map((article) => article.link));
+    const missingCollectionLinksRaw = collections.filter((link) => !visibleLinks.has(link));
+
+    // Search filter
+    const q = searchQuery.toLowerCase().trim();
+    const collectedNewsFiltered = q
+        ? collectedNewsRaw.filter((a) => a.title?.toLowerCase().includes(q))
+        : collectedNewsRaw;
+    const missingLinksFiltered = q
+        ? missingCollectionLinksRaw.filter((link) => link.toLowerCase().includes(q))
+        : missingCollectionLinksRaw;
+
+    // Sort
+    const collectedNews = useMemo(() => {
+        const sorted = [...collectedNewsFiltered];
+        switch (sortMode) {
+            case 'newest':
+                sorted.sort((a, b) => new Date(b.published_at || 0).getTime() - new Date(a.published_at || 0).getTime());
+                break;
+            case 'oldest':
+                sorted.sort((a, b) => new Date(a.published_at || 0).getTime() - new Date(b.published_at || 0).getTime());
+                break;
+            case 'az':
+                sorted.sort((a, b) => (a.title || '').localeCompare(b.title || '', 'ko'));
+                break;
+            case 'za':
+                sorted.sort((a, b) => (b.title || '').localeCompare(a.title || '', 'ko'));
+                break;
+        }
+        return sorted;
+    }, [collectedNewsFiltered, sortMode]);
+
+    const missingCollectionLinks = useMemo(() => {
+        const sorted = [...missingLinksFiltered];
+        if (sortMode === 'az') sorted.sort((a, b) => a.localeCompare(b));
+        if (sortMode === 'za') sorted.sort((a, b) => b.localeCompare(a));
+        return sorted;
+    }, [missingLinksFiltered, sortMode]);
 
     const paperItems = useMemo<PaperCollectionItem[]>(() => {
         return paperRows.map((row) => {
@@ -117,9 +164,11 @@ export default function CollectionsView({ allNews, today }: CollectionsViewProps
         }
     };
 
+    const totalNewsCount = collectedNewsRaw.length + missingCollectionLinksRaw.length;
+
     const noCollections =
-        collectedNews.length === 0 &&
-        missingCollectionLinks.length === 0 &&
+        collectedNewsRaw.length === 0 &&
+        missingCollectionLinksRaw.length === 0 &&
         paperItems.length === 0 &&
         !paperLoading;
 
@@ -151,17 +200,59 @@ export default function CollectionsView({ allNews, today }: CollectionsViewProps
 
     return (
         <div className="space-y-8">
-            {collectedNews.length > 0 && (
+            {collectedNewsRaw.length > 0 && (
                 <div className="flex justify-center">
-                    <ExportCollectionsButton collectedNews={collectedNews} />
+                    <ExportCollectionsButton collectedNews={collectedNewsRaw} />
                 </div>
             )}
 
             <section className="space-y-3">
                 <div className="flex items-center justify-between">
                     <h2 className="text-lg font-black tracking-tight text-foreground">
-                        {isEnglish ? 'News Collections' : '뉴스 컬렉션'} ({collectedNews.length + missingCollectionLinks.length})
+                        {isEnglish ? 'News Collections' : '뉴스 컬렉션'} ({totalNewsCount})
                     </h2>
+                </div>
+
+                {/* Search + Sort Controls */}
+                <div className="flex items-center gap-2">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder={isEnglish ? 'Search by title' : '제목으로 검색'}
+                            className="w-full pl-8 pr-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-blue-500/50 transition-colors"
+                        />
+                    </div>
+                    <div className="relative">
+                        <button
+                            onClick={() => setShowSortMenu((v) => !v)}
+                            className="flex items-center gap-1 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-[11px] font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors whitespace-nowrap"
+                        >
+                            {SORT_LABELS[lang][sortMode]}
+                            <ChevronDown className="w-3 h-3" />
+                        </button>
+                        {showSortMenu && (
+                            <>
+                                <div className="fixed inset-0 z-40" onClick={() => setShowSortMenu(false)} />
+                                <div className="absolute right-0 top-full mt-1 w-32 rounded-lg border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-700 dark:bg-gray-800 z-50">
+                                    {(['newest', 'oldest', 'az', 'za'] as SortMode[]).map((mode) => (
+                                        <button
+                                            key={mode}
+                                            onClick={() => { setSortMode(mode); setShowSortMenu(false); }}
+                                            className={`w-full text-left px-3 py-1.5 text-[11px] font-medium transition-colors ${sortMode === mode
+                                                ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400'
+                                                : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700'
+                                            }`}
+                                        >
+                                            {SORT_LABELS[lang][mode]}
+                                        </button>
+                                    ))}
+                                </div>
+                            </>
+                        )}
+                    </div>
                 </div>
 
                 {collectedNews.length > 0 && (
@@ -228,7 +319,9 @@ export default function CollectionsView({ allNews, today }: CollectionsViewProps
 
                 {collectedNews.length === 0 && missingCollectionLinks.length === 0 && !paperLoading && (
                     <div className="rounded-xl border border-dashed border-gray-200 dark:border-gray-800 p-4 text-sm text-gray-500 dark:text-gray-400">
-                        {isEnglish ? 'No saved news yet.' : '저장된 뉴스가 아직 없습니다.'}
+                        {q
+                            ? (isEnglish ? 'No results found.' : '검색 결과가 없습니다.')
+                            : (isEnglish ? 'No saved news yet.' : '저장된 뉴스가 아직 없습니다.')}
                     </div>
                 )}
             </section>
