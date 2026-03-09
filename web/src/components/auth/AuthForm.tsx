@@ -568,6 +568,17 @@ export default function AuthForm({
                 >
                     {submitting ? (isEnglish ? 'Processing...' : '처리 중...') : mode === 'login' ? (isEnglish ? 'Login' : '로그인') : (isEnglish ? 'Create Account' : '회원가입')}
                 </button>
+
+                {mode === 'login' && (
+                    <div className="text-center pt-1">
+                        <Link
+                            href="/auth/recover"
+                            className="text-[12px] text-gray-400 hover:text-blue-500 dark:text-gray-500 dark:hover:text-blue-400 transition-colors"
+                        >
+                            {t('recover_forgot')}
+                        </Link>
+                    </div>
+                )}
             </form>
         </div>
     );
