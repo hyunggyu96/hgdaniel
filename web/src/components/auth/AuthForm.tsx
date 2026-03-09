@@ -262,7 +262,7 @@ export default function AuthForm({
                 <motion.div
                     className="absolute top-1 bottom-1 rounded-lg bg-white shadow-sm dark:bg-gray-900"
                     style={{ width: 'calc(50% - 4px)' }}
-                    animate={{ x: mode === 'login' ? 0 : 'calc(100% + 4px)' }}
+                    animate={{ x: mode === 'login' ? 0 : '100%' }}
                     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                 />
                 <button
