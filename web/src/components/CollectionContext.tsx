@@ -64,12 +64,14 @@ export function CollectionProvider({ children }: { children: React.ReactNode }) 
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ type: 'news', link }),
-            }).then((res) => {
+            }).then(async (res) => {
                 if (!res.ok) {
-                    // Targeted rollback: re-add
+                    const body = await res.text().catch(() => '');
+                    console.error('[Collections] DELETE failed', res.status, body);
                     setCollections((prev) => prev.includes(link) ? prev : [...prev, link]);
                 }
-            }).catch(() => {
+            }).catch((err) => {
+                console.error('[Collections] DELETE error', err);
                 setCollections((prev) => prev.includes(link) ? prev : [...prev, link]);
             });
             return;
@@ -81,12 +83,14 @@ export function CollectionProvider({ children }: { children: React.ReactNode }) 
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ type: 'news', link, title, url: link }),
-        }).then((res) => {
+        }).then(async (res) => {
             if (!res.ok) {
-                // Targeted rollback: remove
+                const body = await res.text().catch(() => '');
+                console.error('[Collections] POST failed', res.status, body);
                 setCollections((prev) => prev.filter((l) => l !== link));
             }
-        }).catch(() => {
+        }).catch((err) => {
+            console.error('[Collections] POST error', err);
             setCollections((prev) => prev.filter((l) => l !== link));
         });
     }, []); // stable — no deps needed, uses ref for current state
