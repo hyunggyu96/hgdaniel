@@ -87,8 +87,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 );
 
             if (error) {
-                console.error('[collections] POST db error:', error.message, error.code, error.details);
-                return res.status(500).json({ error: 'Failed to save collection item', dbCode: error.code });
+                console.error('[collections] POST db error:', error.message, error.code, error.details, error.hint);
+                return res.status(500).json({
+                    error: 'Failed to save collection item',
+                    dbCode: error.code,
+                    dbMessage: error.message,
+                    dbDetails: error.details,
+                });
             }
 
             return res.status(200).json({ ok: true });
