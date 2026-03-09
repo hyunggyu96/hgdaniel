@@ -29,6 +29,8 @@ export function CollectionProvider({ children }: { children: React.ReactNode }) 
         try {
             const res = await fetch('/api/collections?type=news', { cache: 'no-store' });
             if (!res.ok) {
+                const body = await res.text().catch(() => '');
+                console.error('[Collections] GET failed', res.status, body);
                 setCollections([]);
                 return;
             }

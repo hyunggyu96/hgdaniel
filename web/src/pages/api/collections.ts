@@ -24,9 +24,11 @@ function getBody(req: NextApiRequest) {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const authUser = await getAuthUserFromCookieHeader(req.headers.cookie);
     if (!authUser) {
+        console.error('[collections] AUTH FAILED — cookie present:', !!req.headers.cookie);
         return res.status(401).json({ error: 'Unauthorized' });
     }
     if (!hasFeature(authUser.tier, 'collections')) {
+        console.error('[collections] TIER CHECK FAILED — tier:', authUser.tier);
         return res.status(403).json({ error: 'Upgrade required', code: 'TIER_REQUIRED' });
     }
 
@@ -42,7 +44,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 .order('created_at', { ascending: false });
 
             if (error) {
-                return res.status(500).json({ error: 'Failed to fetch collections' });
+                console.error('[collections] GET db error:', error.message, error.code, error.details);
+                return res.status(500).json({ error: 'Failed to fetch collections', dbCode: error.code });
             }
 
             if (type === 'news') {
@@ -84,7 +87,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 );
 
             if (error) {
-                return res.status(500).json({ error: 'Failed to save collection item' });
+                console.error('[collections] POST db error:', error.message, error.code, error.details);
+                return res.status(500).json({ error: 'Failed to save collection item', dbCode: error.code });
             }
 
             return res.status(200).json({ ok: true });
@@ -109,7 +113,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 .eq('item_key', itemKey);
 
             if (error) {
-                return res.status(500).json({ error: 'Failed to delete collection item' });
+                console.error('[collections] DELETE db error:', error.message, error.code, error.details);
+                return res.status(500).json({ error: 'Failed to delete collection item', dbCode: error.code });
             }
 
             return res.status(200).json({ ok: true });
@@ -117,7 +122,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         return res.status(405).json({ error: 'Method not allowed' });
     } catch (error) {
-        console.error('[collections api] error', error);
+        console.error('[collections] unhandled error:', error);
         return res.status(500).json({ error: 'Internal server error' });
     }
 }
