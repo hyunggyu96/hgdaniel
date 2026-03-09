@@ -30,6 +30,7 @@ export default function RecoverPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [codeError, setCodeError] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [resendCooldown, setResendCooldown] = useState(0);
 
@@ -65,6 +66,7 @@ export default function RecoverPage() {
         const char = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
         if (!char) return;
 
+        setCodeError(false);
         setCodeChars(prev => {
             const next = [...prev];
             next[index] = char[0];
@@ -80,6 +82,7 @@ export default function RecoverPage() {
         e.preventDefault();
         const pasted = e.clipboardData.getData('text').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, CODE_LENGTH);
         if (!pasted) return;
+        setCodeError(false);
         const newChars = Array(CODE_LENGTH).fill('');
         for (let i = 0; i < pasted.length; i++) {
             newChars[i] = pasted[i];
@@ -179,8 +182,10 @@ export default function RecoverPage() {
                 const json = await res.json().catch(() => ({}));
                 const msg = json?.error || '';
                 if (msg.toLowerCase().includes('too many failed')) {
+                    setCodeError(true);
                     setError(isEnglish ? 'Too many failed attempts. Please request a new code.' : '실패 횟수가 초과되었습니다. 새 코드를 요청해주세요.');
                 } else if (msg.toLowerCase().includes('verification code')) {
+                    setCodeError(true);
                     setError(isEnglish ? 'Invalid or expired code. Please try again.' : '인증 코드가 유효하지 않거나 만료되었습니다.');
                 } else if (msg.toLowerCase().includes('password must')) {
                     setError(t('auth_pw_hint'));
@@ -288,7 +293,11 @@ export default function RecoverPage() {
                                             onChange={e => handleCodeInput(i, e.target.value)}
                                             onKeyDown={e => handleCodeKeyDown(i, e)}
                                             onPaste={handleCodePaste}
-                                            className="w-10 h-12 text-center text-lg font-bold uppercase rounded-xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 text-gray-900 dark:text-gray-100 outline-none transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                            className={`w-10 h-12 text-center text-lg font-bold uppercase rounded-xl border bg-white dark:bg-gray-800 outline-none transition-colors ${
+                                                codeError
+                                                    ? 'border-red-400 dark:border-red-500 text-red-600 dark:text-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-500'
+                                                    : 'border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
+                                            }`}
                                         />
                                     ))}
                                 </div>
