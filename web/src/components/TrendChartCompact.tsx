@@ -108,23 +108,23 @@ export default function TrendChartCompact() {
                     {t('trend_title')}
                 </span>
                 {/* Toggle: 일별 / 시간별 */}
-                <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-md p-0.5">
+                <div className="flex items-center gap-px bg-gray-100 dark:bg-gray-700/60 rounded p-px">
                     <button
                         onClick={() => setMode('daily')}
-                        className={`text-[9px] font-bold px-2 py-0.5 rounded transition-colors ${
+                        className={`text-[9px] font-bold leading-none px-1.5 py-[3px] rounded-[3px] transition-all ${
                             mode === 'daily'
-                                ? 'bg-white dark:bg-gray-600 text-[#3182f6] shadow-sm'
-                                : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+                                ? 'bg-white dark:bg-gray-600 text-[#3182f6] shadow-[0_1px_2px_rgba(0,0,0,0.08)]'
+                                : 'text-gray-400 hover:text-gray-500 dark:hover:text-gray-300'
                         }`}
                     >
                         {isEnglish ? '7D' : '일별'}
                     </button>
                     <button
                         onClick={() => setMode('hourly')}
-                        className={`text-[9px] font-bold px-2 py-0.5 rounded transition-colors ${
+                        className={`text-[9px] font-bold leading-none px-1.5 py-[3px] rounded-[3px] transition-all ${
                             mode === 'hourly'
-                                ? 'bg-white dark:bg-gray-600 text-[#3182f6] shadow-sm'
-                                : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+                                ? 'bg-white dark:bg-gray-600 text-[#3182f6] shadow-[0_1px_2px_rgba(0,0,0,0.08)]'
+                                : 'text-gray-400 hover:text-gray-500 dark:hover:text-gray-300'
                         }`}
                     >
                         {isEnglish ? '10m' : '시간별'}
