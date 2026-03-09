@@ -36,6 +36,7 @@ export default function RecoverPage() {
     const [submitting, setSubmitting] = useState(false);
     const [resendCooldown, setResendCooldown] = useState(0);
     const [attemptInfo, setAttemptInfo] = useState<string | null>(null);
+    const [inputWarn, setInputWarn] = useState(false);
 
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -113,7 +114,13 @@ export default function RecoverPage() {
     }, [code, codeVerified, verifying, codeError, identifier, isEnglish]);
 
     const handleCodeInput = useCallback((index: number, value: string) => {
-        const char = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        const raw = value.trim();
+        if (raw && !/^[A-Za-z0-9]+$/.test(raw)) {
+            setInputWarn(true);
+            return;
+        }
+        setInputWarn(false);
+        const char = raw.toUpperCase().replace(/[^A-Z0-9]/g, '');
         if (!char) return;
 
         setCodeError(false);
@@ -378,6 +385,12 @@ export default function RecoverPage() {
                                         />
                                     ))}
                                 </div>
+
+                                {inputWarn && (
+                                    <p className="mt-1.5 text-center text-[11px] font-medium text-amber-600 dark:text-amber-400">
+                                        {isEnglish ? 'Only English letters and numbers are allowed.' : '영문과 숫자만 입력 가능합니다.'}
+                                    </p>
+                                )}
 
                                 {/* Resend button with timer */}
                                 <div className="mt-2 text-center">
