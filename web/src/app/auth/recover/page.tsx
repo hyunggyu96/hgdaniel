@@ -1,9 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, LockKeyhole, CheckCircle2, Eye, EyeOff, Search } from 'lucide-react';
+import { ArrowLeft, LockKeyhole, CheckCircle2, Eye, EyeOff, Search, RotateCcw } from 'lucide-react';
 import { useLanguage } from '@/components/LanguageContext';
+
+const CODE_LENGTH = 8;
+const RESEND_COOLDOWN = 60; // seconds
 
 function passwordStrength(pw: string) {
     return {
@@ -21,19 +24,91 @@ export default function RecoverPage() {
     const [step, setStep] = useState<'identify' | 'code' | 'done'>('identify');
     const [identifier, setIdentifier] = useState('');
     const [maskedEmail, setMaskedEmail] = useState('');
-    const [code, setCode] = useState('');
+    const [codeChars, setCodeChars] = useState<string[]>(Array(CODE_LENGTH).fill(''));
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
+    const [resendCooldown, setResendCooldown] = useState(0);
 
+    const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+    const code = codeChars.join('');
     const pwStrength = passwordStrength(newPassword);
     const pwValid = pwStrength.minLen && pwStrength.hasLower && pwStrength.hasUpper && pwStrength.hasSpecial;
 
-    const handleSendCode = async (e: React.FormEvent) => {
+    // Resend countdown timer
+    useEffect(() => {
+        if (resendCooldown <= 0) return;
+        const timer = setInterval(() => {
+            setResendCooldown(prev => {
+                if (prev <= 1) {
+                    clearInterval(timer);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [resendCooldown]);
+
+    // Auto-focus first code box when entering step 2
+    useEffect(() => {
+        if (step === 'code') {
+            setTimeout(() => inputRefs.current[0]?.focus(), 100);
+        }
+    }, [step]);
+
+    const handleCodeInput = useCallback((index: number, value: string) => {
+        const char = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        if (!char) return;
+
+        setCodeChars(prev => {
+            const next = [...prev];
+            next[index] = char[0];
+            return next;
+        });
+
+        if (index < CODE_LENGTH - 1) {
+            inputRefs.current[index + 1]?.focus();
+        }
+    }, []);
+
+    const handleCodePaste = useCallback((e: React.ClipboardEvent) => {
         e.preventDefault();
+        const pasted = e.clipboardData.getData('text').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, CODE_LENGTH);
+        if (!pasted) return;
+        const newChars = Array(CODE_LENGTH).fill('');
+        for (let i = 0; i < pasted.length; i++) {
+            newChars[i] = pasted[i];
+        }
+        setCodeChars(newChars);
+        const nextEmpty = newChars.findIndex(c => !c);
+        inputRefs.current[nextEmpty >= 0 ? nextEmpty : CODE_LENGTH - 1]?.focus();
+    }, []);
+
+    const handleCodeKeyDown = useCallback((index: number, e: React.KeyboardEvent) => {
+        if (e.key === 'Backspace') {
+            e.preventDefault();
+            setCodeChars(prev => {
+                const next = [...prev];
+                if (next[index]) {
+                    next[index] = '';
+                    return next;
+                }
+                if (index > 0) {
+                    next[index - 1] = '';
+                    inputRefs.current[index - 1]?.focus();
+                    return next;
+                }
+                return prev;
+            });
+        }
+    }, []);
+
+    const sendCode = useCallback(async () => {
         const trimmed = identifier.trim();
         if (!trimmed) {
             setError(isEnglish ? 'Please enter your username or email.' : '아이디 또는 이메일을 입력해주세요.');
@@ -51,8 +126,7 @@ export default function RecoverPage() {
             if (res.ok) {
                 setMaskedEmail(json.maskedEmail || '');
                 setStep('code');
-            } else if (res.status === 404) {
-                setError(json?.error || (isEnglish ? 'Account not found.' : '계정을 찾을 수 없습니다.'));
+                setResendCooldown(RESEND_COOLDOWN);
             } else {
                 setError(json?.error || (isEnglish ? 'Failed to send recovery email.' : '복구 이메일 전송에 실패했습니다.'));
             }
@@ -61,14 +135,26 @@ export default function RecoverPage() {
         } finally {
             setSubmitting(false);
         }
+    }, [identifier, isEnglish]);
+
+    const handleSendCode = async (e: React.FormEvent) => {
+        e.preventDefault();
+        await sendCode();
+    };
+
+    const handleResend = async () => {
+        if (resendCooldown > 0 || submitting) return;
+        setCodeChars(Array(CODE_LENGTH).fill(''));
+        setError(null);
+        await sendCode();
     };
 
     const handleReset = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
 
-        if (code.length !== 6) {
-            setError(isEnglish ? 'Please enter the 6-digit code.' : '6자리 인증코드를 입력해주세요.');
+        if (code.length !== CODE_LENGTH) {
+            setError(isEnglish ? `Please enter the ${CODE_LENGTH}-character code.` : `${CODE_LENGTH}자리 인증코드를 입력해주세요.`);
             return;
         }
         if (!pwValid) {
@@ -92,7 +178,9 @@ export default function RecoverPage() {
             } else {
                 const json = await res.json().catch(() => ({}));
                 const msg = json?.error || '';
-                if (msg.toLowerCase().includes('verification code')) {
+                if (msg.toLowerCase().includes('too many failed')) {
+                    setError(isEnglish ? 'Too many failed attempts. Please request a new code.' : '실패 횟수가 초과되었습니다. 새 코드를 요청해주세요.');
+                } else if (msg.toLowerCase().includes('verification code')) {
                     setError(isEnglish ? 'Invalid or expired code. Please try again.' : '인증 코드가 유효하지 않거나 만료되었습니다.');
                 } else if (msg.toLowerCase().includes('password must')) {
                     setError(t('auth_pw_hint'));
@@ -105,6 +193,12 @@ export default function RecoverPage() {
         } finally {
             setSubmitting(false);
         }
+    };
+
+    const formatCooldown = (sec: number) => {
+        const m = Math.floor(sec / 60);
+        const s = sec % 60;
+        return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
     };
 
     return (
@@ -168,29 +262,51 @@ export default function RecoverPage() {
                     {step === 'code' && (
                         <form onSubmit={handleReset} className="space-y-3">
                             {/* Masked email notification */}
-                            <p className="rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-xs font-medium text-green-700 dark:border-green-900/40 dark:bg-green-900/20 dark:text-green-300">
-                                {maskedEmail && (
-                                    <span className="block mb-0.5 font-mono text-[11px]">{maskedEmail}</span>
-                                )}
-                                {t('recover_sent')}
-                            </p>
+                            <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-2 dark:border-green-900/40 dark:bg-green-900/20">
+                                {maskedEmail ? (
+                                    <span className="block mb-0.5 font-mono text-[11px] text-green-700 dark:text-green-300">{maskedEmail}</span>
+                                ) : null}
+                                <span className="text-xs font-medium text-green-700 dark:text-green-300">
+                                    {t('recover_sent')}
+                                </span>
+                            </div>
 
-                            {/* Code input */}
+                            {/* Code input — 8 individual boxes */}
                             <div>
                                 <span className="mb-1.5 block text-[11px] font-semibold text-gray-600 dark:text-gray-300">
                                     {t('recover_code')}
                                 </span>
-                                <div className="flex items-center rounded-xl border border-gray-200 bg-white px-3 dark:border-gray-700 dark:bg-gray-900">
-                                    <CheckCircle2 className="mr-2 h-4 w-4 text-gray-400" />
-                                    <input
-                                        type="text"
-                                        inputMode="numeric"
-                                        maxLength={6}
-                                        value={code}
-                                        onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                                        placeholder={t('auth_code_placeholder')}
-                                        className="h-10 w-full bg-transparent text-sm outline-none placeholder:text-gray-400 tracking-widest"
-                                    />
+                                <div className="flex gap-1.5 justify-center">
+                                    {Array.from({ length: CODE_LENGTH }).map((_, i) => (
+                                        <input
+                                            key={i}
+                                            ref={el => { inputRefs.current[i] = el; }}
+                                            type="text"
+                                            inputMode="text"
+                                            maxLength={1}
+                                            value={codeChars[i]}
+                                            onChange={e => handleCodeInput(i, e.target.value)}
+                                            onKeyDown={e => handleCodeKeyDown(i, e)}
+                                            onPaste={handleCodePaste}
+                                            className="w-10 h-12 text-center text-lg font-bold uppercase rounded-xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 text-gray-900 dark:text-gray-100 outline-none transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                        />
+                                    ))}
+                                </div>
+
+                                {/* Resend button with timer */}
+                                <div className="mt-2 text-center">
+                                    <button
+                                        type="button"
+                                        onClick={handleResend}
+                                        disabled={resendCooldown > 0 || submitting}
+                                        className="inline-flex items-center gap-1 text-[11px] font-medium text-gray-400 hover:text-blue-500 disabled:hover:text-gray-400 disabled:cursor-not-allowed transition-colors"
+                                    >
+                                        <RotateCcw className="h-3 w-3" />
+                                        {resendCooldown > 0
+                                            ? `${isEnglish ? 'Resend in' : '재전송'} ${formatCooldown(resendCooldown)}`
+                                            : (isEnglish ? 'Resend code' : '코드 재전송')
+                                        }
+                                    </button>
                                 </div>
                             </div>
 
@@ -263,7 +379,7 @@ export default function RecoverPage() {
 
                             <button
                                 type="submit"
-                                disabled={submitting || code.length !== 6 || !pwValid || newPassword !== confirmPassword}
+                                disabled={submitting || code.length !== CODE_LENGTH || !pwValid || newPassword !== confirmPassword}
                                 className="h-11 w-full rounded-xl bg-[#3182f6] text-sm font-bold text-white transition-colors hover:bg-[#1b64da] disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 dark:disabled:bg-gray-700 dark:disabled:text-gray-500"
                             >
                                 {submitting ? (isEnglish ? 'Resetting...' : '재설정 중...') : t('recover_reset')}
