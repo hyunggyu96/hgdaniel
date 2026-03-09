@@ -182,6 +182,28 @@ export default function CollectionsView({ allNews, today }: CollectionsViewProps
         );
     }
 
+    if (!userId) {
+        return (
+            <div className="flex flex-col items-center justify-center py-24 px-6 animate-in fade-in duration-500">
+                <span className="text-4xl mb-4">Bookmarks</span>
+                <h2 className="text-2xl font-bold text-foreground mb-2">
+                    {isEnglish ? 'Login Required' : '로그인이 필요합니다'}
+                </h2>
+                <p className="text-muted-foreground text-center max-w-md mb-5">
+                    {isEnglish
+                        ? 'Please log in to view and manage your collections.'
+                        : '컬렉션을 확인하고 관리하려면 로그인해주세요.'}
+                </p>
+                <a
+                    href="/auth"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-[#3182f6] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#1b64da] transition-colors"
+                >
+                    {isEnglish ? 'Go to Login' : '로그인하기'}
+                </a>
+            </div>
+        );
+    }
+
     if (noCollections) {
         return (
             <div className="flex flex-col items-center justify-center py-24 px-6 animate-in fade-in duration-500">

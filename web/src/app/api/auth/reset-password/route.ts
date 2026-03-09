@@ -69,13 +69,11 @@ export async function POST(request: NextRequest) {
             .eq(isEmail ? 'email' : 'username', identifier)
             .maybeSingle();
 
-        if (!account || !account.email) {
-            return NextResponse.json({ error: 'Invalid or expired verification code' }, { status: 400 });
-        }
-
-        const redisKey = `${RESET_KEY_PREFIX}${account.email}`;
-        const attemptsKey = `${ATTEMPTS_KEY_PREFIX}${account.email}`;
-        const lockKey = `${LOCK_KEY_PREFIX}${account.email}`;
+        // Use email as key for real accounts, identifier for non-existent ones
+        const keyBase = account?.email || `id:${identifier}`;
+        const redisKey = `${RESET_KEY_PREFIX}${keyBase}`;
+        const attemptsKey = `${ATTEMPTS_KEY_PREFIX}${keyBase}`;
+        const lockKey = `${LOCK_KEY_PREFIX}${keyBase}`;
 
         // Check recovery lock
         const isLocked = await redis.get(lockKey);
@@ -100,8 +98,8 @@ export async function POST(request: NextRequest) {
             }, { status: 400 });
         }
 
-        // Verify code
-        const storedCode = await redis.get<string>(redisKey);
+        // Verify code — for non-existent accounts, code will never match
+        const storedCode = account?.email ? await redis.get<string>(redisKey) : null;
         if (!storedCode || !safeCompare(storedCode, code)) {
             const newAttempts = attempts + 1;
             await redis.incr(attemptsKey);
@@ -124,6 +122,11 @@ export async function POST(request: NextRequest) {
                 attempts: newAttempts,
                 maxAttempts: MAX_ATTEMPTS,
             }, { status: 400 });
+        }
+
+        // Code verified — account must exist at this point (non-existent accounts can't pass)
+        if (!account || !account.email) {
+            return NextResponse.json({ error: 'Invalid or expired verification code' }, { status: 400 });
         }
 
         // Delete code BEFORE password update to prevent replay

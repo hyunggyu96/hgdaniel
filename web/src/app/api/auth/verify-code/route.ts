@@ -50,13 +50,12 @@ export async function POST(request: NextRequest) {
             .eq(isEmail ? 'email' : 'username', identifier)
             .maybeSingle();
 
-        if (!account || !account.email) {
-            return NextResponse.json({ error: 'Invalid or expired verification code' }, { status: 400 });
-        }
-
-        const redisKey = `${RESET_KEY_PREFIX}${account.email}`;
-        const attemptsKey = `${ATTEMPTS_KEY_PREFIX}${account.email}`;
-        const lockKey = `${LOCK_KEY_PREFIX}${account.email}`;
+        // Use email as key for real accounts, identifier for non-existent ones
+        // This ensures consistent n/3 responses regardless of account existence
+        const keyBase = account?.email || `id:${identifier}`;
+        const redisKey = `${RESET_KEY_PREFIX}${keyBase}`;
+        const attemptsKey = `${ATTEMPTS_KEY_PREFIX}${keyBase}`;
+        const lockKey = `${LOCK_KEY_PREFIX}${keyBase}`;
 
         // Check recovery lock
         const isLocked = await redis.get(lockKey);
@@ -80,7 +79,8 @@ export async function POST(request: NextRequest) {
             }, { status: 400 });
         }
 
-        const storedCode = await redis.get<string>(redisKey);
+        // For non-existent accounts, code will never match — track attempts consistently
+        const storedCode = account?.email ? await redis.get<string>(redisKey) : null;
         if (!storedCode || !safeCompare(storedCode, code)) {
             const newAttempts = attempts + 1;
             await redis.incr(attemptsKey);
@@ -104,6 +104,11 @@ export async function POST(request: NextRequest) {
                 attempts: newAttempts,
                 maxAttempts: MAX_ATTEMPTS,
             }, { status: 400 });
+        }
+
+        // Code verified — account must exist (non-existent accounts can't pass)
+        if (!account || !account.email) {
+            return NextResponse.json({ error: 'Invalid or expired verification code' }, { status: 400 });
         }
 
         // Code is valid — do NOT delete it (reset-password will delete it)

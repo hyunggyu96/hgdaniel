@@ -419,7 +419,7 @@ export default function NewsListContainer({
                         {viewMode === 'category' ? (
                             classicLayout ? (
                                 /* Classic (main branch) glass-card grid */
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5 relative z-30">
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5 relative z-30">
                                     {CATEGORIES_CONFIG.map((config, idx) => {
                                         const category = config.label;
                                         const articles = newsByCategory[category] || [];
@@ -471,7 +471,7 @@ export default function NewsListContainer({
                                 </div>
                             ) : (
                                 /* Naver-style compact grid */
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                     {/* TrendChart as first card */}
                                     <div className="h-[280px]">
                                         <TrendChartCompact />
