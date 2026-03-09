@@ -1,13 +1,14 @@
 'use client';
 
 import { AreaChart as RAreaChart, Area, XAxis, YAxis, Tooltip as RTooltip, ResponsiveContainer } from 'recharts';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useLanguage } from './LanguageContext';
 
 interface TrendData {
-    date: string;
     [key: string]: string | number;
 }
+
+type Mode = 'daily' | 'hourly';
 
 const CATEGORY_COLORS: Record<string, string> = {
     'Filler': '#3182f6',
@@ -20,29 +21,76 @@ const CATEGORY_COLORS: Record<string, string> = {
     'Corporate News': '#94a3b8',
 };
 
+const getColor = (category: string) => CATEGORY_COLORS[category] || '#3182f6';
+
+function HourlyTooltip({ active, payload, label, yesterday, categories, isEnglish }: any) {
+    if (!active || !payload?.length) return null;
+    const yd = yesterday?.[label];
+    return (
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-2 text-[10px] max-w-[200px]">
+            <div className="text-[10px] font-bold text-gray-500 mb-1">{label}</div>
+            {payload
+                .filter((p: any) => p.value > 0 || (yd && yd[p.dataKey] > 0))
+                .sort((a: any, b: any) => b.value - a.value)
+                .map((p: any) => {
+                    const ydVal = yd?.[p.dataKey] ?? 0;
+                    const diff = p.value - ydVal;
+                    const diffStr = diff > 0 ? `+${diff}` : diff < 0 ? `${diff}` : '0';
+                    const diffColor = diff > 0 ? '#ef4444' : diff < 0 ? '#3b82f6' : '#94a3b8';
+                    return (
+                        <div key={p.dataKey} className="flex items-center gap-1.5 py-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: p.color }} />
+                            <span className="font-semibold text-gray-700 dark:text-gray-200 truncate flex-1">
+                                {p.dataKey.length > 10 ? p.dataKey.slice(0, 9) + '..' : p.dataKey}
+                            </span>
+                            <span className="font-bold text-gray-900 dark:text-gray-100">{p.value}</span>
+                            <span className="font-bold" style={{ color: diffColor }}>
+                                ({diffStr})
+                            </span>
+                        </div>
+                    );
+                })}
+            {payload.filter((p: any) => p.value > 0 || (yd && yd[p.dataKey] > 0)).length === 0 && (
+                <div className="text-gray-400">{isEnglish ? 'No data' : '데이터 없음'}</div>
+            )}
+            <div className="mt-1 pt-1 border-t border-gray-100 dark:border-gray-700 text-[9px] text-gray-400">
+                {isEnglish ? 'vs yesterday' : '어제 대비'}
+            </div>
+        </div>
+    );
+}
+
 export default function TrendChartCompact() {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
+    const isEnglish = language === 'en';
+
+    const [mode, setMode] = useState<Mode>('daily');
     const [data, setData] = useState<TrendData[]>([]);
     const [categories, setCategories] = useState<string[]>([]);
+    const [yesterday, setYesterday] = useState<Record<string, Record<string, number>> | null>(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const res = await fetch('/api/trends');
-                const json = await res.json();
-                if (json.data && json.categories) {
-                    setData(json.data);
-                    setCategories(json.categories);
-                }
-            } catch (err) {
-                console.error("Failed to fetch trend data", err);
-            } finally {
-                setLoading(false);
+    const fetchData = useCallback(async (m: Mode) => {
+        setLoading(true);
+        try {
+            const url = m === 'hourly' ? '/api/trends?mode=hourly' : '/api/trends';
+            const res = await fetch(url);
+            const json = await res.json();
+            if (json.data && json.categories) {
+                setData(json.data);
+                setCategories(json.categories);
+                setYesterday(json.yesterday || null);
             }
+        } catch (err) {
+            console.error("Failed to fetch trend data", err);
+        } finally {
+            setLoading(false);
         }
-        fetchData();
     }, []);
+
+    useEffect(() => { fetchData(mode); }, [mode, fetchData]);
+
+    const xKey = mode === 'daily' ? 'date' : 'time';
 
     if (loading) {
         return (
@@ -52,8 +100,6 @@ export default function TrendChartCompact() {
         );
     }
 
-    const getColor = (category: string) => CATEGORY_COLORS[category] || '#3182f6';
-
     return (
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden h-full flex flex-col">
             {/* Header */}
@@ -61,9 +107,29 @@ export default function TrendChartCompact() {
                 <span className="text-[11px] font-bold text-foreground tracking-tight">
                     {t('trend_title')}
                 </span>
-                <span className="text-[9px] font-bold text-[#3182f6] bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded">
-                    {t('trend_7d')}
-                </span>
+                {/* Toggle: 일별 / 시간별 */}
+                <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-md p-0.5">
+                    <button
+                        onClick={() => setMode('daily')}
+                        className={`text-[9px] font-bold px-2 py-0.5 rounded transition-colors ${
+                            mode === 'daily'
+                                ? 'bg-white dark:bg-gray-600 text-[#3182f6] shadow-sm'
+                                : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+                        }`}
+                    >
+                        {isEnglish ? '7D' : '일별'}
+                    </button>
+                    <button
+                        onClick={() => setMode('hourly')}
+                        className={`text-[9px] font-bold px-2 py-0.5 rounded transition-colors ${
+                            mode === 'hourly'
+                                ? 'bg-white dark:bg-gray-600 text-[#3182f6] shadow-sm'
+                                : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+                        }`}
+                    >
+                        {isEnglish ? '10m' : '시간별'}
+                    </button>
+                </div>
             </div>
 
             {/* Mini legend */}
@@ -89,26 +155,33 @@ export default function TrendChartCompact() {
                             ))}
                         </defs>
                         <XAxis
-                            dataKey="date"
+                            dataKey={xKey}
                             axisLine={false}
                             tickLine={false}
                             tick={{ fill: '#94a3b8', fontSize: 9 }}
                             dy={4}
+                            interval={mode === 'hourly' ? 5 : undefined}
                         />
                         <YAxis hide />
-                        <RTooltip
-                            contentStyle={{
-                                backgroundColor: '#fff',
-                                border: '1px solid #e2e8f0',
-                                borderRadius: '8px',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-                                padding: '8px',
-                                fontSize: '11px',
-                            }}
-                            itemStyle={{ fontSize: '10px', fontWeight: 600, padding: '1px 0' }}
-                            labelStyle={{ color: '#64748b', fontSize: '10px', marginBottom: '4px', fontWeight: 700 }}
-                            itemSorter={(item: any) => -item.value}
-                        />
+                        {mode === 'hourly' ? (
+                            <RTooltip
+                                content={<HourlyTooltip yesterday={yesterday} categories={categories} isEnglish={isEnglish} />}
+                            />
+                        ) : (
+                            <RTooltip
+                                contentStyle={{
+                                    backgroundColor: '#fff',
+                                    border: '1px solid #e2e8f0',
+                                    borderRadius: '8px',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                                    padding: '8px',
+                                    fontSize: '11px',
+                                }}
+                                itemStyle={{ fontSize: '10px', fontWeight: 600, padding: '1px 0' }}
+                                labelStyle={{ color: '#64748b', fontSize: '10px', marginBottom: '4px', fontWeight: 700 }}
+                                itemSorter={(item: any) => -item.value}
+                            />
+                        )}
                         {categories.map((c) => (
                             <Area
                                 key={c}
