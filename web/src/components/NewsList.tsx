@@ -57,10 +57,12 @@ export default function NewsList({ selectedCategory, currentPage = 1, searchQuer
                 const json = await res.json();
                 const p = json?.preferences || {};
                 if (cancelled) return;
-                if (typeof p.showBadges === 'boolean') setShowBadges(p.showBadges);
-                if (typeof p.showKeywords === 'boolean') setShowKeywords(p.showKeywords);
-                if (p.viewMode === 'category' || p.viewMode === 'time') setViewMode(p.viewMode);
-                if (typeof p.classicLayout === 'boolean') setClassicLayout(p.classicLayout);
+                // Always reset ALL prefs to saved value or default so
+                // logged-out session state doesn't leak into logged-in state
+                setShowBadges(typeof p.showBadges === 'boolean' ? p.showBadges : DEFAULT_PREFS.showBadges);
+                setShowKeywords(typeof p.showKeywords === 'boolean' ? p.showKeywords : DEFAULT_PREFS.showKeywords);
+                setViewMode(p.viewMode === 'category' || p.viewMode === 'time' ? p.viewMode : DEFAULT_PREFS.viewMode);
+                setClassicLayout(typeof p.classicLayout === 'boolean' ? p.classicLayout : DEFAULT_PREFS.classicLayout);
             } catch {
                 // ignore — use defaults
             } finally {
