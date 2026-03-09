@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Redis } from '@upstash/redis';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import {
     buildSessionCookie,
@@ -8,6 +9,13 @@ import {
     validateUsername,
 } from '@/lib/auth';
 import { rateLimit, getClientIp } from '@/lib/rateLimit';
+
+function getRedis() {
+    const url = process.env.UPSTASH_REDIS_REST_URL?.trim();
+    const token = process.env.UPSTASH_REDIS_REST_TOKEN?.trim();
+    if (!url || !token) return null;
+    return new Redis({ url, token });
+}
 
 export async function POST(request: NextRequest) {
     try {
@@ -25,6 +33,7 @@ export async function POST(request: NextRequest) {
         const password = String(body?.password || '');
         const email = String(body?.email || '').trim().toLowerCase();
         const birthYear = Number(body?.birthYear) || 0;
+        const emailCode = String(body?.emailCode || '').trim();
         const agreedPrivacy = !!body?.agreedPrivacy;
         const agreedTerms = !!body?.agreedTerms;
 
@@ -40,6 +49,21 @@ export async function POST(request: NextRequest) {
         // Validate email
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             return NextResponse.json({ error: 'Valid email address is required' }, { status: 400 });
+        }
+
+        // Verify email code
+        const redis = getRedis();
+        if (redis) {
+            if (!emailCode) {
+                return NextResponse.json({ error: 'Email verification code is required' }, { status: 400 });
+            }
+            const redisKey = `email-verify:${email}`;
+            const storedCode = await redis.get<string>(redisKey);
+            if (!storedCode || storedCode !== emailCode) {
+                return NextResponse.json({ error: 'Invalid or expired verification code' }, { status: 400 });
+            }
+            // Delete code after successful verification
+            await redis.del(redisKey);
         }
 
         // Validate birth year

@@ -62,6 +62,15 @@ export function validatePassword(password: string) {
     if (password.length > 128) {
         return { ok: false, reason: 'Password is too long' };
     }
+    if (!/[a-z]/.test(password)) {
+        return { ok: false, reason: 'Password must include a lowercase letter' };
+    }
+    if (!/[A-Z]/.test(password)) {
+        return { ok: false, reason: 'Password must include an uppercase letter' };
+    }
+    if (!/[^a-zA-Z0-9]/.test(password)) {
+        return { ok: false, reason: 'Password must include a special character' };
+    }
     return { ok: true };
 }
 

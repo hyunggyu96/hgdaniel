@@ -134,10 +134,20 @@ export const translations = {
         // Auth & Privacy
         auth_email: '이메일',
         auth_birth_year: '생년',
-        auth_agree_all: '모든 약관에 동의합니다',
+        auth_agree_all: '모든 약관에 동의합니다.',
         auth_agree_terms: '이용약관 동의',
         auth_agree_privacy: '개인정보처리방침 동의',
         auth_required: '(필수)',
+        auth_check_username: '중복확인',
+        auth_username_available: '사용 가능한 아이디입니다.',
+        auth_username_taken: '이미 사용 중인 아이디입니다.',
+        auth_send_code: '인증',
+        auth_code_sent: '인증 코드가 전송되었습니다.',
+        auth_code_placeholder: '인증 코드 6자리',
+        auth_email_verified: '인증 완료',
+        auth_pw_hint: '8자 이상, 영문 대소문자 및 특수문자 포함.',
+        auth_username_hint: '* 아이디는 영문 소문자로 저장됩니다.',
+        auth_birth_hint: '* 사용자 평균 연령대 통계에 사용됩니다.',
         privacy_title: '개인정보 처리방침',
 
         // Editor's Pick
@@ -272,10 +282,20 @@ export const translations = {
         // Auth & Privacy
         auth_email: 'Email',
         auth_birth_year: 'Birth Year',
-        auth_agree_all: 'I agree to all terms',
+        auth_agree_all: 'I agree to all terms.',
         auth_agree_terms: 'Terms of Service',
         auth_agree_privacy: 'Privacy Policy',
         auth_required: '(Required)',
+        auth_check_username: 'Check',
+        auth_username_available: 'Username is available.',
+        auth_username_taken: 'Username is already taken.',
+        auth_send_code: 'Verify',
+        auth_code_sent: 'Verification code sent.',
+        auth_code_placeholder: '6-digit code',
+        auth_email_verified: 'Verified',
+        auth_pw_hint: '8+ chars, upper/lowercase & special char.',
+        auth_username_hint: '* Username is saved in lowercase.',
+        auth_birth_hint: '* Used for average age group statistics.',
         privacy_title: 'Privacy Policy',
 
         // Editor's Pick
