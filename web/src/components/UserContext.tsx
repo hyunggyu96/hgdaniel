@@ -16,6 +16,7 @@ interface UserContextType {
     login: (username: string, password: string) => Promise<AuthResult>;
     register: (username: string, password: string, email: string, birthYear: number) => Promise<AuthResult>;
     logout: () => Promise<void>;
+    deleteAccount: (password: string) => Promise<AuthResult>;
     refreshUser: () => Promise<void>;
 }
 
@@ -98,8 +99,22 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    const deleteAccount = async (password: string): Promise<AuthResult> => {
+        const res = await fetch('/api/auth/delete-account', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password }),
+        });
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok) return { ok: false, error: json?.error || 'Delete failed' };
+        setUserId(null);
+        setUserTier('free');
+        setIsAdmin(false);
+        return { ok: true };
+    };
+
     return (
-        <UserContext.Provider value={{ userId, userTier, isAdmin, isLoading, login, register, logout, refreshUser }}>
+        <UserContext.Provider value={{ userId, userTier, isAdmin, isLoading, login, register, logout, deleteAccount, refreshUser }}>
             {children}
         </UserContext.Provider>
     );

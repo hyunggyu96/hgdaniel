@@ -216,6 +216,9 @@ export default function AuthForm({
                         <label className="block pt-0.5">
                             <span className="mb-1.5 block text-[11px] font-semibold text-gray-600 dark:text-gray-300">
                                 {t('auth_birth_year')}
+                                <span className="ml-1 font-normal text-gray-400 dark:text-gray-500">
+                                    {isEnglish ? '* used for average age group statistics' : '* 사용자 평균 연령대 통계에 사용됩니다'}
+                                </span>
                             </span>
                             <div className="flex items-center rounded-xl border border-gray-200 bg-white px-3 dark:border-gray-700 dark:bg-gray-900">
                                 <Calendar className="mr-2 h-4 w-4 text-gray-400" />

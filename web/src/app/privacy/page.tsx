@@ -130,11 +130,43 @@ export default function PrivacyPage() {
 
                     {/* 7. Rights */}
                     <Section num={7} title={isKo ? '이용자의 권리 및 행사 방법' : 'User Rights'}>
-                        <p className="mb-2">{isKo ? '이용자는 언제든지 다음 권리를 행사할 수 있습니다:' : 'Users may exercise the following rights at any time:'}</p>
-                        <ul className="list-disc list-inside space-y-1">
-                            <li>{isKo ? '개인정보 열람, 정정, 삭제 요청' : 'Request to view, correct, or delete personal information'}</li>
-                            <li>{isKo ? '회원 탈퇴 (서비스 내 설정 또는 이메일 요청)' : 'Account deletion (via service settings or email request)'}</li>
-                        </ul>
+                        <p className="mb-3">{isKo ? '이용자는 「개인정보 보호법」 제35조~제37조에 따라 언제든지 다음 권리를 행사할 수 있습니다:' : 'Under Articles 35-37 of the Personal Information Protection Act (PIPA), users may exercise the following rights at any time:'}</p>
+                        <table className="w-full text-[13px] border-collapse mb-3">
+                            <thead>
+                                <tr className="border-b border-gray-200 dark:border-gray-700 text-left">
+                                    <th className="py-2 pr-4 font-bold text-gray-900 dark:text-gray-100">{isKo ? '권리' : 'Right'}</th>
+                                    <th className="py-2 pr-4 font-bold text-gray-900 dark:text-gray-100">{isKo ? '행사 방법' : 'How to Exercise'}</th>
+                                    <th className="py-2 font-bold text-gray-900 dark:text-gray-100">{isKo ? '법적 근거' : 'Legal Basis'}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr className="border-b border-gray-100 dark:border-gray-800">
+                                    <td className="py-2 pr-4">{isKo ? '개인정보 열람 요청' : 'Request access to personal info'}</td>
+                                    <td className="py-2 pr-4">{isKo ? '이메일 (privacy@coauths.com)' : 'Email (privacy@coauths.com)'}</td>
+                                    <td className="py-2">{isKo ? '개인정보 보호법 제35조' : 'PIPA Art. 35'}</td>
+                                </tr>
+                                <tr className="border-b border-gray-100 dark:border-gray-800">
+                                    <td className="py-2 pr-4">{isKo ? '개인정보 정정·삭제 요청' : 'Request correction or deletion'}</td>
+                                    <td className="py-2 pr-4">{isKo ? '이메일 (privacy@coauths.com)' : 'Email (privacy@coauths.com)'}</td>
+                                    <td className="py-2">{isKo ? '개인정보 보호법 제36조' : 'PIPA Art. 36'}</td>
+                                </tr>
+                                <tr className="border-b border-gray-100 dark:border-gray-800">
+                                    <td className="py-2 pr-4">{isKo ? '개인정보 처리정지 요청' : 'Request suspension of processing'}</td>
+                                    <td className="py-2 pr-4">{isKo ? '이메일 (privacy@coauths.com)' : 'Email (privacy@coauths.com)'}</td>
+                                    <td className="py-2">{isKo ? '개인정보 보호법 제37조' : 'PIPA Art. 37'}</td>
+                                </tr>
+                                <tr>
+                                    <td className="py-2 pr-4">{isKo ? '회원 탈퇴 (계정 삭제)' : 'Account deletion (withdrawal)'}</td>
+                                    <td className="py-2 pr-4">{isKo ? '서비스 내 회원탈퇴 기능 또는 이메일' : 'In-service deletion feature or email'}</td>
+                                    <td className="py-2">{isKo ? '개인정보 보호법 제36조' : 'PIPA Art. 36'}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p className="text-[13px]">
+                            {isKo
+                                ? '권리 행사 시 본인 확인 절차를 거친 후 지체 없이 처리하며, 처리 결과를 이메일로 통지합니다.'
+                                : 'Requests will be processed without delay after identity verification, and results will be communicated via email.'}
+                        </p>
                     </Section>
 
                     {/* 8. Security */}
@@ -158,8 +190,8 @@ export default function PrivacyPage() {
                     <Section num={10} title={isKo ? '개인정보 처리방침 변경' : 'Policy Changes'}>
                         <p>
                             {isKo
-                                ? '본 방침은 시행일로부터 적용되며, 변경 사항이 있을 경우 서비스 내 공지를 통해 알려드립니다.'
-                                : 'This policy is effective from the date stated above. Any changes will be announced through the service.'}
+                                ? '본 방침은 시행일로부터 적용되며, 변경 사항이 있을 경우 서비스 내 공지 및 이메일을 통해 알려드립니다.'
+                                : 'This policy is effective from the date stated above. Any changes will be announced through in-service notifications and email.'}
                         </p>
                     </Section>
                 </article>
