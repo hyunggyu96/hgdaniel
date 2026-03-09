@@ -152,16 +152,17 @@ export const translations = {
 
         // Account Recovery
         recover_title: '계정 찾기',
-        recover_desc: '가입 시 사용한 이메일을 입력하세요',
-        recover_send: '인증코드 발송',
-        recover_sent: '이메일이 발송되었습니다',
+        recover_desc: '가입 시 사용한 아이디 또는 이메일을 입력하세요',
+        recover_identifier_label: '아이디 또는 이메일',
+        recover_send: '계정 찾기',
+        recover_sent: '이메일로 인증코드가 전송되었습니다.',
         recover_code: '인증코드',
         recover_new_pw: '새 비밀번호',
         recover_confirm_pw: '새 비밀번호 확인',
         recover_reset: '비밀번호 재설정',
         recover_success: '비밀번호가 재설정되었습니다!',
         recover_go_login: '로그인하기',
-        recover_forgot: '비밀번호를 잊으셨나요?',
+        recover_forgot: '아이디 또는 비밀번호를 잊으셨나요?',
         recover_mismatch: '비밀번호가 일치하지 않습니다',
 
         // Editor's Pick
@@ -314,16 +315,17 @@ export const translations = {
 
         // Account Recovery
         recover_title: 'Find Your Account',
-        recover_desc: 'Enter the email you used to register',
-        recover_send: 'Send Code',
-        recover_sent: 'Email sent if account exists',
+        recover_desc: 'Enter your username or email to recover your account',
+        recover_identifier_label: 'Username or Email',
+        recover_send: 'Find Account',
+        recover_sent: 'Verification code sent to your email.',
         recover_code: 'Verification Code',
         recover_new_pw: 'New Password',
         recover_confirm_pw: 'Confirm New Password',
         recover_reset: 'Reset Password',
         recover_success: 'Password has been reset!',
         recover_go_login: 'Go to Login',
-        recover_forgot: 'Forgot your password?',
+        recover_forgot: 'Forgot your username or password?',
         recover_mismatch: 'Passwords do not match',
 
         // Editor's Pick

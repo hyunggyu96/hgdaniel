@@ -114,6 +114,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
                             <AuthForm
                                 initialMode={initialMode}
                                 onModeChange={setMode}
+                                onClose={onClose}
                                 onSuccess={() => {
                                     onClose();
                                 }}

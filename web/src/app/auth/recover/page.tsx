@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Mail, LockKeyhole, CheckCircle2, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, LockKeyhole, CheckCircle2, Eye, EyeOff, Search } from 'lucide-react';
 import { useLanguage } from '@/components/LanguageContext';
 
 function passwordStrength(pw: string) {
@@ -18,8 +18,9 @@ export default function RecoverPage() {
     const { language, t } = useLanguage();
     const isEnglish = language === 'en';
 
-    const [step, setStep] = useState<'email' | 'code' | 'done'>('email');
-    const [email, setEmail] = useState('');
+    const [step, setStep] = useState<'identify' | 'code' | 'done'>('identify');
+    const [identifier, setIdentifier] = useState('');
+    const [maskedEmail, setMaskedEmail] = useState('');
     const [code, setCode] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -33,8 +34,9 @@ export default function RecoverPage() {
 
     const handleSendCode = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            setError(isEnglish ? 'Please enter a valid email address.' : '유효한 이메일 주소를 입력해주세요.');
+        const trimmed = identifier.trim();
+        if (!trimmed) {
+            setError(isEnglish ? 'Please enter your username or email.' : '아이디 또는 이메일을 입력해주세요.');
             return;
         }
         setSubmitting(true);
@@ -43,12 +45,15 @@ export default function RecoverPage() {
             const res = await fetch('/api/auth/recover', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email }),
+                body: JSON.stringify({ identifier: trimmed }),
             });
+            const json = await res.json().catch(() => ({}));
             if (res.ok) {
+                setMaskedEmail(json.maskedEmail || '');
                 setStep('code');
+            } else if (res.status === 404) {
+                setError(json?.error || (isEnglish ? 'Account not found.' : '계정을 찾을 수 없습니다.'));
             } else {
-                const json = await res.json().catch(() => ({}));
                 setError(json?.error || (isEnglish ? 'Failed to send recovery email.' : '복구 이메일 전송에 실패했습니다.'));
             }
         } catch {
@@ -80,7 +85,7 @@ export default function RecoverPage() {
             const res = await fetch('/api/auth/reset-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, code, newPassword }),
+                body: JSON.stringify({ identifier: identifier.trim(), code, newPassword }),
             });
             if (res.ok) {
                 setStep('done');
@@ -123,21 +128,21 @@ export default function RecoverPage() {
                         </p>
                     </div>
 
-                    {/* Step 1: Email */}
-                    {step === 'email' && (
+                    {/* Step 1: Username or Email */}
+                    {step === 'identify' && (
                         <form onSubmit={handleSendCode} className="space-y-3">
                             <div>
                                 <span className="mb-1.5 block text-[11px] font-semibold text-gray-600 dark:text-gray-300">
-                                    {t('auth_email')}
+                                    {t('recover_identifier_label')}
                                 </span>
                                 <div className="flex items-center rounded-xl border border-gray-200 bg-white px-3 dark:border-gray-700 dark:bg-gray-900">
-                                    <Mail className="mr-2 h-4 w-4 text-gray-400" />
+                                    <Search className="mr-2 h-4 w-4 text-gray-400" />
                                     <input
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="name@example.com"
-                                        autoComplete="email"
+                                        type="text"
+                                        value={identifier}
+                                        onChange={(e) => setIdentifier(e.target.value)}
+                                        placeholder={isEnglish ? 'username or email' : '아이디 또는 이메일'}
+                                        autoComplete="username"
                                         className="h-10 w-full bg-transparent text-sm outline-none placeholder:text-gray-400"
                                     />
                                 </div>
@@ -151,10 +156,10 @@ export default function RecoverPage() {
 
                             <button
                                 type="submit"
-                                disabled={submitting || !email}
+                                disabled={submitting || !identifier.trim()}
                                 className="h-11 w-full rounded-xl bg-[#3182f6] text-sm font-bold text-white transition-colors hover:bg-[#1b64da] disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 dark:disabled:bg-gray-700 dark:disabled:text-gray-500"
                             >
-                                {submitting ? (isEnglish ? 'Sending...' : '전송 중...') : t('recover_send')}
+                                {submitting ? (isEnglish ? 'Searching...' : '검색 중...') : t('recover_send')}
                             </button>
                         </form>
                     )}
@@ -162,7 +167,11 @@ export default function RecoverPage() {
                     {/* Step 2: Code + New Password */}
                     {step === 'code' && (
                         <form onSubmit={handleReset} className="space-y-3">
+                            {/* Masked email notification */}
                             <p className="rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-xs font-medium text-green-700 dark:border-green-900/40 dark:bg-green-900/20 dark:text-green-300">
+                                {maskedEmail && (
+                                    <span className="block mb-0.5 font-mono text-[11px]">{maskedEmail}</span>
+                                )}
                                 {t('recover_sent')}
                             </p>
 

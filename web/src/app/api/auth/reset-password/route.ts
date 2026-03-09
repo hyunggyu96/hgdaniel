@@ -22,12 +22,12 @@ export async function POST(request: NextRequest) {
         }
 
         const body = await request.json();
-        const email = String(body?.email || '').trim().toLowerCase();
+        const identifier = String(body?.identifier || '').trim().toLowerCase();
         const code = String(body?.code || '').trim();
         const newPassword = String(body?.newPassword || '');
 
-        if (!email || !code || !newPassword) {
-            return NextResponse.json({ error: 'Email, code, and new password are required' }, { status: 400 });
+        if (!identifier || !code || !newPassword) {
+            return NextResponse.json({ error: 'Identifier, code, and new password are required' }, { status: 400 });
         }
 
         const redis = getRedis();
@@ -35,8 +35,20 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Recovery service is not configured' }, { status: 503 });
         }
 
-        // Verify code
-        const redisKey = `${RESET_KEY_PREFIX}${email}`;
+        // Look up account by username or email
+        const isEmail = identifier.includes('@');
+        const { data: account } = await supabaseAdmin
+            .from('accounts')
+            .select('id, email, session_version')
+            .eq(isEmail ? 'email' : 'username', identifier)
+            .maybeSingle();
+
+        if (!account || !account.email) {
+            return NextResponse.json({ error: 'Account not found' }, { status: 400 });
+        }
+
+        // Verify code using the account's email
+        const redisKey = `${RESET_KEY_PREFIX}${account.email}`;
         const storedCode = await redis.get<string>(redisKey);
         if (!storedCode || storedCode !== code) {
             return NextResponse.json({ error: 'Invalid or expired verification code' }, { status: 400 });
@@ -46,17 +58,6 @@ export async function POST(request: NextRequest) {
         const pwCheck = validatePassword(newPassword);
         if (!pwCheck.ok) {
             return NextResponse.json({ error: pwCheck.reason }, { status: 400 });
-        }
-
-        // Find account by email
-        const { data: account } = await supabaseAdmin
-            .from('accounts')
-            .select('id, session_version')
-            .eq('email', email)
-            .maybeSingle();
-
-        if (!account) {
-            return NextResponse.json({ error: 'Account not found' }, { status: 400 });
         }
 
         // Hash and update password, increment session_version

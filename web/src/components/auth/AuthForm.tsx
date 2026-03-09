@@ -13,6 +13,7 @@ interface AuthFormProps {
     initialMode?: AuthMode;
     onSuccess?: (mode: AuthMode) => void;
     onModeChange?: (mode: AuthMode) => void;
+    onClose?: () => void;
     className?: string;
 }
 
@@ -54,6 +55,7 @@ export default function AuthForm({
     initialMode = 'login',
     onSuccess,
     onModeChange,
+    onClose,
     className = '',
 }: AuthFormProps) {
     const { login, register } = useUser();
@@ -573,6 +575,7 @@ export default function AuthForm({
                     <div className="text-center pt-1">
                         <Link
                             href="/auth/recover"
+                            onClick={() => onClose?.()}
                             className="text-[12px] text-gray-400 hover:text-blue-500 dark:text-gray-500 dark:hover:text-blue-400 transition-colors"
                         >
                             {t('recover_forgot')}
