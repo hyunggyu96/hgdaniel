@@ -13,7 +13,7 @@ import dynamic from 'next/dynamic';
 
 const TrendChartCompact = dynamic(() => import('./TrendChartCompact'), {
     ssr: false,
-    loading: () => <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 h-[280px] animate-pulse" />,
+    loading: () => <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 min-h-[280px] h-full animate-pulse" />,
 });
 
 interface Props {
@@ -472,8 +472,8 @@ export default function NewsListContainer({
                             ) : (
                                 /* Naver-style compact grid */
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                    {/* TrendChart as first card */}
-                                    <div className="h-[280px]">
+                                    {/* TrendChart as first card — height matches adjacent card via grid */}
+                                    <div className="min-h-[280px]">
                                         <TrendChartCompact />
                                     </div>
 
