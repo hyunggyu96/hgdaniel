@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useUser } from './UserContext';
 
 interface CollectionContextType {
@@ -46,34 +46,50 @@ export function CollectionProvider({ children }: { children: React.ReactNode }) 
         void loadCollections();
     }, [loadCollections]);
 
+    // Keep a ref in sync so toggleCollection never closes over stale state
+    const collectionsRef = useRef(collections);
+    collectionsRef.current = collections;
+
     const isInCollection = useCallback((link: string) => {
         return collections.includes(link);
     }, [collections]);
 
     const toggleCollection = useCallback((link: string, title?: string) => {
-        const inCollection = collections.includes(link);
+        const inCollection = collectionsRef.current.includes(link);
 
         if (inCollection) {
+            // Optimistic remove
             setCollections((prev) => prev.filter((l) => l !== link));
             void fetch('/api/collections', {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ type: 'news', link }),
             }).then((res) => {
-                if (!res.ok) void loadCollections();
+                if (!res.ok) {
+                    // Targeted rollback: re-add
+                    setCollections((prev) => prev.includes(link) ? prev : [...prev, link]);
+                }
+            }).catch(() => {
+                setCollections((prev) => prev.includes(link) ? prev : [...prev, link]);
             });
             return;
         }
 
-        setCollections((prev) => [...prev, link]);
+        // Optimistic add
+        setCollections((prev) => prev.includes(link) ? prev : [...prev, link]);
         void fetch('/api/collections', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ type: 'news', link, title, url: link }),
         }).then((res) => {
-            if (!res.ok) void loadCollections();
+            if (!res.ok) {
+                // Targeted rollback: remove
+                setCollections((prev) => prev.filter((l) => l !== link));
+            }
+        }).catch(() => {
+            setCollections((prev) => prev.filter((l) => l !== link));
         });
-    }, [collections, loadCollections]);
+    }, []); // stable — no deps needed, uses ref for current state
 
     const value: CollectionContextType = {
         collections,
