@@ -31,6 +31,8 @@ export default function RecoverPage() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [codeError, setCodeError] = useState(false);
+    const [codeVerified, setCodeVerified] = useState(false);
+    const [verifying, setVerifying] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [resendCooldown, setResendCooldown] = useState(0);
 
@@ -62,11 +64,47 @@ export default function RecoverPage() {
         }
     }, [step]);
 
+    // Auto-verify when all 8 characters are entered
+    useEffect(() => {
+        if (code.length !== CODE_LENGTH || codeVerified || verifying || codeError) return;
+
+        const verify = async () => {
+            setVerifying(true);
+            setError(null);
+            try {
+                const res = await fetch('/api/auth/verify-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ identifier: identifier.trim(), code }),
+                });
+                if (res.ok) {
+                    setCodeVerified(true);
+                } else {
+                    const json = await res.json().catch(() => ({}));
+                    const msg = json?.error || '';
+                    setCodeError(true);
+                    if (msg.toLowerCase().includes('too many failed')) {
+                        setError(isEnglish ? 'Too many failed attempts. Please request a new code.' : '실패 횟수가 초과되었습니다. 새 코드를 요청해주세요.');
+                    } else {
+                        setError(isEnglish ? 'Invalid or expired code.' : '인증 코드가 유효하지 않거나 만료되었습니다.');
+                    }
+                }
+            } catch {
+                setCodeError(true);
+                setError(isEnglish ? 'Failed to verify code.' : '코드 검증에 실패했습니다.');
+            } finally {
+                setVerifying(false);
+            }
+        };
+        verify();
+    }, [code, codeVerified, verifying, codeError, identifier, isEnglish]);
+
     const handleCodeInput = useCallback((index: number, value: string) => {
         const char = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
         if (!char) return;
 
         setCodeError(false);
+        setCodeVerified(false);
         setCodeChars(prev => {
             const next = [...prev];
             next[index] = char[0];
@@ -83,6 +121,7 @@ export default function RecoverPage() {
         const pasted = e.clipboardData.getData('text').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, CODE_LENGTH);
         if (!pasted) return;
         setCodeError(false);
+        setCodeVerified(false);
         const newChars = Array(CODE_LENGTH).fill('');
         for (let i = 0; i < pasted.length; i++) {
             newChars[i] = pasted[i];
@@ -278,8 +317,14 @@ export default function RecoverPage() {
 
                             {/* Code input — 8 individual boxes */}
                             <div>
-                                <span className="mb-1.5 block text-[11px] font-semibold text-gray-600 dark:text-gray-300">
+                                <span className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-gray-600 dark:text-gray-300">
                                     {t('recover_code')}
+                                    {verifying && (
+                                        <span className="text-blue-500 font-normal">{isEnglish ? 'Verifying...' : '확인 중...'}</span>
+                                    )}
+                                    {codeVerified && (
+                                        <span className="text-green-500 flex items-center gap-0.5"><CheckCircle2 className="h-3 w-3" />{isEnglish ? 'Verified' : '확인됨'}</span>
+                                    )}
                                 </span>
                                 <div className="flex gap-1.5 justify-center">
                                     {Array.from({ length: CODE_LENGTH }).map((_, i) => (
@@ -293,10 +338,13 @@ export default function RecoverPage() {
                                             onChange={e => handleCodeInput(i, e.target.value)}
                                             onKeyDown={e => handleCodeKeyDown(i, e)}
                                             onPaste={handleCodePaste}
+                                            disabled={codeVerified}
                                             className={`w-10 h-12 text-center text-lg font-bold uppercase rounded-xl border bg-white dark:bg-gray-800 outline-none transition-colors ${
                                                 codeError
                                                     ? 'border-red-400 dark:border-red-500 text-red-600 dark:text-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-500'
-                                                    : 'border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
+                                                    : codeVerified
+                                                        ? 'border-green-400 dark:border-green-600 text-green-600 dark:text-green-400'
+                                                        : 'border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
                                             }`}
                                         />
                                     ))}
