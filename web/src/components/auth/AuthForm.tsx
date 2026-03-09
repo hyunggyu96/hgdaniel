@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, LockKeyhole, UserRound } from 'lucide-react';
+import { Eye, EyeOff, LockKeyhole, UserRound, Mail, Calendar } from 'lucide-react';
+import Link from 'next/link';
 import { useUser } from '@/components/UserContext';
 import { useLanguage } from '@/components/LanguageContext';
 
@@ -25,6 +26,7 @@ function mapAuthError(message: string | undefined, isEnglish: boolean): string {
     if (!text) return isEnglish ? 'Something went wrong during authentication.' : '인증 처리 중 문제가 발생했습니다.';
     if (text.includes('invalid credentials')) return isEnglish ? 'Invalid username or password.' : '아이디 또는 비밀번호가 올바르지 않습니다.';
     if (text.includes('username already exists')) return isEnglish ? 'This username is already in use.' : '이미 사용 중인 아이디입니다.';
+    if (text.includes('email already exists')) return isEnglish ? 'This email is already in use.' : '이미 사용 중인 이메일입니다.';
     if (text.includes('username and password are required')) return isEnglish ? 'Please enter both username and password.' : '아이디와 비밀번호를 입력해주세요.';
     if (text.includes('password must be at least 8')) return isEnglish ? 'Password must be at least 8 characters.' : '비밀번호는 8자 이상이어야 합니다.';
     if (text.includes('username must be 3-32')) return isEnglish ? 'Username format is invalid.' : '아이디 형식이 올바르지 않습니다.';
@@ -41,15 +43,20 @@ export default function AuthForm({
     className = '',
 }: AuthFormProps) {
     const { login, register } = useUser();
-    const { language } = useLanguage();
+    const { language, t } = useLanguage();
     const isEnglish = language === 'en';
 
     const [mode, setMode] = useState<AuthMode>(initialMode);
     const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [birthYear, setBirthYear] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [agreedAll, setAgreedAll] = useState(false);
+    const [agreedTerms, setAgreedTerms] = useState(false);
+    const [agreedPrivacy, setAgreedPrivacy] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
 
@@ -61,6 +68,11 @@ export default function AuthForm({
         setError(null);
         setPassword('');
         setConfirmPassword('');
+        setEmail('');
+        setBirthYear('');
+        setAgreedAll(false);
+        setAgreedTerms(false);
+        setAgreedPrivacy(false);
         onModeChange?.(mode);
     }, [mode, onModeChange]);
 
@@ -80,8 +92,20 @@ export default function AuthForm({
             return { ok: false, error: isEnglish ? 'Password must be at least 8 characters.' : '비밀번호는 8자 이상이어야 합니다.' };
         }
 
-        if (mode === 'register' && password !== confirmPassword) {
-            return { ok: false, error: isEnglish ? 'Password confirmation does not match.' : '비밀번호 확인이 일치하지 않습니다.' };
+        if (mode === 'register') {
+            if (password !== confirmPassword) {
+                return { ok: false, error: isEnglish ? 'Password confirmation does not match.' : '비밀번호 확인이 일치하지 않습니다.' };
+            }
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                return { ok: false, error: isEnglish ? 'Please enter a valid email address.' : '유효한 이메일 주소를 입력해주세요.' };
+            }
+            const yr = Number(birthYear);
+            if (!yr || yr < 1900 || yr > new Date().getFullYear()) {
+                return { ok: false, error: isEnglish ? 'Please enter a valid birth year.' : '유효한 생년을 입력해주세요.' };
+            }
+            if (!agreedTerms || !agreedPrivacy) {
+                return { ok: false, error: isEnglish ? 'You must agree to all required terms.' : '필수 약관에 모두 동의해주세요.' };
+            }
         }
 
         return { ok: true, normalized };
@@ -99,8 +123,9 @@ export default function AuthForm({
 
         setSubmitting(true);
         try {
-            const authAction = mode === 'login' ? login : register;
-            const result = await authAction(check.normalized, password);
+            const result = mode === 'login'
+                ? await login(check.normalized, password)
+                : await register(check.normalized, password, email, Number(birthYear));
 
             if (!result.ok) {
                 setError(mapAuthError(result.error, isEnglish));
@@ -162,6 +187,53 @@ export default function AuthForm({
                     </div>
                 </label>
 
+                {/* Email (register only) */}
+                <div className="grid transition-[grid-template-rows] duration-300 ease-in-out" style={{ gridTemplateRows: mode === 'register' ? '1fr' : '0fr' }}>
+                    <div className="overflow-hidden">
+                        <label className="block pt-0.5">
+                            <span className="mb-1.5 block text-[11px] font-semibold text-gray-600 dark:text-gray-300">
+                                {t('auth_email')}
+                            </span>
+                            <div className="flex items-center rounded-xl border border-gray-200 bg-white px-3 dark:border-gray-700 dark:bg-gray-900">
+                                <Mail className="mr-2 h-4 w-4 text-gray-400" />
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="name@example.com"
+                                    autoComplete="email"
+                                    tabIndex={mode === 'register' ? 0 : -1}
+                                    className="h-10 w-full bg-transparent text-sm outline-none placeholder:text-gray-400"
+                                />
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                {/* Birth Year (register only) */}
+                <div className="grid transition-[grid-template-rows] duration-300 ease-in-out" style={{ gridTemplateRows: mode === 'register' ? '1fr' : '0fr' }}>
+                    <div className="overflow-hidden">
+                        <label className="block pt-0.5">
+                            <span className="mb-1.5 block text-[11px] font-semibold text-gray-600 dark:text-gray-300">
+                                {t('auth_birth_year')}
+                            </span>
+                            <div className="flex items-center rounded-xl border border-gray-200 bg-white px-3 dark:border-gray-700 dark:bg-gray-900">
+                                <Calendar className="mr-2 h-4 w-4 text-gray-400" />
+                                <input
+                                    type="number"
+                                    value={birthYear}
+                                    onChange={(e) => setBirthYear(e.target.value)}
+                                    placeholder="1990"
+                                    min={1900}
+                                    max={new Date().getFullYear()}
+                                    tabIndex={mode === 'register' ? 0 : -1}
+                                    className="h-10 w-full bg-transparent text-sm outline-none placeholder:text-gray-400"
+                                />
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
                 <label className="block">
                     <span className="mb-1.5 block text-[11px] font-semibold text-gray-600 dark:text-gray-300">
                         {isEnglish ? 'Password' : '비밀번호'}
@@ -215,6 +287,64 @@ export default function AuthForm({
                                 </button>
                             </div>
                         </label>
+                    </div>
+                </div>
+
+                {/* Terms Agreement (register only) */}
+                <div className="grid transition-[grid-template-rows] duration-300 ease-in-out" style={{ gridTemplateRows: mode === 'register' ? '1fr' : '0fr' }}>
+                    <div className="overflow-hidden">
+                        <div className="space-y-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-3 dark:border-gray-700 dark:bg-gray-900/60">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={agreedAll}
+                                    onChange={(e) => {
+                                        const v = e.target.checked;
+                                        setAgreedAll(v);
+                                        setAgreedTerms(v);
+                                        setAgreedPrivacy(v);
+                                    }}
+                                    tabIndex={mode === 'register' ? 0 : -1}
+                                    className="h-4 w-4 rounded border-gray-300 text-blue-600 accent-blue-600"
+                                />
+                                <span className="text-[12px] font-bold text-gray-800 dark:text-gray-200">{t('auth_agree_all')}</span>
+                            </label>
+                            <div className="ml-1 space-y-1.5 border-t border-gray-200 pt-2 dark:border-gray-700">
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={agreedTerms}
+                                        onChange={(e) => {
+                                            setAgreedTerms(e.target.checked);
+                                            if (!e.target.checked) setAgreedAll(false);
+                                            else if (agreedPrivacy) setAgreedAll(true);
+                                        }}
+                                        tabIndex={mode === 'register' ? 0 : -1}
+                                        className="h-3.5 w-3.5 rounded border-gray-300 text-blue-600 accent-blue-600"
+                                    />
+                                    <span className="text-[11px] text-gray-600 dark:text-gray-400">
+                                        {t('auth_agree_terms')} <span className="text-red-500">{t('auth_required')}</span>
+                                    </span>
+                                </label>
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={agreedPrivacy}
+                                        onChange={(e) => {
+                                            setAgreedPrivacy(e.target.checked);
+                                            if (!e.target.checked) setAgreedAll(false);
+                                            else if (agreedTerms) setAgreedAll(true);
+                                        }}
+                                        tabIndex={mode === 'register' ? 0 : -1}
+                                        className="h-3.5 w-3.5 rounded border-gray-300 text-blue-600 accent-blue-600"
+                                    />
+                                    <span className="text-[11px] text-gray-600 dark:text-gray-400">
+                                        <Link href="/privacy" target="_blank" className="underline hover:text-blue-600">{t('auth_agree_privacy')}</Link>{' '}
+                                        <span className="text-red-500">{t('auth_required')}</span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

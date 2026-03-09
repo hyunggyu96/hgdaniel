@@ -14,7 +14,7 @@ interface UserContextType {
     isAdmin: boolean;
     isLoading: boolean;
     login: (username: string, password: string) => Promise<AuthResult>;
-    register: (username: string, password: string) => Promise<AuthResult>;
+    register: (username: string, password: string, email: string, birthYear: number) => Promise<AuthResult>;
     logout: () => Promise<void>;
     refreshUser: () => Promise<void>;
 }
@@ -72,11 +72,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         return { ok: true };
     };
 
-    const register = async (username: string, password: string): Promise<AuthResult> => {
+    const register = async (username: string, password: string, email: string, birthYear: number): Promise<AuthResult> => {
         const res = await fetch('/api/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password }),
+            body: JSON.stringify({ username, password, email, birthYear, agreedPrivacy: true, agreedTerms: true }),
         });
         const json = await res.json().catch(() => ({}));
         if (!res.ok) return { ok: false, error: json?.error || 'Register failed' };

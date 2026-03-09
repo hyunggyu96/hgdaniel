@@ -110,14 +110,14 @@ export default function RootLayout({
                         <div className="space-y-8">
                           <p className="text-[#3182f6]">Policy</p>
                           <ul className="space-y-4 text-muted-foreground">
-                            <li className="hover:text-foreground cursor-pointer transition-colors">Privacy</li>
+                            <li><Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link></li>
                             <li className="hover:text-foreground cursor-pointer transition-colors">Legal</li>
                           </ul>
                         </div>
                       </div>
                     </div>
                     <div className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.5em] pt-12 border-t border-gray-200 dark:border-gray-800">
-                      <span>&copy; 2025 ALL RIGHTS RESERVED.</span>
+                      <span>&copy; 2026 ALL RIGHTS RESERVED.</span>
                     </div>
                   </div>
                 </footer>

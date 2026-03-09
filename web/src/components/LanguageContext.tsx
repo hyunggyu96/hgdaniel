@@ -131,6 +131,15 @@ export const translations = {
         trend_7d: '7일',
         display_classic: '과거 뉴스피드',
 
+        // Auth & Privacy
+        auth_email: '이메일',
+        auth_birth_year: '생년',
+        auth_agree_all: '모든 약관에 동의합니다',
+        auth_agree_terms: '이용약관 동의',
+        auth_agree_privacy: '개인정보처리방침 동의',
+        auth_required: '(필수)',
+        privacy_title: '개인정보 처리방침',
+
         // Editor's Pick
         editors_picks_curated: '큐레이션',
         editors_picks_settings: 'Editor\'s pick 설정',
@@ -259,6 +268,15 @@ export const translations = {
         trend_title: 'Keyword Trends',
         trend_7d: '7D',
         display_classic: 'Classic Feed',
+
+        // Auth & Privacy
+        auth_email: 'Email',
+        auth_birth_year: 'Birth Year',
+        auth_agree_all: 'I agree to all terms',
+        auth_agree_terms: 'Terms of Service',
+        auth_agree_privacy: 'Privacy Policy',
+        auth_required: '(Required)',
+        privacy_title: 'Privacy Policy',
 
         // Editor's Pick
         editors_picks_curated: 'CURATED',
