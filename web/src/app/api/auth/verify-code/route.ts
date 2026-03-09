@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
         const isEmail = identifier.includes('@');
         const { data: account } = await supabaseAdmin
             .from('accounts')
-            .select('email')
+            .select('id, email')
             .eq(isEmail ? 'email' : 'username', identifier)
             .maybeSingle();
 
@@ -70,6 +70,16 @@ export async function POST(request: NextRequest) {
         }
 
         // Code is valid — do NOT delete it (reset-password will delete it)
+        // Update most recent recovery log: code_verified = true
+        const { error: logErr } = await supabaseAdmin
+            .from('recovery_logs')
+            .update({ code_verified: true, updated_at: new Date().toISOString() })
+            .eq('account_id', account.id)
+            .eq('code_verified', false)
+            .order('created_at', { ascending: false })
+            .limit(1);
+        if (logErr) console.error('[auth/verify-code] log error:', logErr);
+
         return NextResponse.json({ valid: true });
     } catch (error) {
         console.error('[auth/verify-code] error:', error);

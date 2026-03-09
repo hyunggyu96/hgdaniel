@@ -103,6 +103,16 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Failed to reset password' }, { status: 500 });
         }
 
+        // Update most recent recovery log: password_reset = true
+        const { error: logErr } = await supabaseAdmin
+            .from('recovery_logs')
+            .update({ password_reset: true, updated_at: new Date().toISOString() })
+            .eq('account_id', account.id)
+            .eq('password_reset', false)
+            .order('created_at', { ascending: false })
+            .limit(1);
+        if (logErr) console.error('[auth/reset-password] log error:', logErr);
+
         return NextResponse.json({ ok: true });
     } catch (error) {
         console.error('[auth/reset-password] error:', error);

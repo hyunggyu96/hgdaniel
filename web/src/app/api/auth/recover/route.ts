@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
         const isEmail = identifier.includes('@');
         const { data: account } = await supabaseAdmin
             .from('accounts')
-            .select('username, email')
+            .select('id, username, email')
             .eq(isEmail ? 'email' : 'username', identifier)
             .maybeSingle();
 
@@ -103,7 +103,8 @@ export async function POST(request: NextRequest) {
             html: `
                 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 440px; margin: 0 auto; padding: 32px;">
                     <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 16px; color: #111;">계정 복구 / Account Recovery</h2>
-                    <p style="font-size: 14px; color: #666; margin-bottom: 8px;">아이디 / Username: <strong style="color: #111;">${account.username}</strong></p>
+                    <p style="font-size: 15px; color: #333; margin-bottom: 16px;"><strong>${account.username}</strong> 님,</p>
+                    <p style="font-size: 13px; color: #666; margin-bottom: 8px;">아이디: <strong style="color: #111;">${account.username}</strong></p>
                     <p style="font-size: 13px; color: #666; margin-bottom: 20px;">아래 인증 코드를 복사하여 입력하세요. 코드는 5분간 유효합니다.<br/>Copy and paste the code below. Valid for 5 minutes.</p>
                     <div style="background: #f5f5f5; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 20px;">
                         <div style="font-size: 36px; font-weight: 900; letter-spacing: 6px; font-family: 'SF Mono', 'Consolas', 'Monaco', monospace; color: #111; user-select: all; -webkit-user-select: all;">${code}</div>
@@ -112,6 +113,17 @@ export async function POST(request: NextRequest) {
                 </div>
             `,
         });
+
+        // Log recovery attempt
+        const { error: logErr } = await supabaseAdmin.from('recovery_logs').insert({
+            account_id: account.id,
+            identifier_used: identifier,
+            ip_address: ip,
+            code_sent: true,
+            code_verified: false,
+            password_reset: false,
+        });
+        if (logErr) console.error('[auth/recover] log error:', logErr);
 
         return NextResponse.json({
             ok: true,
