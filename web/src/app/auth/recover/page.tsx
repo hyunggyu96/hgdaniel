@@ -35,6 +35,7 @@ export default function RecoverPage() {
     const [verifying, setVerifying] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [resendCooldown, setResendCooldown] = useState(0);
+    const [attemptInfo, setAttemptInfo] = useState<string | null>(null);
 
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -71,6 +72,7 @@ export default function RecoverPage() {
         const verify = async () => {
             setVerifying(true);
             setError(null);
+            setAttemptInfo(null);
             try {
                 const res = await fetch('/api/auth/verify-code', {
                     method: 'POST',
@@ -79,14 +81,25 @@ export default function RecoverPage() {
                 });
                 if (res.ok) {
                     setCodeVerified(true);
+                    setAttemptInfo(null);
                 } else {
                     const json = await res.json().catch(() => ({}));
                     const msg = json?.error || '';
+                    const attempts = json?.attempts;
+                    const maxAttempts = json?.maxAttempts;
                     setCodeError(true);
-                    if (msg.toLowerCase().includes('too many failed')) {
+
+                    if (json?.locked) {
+                        setError(isEnglish ? 'Account recovery is temporarily locked. Please try again later.' : '계정 복구가 일시적으로 잠겼습니다. 나중에 다시 시도해주세요.');
+                        setAttemptInfo(null);
+                    } else if (msg.toLowerCase().includes('too many failed')) {
                         setError(isEnglish ? 'Too many failed attempts. Please request a new code.' : '실패 횟수가 초과되었습니다. 새 코드를 요청해주세요.');
+                        setAttemptInfo(null);
                     } else {
                         setError(isEnglish ? 'Invalid or expired code.' : '인증 코드가 유효하지 않거나 만료되었습니다.');
+                        if (typeof attempts === 'number' && typeof maxAttempts === 'number') {
+                            setAttemptInfo(`${attempts}/${maxAttempts}`);
+                        }
                     }
                 }
             } catch {
@@ -105,6 +118,7 @@ export default function RecoverPage() {
 
         setCodeError(false);
         setCodeVerified(false);
+        setAttemptInfo(null);
         setCodeChars(prev => {
             const next = [...prev];
             next[index] = char[0];
@@ -122,6 +136,7 @@ export default function RecoverPage() {
         if (!pasted) return;
         setCodeError(false);
         setCodeVerified(false);
+        setAttemptInfo(null);
         const newChars = Array(CODE_LENGTH).fill('');
         for (let i = 0; i < pasted.length; i++) {
             newChars[i] = pasted[i];
@@ -158,6 +173,7 @@ export default function RecoverPage() {
         }
         setSubmitting(true);
         setError(null);
+        setAttemptInfo(null);
         try {
             const res = await fetch('/api/auth/recover', {
                 method: 'POST',
@@ -187,6 +203,9 @@ export default function RecoverPage() {
     const handleResend = async () => {
         if (resendCooldown > 0 || submitting) return;
         setCodeChars(Array(CODE_LENGTH).fill(''));
+        setCodeError(false);
+        setCodeVerified(false);
+        setAttemptInfo(null);
         setError(null);
         await sendCode();
     };
@@ -194,6 +213,7 @@ export default function RecoverPage() {
     const handleReset = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
+        setAttemptInfo(null);
 
         if (code.length !== CODE_LENGTH) {
             setError(isEnglish ? `Please enter the ${CODE_LENGTH}-character code.` : `${CODE_LENGTH}자리 인증코드를 입력해주세요.`);
@@ -220,12 +240,21 @@ export default function RecoverPage() {
             } else {
                 const json = await res.json().catch(() => ({}));
                 const msg = json?.error || '';
-                if (msg.toLowerCase().includes('too many failed')) {
+                const attempts = json?.attempts;
+                const maxAttempts = json?.maxAttempts;
+
+                if (json?.locked) {
+                    setCodeError(true);
+                    setError(isEnglish ? 'Account recovery is temporarily locked. Please try again later.' : '계정 복구가 일시적으로 잠겼습니다. 나중에 다시 시도해주세요.');
+                } else if (msg.toLowerCase().includes('too many failed')) {
                     setCodeError(true);
                     setError(isEnglish ? 'Too many failed attempts. Please request a new code.' : '실패 횟수가 초과되었습니다. 새 코드를 요청해주세요.');
                 } else if (msg.toLowerCase().includes('verification code')) {
                     setCodeError(true);
                     setError(isEnglish ? 'Invalid or expired code. Please try again.' : '인증 코드가 유효하지 않거나 만료되었습니다.');
+                    if (typeof attempts === 'number' && typeof maxAttempts === 'number') {
+                        setAttemptInfo(`${attempts}/${maxAttempts}`);
+                    }
                 } else if (msg.toLowerCase().includes('password must')) {
                     setError(t('auth_pw_hint'));
                 } else {
@@ -305,7 +334,7 @@ export default function RecoverPage() {
                     {/* Step 2: Code + New Password */}
                     {step === 'code' && (
                         <form onSubmit={handleReset} className="space-y-3">
-                            {/* Masked email notification */}
+                            {/* Masked email + generic notification */}
                             <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-2 dark:border-green-900/40 dark:bg-green-900/20">
                                 {maskedEmail ? (
                                     <span className="block mb-0.5 font-mono text-[11px] text-green-700 dark:text-green-300">{maskedEmail}</span>
@@ -431,6 +460,9 @@ export default function RecoverPage() {
                             {error && (
                                 <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-600 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-300">
                                     {error}
+                                    {attemptInfo && (
+                                        <span className="ml-1.5 font-bold text-red-500 dark:text-red-400">({attemptInfo})</span>
+                                    )}
                                 </p>
                             )}
 

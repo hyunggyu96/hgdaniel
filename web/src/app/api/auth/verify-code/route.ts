@@ -6,7 +6,9 @@ import { rateLimit, getClientIp } from '@/lib/rateLimit';
 
 const RESET_KEY_PREFIX = 'pw-reset:';
 const ATTEMPTS_KEY_PREFIX = 'pw-reset-attempts:';
-const MAX_ATTEMPTS = 5;
+const LOCK_KEY_PREFIX = 'recovery-locked:';
+const MAX_ATTEMPTS = 3;
+const LOCK_TTL = 900; // 15 minutes
 
 function getRedis() {
     const url = process.env.UPSTASH_REDIS_REST_URL?.trim();
@@ -54,31 +56,74 @@ export async function POST(request: NextRequest) {
 
         const redisKey = `${RESET_KEY_PREFIX}${account.email}`;
         const attemptsKey = `${ATTEMPTS_KEY_PREFIX}${account.email}`;
+        const lockKey = `${LOCK_KEY_PREFIX}${account.email}`;
+
+        // Check recovery lock
+        const isLocked = await redis.get(lockKey);
+        if (isLocked) {
+            return NextResponse.json({
+                error: 'Account recovery is temporarily locked. Please try again later.',
+                locked: true,
+            }, { status: 400 });
+        }
 
         const attempts = await redis.get<number>(attemptsKey) || 0;
         if (attempts >= MAX_ATTEMPTS) {
             await redis.del(redisKey);
             await redis.del(attemptsKey);
-            return NextResponse.json({ error: 'Too many failed attempts. Please request a new code.' }, { status: 400 });
+            await redis.set(lockKey, '1', { ex: LOCK_TTL });
+            return NextResponse.json({
+                error: 'Too many failed attempts. Account recovery locked for 15 minutes.',
+                attempts: MAX_ATTEMPTS,
+                maxAttempts: MAX_ATTEMPTS,
+                locked: true,
+            }, { status: 400 });
         }
 
         const storedCode = await redis.get<string>(redisKey);
         if (!storedCode || !safeCompare(storedCode, code)) {
+            const newAttempts = attempts + 1;
             await redis.incr(attemptsKey);
             await redis.expire(attemptsKey, 300);
-            return NextResponse.json({ error: 'Invalid or expired verification code' }, { status: 400 });
+
+            // Lock on final attempt
+            if (newAttempts >= MAX_ATTEMPTS) {
+                await redis.del(redisKey);
+                await redis.del(attemptsKey);
+                await redis.set(lockKey, '1', { ex: LOCK_TTL });
+                return NextResponse.json({
+                    error: 'Too many failed attempts. Account recovery locked for 15 minutes.',
+                    attempts: MAX_ATTEMPTS,
+                    maxAttempts: MAX_ATTEMPTS,
+                    locked: true,
+                }, { status: 400 });
+            }
+
+            return NextResponse.json({
+                error: 'Invalid or expired verification code',
+                attempts: newAttempts,
+                maxAttempts: MAX_ATTEMPTS,
+            }, { status: 400 });
         }
 
         // Code is valid — do NOT delete it (reset-password will delete it)
         // Update most recent recovery log: code_verified = true
-        const { error: logErr } = await supabaseAdmin
+        const { data: logRow } = await supabaseAdmin
             .from('recovery_logs')
-            .update({ code_verified: true, updated_at: new Date().toISOString() })
+            .select('id')
             .eq('account_id', account.id)
             .eq('code_verified', false)
             .order('created_at', { ascending: false })
-            .limit(1);
-        if (logErr) console.error('[auth/verify-code] log error:', logErr);
+            .limit(1)
+            .maybeSingle();
+
+        if (logRow) {
+            const { error: logErr } = await supabaseAdmin
+                .from('recovery_logs')
+                .update({ code_verified: true, updated_at: new Date().toISOString() })
+                .eq('id', logRow.id);
+            if (logErr) console.error('[auth/verify-code] log error:', logErr);
+        }
 
         return NextResponse.json({ valid: true });
     } catch (error) {
