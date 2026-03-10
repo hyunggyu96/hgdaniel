@@ -45,7 +45,7 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})()` }} />
+        <script src="/theme-init.js" />
       </head>
       <body className={`${noto.className} bg-background text-foreground selection:bg-blue-100 selection:text-blue-900 transition-colors duration-300`}>
         <ThemeProvider>

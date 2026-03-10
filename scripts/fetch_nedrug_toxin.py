@@ -2,14 +2,21 @@
 Fetch botulinum toxin drug data from nedrug.mfds.go.kr and upsert to Supabase.
 Source: 식약처 의약품등 정보검색 (nedrug.mfds.go.kr)
 """
+import os
 import requests
 import re
 import json
 import time
 import psycopg2
 from psycopg2.extras import execute_values
+from dotenv import load_dotenv
 
-DB_CONN = "postgresql://postgres.jwkdxygcpfdmavxcbcfe:AISapience111$@aws-1-ap-south-1.pooler.supabase.com:6543/postgres"
+# Load env from project root .env.local
+load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env.local'))
+
+DB_CONN = os.getenv("DATABASE_URL")
+if not DB_CONN:
+    raise RuntimeError("DATABASE_URL not set in .env.local")
 
 # Company name mapping to company_id in companies table
 # clean name (without (주)/(유)) → company_id

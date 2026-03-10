@@ -11,13 +11,9 @@ import sys
 import time
 import json
 import requests
-import urllib3
 from datetime import datetime
 from dotenv import load_dotenv
 from supabase import create_client, Client
-
-# Suppress SSL warnings (data.go.kr uses self-signed certs sometimes)
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Encoding fix for Windows console
 if sys.platform == 'win32':
@@ -113,7 +109,7 @@ def fetch_paginated(base_url: str, params: dict, label: str = "") -> list:
         params["pageNo"] = str(page)
         try:
             time.sleep(REQUEST_INTERVAL)
-            resp = requests.get(base_url, params=params, verify=False, timeout=15)
+            resp = requests.get(base_url, params=params, timeout=15)
             if resp.status_code != 200:
                 print(f"  Error {resp.status_code}: {resp.text[:200]}")
                 break
@@ -178,7 +174,7 @@ def fetch_product_info(product_category: str) -> list:
         }
         try:
             time.sleep(REQUEST_INTERVAL)
-            resp = requests.get(PRODUCT_API_URL, params=params, verify=False, timeout=15)
+            resp = requests.get(PRODUCT_API_URL, params=params, timeout=15)
             if resp.status_code != 200:
                 print(f"  Error {resp.status_code}")
                 break

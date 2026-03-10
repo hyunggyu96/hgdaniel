@@ -1,6 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { rateLimit, getClientIp } from '@/lib/rateLimit';
 
+// ─── CSRF: Origin check for state-changing requests ───
+const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
+
+function isOriginAllowed(request: NextRequest): boolean {
+    const origin = request.headers.get('origin');
+    const host = request.headers.get('host');
+    if (!origin) {
+        // No origin header — fall back to referer
+        const referer = request.headers.get('referer');
+        if (!referer) return true; // Non-browser clients (curl, cron)
+        try {
+            return new URL(referer).host === host;
+        } catch {
+            return false;
+        }
+    }
+    try {
+        return new URL(origin).host === host;
+    } catch {
+        return false;
+    }
+}
+
 // Rate limit configs per route pattern
 const RATE_LIMITS: { pattern: RegExp; maxRequests: number; windowMs: number }[] = [
     // Auth endpoints (already have per-route limits, this is a global safety net)
@@ -35,6 +58,11 @@ export async function middleware(request: NextRequest) {
     // Skip rate limiting for Vercel Cron (authenticated by CRON_SECRET in the handler)
     if (pathname.startsWith('/api/cron/')) {
         return NextResponse.next();
+    }
+
+    // CSRF: block cross-origin state-changing requests
+    if (!SAFE_METHODS.has(request.method) && !isOriginAllowed(request)) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const ip = getClientIp(request.headers);

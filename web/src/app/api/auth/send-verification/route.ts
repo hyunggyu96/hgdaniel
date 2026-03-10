@@ -19,9 +19,10 @@ function getResend() {
 }
 
 function generateCode(): string {
-    const arr = new Uint32Array(1);
-    crypto.getRandomValues(arr);
-    return String(arr[0] % 1_000_000).padStart(6, '0');
+    const charset = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no I/O/0/1 to avoid confusion
+    const bytes = new Uint8Array(8);
+    crypto.getRandomValues(bytes);
+    return Array.from(bytes, b => charset[b % charset.length]).join('');
 }
 
 export async function POST(request: NextRequest) {
@@ -65,7 +66,7 @@ export async function POST(request: NextRequest) {
                 <div style="font-family: -apple-system, sans-serif; max-width: 400px; margin: 0 auto; padding: 32px;">
                     <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">이메일 인증 코드</h2>
                     <p style="font-size: 14px; color: #666; margin-bottom: 24px;">아래 인증 코드를 입력해주세요. 코드는 5분간 유효합니다.</p>
-                    <div style="font-size: 32px; font-weight: 900; letter-spacing: 8px; text-align: center; padding: 20px; background: #f5f5f5; border-radius: 12px; margin-bottom: 24px;">${code}</div>
+                    <div style="font-size: 28px; font-weight: 900; letter-spacing: 6px; text-align: center; padding: 20px; background: #f5f5f5; border-radius: 12px; margin-bottom: 24px; font-family: monospace;">${code}</div>
                     <p style="font-size: 12px; color: #999;">본인이 요청하지 않은 경우 이 이메일을 무시해주세요.</p>
                     <hr style="margin: 24px 0; border: none; border-top: 1px solid #eee;" />
                     <p style="font-size: 12px; color: #999;">Email Verification Code — Enter the code above. Valid for 5 minutes.</p>

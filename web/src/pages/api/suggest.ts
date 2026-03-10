@@ -8,8 +8,12 @@ const SERVICE_ACCOUNT_KEY_B64 = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_B64 || ''
 
 async function getDoc() {
     try {
+        if (!SERVICE_ACCOUNT_KEY_B64) throw new Error('Missing service account key');
         const jsonStr = Buffer.from(SERVICE_ACCOUNT_KEY_B64, 'base64').toString('utf-8');
         const creds = JSON.parse(jsonStr);
+        if (typeof creds.client_email !== 'string' || typeof creds.private_key !== 'string') {
+            throw new Error('Invalid service account format');
+        }
         const serviceAccountAuth = new JWT({
             email: creds.client_email,
             key: creds.private_key,
@@ -19,7 +23,7 @@ async function getDoc() {
         await doc.loadInfo();
         return doc;
     } catch (e) {
-        console.error('Suggest Auth Error:', e);
+        console.error('Suggest Auth Error:', (e as Error).message);
         throw new Error('Auth Failed');
     }
 }

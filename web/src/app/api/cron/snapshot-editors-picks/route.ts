@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { timingSafeEqual } from 'crypto';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
+function verifyCronSecret(authHeader: string | null): boolean {
+    const expected = process.env.CRON_SECRET;
+    if (!expected || !authHeader) return false;
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+    if (!token) return false;
+    const a = Buffer.from(expected, 'utf-8');
+    const b = Buffer.from(token, 'utf-8');
+    if (a.length !== b.length) return false;
+    return timingSafeEqual(a, b);
+}
+
 export async function GET(request: NextRequest) {
-    // Verify Vercel Cron secret
-    const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    if (!verifyCronSecret(request.headers.get('authorization'))) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

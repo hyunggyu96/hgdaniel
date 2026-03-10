@@ -12,9 +12,9 @@ export type Feature =
     | 'collections';
 
 // ─── Prototype Mode ───
-// Default: true (all features unlocked for prototype)
-// Set NEXT_PUBLIC_TIER_BYPASS=false to enable tier-based access control
-export const TIER_BYPASS = process.env.NEXT_PUBLIC_TIER_BYPASS !== 'false';
+// Default: false (tier-based access control enabled)
+// Set NEXT_PUBLIC_TIER_BYPASS=true explicitly to unlock all features
+export const TIER_BYPASS = process.env.NEXT_PUBLIC_TIER_BYPASS === 'true';
 
 // ─── Public Features ───
 // TIER_BYPASS=false일 때, 로그인 없이도 접근 가능한 기능
