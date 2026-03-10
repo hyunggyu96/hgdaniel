@@ -23,6 +23,42 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 const getColor = (category: string) => CATEGORY_COLORS[category] || '#3182f6';
 
+function DailyTooltip({ active, payload, label, isToday, isEnglish }: any) {
+    if (!active || !payload?.length) return null;
+    // solid와 dash 키를 병합하여 카테고리별 최종 값 추출
+    const merged: Record<string, { value: number; color: string }> = {};
+    payload.forEach((p: any) => {
+        const name = p.dataKey?.endsWith('__dash') ? p.dataKey.replace('__dash', '') : p.dataKey;
+        const val = p.value;
+        if (val == null || val === undefined) return;
+        if (!merged[name] || val > 0) {
+            merged[name] = { value: val, color: getColor(name) };
+        }
+    });
+    const items = Object.entries(merged)
+        .filter(([, v]) => v.value > 0)
+        .sort((a, b) => b[1].value - a[1].value);
+    return (
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-2 text-[10px] max-w-[200px]">
+            <div className="text-[10px] font-bold text-gray-500 mb-1">
+                {label}{isToday && <span className="ml-1 text-blue-400">{isEnglish ? '(in progress)' : '(진행중)'}</span>}
+            </div>
+            {items.map(([name, { value, color }]) => (
+                <div key={name} className="flex items-center gap-1.5 py-0.5">
+                    <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: color }} />
+                    <span className="font-semibold text-gray-700 dark:text-gray-200 truncate flex-1">
+                        {name.length > 12 ? name.slice(0, 10) + '..' : name}
+                    </span>
+                    <span className="font-bold text-gray-900 dark:text-gray-100">{value}</span>
+                </div>
+            ))}
+            {items.length === 0 && (
+                <div className="text-gray-400">{isEnglish ? 'No data' : '데이터 없음'}</div>
+            )}
+        </div>
+    );
+}
+
 function HourlyTooltip({ active, payload, label, yesterday, categories, isEnglish }: any) {
     if (!active || !payload?.length) return null;
     const yd = yesterday?.[label];
@@ -92,6 +128,28 @@ export default function TrendChartCompact() {
 
     const xKey = mode === 'daily' ? 'date' : 'time';
 
+    // 일별 모드: 오늘(마지막) 구간을 점선으로 분리
+    const chartData = (mode === 'daily' && data.length >= 2)
+        ? data.map((d, i) => {
+            if (i === data.length - 2) {
+                // 어제: 점선 시작점 복제
+                const extra: Record<string, any> = {};
+                categories.forEach(c => { extra[`${c}__dash`] = d[c]; });
+                return { ...d, ...extra };
+            }
+            if (i === data.length - 1) {
+                // 오늘: 실선 값 제거, 점선 값만 보존
+                const result: Record<string, any> = { [xKey]: d[xKey] };
+                categories.forEach(c => {
+                    result[c] = undefined;
+                    result[`${c}__dash`] = d[c];
+                });
+                return result;
+            }
+            return d;
+        })
+        : data;
+
     if (loading) {
         return (
             <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-3 h-full">
@@ -145,7 +203,7 @@ export default function TrendChartCompact() {
             {/* Chart */}
             <div className="flex-1 min-h-0 px-1 pb-1">
                 <ResponsiveContainer width="100%" height="100%">
-                    <RAreaChart data={data} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                    <RAreaChart data={chartData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                         <defs>
                             {categories.map((c) => (
                                 <linearGradient key={`cg-${c}`} id={`compact-${c}`} x1="0" y1="0" x2="0" y2="1">
@@ -169,17 +227,10 @@ export default function TrendChartCompact() {
                             />
                         ) : (
                             <RTooltip
-                                contentStyle={{
-                                    backgroundColor: '#fff',
-                                    border: '1px solid #e2e8f0',
-                                    borderRadius: '8px',
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-                                    padding: '8px',
-                                    fontSize: '11px',
+                                content={({ active, payload, label }: any) => {
+                                    const todayLabel = chartData.length ? chartData[chartData.length - 1]?.[xKey] : null;
+                                    return <DailyTooltip active={active} payload={payload} label={label} isToday={label === todayLabel} isEnglish={isEnglish} />;
                                 }}
-                                itemStyle={{ fontSize: '10px', fontWeight: 600, padding: '1px 0' }}
-                                labelStyle={{ color: '#64748b', fontSize: '10px', marginBottom: '4px', fontWeight: 700 }}
-                                itemSorter={(item: any) => -item.value}
                             />
                         )}
                         {categories.map((c) => (
@@ -193,6 +244,23 @@ export default function TrendChartCompact() {
                                 fillOpacity={0.1}
                                 dot={false}
                                 animationDuration={800}
+                                connectNulls={false}
+                            />
+                        ))}
+                        {/* 일별 모드: 오늘 구간 점선 */}
+                        {mode === 'daily' && categories.map((c) => (
+                            <Area
+                                key={`${c}__dash`}
+                                type="monotone"
+                                dataKey={`${c}__dash`}
+                                stroke={getColor(c)}
+                                fill="none"
+                                strokeWidth={1.5}
+                                strokeDasharray="4 3"
+                                strokeOpacity={0.6}
+                                dot={false}
+                                animationDuration={800}
+                                legendType="none"
                             />
                         ))}
                     </RAreaChart>
