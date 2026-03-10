@@ -108,23 +108,23 @@ export default function TrendChartCompact() {
                     {t('trend_title')}
                 </span>
                 {/* Toggle: 일별 / 시간별 */}
-                <div className="flex items-center gap-px bg-gray-100 dark:bg-gray-700/60 rounded p-px">
+                <div className="flex items-center p-0.5 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                     <button
                         onClick={() => setMode('daily')}
-                        className={`text-[9px] font-bold leading-none px-1.5 py-[3px] rounded-[3px] transition-all ${
+                        className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 ${
                             mode === 'daily'
-                                ? 'bg-white dark:bg-gray-600 text-[#3182f6] shadow-[0_1px_2px_rgba(0,0,0,0.08)]'
-                                : 'text-gray-400 hover:text-gray-500 dark:hover:text-gray-300'
+                                ? 'bg-blue-500 text-white shadow-sm'
+                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                         }`}
                     >
                         {isEnglish ? '7D' : '일별'}
                     </button>
                     <button
                         onClick={() => setMode('hourly')}
-                        className={`text-[9px] font-bold leading-none px-1.5 py-[3px] rounded-[3px] transition-all ${
+                        className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 ${
                             mode === 'hourly'
-                                ? 'bg-white dark:bg-gray-600 text-[#3182f6] shadow-[0_1px_2px_rgba(0,0,0,0.08)]'
-                                : 'text-gray-400 hover:text-gray-500 dark:hover:text-gray-300'
+                                ? 'bg-blue-500 text-white shadow-sm'
+                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                         }`}
                     >
                         {isEnglish ? '10m' : '시간별'}
