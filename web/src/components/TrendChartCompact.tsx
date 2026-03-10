@@ -155,7 +155,7 @@ export default function TrendChartCompact() {
                             ))}
                             {/* 빗금 패턴 (진행중 표시) */}
                             <pattern id="hatch-today" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-                                <line x1="0" y1="0" x2="0" y2="6" stroke="#94a3b8" strokeWidth="0.8" strokeOpacity="0.18" />
+                                <line x1="0" y1="0" x2="0" y2="6" stroke="#94a3b8" strokeWidth="1" strokeOpacity="0.35" />
                             </pattern>
                         </defs>
                         <XAxis
