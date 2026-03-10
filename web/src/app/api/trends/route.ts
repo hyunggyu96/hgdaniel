@@ -139,16 +139,21 @@ async function handleHourly() {
         }
     });
 
-    // 차트 데이터 구성
-    const trendData = timeSlots.map(slot => ({
-        time: slot,
-        ...todayMap[slot],
-    }));
+    // 누적 합산 (00:00 KST 기준)
+    const cumToday: Record<string, number> = {};
+    const cumYesterday: Record<string, number> = {};
+    allKeywords.forEach(k => { cumToday[k] = 0; cumYesterday[k] = 0; });
 
-    // 어제 데이터 (tooltip 비교용)
+    const trendData: Record<string, string | number>[] = [];
     const yesterday: Record<string, Record<string, number>> = {};
+
     timeSlots.forEach(slot => {
-        yesterday[slot] = yesterdayMap[slot];
+        allKeywords.forEach(k => {
+            cumToday[k] += todayMap[slot][k];
+            cumYesterday[k] += yesterdayMap[slot][k];
+        });
+        trendData.push({ time: slot, ...Object.fromEntries(allKeywords.map(k => [k, cumToday[k]])) });
+        yesterday[slot] = Object.fromEntries(allKeywords.map(k => [k, cumYesterday[k]]));
     });
 
     return NextResponse.json(

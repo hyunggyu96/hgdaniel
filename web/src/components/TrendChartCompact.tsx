@@ -54,7 +54,7 @@ function HourlyTooltip({ active, payload, label, yesterday, categories, isEnglis
                 <div className="text-gray-400">{isEnglish ? 'No data' : '데이터 없음'}</div>
             )}
             <div className="mt-1 pt-1 border-t border-gray-100 dark:border-gray-700 text-[9px] text-gray-400">
-                {isEnglish ? 'vs yesterday' : '어제 대비'}
+                {isEnglish ? 'cumul. vs yesterday' : '어제 동시간 누적 대비'}
             </div>
         </div>
     );
