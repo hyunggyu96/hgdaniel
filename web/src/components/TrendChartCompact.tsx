@@ -1,6 +1,6 @@
 'use client';
 
-import { AreaChart as RAreaChart, Area, XAxis, YAxis, Tooltip as RTooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart as RAreaChart, Area, XAxis, YAxis, Tooltip as RTooltip, ResponsiveContainer, ReferenceArea } from 'recharts';
 import { useEffect, useState, useCallback } from 'react';
 import { useLanguage } from './LanguageContext';
 
@@ -153,6 +153,10 @@ export default function TrendChartCompact() {
                                     <stop offset="95%" stopColor={getColor(c)} stopOpacity={0.02} />
                                 </linearGradient>
                             ))}
+                            {/* 빗금 패턴 (진행중 표시) */}
+                            <pattern id="hatch-today" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                                <line x1="0" y1="0" x2="0" y2="6" stroke="#94a3b8" strokeWidth="0.8" strokeOpacity="0.18" />
+                            </pattern>
                         </defs>
                         <XAxis
                             dataKey={xKey}
@@ -180,6 +184,16 @@ export default function TrendChartCompact() {
                                 itemStyle={{ fontSize: '10px', fontWeight: 600, padding: '1px 0' }}
                                 labelStyle={{ color: '#64748b', fontSize: '10px', marginBottom: '4px', fontWeight: 700 }}
                                 itemSorter={(item: any) => -item.value}
+                            />
+                        )}
+                        {/* 일별: 어제→오늘 구간 빗금 배경 */}
+                        {mode === 'daily' && data.length >= 2 && (
+                            <ReferenceArea
+                                x1={data[data.length - 2]?.[xKey] as string}
+                                x2={data[data.length - 1]?.[xKey] as string}
+                                fill="url(#hatch-today)"
+                                fillOpacity={1}
+                                stroke="none"
                             />
                         )}
                         {categories.map((c) => (
