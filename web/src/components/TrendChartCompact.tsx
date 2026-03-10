@@ -25,31 +25,22 @@ const getColor = (category: string) => CATEGORY_COLORS[category] || '#3182f6';
 
 function DailyTooltip({ active, payload, label, isToday, isEnglish }: any) {
     if (!active || !payload?.length) return null;
-    // solid와 dash 키를 병합하여 카테고리별 최종 값 추출
-    const merged: Record<string, { value: number; color: string }> = {};
-    payload.forEach((p: any) => {
-        const name = p.dataKey?.endsWith('__dash') ? p.dataKey.replace('__dash', '') : p.dataKey;
-        const val = p.value;
-        if (val == null || val === undefined) return;
-        if (!merged[name] || val > 0) {
-            merged[name] = { value: val, color: getColor(name) };
-        }
-    });
-    const items = Object.entries(merged)
-        .filter(([, v]) => v.value > 0)
-        .sort((a, b) => b[1].value - a[1].value);
+    // __solid overlay 키를 제외하고 원본 카테고리만 표시
+    const items = payload
+        .filter((p: any) => !p.dataKey?.endsWith('__solid') && p.value != null && p.value > 0)
+        .sort((a: any, b: any) => b.value - a.value);
     return (
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-2 text-[10px] max-w-[200px]">
             <div className="text-[10px] font-bold text-gray-500 mb-1">
                 {label}{isToday && <span className="ml-1 text-blue-400">{isEnglish ? '(in progress)' : '(진행중)'}</span>}
             </div>
-            {items.map(([name, { value, color }]) => (
-                <div key={name} className="flex items-center gap-1.5 py-0.5">
-                    <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: color }} />
+            {items.map((p: any) => (
+                <div key={p.dataKey} className="flex items-center gap-1.5 py-0.5">
+                    <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: p.color || getColor(p.dataKey) }} />
                     <span className="font-semibold text-gray-700 dark:text-gray-200 truncate flex-1">
-                        {name.length > 12 ? name.slice(0, 10) + '..' : name}
+                        {p.dataKey.length > 12 ? p.dataKey.slice(0, 10) + '..' : p.dataKey}
                     </span>
-                    <span className="font-bold text-gray-900 dark:text-gray-100">{value}</span>
+                    <span className="font-bold text-gray-900 dark:text-gray-100">{p.value}</span>
                 </div>
             ))}
             {items.length === 0 && (
@@ -128,25 +119,15 @@ export default function TrendChartCompact() {
 
     const xKey = mode === 'daily' ? 'date' : 'time';
 
-    // 일별 모드: 오늘(마지막) 구간을 점선으로 분리
+    // 일별: 전체 곡선은 점선(base), 완료 구간은 실선(overlay)으로 덮기
     const chartData = (mode === 'daily' && data.length >= 2)
         ? data.map((d, i) => {
-            if (i === data.length - 2) {
-                // 어제: 점선 시작점 복제
-                const extra: Record<string, any> = {};
-                categories.forEach(c => { extra[`${c}__dash`] = d[c]; });
-                return { ...d, ...extra };
-            }
-            if (i === data.length - 1) {
-                // 오늘: 실선 값 제거, 점선 값만 보존
-                const result: Record<string, any> = { [xKey]: d[xKey] };
-                categories.forEach(c => {
-                    result[c] = undefined;
-                    result[`${c}__dash`] = d[c];
-                });
-                return result;
-            }
-            return d;
+            const extra: Record<string, any> = {};
+            categories.forEach(c => {
+                // __solid: 마지막 포인트(오늘)만 undefined → 실선이 어제에서 끊김
+                extra[`${c}__solid`] = i < data.length - 1 ? d[c] : undefined;
+            });
+            return { ...d, ...extra };
         })
         : data;
 
@@ -233,36 +214,57 @@ export default function TrendChartCompact() {
                                 }}
                             />
                         )}
-                        {categories.map((c) => (
-                            <Area
-                                key={c}
-                                type="monotone"
-                                dataKey={c}
-                                stroke={getColor(c)}
-                                fill={`url(#compact-${c})`}
-                                strokeWidth={1.5}
-                                fillOpacity={0.1}
-                                dot={false}
-                                animationDuration={800}
-                                connectNulls={false}
-                            />
-                        ))}
-                        {/* 일별 모드: 오늘 구간 점선 */}
-                        {mode === 'daily' && categories.map((c) => (
-                            <Area
-                                key={`${c}__dash`}
-                                type="monotone"
-                                dataKey={`${c}__dash`}
-                                stroke={getColor(c)}
-                                fill="none"
-                                strokeWidth={1.5}
-                                strokeDasharray="4 3"
-                                strokeOpacity={0.6}
-                                dot={false}
-                                animationDuration={800}
-                                legendType="none"
-                            />
-                        ))}
+                        {mode === 'daily' && data.length >= 2 ? (
+                            <>
+                                {/* Base: 전체 곡선 점선 + 그라디언트 fill */}
+                                {categories.map((c) => (
+                                    <Area
+                                        key={c}
+                                        type="monotone"
+                                        dataKey={c}
+                                        stroke={getColor(c)}
+                                        fill={`url(#compact-${c})`}
+                                        strokeWidth={1.5}
+                                        strokeDasharray="4 3"
+                                        strokeOpacity={0.5}
+                                        fillOpacity={0.1}
+                                        dot={false}
+                                        animationDuration={800}
+                                    />
+                                ))}
+                                {/* Overlay: 완료 구간 실선 (오늘 제외) — 점선 위에 덮어씌움 */}
+                                {categories.map((c) => (
+                                    <Area
+                                        key={`${c}__solid`}
+                                        type="monotone"
+                                        dataKey={`${c}__solid`}
+                                        stroke={getColor(c)}
+                                        fill="none"
+                                        strokeWidth={1.5}
+                                        dot={false}
+                                        animationDuration={800}
+                                        connectNulls={false}
+                                        legendType="none"
+                                        tooltipType="none"
+                                    />
+                                ))}
+                            </>
+                        ) : (
+                            /* hourly 또는 데이터 부족 시 기존 실선 */
+                            categories.map((c) => (
+                                <Area
+                                    key={c}
+                                    type="monotone"
+                                    dataKey={c}
+                                    stroke={getColor(c)}
+                                    fill={`url(#compact-${c})`}
+                                    strokeWidth={1.5}
+                                    fillOpacity={0.1}
+                                    dot={false}
+                                    animationDuration={800}
+                                />
+                            ))
+                        )}
                     </RAreaChart>
                 </ResponsiveContainer>
             </div>
