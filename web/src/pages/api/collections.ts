@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { getAuthUserFromCookieHeader } from '@/lib/authSession';
-import { hasFeature } from '@/lib/tiers';
+import { hasFeature, getTierConfig } from '@/lib/tiers';
 
 type CollectionType = 'news' | 'paper';
 
@@ -67,6 +67,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             if (!itemKey) {
                 return res.status(400).json({ error: 'Missing item key' });
+            }
+
+            // Check collection limit per tier
+            const tierConfig = getTierConfig(authUser.tier);
+            const limit = tierConfig.collectionsLimit;
+            if (limit !== null) {
+                const { count, error: countErr } = await supabaseAdmin
+                    .from('user_collections')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('user_id', authUser.id);
+
+                if (!countErr && (count ?? 0) >= limit) {
+                    return res.status(403).json({
+                        error: `Collection limit reached (${limit})`,
+                        code: 'COLLECTION_LIMIT',
+                        limit,
+                        current: count,
+                    });
+                }
             }
 
             const title = body.title ? String(body.title) : null;

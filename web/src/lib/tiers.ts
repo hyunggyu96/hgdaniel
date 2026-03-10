@@ -29,13 +29,17 @@ export const TIER_CONFIG = {
         newsDaysLimit: 3,
         insightViewsPerDay: 10,
         askAiQueriesPerDay: 0,
-        features: new Set<Feature>([]),
+        collectionsLimit: 50 as number | null,
+        features: new Set<Feature>([
+            'collections',
+        ]),
     },
     pro: {
         label: 'Pro',
         newsDaysLimit: null as number | null,
         insightViewsPerDay: null as number | null,
         askAiQueriesPerDay: 50,
+        collectionsLimit: 500 as number | null,
         features: new Set<Feature>([
             'news_unlimited',
             'insights_unlimited',
@@ -52,6 +56,7 @@ export const TIER_CONFIG = {
         newsDaysLimit: null as number | null,
         insightViewsPerDay: null as number | null,
         askAiQueriesPerDay: null as number | null,
+        collectionsLimit: null as number | null,
         features: new Set<Feature>([
             'news_unlimited',
             'insights_unlimited',

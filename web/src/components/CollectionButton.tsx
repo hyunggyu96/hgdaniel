@@ -14,7 +14,7 @@ export default function CollectionButton({
     newsTitle: string;
     size?: number;
 }) {
-    const { isInCollection, toggleCollection } = useCollection();
+    const { isInCollection, toggleCollection, limitReached } = useCollection();
     const { userId } = useUser();
     const router = useRouter();
     const pathname = usePathname();
@@ -27,6 +27,7 @@ export default function CollectionButton({
         e.stopPropagation();
 
         if (isLoggedIn) {
+            if (!inCollection && limitReached) return; // prevent adding beyond limit
             toggleCollection(newsLink, newsTitle);
             return;
         }
@@ -40,7 +41,7 @@ export default function CollectionButton({
     return (
         <button
             onClick={handleClick}
-            title={!isLoggedIn ? '로그인 후 북마크를 저장할 수 있습니다.' : ''}
+            title={!isLoggedIn ? '로그인 후 북마크를 저장할 수 있습니다.' : (!inCollection && limitReached) ? '북마크 한도에 도달했습니다.' : ''}
             aria-label={inCollection ? 'Remove from collections' : 'Add to collections'}
             className={`group/star p-1 rounded-lg transition-all ${isLoggedIn ? 'hover:bg-gray-100 dark:hover:bg-gray-700' : 'opacity-70 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
         >

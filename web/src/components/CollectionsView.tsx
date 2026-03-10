@@ -39,7 +39,7 @@ const SORT_LABELS: Record<string, Record<SortMode, string>> = {
 };
 
 export default function CollectionsView({ allNews, today }: CollectionsViewProps) {
-    const { collections, isLoading } = useCollection();
+    const { collections, isLoading, limitReached } = useCollection();
     const { userId } = useUser();
     const { language } = useLanguage();
     const isEnglish = language === 'en';
@@ -222,6 +222,15 @@ export default function CollectionsView({ allNews, today }: CollectionsViewProps
 
     return (
         <div className="space-y-8">
+            {limitReached && (
+                <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 dark:border-amber-900/40 dark:bg-amber-900/20">
+                    <p className="text-xs font-medium text-amber-700 dark:text-amber-300">
+                        {isEnglish
+                            ? 'You have reached the bookmark limit for your plan. Upgrade to save more.'
+                            : '현재 플랜의 북마크 한도에 도달했습니다. 더 저장하려면 업그레이드하세요.'}
+                    </p>
+                </div>
+            )}
             {collectedNewsRaw.length > 0 && (
                 <div className="flex justify-center">
                     <ExportCollectionsButton collectedNews={collectedNewsRaw} />

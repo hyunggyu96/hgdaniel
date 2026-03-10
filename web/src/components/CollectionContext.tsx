@@ -9,6 +9,7 @@ interface CollectionContextType {
     toggleCollection: (link: string, title?: string) => void;
     collectionCount: number;
     isLoading: boolean;
+    limitReached: boolean;
 }
 
 const CollectionContext = createContext<CollectionContextType | undefined>(undefined);
@@ -17,6 +18,7 @@ export function CollectionProvider({ children }: { children: React.ReactNode }) 
     const { userId } = useUser();
     const [collections, setCollections] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [limitReached, setLimitReached] = useState(false);
 
     const loadCollections = useCallback(async () => {
         if (!userId) {
@@ -80,6 +82,7 @@ export function CollectionProvider({ children }: { children: React.ReactNode }) 
         }
 
         // Optimistic add
+        setLimitReached(false);
         setCollections((prev) => prev.includes(link) ? prev : [...prev, link]);
         void fetch('/api/collections', {
             method: 'POST',
@@ -87,8 +90,10 @@ export function CollectionProvider({ children }: { children: React.ReactNode }) 
             body: JSON.stringify({ type: 'news', link, title, url: link }),
         }).then(async (res) => {
             if (!res.ok) {
-                const body = await res.text().catch(() => '');
-                console.error('[Collections] POST failed', res.status, body);
+                const json = await res.json().catch(() => ({}));
+                if (json?.code === 'COLLECTION_LIMIT') {
+                    setLimitReached(true);
+                }
                 setCollections((prev) => prev.filter((l) => l !== link));
             }
         }).catch((err) => {
@@ -103,6 +108,7 @@ export function CollectionProvider({ children }: { children: React.ReactNode }) 
         toggleCollection,
         collectionCount: collections.length,
         isLoading,
+        limitReached,
     };
 
     return (
