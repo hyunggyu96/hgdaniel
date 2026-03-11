@@ -18,6 +18,13 @@ function getRedis() {
 }
 
 export async function POST(request: NextRequest) {
+    if (process.env.NEXT_PUBLIC_REGISTRATION_DISABLED === 'true') {
+        return NextResponse.json(
+            { error: 'Registration is currently disabled' },
+            { status: 403 },
+        );
+    }
+
     try {
         const ip = getClientIp(request.headers);
         const { allowed, retryAfterMs } = await rateLimit(`register:${ip}`, { maxRequests: 5, windowMs: 60_000 });

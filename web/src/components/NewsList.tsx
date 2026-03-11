@@ -8,6 +8,7 @@ import EditorsPicks from './EditorsPicks';
 import { useLanguage } from './LanguageContext';
 import { useTier } from '@/hooks/useTier';
 import { useUser } from './UserContext';
+import { useFeedMode } from './FeedModeContext';
 
 interface NewsListProps {
     selectedCategory?: string | null;
@@ -24,8 +25,8 @@ interface DisplayPrefs {
 }
 
 const DEFAULT_PREFS: DisplayPrefs = {
-    showBadges: false,
-    showKeywords: false,
+    showBadges: true,
+    showKeywords: true,
     viewMode: 'category',
     classicLayout: false,
 };
@@ -35,9 +36,10 @@ export default function NewsList({ selectedCategory, currentPage = 1, searchQuer
     const { t } = useLanguage();
     const { config: tierConfig } = useTier();
     const { userId } = useUser();
+    const { feedMode } = useFeedMode();
 
-    const [showBadges, setShowBadges] = useState(false);
-    const [showKeywords, setShowKeywords] = useState(false);
+    const [showBadges, setShowBadges] = useState(true);
+    const [showKeywords, setShowKeywords] = useState(true);
     const [viewMode, setViewMode] = useState<'category' | 'time'>('category');
     const [classicLayout, setClassicLayout] = useState(false);
     const [prefsLoaded, setPrefsLoaded] = useState(false);
@@ -173,9 +175,12 @@ export default function NewsList({ selectedCategory, currentPage = 1, searchQuer
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
     const isLandingPage = !selectedCategory && !searchQuery && !showCollections;
 
+    // In classic mode, force glass-card layout
+    const effectiveClassicLayout = feedMode === 'classic' ? true : classicLayout;
+
     return (
         <>
-        {isLandingPage && <EditorsPicks allNews={allNews} showBadges={showBadges} showKeywords={showKeywords} />}
+        {feedMode === 'ai' && isLandingPage && <EditorsPicks allNews={allNews} showBadges={showBadges} showKeywords={showKeywords} />}
         <NewsListContainer
             allNews={allNews}
             newsByCategory={newsByCategory}
@@ -193,8 +198,9 @@ export default function NewsList({ selectedCategory, currentPage = 1, searchQuer
             setShowKeywords={handleSetShowKeywords}
             viewMode={viewMode}
             setViewMode={handleSetViewMode}
-            classicLayout={classicLayout}
+            classicLayout={effectiveClassicLayout}
             setClassicLayout={handleSetClassicLayout}
+            feedMode={feedMode}
         />
         </>
     );

@@ -61,8 +61,9 @@ export default function AuthForm({
     const { login, register } = useUser();
     const { language, t } = useLanguage();
     const isEnglish = language === 'en';
+    const registrationDisabled = process.env.NEXT_PUBLIC_REGISTRATION_DISABLED === 'true';
 
-    const [mode, setMode] = useState<AuthMode>(initialMode);
+    const [mode, setMode] = useState<AuthMode>(registrationDisabled ? 'login' : initialMode);
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [birthYear, setBirthYear] = useState('');
@@ -92,8 +93,8 @@ export default function AuthForm({
     const usernameError = hasInvalidChars;
 
     useEffect(() => {
-        setMode(initialMode);
-    }, [initialMode]);
+        setMode(registrationDisabled ? 'login' : initialMode);
+    }, [initialMode, registrationDisabled]);
 
     useEffect(() => {
         setError(null);
@@ -172,7 +173,7 @@ export default function AuthForm({
         && USERNAME_RE.test(usernameNorm)
         && usernameChecked === true
         && email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-        && codeSent && emailCode.length === 6
+        && codeSent && emailCode.length === 8
         && pwValid
         && password === confirmPassword
         && birthYear
@@ -260,32 +261,40 @@ export default function AuthForm({
 
     return (
         <div className={`space-y-4 ${className}`}>
-            <div className="relative inline-flex w-full rounded-xl bg-gray-100 p-1 dark:bg-gray-800">
-                <motion.div
-                    className="absolute top-1 bottom-1 rounded-lg bg-white shadow-sm dark:bg-gray-900"
-                    style={{ width: 'calc(50% - 4px)' }}
-                    animate={{ x: mode === 'login' ? 0 : '100%' }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                />
-                <button
-                    type="button"
-                    onClick={() => setMode('login')}
-                    className={`relative z-10 flex-1 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
-                        mode === 'login' ? 'text-blue-600' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-                    }`}
-                >
-                    {isEnglish ? 'Login' : '로그인'}
-                </button>
-                <button
-                    type="button"
-                    onClick={() => setMode('register')}
-                    className={`relative z-10 flex-1 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
-                        mode === 'register' ? 'text-blue-600' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-                    }`}
-                >
-                    {isEnglish ? 'Register' : '회원가입'}
-                </button>
-            </div>
+            {registrationDisabled ? (
+                <div className="w-full rounded-xl bg-gray-100 p-2 dark:bg-gray-800 text-center">
+                    <span className="text-xs font-semibold text-blue-600">
+                        {isEnglish ? 'Login' : '로그인'}
+                    </span>
+                </div>
+            ) : (
+                <div className="relative inline-flex w-full rounded-xl bg-gray-100 p-1 dark:bg-gray-800">
+                    <motion.div
+                        className="absolute top-1 bottom-1 rounded-lg bg-white shadow-sm dark:bg-gray-900"
+                        style={{ width: 'calc(50% - 4px)' }}
+                        animate={{ x: mode === 'login' ? 0 : '100%' }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                    />
+                    <button
+                        type="button"
+                        onClick={() => setMode('login')}
+                        className={`relative z-10 flex-1 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
+                            mode === 'login' ? 'text-blue-600' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                        }`}
+                    >
+                        {isEnglish ? 'Login' : '로그인'}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setMode('register')}
+                        className={`relative z-10 flex-1 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
+                            mode === 'register' ? 'text-blue-600' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                        }`}
+                    >
+                        {isEnglish ? 'Register' : '회원가입'}
+                    </button>
+                </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-3">
                 {/* Username */}
@@ -383,11 +392,11 @@ export default function AuthForm({
                                     <CheckCircle2 className="mr-2 h-4 w-4 text-gray-400" />
                                     <input
                                         type="text"
-                                        inputMode="numeric"
-                                        maxLength={6}
+                                        inputMode="text"
+                                        maxLength={8}
                                         value={emailCode}
                                         onChange={(e) => {
-                                            const v = e.target.value.replace(/\D/g, '').slice(0, 6);
+                                            const v = e.target.value.replace(/[^A-Za-z0-9]/g, '').slice(0, 8).toUpperCase();
                                             setEmailCode(v);
                                         }}
                                         placeholder={t('auth_code_placeholder')}

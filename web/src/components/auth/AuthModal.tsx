@@ -22,6 +22,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
     const searchParams = useSearchParams();
     const { language } = useLanguage();
     const isEnglish = language === 'en';
+    const registrationDisabled = process.env.NEXT_PUBLIC_REGISTRATION_DISABLED === 'true';
 
     useEffect(() => {
         setMounted(true);
@@ -92,7 +93,9 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }: Au
                                 </div>
                                 <div>
                                     <h3 className="text-base font-bold text-foreground leading-none">
-                                        {isEnglish ? 'Login / Register' : '로그인/회원가입'}
+                                        {registrationDisabled
+                                            ? (isEnglish ? 'Login' : '로그인')
+                                            : (isEnglish ? 'Login / Register' : '로그인/회원가입')}
                                     </h3>
                                     <p className="text-[11px] text-muted-foreground mt-1 leading-none">
                                         {isEnglish

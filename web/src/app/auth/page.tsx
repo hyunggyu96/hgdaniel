@@ -26,8 +26,12 @@ export default function AuthPage() {
     const { language } = useLanguage();
     const isEnglish = language === 'en';
 
+    const registrationDisabled = process.env.NEXT_PUBLIC_REGISTRATION_DISABLED === 'true';
     const nextPath = useMemo(() => sanitizeNextPath(searchParams?.get('next') || null), [searchParams]);
-    const mode = useMemo(() => resolveMode(searchParams?.get('mode') || null), [searchParams]);
+    const mode = useMemo(() => {
+        if (registrationDisabled) return 'login' as AuthMode;
+        return resolveMode(searchParams?.get('mode') || null);
+    }, [searchParams, registrationDisabled]);
 
     if (userId) {
         return (

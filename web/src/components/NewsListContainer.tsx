@@ -35,6 +35,7 @@ interface Props {
     setViewMode: (mode: 'category' | 'time') => void;
     classicLayout: boolean;
     setClassicLayout: (fn: (prev: boolean) => boolean) => void;
+    feedMode?: 'classic' | 'ai';
 }
 
 // Shared yesterday string (computed once per render cycle)
@@ -285,6 +286,7 @@ export default function NewsListContainer({
     selectedCategory, searchQuery, showCollections, today, isLandingPage, CATEGORIES_CONFIG, newsDaysLimit,
     showBadges, setShowBadges, showKeywords, setShowKeywords,
     viewMode, setViewMode, classicLayout, setClassicLayout,
+    feedMode = 'ai',
 }: Props) {
     const { t } = useLanguage();
     const PAGE_SIZE = 20;
@@ -354,15 +356,17 @@ export default function NewsListContainer({
                         >
                             Keywords
                         </button>
-                        <button
-                            onClick={() => setClassicLayout(prev => !prev)}
-                            className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 border ${classicLayout
-                                ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800'
-                                : 'bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-700 hover:text-gray-600 dark:hover:text-gray-300'
-                            }`}
-                        >
-                            {t('display_classic')}
-                        </button>
+                        {feedMode === 'ai' && (
+                            <button
+                                onClick={() => setClassicLayout(prev => !prev)}
+                                className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 border ${classicLayout
+                                    ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800'
+                                    : 'bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-700 hover:text-gray-600 dark:hover:text-gray-300'
+                                }`}
+                            >
+                                {t('display_classic')}
+                            </button>
+                        )}
 
                         <div className="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-0.5" />
 

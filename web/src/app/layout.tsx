@@ -16,6 +16,8 @@ import { ThemeProvider } from '@/components/ThemeContext';
 import ThemeToggle from '@/components/ThemeToggle';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { Toaster } from 'sonner';
+import { FeedModeProvider } from '@/components/FeedModeContext';
+import FeedModeToggleWrapper from '@/components/FeedModeToggleWrapper';
 
 const noto = Noto_Sans_KR({
   subsets: ["latin"],
@@ -51,6 +53,7 @@ export default function RootLayout({
         <ThemeProvider>
           <LanguageProvider>
             <UserProvider>
+              <FeedModeProvider>
               <CollectionProvider>
                 {/* Header / Brand (GNB) */}
                 {/* Header / Brand (GNB) */}
@@ -71,6 +74,9 @@ export default function RootLayout({
 
                     {/* Right: Actions */}
                     <div className="flex items-center gap-2 shrink-0">
+                      <Suspense fallback={null}>
+                        <FeedModeToggleWrapper />
+                      </Suspense>
                       <ThemeToggle />
                       <LanguageSwitcher />
                       <HeaderStatus />
@@ -122,6 +128,7 @@ export default function RootLayout({
                   </div>
                 </footer>
               </CollectionProvider>
+              </FeedModeProvider>
             </UserProvider>
           </LanguageProvider>
         </ThemeProvider>

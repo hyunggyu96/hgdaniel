@@ -143,7 +143,7 @@ export const translations = {
         auth_username_taken: '이미 사용 중인 아이디입니다.',
         auth_send_code: '인증',
         auth_code_sent: '인증 코드가 전송되었습니다.',
-        auth_code_placeholder: '인증 코드 6자리',
+        auth_code_placeholder: '인증 코드 8자리',
         auth_email_verified: '인증 완료',
         auth_pw_hint: '8자 이상, 영문 대소문자 및 특수문자 포함.',
         auth_username_hint: '* 아이디는 영문 소문자로 저장됩니다.',
@@ -164,6 +164,11 @@ export const translations = {
         recover_go_login: '로그인하기',
         recover_forgot: '아이디 또는 비밀번호를 잊으셨나요?',
         recover_mismatch: '비밀번호가 일치하지 않습니다',
+
+        // Feed Mode
+        feed_mode_classic: '클래식 피드',
+        feed_mode_ai: 'AI 뉴스피드',
+        registration_disabled_notice: '현재 회원가입이 불가능합니다.',
 
         // Editor's Pick
         editors_picks_curated: '큐레이션',
@@ -306,7 +311,7 @@ export const translations = {
         auth_username_taken: 'Username is already taken.',
         auth_send_code: 'Verify',
         auth_code_sent: 'Verification code sent.',
-        auth_code_placeholder: '6-digit code',
+        auth_code_placeholder: '8-character code',
         auth_email_verified: 'Verified',
         auth_pw_hint: '8+ chars, upper/lowercase & special char.',
         auth_username_hint: '* Username is saved in lowercase.',
@@ -327,6 +332,11 @@ export const translations = {
         recover_go_login: 'Go to Login',
         recover_forgot: 'Forgot your username or password?',
         recover_mismatch: 'Passwords do not match',
+
+        // Feed Mode
+        feed_mode_classic: 'Classic Feed',
+        feed_mode_ai: 'AI Newsfeed',
+        registration_disabled_notice: 'Registration is currently unavailable.',
 
         // Editor's Pick
         editors_picks_curated: 'CURATED',
