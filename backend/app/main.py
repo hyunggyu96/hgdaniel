@@ -10,21 +10,20 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_STR}/openapi.json"
 )
 
-# CORS Configuration
+# CORS Configuration - explicit allowlist only
 origins = [
     "http://localhost:3000",
     "https://coauths.com",
     "https://www.coauths.com",
-    # Add your Vercel deployment domains here
-    "*" # Temporarily allow all for development/migration
+    "https://aesthetics-intelligence.vercel.app",
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 app.include_router(api_router, prefix=settings.API_V1_STR)

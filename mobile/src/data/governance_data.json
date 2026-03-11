@@ -1,0 +1,326 @@
+{
+  "한스바이오메드": {
+    "largest_shareholder": "황호찬 외 3인 (23.12%)",
+    "ceo": "김근영",
+    "parent_group": "",
+    "governance_type": "오너경영 (창업주 사내이사)",
+    "subsidiaries": "HansBiomed USA, Europe, Ireland, Thailand, Shanghai, Vietnam, Colombia, Mexico, 한스케어, 한스씨엠, 한스파마, 민트메디컬, REBIRTH(QINGDAO)",
+    "source": "DART 전자공시",
+    "source_date": "2025"
+  },
+  "엘앤씨바이오": {
+    "largest_shareholder": "이환철 (27.88%)",
+    "ceo": "이환철, 이재호 (각자대표)",
+    "parent_group": "",
+    "governance_type": "오너경영",
+    "subsidiaries": "L&C Bioscience Technology (중국), 엘앤씨이에스, 엘앤씨메디케어, 엘앤씨에이아이, 엘앤씨퓨처랩, 글로벌의학연구센터",
+    "source": "DART 전자공시",
+    "source_date": "2025"
+  },
+  "제테마": {
+    "largest_shareholder": "김재영 외 특수관계인 (29.92%)",
+    "ceo": "김재영, 남정선 (각자대표)",
+    "parent_group": "",
+    "governance_type": "오너경영",
+    "subsidiaries": "Jetema USA Inc., Jetema Shanghai, 볼로닉, 제이메타, 그로젠바이오 (구 페로카), PRONEX Thailand",
+    "source": "DART 전자공시",
+    "source_date": "2025"
+  },
+  "한국비엔씨": {
+    "largest_shareholder": "최완규 외 7인 (19.61%)",
+    "ceo": "최완규",
+    "parent_group": "",
+    "governance_type": "오너경영",
+    "subsidiaries": "한국비티비 (구 지티지웰니스), BNC KOREA USA Inc., 켐바이오진",
+    "source": "DART 전자공시 / FnGuide",
+    "source_date": "2025"
+  },
+  "종근당바이오": {
+    "largest_shareholder": "종근당홀딩스",
+    "ceo": "박완갑",
+    "parent_group": "종근당그룹",
+    "governance_type": "대기업 계열",
+    "subsidiaries": "PacificBlue Health Pty Ltd (호주, 건강기능식품)",
+    "source": "DART 전자공시",
+    "source_date": "2025"
+  },
+  "휴온스": {
+    "largest_shareholder": "휴온스글로벌 (40.74%)",
+    "ceo": "송수영",
+    "parent_group": "휴온스그룹",
+    "governance_type": "그룹 계열 (자회사)",
+    "subsidiaries": "휴메딕스, 휴온스바이오파마, 휴온스메디텍, 휴엠앤씨, 휴온스엔, 팬젠, 휴온스생명과학, 휴온스랩, HuM&C Vina (베트남), Huons USA, Huons Japan",
+    "source": "DART 전자공시",
+    "source_date": "2025"
+  },
+  "휴온스글로벌": {
+    "largest_shareholder": "윤성태 (42.84%)",
+    "ceo": "송수영",
+    "parent_group": "휴온스그룹 (지주회사)",
+    "governance_type": "오너경영",
+    "subsidiaries": "휴온스, 휴메딕스, 휴온스바이오파마, 휴온스메디텍, 휴엠앤씨, 휴온스엔, 팬젠, 휴온스생명과학, 푸드어셈블, 휴온스랩, Huons USA, Huons Japan",
+    "source": "DART 전자공시",
+    "source_date": "2025"
+  },
+  "휴메딕스": {
+    "largest_shareholder": "휴온스글로벌",
+    "ceo": "강민종",
+    "parent_group": "휴온스그룹",
+    "governance_type": "그룹 계열 (자회사)",
+    "subsidiaries": "휴온스메디컬 (의료기기 제조)",
+    "source": "DART 전자공시",
+    "source_date": "2025"
+  },
+  "휴젤": {
+    "largest_shareholder": "아프로디테 애퀴지션 홀딩스 (27.91%)",
+    "ceo": "문형진, 박철민 (각자대표)",
+    "parent_group": "컨소시엄 (GS·CBC·무바달라·IMM)",
+    "governance_type": "컨소시엄 경영",
+    "subsidiaries": "아크로스 (HA필러), 제이월드, Hugel America, Hugel Australia, Hugel Thailand, Hugel Taiwan, Hugel Canada, Hugel Hong Kong, Hugel Shanghai, Hugel Singapore",
+    "source": "DART 전자공시",
+    "source_date": "2025"
+  },
+  "메디톡스": {
+    "largest_shareholder": "정현호 (17.19%)",
+    "ceo": "정현호",
+    "parent_group": "",
+    "governance_type": "오너경영 (창업주)",
+    "subsidiaries": "뉴메코 (보툴리눔톡신), 메디톡스벤처투자, 리비옴, 벙커엠, 하이웨이원, Luvantas Inc, MDT International, Medytox Thailand",
+    "source": "DART 전자공시",
+    "source_date": "2025.11"
+  },
+  "대웅제약": {
+    "largest_shareholder": "(주)대웅",
+    "ceo": "이창재, 박성수 (각자대표)",
+    "parent_group": "대웅그룹",
+    "governance_type": "오너경영",
+    "subsidiaries": "한올바이오파마, 아이엔테라퓨틱스, 힐리언스, 아피셀테라퓨틱스, Daewoong America, Daewoong Japan, Daewoong HK, PT Selatox Bio Pharma (인도네시아)",
+    "source": "DART 전자공시",
+    "source_date": "2025"
+  },
+  "파마리서치": {
+    "largest_shareholder": "파마리서치홀딩스",
+    "ceo": "손지훈",
+    "parent_group": "파마리서치홀딩스 (2025 인적분할, 지주회사)",
+    "governance_type": "오너경영 (지주회사 체제)",
+    "subsidiaries": "파마리서치바이오 (제약), 파마리서치헬스케어, 파마리서치H&B, Pharmaresearch USA, Pharmaresearch Singapore, 수인투자, 플루토, 메디코썬, 튜링바이오, Dr.J Skinclinic, 알파오메가메디칼",
+    "source": "DART 전자공시",
+    "source_date": "2025"
+  },
+  "클래시스": {
+    "largest_shareholder": "베인캐피탈 (54.16%)",
+    "ceo": "백승한",
+    "parent_group": "Bain Capital (PE)",
+    "governance_type": "PE 경영",
+    "subsidiaries": "엔슨 (의료기기), Classys Japan, Skederm Inc (미국, 화장품), Skederm Shanghai",
+    "source": "DART 전자공시 / The Bell",
+    "source_date": "2025"
+  },
+  "케어젠": {
+    "largest_shareholder": "정용지 외 특수관계인 (64.43%)",
+    "ceo": "정용지",
+    "parent_group": "",
+    "governance_type": "오너경영 (창업주)",
+    "subsidiaries": "Caregen Biopharma Inc. (미국, 의약품), 절강케이카이젠 (중국)",
+    "source": "DART 전자공시",
+    "source_date": "2024.12"
+  },
+  "원텍": {
+    "largest_shareholder": "김종원 (31.73%)",
+    "ceo": "김종원, 김정현 (각자대표)",
+    "parent_group": "",
+    "governance_type": "오너경영 (부자 공동경영)",
+    "subsidiaries": "Wontech Asia (태국), Beijing Wontech (중국), Wontech Japan, Wontech Inc (미국), WonTechnology LLC",
+    "source": "DART 전자공시",
+    "source_date": "2025"
+  },
+  "동방메디컬": {
+    "largest_shareholder": "김근식 외 (49.02%)",
+    "ceo": "김근식",
+    "parent_group": "",
+    "governance_type": "오너경영",
+    "subsidiaries": "메디퍼스트, 필텍, 소주동방의료기계, 청도동방의료용구, PT Dongbang Medical Indonesia, PT Dongbang Medical Global, BENEV DBM Corp, 동방미객(북경)",
+    "source": "DART 전자공시",
+    "source_date": "2025"
+  },
+  "제이시스메디칼": {
+    "largest_shareholder": "Archimed Group (프랑스 PE)",
+    "ceo": "빈센 기요못",
+    "parent_group": "Archimed Group",
+    "governance_type": "PE 경영 (상장폐지)",
+    "subsidiaries": "",
+    "source": "DART 전자공시 / 서울경제",
+    "source_date": "2024.10"
+  },
+  "바이오비쥬": {
+    "largest_shareholder": "청담글로벌",
+    "ceo": "양준호",
+    "parent_group": "청담글로벌",
+    "governance_type": "모회사 계열",
+    "subsidiaries": "",
+    "source": "DART 전자공시",
+    "source_date": "2025"
+  },
+  "바이오플러스": {
+    "largest_shareholder": "정현규 외 특수관계인 (29.12%)",
+    "ceo": "정현규",
+    "parent_group": "",
+    "governance_type": "오너경영",
+    "subsidiaries": "BioPlus Japan, BioPlus USA Inc., BioPlus(Hainan), DEW BioPlus Middle East, BioPlusDew (인도), 바이오플러스인터내셔널, 유비프로틴, 인피니타, 제이원글로벌, 랩에이치",
+    "source": "DART 전자공시",
+    "source_date": "2025"
+  },
+  "비올": {
+    "largest_shareholder": "비엔나투자목적회사 / VIG파트너스 (48.77%)",
+    "ceo": "이은천",
+    "parent_group": "VIG파트너스 (PE)",
+    "governance_type": "PE 경영 (상장폐지 추진)",
+    "subsidiaries": "레본슨 (카메라 영상기기)",
+    "source": "DART 전자공시 / 코스인코리아",
+    "source_date": "2025"
+  },
+  "하이로닉": {
+    "largest_shareholder": "이진우 (26.35%)",
+    "ceo": "이진우",
+    "parent_group": "",
+    "governance_type": "오너경영",
+    "subsidiaries": "하이로닉코리아, 아띠베뷰티 (미용기기)",
+    "source": "DART 전자공시",
+    "source_date": "2025"
+  },
+  "레이저옵텍": {
+    "largest_shareholder": "주홍",
+    "ceo": "주홍, 이창진 (각자대표)",
+    "parent_group": "",
+    "governance_type": "오너경영",
+    "subsidiaries": "Laseroptek America Corp (미국, 2024 설립)",
+    "source": "DART 전자공시",
+    "source_date": "2025"
+  },
+  "유바이오로직스": {
+    "largest_shareholder": "바이오노트 외 (~20%)",
+    "ceo": "백영옥",
+    "parent_group": "",
+    "governance_type": "전문경영인 체제",
+    "subsidiaries": "피움바이오 (기능성 화장품 R&D)",
+    "source": "DART 전자공시",
+    "source_date": "2025"
+  },
+  "바임글로벌": {
+    "largest_shareholder": "",
+    "ceo": "",
+    "parent_group": "",
+    "governance_type": "",
+    "subsidiaries": "",
+    "source": "",
+    "source_date": ""
+  },
+  "엑소코바이오": {
+    "largest_shareholder": "",
+    "ceo": "",
+    "parent_group": "",
+    "governance_type": "",
+    "subsidiaries": "",
+    "source": "",
+    "source_date": ""
+  },
+  "알에프바이오": {
+    "largest_shareholder": "",
+    "ceo": "",
+    "parent_group": "",
+    "governance_type": "",
+    "subsidiaries": "",
+    "source": "",
+    "source_date": ""
+  },
+  "차메디텍": {
+    "largest_shareholder": "",
+    "ceo": "",
+    "parent_group": "차병원그룹",
+    "governance_type": "그룹 계열",
+    "subsidiaries": "",
+    "source": "기업 IR",
+    "source_date": ""
+  },
+  "JW중외제약": {
+    "largest_shareholder": "JW홀딩스",
+    "ceo": "신영섭, 함은경 (각자대표)",
+    "parent_group": "JW그룹",
+    "governance_type": "오너경영",
+    "subsidiaries": "JW생명과학, JW생활건강, JW메디칼",
+    "source": "DART 전자공시 / 아시아투데이",
+    "source_date": "2025.12"
+  },
+  "동국제약": {
+    "largest_shareholder": "권기범 (회장)",
+    "ceo": "송준호",
+    "parent_group": "동국그룹",
+    "governance_type": "오너경영 (전문경영인 대표)",
+    "subsidiaries": "동국생명과학 (조영제/의료기기), 리봄화장품 (화장품 ODM), 위드닉스 (미용기기/가전)",
+    "source": "DART 전자공시",
+    "source_date": "2025"
+  },
+  "리젠바이오텍": {
+    "largest_shareholder": "",
+    "ceo": "",
+    "parent_group": "",
+    "governance_type": "",
+    "subsidiaries": "",
+    "source": "",
+    "source_date": ""
+  },
+  "울트라브이": {
+    "largest_shareholder": "",
+    "ceo": "",
+    "parent_group": "",
+    "governance_type": "",
+    "subsidiaries": "",
+    "source": "",
+    "source_date": ""
+  },
+  "제노스": {
+    "largest_shareholder": "",
+    "ceo": "",
+    "parent_group": "",
+    "governance_type": "",
+    "subsidiaries": "",
+    "source": "",
+    "source_date": ""
+  },
+  "멀츠": {
+    "largest_shareholder": "Merz 가문 (100%)",
+    "ceo": "",
+    "parent_group": "Merz Group (독일)",
+    "governance_type": "외국계 (가족경영, 비상장)",
+    "subsidiaries": "Merz Aesthetics, Merz Therapeutics, Merz Pharmaceuticals",
+    "source": "Merz Group 공식 홈페이지",
+    "source_date": ""
+  },
+  "앨러간": {
+    "largest_shareholder": "AbbVie Inc. (100%)",
+    "ceo": "",
+    "parent_group": "AbbVie Inc.",
+    "governance_type": "외국계 (모회사 완전자회사)",
+    "subsidiaries": "Allergan Aesthetics (AbbVie 사업부)",
+    "source": "AbbVie Annual Report",
+    "source_date": ""
+  },
+  "갈더마": {
+    "largest_shareholder": "EQT Fund Management (28%)",
+    "ceo": "Flemming Ornskov",
+    "parent_group": "",
+    "governance_type": "외국계 (SIX Swiss Exchange 상장)",
+    "subsidiaries": "",
+    "source": "Galderma Investor Relations / Yahoo Finance",
+    "source_date": "2025.6"
+  },
+  "테옥산": {
+    "largest_shareholder": "",
+    "ceo": "",
+    "parent_group": "",
+    "governance_type": "외국계 (스위스, 비상장)",
+    "subsidiaries": "",
+    "source": "Teoxane 공식 홈페이지",
+    "source_date": ""
+  }
+}

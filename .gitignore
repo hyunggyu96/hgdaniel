@@ -2,9 +2,16 @@
 .env
 .env.local
 .env.*
+!.env.example
 web/.env
 web/.env.local
 web/.env.*
+backend/.env
+backend/.env.*
+!backend/.env.example
+collector/.env
+collector/.env.*
+!collector/.env.example
 
 # Python
 __pycache__/
@@ -19,6 +26,7 @@ news_data.db
 *.csv
 *.xlsx
 *.log
+web/src/data/mfds_competitors.json
 
 # Google Credentials
 service_account.json
@@ -52,3 +60,7 @@ screenshots/
 
 # Scripts
 *.ps1
+
+# DART API cache
+dart_cache/
+company_financials.json

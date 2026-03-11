@@ -12,3 +12,9 @@
 1.  **PRIMARY REMOTE**: Always use `hyunggyu96/hgdaniel` (upstream) for both PULL and PUSH operations on the `prototype` branch.
 2.  **BACKUP ONLY**: `jonathancoauths/coauths` (origin) is a backup repository. **NEVER** push to it unless explicitly requested by the user.
 3.  **FORGET ORIGIN**: Treat `upstream` as the only source of truth for daily work.
+
+## 3. Security Review on Code Changes
+1.  **Every code update** must include a security vulnerability analysis.
+2.  Report identified vulnerabilities with severity level (Critical / High / Medium / Low).
+3.  Provide actionable fix recommendations alongside each finding.
+4.  Check for OWASP Top 10 issues: injection, auth flaws, XSS, CSRF, insecure dependencies, etc.

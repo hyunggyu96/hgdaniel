@@ -1,4 +1,5 @@
 from typing import Generator
+from fastapi import Depends
 from supabase import create_client, Client
 from app.core.config import settings
 from app.services.dart_client import DartAPI

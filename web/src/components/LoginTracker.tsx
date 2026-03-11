@@ -17,7 +17,7 @@ export default function LoginTracker() {
                         await fetch('/api/log-login', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ userId, title: title.trim(), link: url })
+                            body: JSON.stringify({ title: title.trim(), link: url })
                         });
                     } catch (err) {
                         console.error('Failed to log login click', err);

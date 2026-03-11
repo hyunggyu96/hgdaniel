@@ -1,0 +1,195 @@
+import { NextResponse } from 'next/server';
+import Groq from 'groq-sdk';
+import { searchSimilarChunks, getSourcesForSession, getChunksForSession } from '@/lib/embedding';
+import { getAuthUserFromCookieHeader } from '@/lib/authSession';
+import { requireFeature } from '@/lib/tierGuard';
+import { getTierConfig } from '@/lib/tiers';
+import { getDailyUsageCount, recordUsage } from '@/lib/usage';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
+
+export async function POST(request: Request) {
+    try {
+        // Auth + tier check
+        const user = await getAuthUserFromCookieHeader(request.headers.get('cookie'));
+        if (!user) {
+            return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+        }
+        const featureCheck = requireFeature(user, 'ask_ai');
+        if (featureCheck) return featureCheck;
+
+        // Daily limit check — record usage BEFORE expensive operation to prevent race condition
+        const config = getTierConfig(user.tier);
+        if (config.askAiQueriesPerDay !== null) {
+            const used = await getDailyUsageCount(user.id, 'ask_ai_query');
+            if (used >= config.askAiQueriesPerDay) {
+                return NextResponse.json(
+                    { error: 'Daily query limit reached', code: 'LIMIT_REACHED', limit: config.askAiQueriesPerDay },
+                    { status: 429 }
+                );
+            }
+            await recordUsage(user.id, 'ask_ai_query');
+        }
+
+        const { session_id, message, history } = await request.json();
+
+        if (!session_id) {
+            return NextResponse.json({ error: 'session_id required' }, { status: 400 });
+        }
+        if (!message) {
+            return NextResponse.json({ error: 'message required' }, { status: 400 });
+        }
+
+        // Verify user owns this session
+        const { data: sessionOwner, error: sessionError } = await supabaseAdmin
+            .from('ask_ai_sessions')
+            .select('user_id')
+            .eq('id', session_id)
+            .single();
+
+        if (sessionError || !sessionOwner || sessionOwner.user_id !== user.id) {
+            return NextResponse.json({ error: 'Session not found' }, { status: 403 });
+        }
+
+        const groqApiKey = process.env.GROQ_API_KEY?.trim();
+        if (!groqApiKey) {
+            console.error('GROQ_API_KEY is missing');
+            return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+        }
+
+        const groq = new Groq({ apiKey: groqApiKey });
+
+        // 1. Search similar chunks (with error handling)
+        let chunks: any[] = [];
+        try {
+            chunks = await searchSimilarChunks(session_id, message, 10);
+        } catch (searchError) {
+            console.warn('RAG search failed, continuing without context:', searchError);
+            // Don't fail the request, just proceed with empty chunks
+        }
+
+        // Fallback for broad queries (e.g. "summarize briefly") where similarity search can return 0 results.
+        if (chunks.length === 0) {
+            try {
+                chunks = await getChunksForSession(session_id, 10);
+            } catch (fallbackError) {
+                console.warn('Fallback chunk load failed:', fallbackError);
+            }
+        }
+
+        // 2. Get source metadata
+        const sources = await getSourcesForSession(session_id);
+        const sourceMap = new Map(sources.map(s => [s.id, s]));
+
+        // 3. Build context with source references
+        const contextParts: string[] = [];
+        const usedSources = new Map<string, { index: number; source: any }>();
+        let sourceIndex = 1;
+
+        for (const chunk of chunks) {
+            const source = sourceMap.get(chunk.source_id);
+            if (!source) continue;
+
+            if (!usedSources.has(chunk.source_id)) {
+                usedSources.set(chunk.source_id, { index: sourceIndex, source });
+                sourceIndex++;
+            }
+
+            const ref = usedSources.get(chunk.source_id)!;
+            const label = source.source_type === 'paper'
+                ? source.paper_title
+                : source.file_name;
+
+            contextParts.push(`[Source ${ref.index}: ${label}]\n${chunk.content}`);
+        }
+
+        const contextStr = contextParts.join('\n\n---\n\n');
+
+        // 4. Build source references for response
+        const sourceRefs = Array.from(usedSources.entries()).map(([, v]) => ({
+            index: v.index,
+            type: v.source.source_type,
+            title: v.source.source_type === 'paper' ? v.source.paper_title : v.source.file_name,
+            journal: v.source.paper_journal || null,
+            link: v.source.paper_link || null,
+        }));
+
+        if (sourceRefs.length === 0) {
+            return NextResponse.json(
+                { error: 'No context found. Please add papers/files again and retry.' },
+                { status: 400 }
+            );
+        }
+
+        // 5. Build chat history for Groq
+        const chatHistory = (history || []).map((msg: any) => ({
+            role: msg.role === 'user' ? 'user' : 'assistant', // Groq uses 'assistant' not 'model'
+            content: msg.content,
+        }));
+
+        // 6. Create RAG prompt
+        const systemPrompt = `You are a research assistant specializing in academic paper analysis.
+Answer questions based ONLY on the provided context sources below.
+Always cite your sources using [Source N] format where N matches the source number.
+If the context doesn't contain enough information to fully answer, say so explicitly.
+Answer in the same language as the user's question.
+Be concise but thorough.
+
+## Context Sources:
+${contextStr || 'No context sources available. Please inform the user to add papers or upload files first.'}
+
+## Source References:
+${sourceRefs.map(s => `[Source ${s.index}] ${s.title}${s.journal ? ` (${s.journal})` : ''}`).join('\n')}`;
+
+        // 7. Stream response from Groq
+        const completion = await groq.chat.completions.create({
+            messages: [
+                { role: 'system', content: systemPrompt },
+                ...chatHistory,
+                { role: 'user', content: message }
+            ],
+            model: 'llama-3.3-70b-versatile',
+            temperature: 0.3,
+            max_tokens: 2048,
+            stream: true,
+        });
+
+        // Create a ReadableStream for streaming response
+        const encoder = new TextEncoder();
+        const stream = new ReadableStream({
+            async start(controller) {
+                try {
+                    for await (const chunk of completion) {
+                        const text = chunk.choices[0]?.delta?.content || '';
+                        if (text) {
+                            controller.enqueue(
+                                encoder.encode(`data: ${JSON.stringify({ text })}\n\n`)
+                            );
+                        }
+                    }
+                    // Send source references at the end
+                    controller.enqueue(
+                        encoder.encode(`data: ${JSON.stringify({ sources: sourceRefs, done: true })}\n\n`)
+                    );
+                    controller.close();
+                } catch (err: any) {
+                    console.error('[chat] Stream error:', err);
+                    controller.enqueue(
+                        encoder.encode(`data: ${JSON.stringify({ error: 'Stream interrupted' })}\n\n`)
+                    );
+                    controller.close();
+                }
+            },
+        });
+
+        return new Response(stream, {
+            headers: {
+                'Content-Type': 'text/event-stream',
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
+            },
+        });
+    } catch (err: any) {
+        console.error('[chat] Error:', err);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
+}

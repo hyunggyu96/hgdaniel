@@ -1,10 +1,14 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNews } from '@/hooks/useNews';
 import { groupNewsByCategory, CATEGORIES_CONFIG } from '@/lib/constants';
 import NewsListContainer from './NewsListContainer';
+import EditorsPicks from './EditorsPicks';
 import { useLanguage } from './LanguageContext';
+import { useTier } from '@/hooks/useTier';
+import { useUser } from './UserContext';
+import { useFeedMode } from './FeedModeContext';
 
 interface NewsListProps {
     selectedCategory?: string | null;
@@ -13,9 +17,105 @@ interface NewsListProps {
     showCollections?: boolean;
 }
 
+interface DisplayPrefs {
+    showBadges: boolean;
+    showKeywords: boolean;
+    viewMode: 'category' | 'time';
+    classicLayout: boolean;
+}
+
+const DEFAULT_PREFS: DisplayPrefs = {
+    showBadges: true,
+    showKeywords: true,
+    viewMode: 'category',
+    classicLayout: false,
+};
+
 export default function NewsList({ selectedCategory, currentPage = 1, searchQuery, showCollections }: NewsListProps) {
     const { news: allNews, isLoading, isError } = useNews();
     const { t } = useLanguage();
+    const { config: tierConfig } = useTier();
+    const { userId } = useUser();
+    const { feedMode } = useFeedMode();
+
+    const [showBadges, setShowBadges] = useState(true);
+    const [showKeywords, setShowKeywords] = useState(true);
+    const [viewMode, setViewMode] = useState<'category' | 'time'>('category');
+    const [classicLayout, setClassicLayout] = useState(false);
+    const [prefsLoaded, setPrefsLoaded] = useState(false);
+    const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    // Load preferences on mount (if logged in)
+    useEffect(() => {
+        if (!userId) {
+            setPrefsLoaded(true);
+            return;
+        }
+        let cancelled = false;
+        (async () => {
+            try {
+                const res = await fetch('/api/user/preferences', { cache: 'no-store' });
+                if (!res.ok || cancelled) return;
+                const json = await res.json();
+                const p = json?.preferences || {};
+                if (cancelled) return;
+                // Always reset ALL prefs to saved value or default so
+                // logged-out session state doesn't leak into logged-in state
+                setShowBadges(typeof p.showBadges === 'boolean' ? p.showBadges : DEFAULT_PREFS.showBadges);
+                setShowKeywords(typeof p.showKeywords === 'boolean' ? p.showKeywords : DEFAULT_PREFS.showKeywords);
+                setViewMode(p.viewMode === 'category' || p.viewMode === 'time' ? p.viewMode : DEFAULT_PREFS.viewMode);
+                setClassicLayout(typeof p.classicLayout === 'boolean' ? p.classicLayout : DEFAULT_PREFS.classicLayout);
+            } catch {
+                // ignore — use defaults
+            } finally {
+                if (!cancelled) setPrefsLoaded(true);
+            }
+        })();
+        return () => { cancelled = true; };
+    }, [userId]);
+
+    // Debounced save preferences on change
+    const savePrefs = useCallback((prefs: Partial<DisplayPrefs>) => {
+        if (!userId) return;
+        if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+        saveTimerRef.current = setTimeout(() => {
+            void fetch('/api/user/preferences', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ preferences: prefs }),
+            });
+        }, 500);
+    }, [userId]);
+
+    // Wrap setters to also save
+    const handleSetShowBadges = useCallback((fn: (prev: boolean) => boolean) => {
+        setShowBadges((prev) => {
+            const next = fn(prev);
+            savePrefs({ showBadges: next });
+            return next;
+        });
+    }, [savePrefs]);
+
+    const handleSetShowKeywords = useCallback((fn: (prev: boolean) => boolean) => {
+        setShowKeywords((prev) => {
+            const next = fn(prev);
+            savePrefs({ showKeywords: next });
+            return next;
+        });
+    }, [savePrefs]);
+
+    const handleSetViewMode = useCallback((mode: 'category' | 'time') => {
+        setViewMode(mode);
+        savePrefs({ viewMode: mode });
+    }, [savePrefs]);
+
+    const handleSetClassicLayout = useCallback((fn: (prev: boolean) => boolean) => {
+        setClassicLayout((prev) => {
+            const next = fn(prev);
+            savePrefs({ classicLayout: next });
+            return next;
+        });
+    }, [savePrefs]);
 
     if (isLoading) {
         return (
@@ -62,10 +162,25 @@ export default function NewsList({ selectedCategory, currentPage = 1, searchQuer
         );
     }
 
+    // Tier-based date filter: free users only see recent articles
+    if (tierConfig.newsDaysLimit) {
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - tierConfig.newsDaysLimit);
+        filteredNews = filteredNews.filter(article => {
+            const pubDate = article.published_at ? new Date(article.published_at) : null;
+            return pubDate && pubDate >= cutoffDate;
+        });
+    }
+
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
     const isLandingPage = !selectedCategory && !searchQuery && !showCollections;
 
+    // In classic mode, force glass-card layout
+    const effectiveClassicLayout = feedMode === 'classic' ? true : classicLayout;
+
     return (
+        <>
+        {feedMode === 'ai' && isLandingPage && <EditorsPicks allNews={allNews} showBadges={showBadges} showKeywords={showKeywords} />}
         <NewsListContainer
             allNews={allNews}
             newsByCategory={newsByCategory}
@@ -76,6 +191,17 @@ export default function NewsList({ selectedCategory, currentPage = 1, searchQuer
             today={today}
             isLandingPage={isLandingPage}
             CATEGORIES_CONFIG={CATEGORIES_CONFIG}
+            newsDaysLimit={tierConfig.newsDaysLimit || null}
+            showBadges={showBadges}
+            setShowBadges={handleSetShowBadges}
+            showKeywords={showKeywords}
+            setShowKeywords={handleSetShowKeywords}
+            viewMode={viewMode}
+            setViewMode={handleSetViewMode}
+            classicLayout={effectiveClassicLayout}
+            setClassicLayout={handleSetClassicLayout}
+            feedMode={feedMode}
         />
+        </>
     );
 }

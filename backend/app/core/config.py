@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     NAVER_CLIENT_ID: str = os.getenv("NAVER_CLIENT_ID", "")
     NAVER_CLIENT_SECRET: str = os.getenv("NAVER_CLIENT_SECRET", "")
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
+    PUBMED_EMAIL: str = os.getenv("PUBMED_EMAIL", "")
+    PUBMED_API_KEY: str = os.getenv("PUBMED_API_KEY", "")
     
     class Config:
         case_sensitive = True

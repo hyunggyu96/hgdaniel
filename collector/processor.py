@@ -52,23 +52,18 @@ if sys.platform == 'win32':
 shared_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '_shared')
 keywords_path = os.path.join(shared_dir, 'keywords.json')
 EXPERT_ANALYSIS_KEYWORDS = []
+CATEGORIES_CONFIG = []
 
 try:
     with open(keywords_path, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-        for cat in data.get('categories', []):
+        kw_data = json.load(f)
+        CATEGORIES_CONFIG = kw_data.get('categories', [])
+        for cat in CATEGORIES_CONFIG:
             EXPERT_ANALYSIS_KEYWORDS.extend(cat.get('keywords', []))
     print(f"✅ Loaded {len(EXPERT_ANALYSIS_KEYWORDS)} keywords from keywords.json")
 except Exception as e:
     print(f"⚠️ Failed to load keywords.json: {e}")
     EXPERT_ANALYSIS_KEYWORDS = ["휴젤", "메디톡스", "파마리서치", "대웅제약", "필러", "보톡스"]
-
-# [2.5] Category Mapping Logic (Sync with Frontend lib/constants.ts)
-CATEGORIES_CONFIG = []
-try:
-    with open(keywords_path, 'r', encoding='utf-8') as f:
-        CATEGORIES_CONFIG = json.load(f).get('categories', [])
-except: pass
 
 # [NEW] 기업명 단독 키워드 리스트 (이 키워드만 있으면 Corporate News)
 COMPANY_ONLY_KEYWORDS = [
@@ -170,7 +165,7 @@ def get_google_sheet():
         print(f"⚠️ Google Sheet Warning: {e}")
         return None
 
-import re
+import re  # noqa: E402 - must be after dotenv/path setup
 
 # [3] Filtering Configuration (Confirmed by User)
 CAR_BRANDS = [
@@ -283,44 +278,32 @@ async def analyze_article_expert_async(title, description, search_keyword):
     # [V5.1] AI 분석 실패 시 Fallback(로컬 추출) 대신 에러를 반환하여 수동 검토 유도
     return analysis
 
-# [4] Semantic Deduplication (Point 3)
-def is_semantically_duplicate(new_title, recent_articles):
-    """Checks if a title is too similar to recent articles (Jaccard Similarity)."""
-    def get_words(text):
-        if not text: return set()
-        # Remove ALL special characters including various quotes and brackets
-        clean = re.sub(r'[^가-힣a-zA-Z0-9\s]', ' ', text)
-        return set(clean.lower().split())
+# [4] Semantic Deduplication (Jaccard Similarity)
+def _get_words(text):
+    """Extract word set from text for similarity comparison."""
+    if not text: return set()
+    return set(re.sub(r'[^가-힣a-zA-Z0-9\s]', ' ', text).lower().split())
 
-    new_words = get_words(new_title)
+def jaccard_sim(text1, text2):
+    """Returns Jaccard similarity between two texts (0.0-1.0)."""
+    w1, w2 = _get_words(text1), _get_words(text2)
+    if not w1 or not w2: return 0.0
+    return len(w1 & w2) / len(w1 | w2)
+
+def is_semantically_duplicate(new_title, recent_articles):
+    """Checks if a title is too similar to recent articles."""
+    new_words = _get_words(new_title)
     if len(new_words) < 3: return None
 
     for art in recent_articles:
         ref_title = art.get('title', '')
-        ref_words = get_words(ref_title)
-        if not ref_words: continue
-        
-        intersection = new_words.intersection(ref_words)
-        union = new_words.union(ref_words)
-        similarity = len(intersection) / len(union) if union else 0
-        
-        # Lowered threshold to 0.7 to catch slightly modified titles from different agencies
-        if similarity > 0.7:
+        if jaccard_sim(new_title, ref_title) > 0.7:
             return ref_title
     return None
 
 def is_semantic_duplicate(text1, text2, threshold=0.8):
-    if not text1 or not text2: return False
-    # Remove special chars and split into words
-    def get_words(t): return set(re.sub(r'[^가-힣a-zA-Z0-9]', ' ', t).split())
-    w1 = get_words(text1)
-    w2 = get_words(text2)
-    if not w1 or not w2: return False
-    
-    intersection = w1.intersection(w2)
-    union = w1.union(w2)
-    similarity = len(intersection) / len(union)
-    return similarity >= threshold
+    """Checks if two texts exceed similarity threshold."""
+    return jaccard_sim(text1, text2) >= threshold
 
 # [New] 키워드별 문맥 노이즈 설정 (동음이의어 방지)
 CONTEXT_NOISE_FILTER = {
@@ -357,8 +340,7 @@ async def process_item(item, worksheet, recent_articles):
         print(f"🚫 Hard Filter: Noise Keyword detected ({title[:20]}...)")
         supabase.table("raw_news").update({"status": "filtered"}).eq("id", raw_id).execute()
         return False
-        
-    # 3. Bad Keywords (Quiz, etc)
+
     # 3. Bad Keywords (Quiz, etc) - Check FULL TEXT
     if any(bad in full_text for bad in BAD_KEYWORDS):
         print(f"🚫 Hard Filter: Bad Keyword detected ({title[:20]}...)")
@@ -399,23 +381,20 @@ async def process_item(item, worksheet, recent_articles):
         return False
     
     # Extract AI fields (safely handle dict values)
-    ai_main = analysis.get("main_keyword", "기타")
-    if isinstance(ai_main, dict):
-        ai_main = ai_main.get("name", str(ai_main)) if "name" in ai_main else "기타"
-    ai_main = str(ai_main) if ai_main else "기타"
-    
+    def safe_str(val, default="기타"):
+        if isinstance(val, dict):
+            return val.get("name", default) if "name" in val else default
+        return str(val) if val else default
+
+    ai_main = safe_str(analysis.get("main_keyword", "기타"))
     ai_included = analysis.get("included_keywords", [])
-    issue_nature = analysis.get("issue_nature", "기타")
-    if isinstance(issue_nature, dict):
-        issue_nature = issue_nature.get("name", "기타") if "name" in issue_nature else "기타"
-    issue_nature = str(issue_nature) if issue_nature else "기타"
+    issue_nature = safe_str(analysis.get("issue_nature", "기타"))
     
     # [V4.5] AI 요약 대신 원본 발췌문(description) 사용
     summary = str(desc if desc else title)
     
-    # [Nuclear Option] Cleanup and 70-char hard truncate for frontend safety
-    summary = re.sub(r'[\u4e00-\u9fff]', '', summary) # Remove Hanja
-    summary = re.sub(r'[\u3040-\u30ff]', '', summary) # Remove Japanese
+    # Cleanup CJK chars and 70-char hard truncate for frontend safety
+    summary = re.sub(r'[\u4e00-\u9fff\u3040-\u30ff]', '', summary)
     if len(summary) > 70:
         summary = summary[:67] + "..."
     
@@ -429,9 +408,7 @@ async def process_item(item, worksheet, recent_articles):
     
     # [3] MERGE LOGIC (Union of AI and Local)
     final_main = ai_main if (ai_main and ai_main != "기타") else local_main
-    if isinstance(final_main, dict):
-        final_main = final_main.get("name", "기타") if "name" in final_main else "기타"
-    final_main = str(final_main) if final_main else "기타"
+    final_main = safe_str(final_main)
     
     # [4] CLEANUP & FINAL FORMATTING (Nuclear Option)
     def clean_kw(k):
@@ -440,11 +417,8 @@ async def process_item(item, worksheet, recent_articles):
         # 1. Replace common Hanja
         k = k.replace("社", "사").replace("外", "외").replace("內", "내").replace("美", "미").replace("中", "중").replace("日", "일").replace("韓", "한")
         
-        # 2. Remove all Hanja (4E00-9FFF)
-        k = re.sub(r'[\u4e00-\u9fff]', '', k)
-        
-        # 3. Remove all Japanese (Hiragana: 3040-309F, Katakana: 30A0-30FF)
-        k = re.sub(r'[\u3040-\u30ff]', '', k)
+        # 2. Remove Hanja + Japanese
+        k = re.sub(r'[\u4e00-\u9fff\u3040-\u30ff]', '', k)
         
         # 4. Remove strange symbols/control chars but keep basic punct
         k = re.sub(r'[^\w\s\d.,!?"\'\[\]()%&-]', '', k)

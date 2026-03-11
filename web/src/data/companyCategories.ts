@@ -23,11 +23,18 @@ export const COMPANY_CATEGORIES = {
         "비올",
         "하이로닉",
         "레이저옵텍",
-        "유바이오로직스"
+        "유바이오로직스",
+        "바임글로벌",
+        "엑소코바이오",
+        "알에프바이오",
+        "차메디텍",
+        "JW중외제약",
+        "동국제약",
+        "리젠바이오텍",
+        "울트라브이",
+        "제노스"
     ],
     global: [
-        "바임글로벌",   // Korea-based but private
-        "엑소코바이오", // KOSDAQ but limited DART data
         "멀츠",         // Germany (Merz Pharma)
         "앨러간",       // USA (Allergan/AbbVie)
         "갈더마",       // Switzerland (Galderma)

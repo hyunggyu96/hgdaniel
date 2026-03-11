@@ -7,7 +7,7 @@ export default function LanguageSwitcher() {
     return (
         <button
             onClick={() => setLanguage(language === 'ko' ? 'en' : 'ko')}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors text-xs font-bold text-gray-700 uppercase tracking-wide"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide"
         >
             <span>{language === 'ko' ? 'KR' : 'EN'}</span>
             <span className="text-gray-400">/</span>

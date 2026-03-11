@@ -1,7 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { getCollections, addToCollection, removeFromCollection } from '@/lib/collectionUtils';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useUser } from './UserContext';
 
 interface CollectionContextType {
@@ -10,6 +9,7 @@ interface CollectionContextType {
     toggleCollection: (link: string, title?: string) => void;
     collectionCount: number;
     isLoading: boolean;
+    limitReached: boolean;
 }
 
 const CollectionContext = createContext<CollectionContextType | undefined>(undefined);
@@ -18,95 +18,97 @@ export function CollectionProvider({ children }: { children: React.ReactNode }) 
     const { userId } = useUser();
     const [collections, setCollections] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [limitReached, setLimitReached] = useState(false);
 
-    // Initial load and sync
-    useEffect(() => {
-        const loadCollections = async () => {
-            console.log(`[Collections] Loading for user: ${userId || 'GUEST'}`);
-            setIsLoading(true);
-            if (userId) {
-                try {
-                    const res = await fetch(`/api/collections?userId=${encodeURIComponent(userId)}`);
-                    if (res.ok) {
-                        const dbCollections = await res.json();
-                        console.log(`[Collections] Fetched ${dbCollections.length} items from server`);
-
-                        const guestCollections = getCollections();
-                        if (guestCollections.length > 0) {
-                            console.log(`[Collections] Merging ${guestCollections.length} guest items...`);
-                            for (const link of guestCollections) {
-                                if (!dbCollections.includes(link)) {
-                                    await fetch('/api/collections', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ userId, link })
-                                    });
-                                    dbCollections.push(link);
-                                }
-                            }
-                            localStorage.removeItem('news_collections_links');
-                            console.log('[Collections] Merge complete');
-                        }
-                        setCollections(dbCollections);
-                    }
-                } catch (error) {
-                    console.error('[Collections] Load failed:', error);
-                    setCollections(getCollections());
-                }
-            } else {
-                const local = getCollections();
-                console.log(`[Collections] Loaded ${local.length} items from local storage`);
-                setCollections(local);
-            }
+    const loadCollections = useCallback(async () => {
+        if (!userId) {
+            setCollections([]);
             setIsLoading(false);
-        };
+            return;
+        }
 
-        loadCollections();
+        setIsLoading(true);
+        try {
+            const res = await fetch('/api/collections?type=news', { cache: 'no-store' });
+            if (!res.ok) {
+                const body = await res.text().catch(() => '');
+                console.error('[Collections] GET failed', res.status, body);
+                setCollections([]);
+                return;
+            }
+            const data = await res.json();
+            setCollections(Array.isArray(data) ? data : []);
+        } catch (error) {
+            console.error('[Collections] load failed', error);
+            setCollections([]);
+        } finally {
+            setIsLoading(false);
+        }
     }, [userId]);
 
-    // Check if news is in collection
-    const checkInCollection = useCallback((link: string) => {
+    useEffect(() => {
+        void loadCollections();
+    }, [loadCollections]);
+
+    // Keep a ref in sync so toggleCollection never closes over stale state
+    const collectionsRef = useRef(collections);
+    collectionsRef.current = collections;
+
+    const isInCollection = useCallback((link: string) => {
         return collections.includes(link);
     }, [collections]);
 
-    // Toggle collection with optimistic update & server sync
-    const handleToggleCollection = useCallback(async (link: string, title?: string) => {
-        const inCollection = collections.includes(link);
-        console.log(`[Collections] Toggling ${inCollection ? 'REMOVE' : 'ADD'} for ${link.slice(0, 30)}...`);
+    const toggleCollection = useCallback((link: string, title?: string) => {
+        const inCollection = collectionsRef.current.includes(link);
 
         if (inCollection) {
-            setCollections(prev => prev.filter(l => l !== link));
-            if (userId) {
-                const res = await fetch('/api/collections', {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId, link })
-                });
-                if (!res.ok) console.error('[Collections] DELETE failed');
-            } else {
-                removeFromCollection(link);
-            }
-        } else {
-            setCollections(prev => [...prev, link]);
-            if (userId) {
-                const res = await fetch('/api/collections', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId, link, title })
-                });
-                if (!res.ok) console.error('[Collections] POST failed');
-            } else {
-                addToCollection(link);
-            }
+            // Optimistic remove
+            setCollections((prev) => prev.filter((l) => l !== link));
+            void fetch('/api/collections', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'news', link }),
+            }).then(async (res) => {
+                if (!res.ok) {
+                    const body = await res.text().catch(() => '');
+                    console.error('[Collections] DELETE failed', res.status, body);
+                    setCollections((prev) => prev.includes(link) ? prev : [...prev, link]);
+                }
+            }).catch((err) => {
+                console.error('[Collections] DELETE error', err);
+                setCollections((prev) => prev.includes(link) ? prev : [...prev, link]);
+            });
+            return;
         }
-    }, [collections, userId]);
+
+        // Optimistic add
+        setLimitReached(false);
+        setCollections((prev) => prev.includes(link) ? prev : [...prev, link]);
+        void fetch('/api/collections', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'news', link, title, url: link }),
+        }).then(async (res) => {
+            if (!res.ok) {
+                const json = await res.json().catch(() => ({}));
+                if (json?.code === 'COLLECTION_LIMIT') {
+                    setLimitReached(true);
+                }
+                setCollections((prev) => prev.filter((l) => l !== link));
+            }
+        }).catch((err) => {
+            console.error('[Collections] POST error', err);
+            setCollections((prev) => prev.filter((l) => l !== link));
+        });
+    }, []); // stable — no deps needed, uses ref for current state
 
     const value: CollectionContextType = {
         collections,
-        isInCollection: checkInCollection,
-        toggleCollection: handleToggleCollection,
+        isInCollection,
+        toggleCollection,
         collectionCount: collections.length,
-        isLoading
+        isLoading,
+        limitReached,
     };
 
     return (

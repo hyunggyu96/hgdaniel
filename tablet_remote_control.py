@@ -1,12 +1,16 @@
 import paramiko
 import time
 import sys
+import os
+from dotenv import load_dotenv
+
+load_dotenv('.env.local')
 
 # Tablet Config
-HOST = "192.168.219.102"
-PORT = 8022
-USER = "u0_a43"
-PASS = "aisapiens"
+HOST = os.getenv("SSH_HOST", "")
+PORT = int(os.getenv("SSH_PORT", "8022"))
+USER = os.getenv("SSH_USERNAME", "")
+PASS = os.getenv("SSH_PASSWORD", "")
 
 def run_ssh_command():
     client = paramiko.SSHClient()

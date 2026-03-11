@@ -1,62 +1,105 @@
 'use client';
 
-import { Card, Text } from "@tremor/react";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { API_ENDPOINTS } from '@/lib/apiConfig';
 import { useLanguage } from "@/components/LanguageContext";
-import { COMPANY_CATEGORIES, getCompanyCategory } from "@/data/companyCategories";
+import { Building2, Globe, Search, BarChart3, PieChart } from "lucide-react";
+import TierGate from '@/components/TierGate';
+import { supabase } from '@/lib/supabaseClient';
 
-const allCompanies: { id: number; name: string }[] = [
-    { id: 1, name: "한스바이오메드" },
-    { id: 2, name: "엘앤씨바이오" },
-    { id: 3, name: "제테마" },
-    { id: 4, name: "한국비엔씨" },
-    { id: 5, name: "종근당바이오" },
-    { id: 6, name: "휴온스" },
-    { id: 7, name: "휴온스글로벌" },
-    { id: 8, name: "휴메딕스" },
-    { id: 9, name: "휴젤" },
-    { id: 10, name: "메디톡스" },
-    { id: 11, name: "대웅제약" },
-    { id: 12, name: "파마리서치" },
-    { id: 13, name: "클래시스" },
-    { id: 14, name: "케어젠" },
-    { id: 15, name: "원텍" },
-    { id: 16, name: "동방메디컬" },
-    { id: 17, name: "제이시스메디칼" },
-    { id: 18, name: "바이오비쥬" },
-    { id: 19, name: "바이오플러스" },
-    { id: 20, name: "비올" },
-    { id: 21, name: "하이로닉" },
-    { id: 22, name: "레이저옵텍" },
-    { id: 23, name: "유바이오로직스" },
-    { id: 24, name: "바임글로벌" },
-    { id: 25, name: "엑소코바이오" },
-    { id: 26, name: "멀츠" },
-    { id: 27, name: "앨러간" },
-    { id: 28, name: "갈더마" },
-    { id: 29, name: "테옥산" }
+const financialData: Record<string, any> = require('@/data/financial_data.json');
+
+// revenue logic removed for compactness
+
+type CompanyStatus = 'KOSPI' | 'KOSDAQ' | 'Unlisted' | 'Global_Listed' | 'Global_Private';
+type CompanyCategory = 'korean' | 'global';
+type KoreanMarketFilter = 'listed' | 'unlisted';
+
+interface CompanyData {
+    id: number;
+    name: { ko: string; en: string };
+    status: CompanyStatus;
+    category: CompanyCategory;
+}
+
+const allCompanies: CompanyData[] = [
+    { id: 1, name: { ko: "한스바이오메드", en: "HansBiomed" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 2, name: { ko: "엘앤씨바이오", en: "L&C Bio" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 3, name: { ko: "제테마", en: "Jetema" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 4, name: { ko: "한국비엔씨", en: "BNC Korea" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 5, name: { ko: "종근당바이오", en: "Chong Kun Dang Bio" }, status: 'KOSPI', category: 'korean' },
+    { id: 6, name: { ko: "휴온스", en: "Huons" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 7, name: { ko: "휴온스글로벌", en: "Huons Global" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 8, name: { ko: "휴메딕스", en: "Humedix" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 9, name: { ko: "휴젤", en: "Hugel" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 10, name: { ko: "메디톡스", en: "Medytox" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 11, name: { ko: "대웅제약", en: "Daewoong Pharma" }, status: 'KOSPI', category: 'korean' },
+    { id: 12, name: { ko: "파마리서치", en: "PharmaResearch" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 13, name: { ko: "클래시스", en: "Classys" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 14, name: { ko: "케어젠", en: "Caregen" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 15, name: { ko: "원텍", en: "Wontech" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 16, name: { ko: "동방메디컬", en: "Dongbang Medical" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 17, name: { ko: "제이시스메디칼", en: "Jeisys Medical" }, status: 'Unlisted', category: 'korean' },
+    { id: 18, name: { ko: "바이오비쥬", en: "BioBijou" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 19, name: { ko: "바이오플러스", en: "BioPlus" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 20, name: { ko: "비올", en: "Viol" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 21, name: { ko: "하이로닉", en: "Hironic" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 22, name: { ko: "레이저옵텍", en: "Laseroptek" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 23, name: { ko: "유바이오로직스", en: "EuBiologics" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 24, name: { ko: "바임글로벌", en: "Vaim Global" }, status: 'Unlisted', category: 'korean' },
+    { id: 25, name: { ko: "엑소코바이오", en: "ExoCoBio" }, status: 'Unlisted', category: 'korean' },
+    { id: 26, name: { ko: "알에프바이오", en: "RFBio" }, status: 'Unlisted', category: 'korean' },
+    { id: 27, name: { ko: "차메디텍", en: "Cha Meditech" }, status: 'Unlisted', category: 'korean' },
+    { id: 28, name: { ko: "JW중외제약", en: "JW Pharmaceutical" }, status: 'KOSPI', category: 'korean' },
+    { id: 29, name: { ko: "동국제약", en: "Dongkook Pharmaceutical" }, status: 'KOSDAQ', category: 'korean' },
+    { id: 30, name: { ko: "리젠바이오텍", en: "Regen Biotech" }, status: 'Unlisted', category: 'korean' },
+    { id: 31, name: { ko: "울트라브이", en: "Ultra V" }, status: 'Unlisted', category: 'korean' },
+    { id: 32, name: { ko: "제노스", en: "Genoss" }, status: 'Unlisted', category: 'korean' },
+    { id: 33, name: { ko: "멀츠", en: "Merz Aesthetics" }, status: 'Global_Private', category: 'global' },
+    { id: 34, name: { ko: "앨러간", en: "Allergan Aesthetics" }, status: 'Global_Listed', category: 'global' },
+    { id: 35, name: { ko: "갈더마", en: "Galderma" }, status: 'Global_Listed', category: 'global' },
+    { id: 36, name: { ko: "테옥산", en: "Teoxane" }, status: 'Global_Private', category: 'global' }
 ];
+
+const StatusBadge = ({ status, lang }: { status: CompanyStatus; lang: string }) => {
+    // Minimal Dot Style Badge
+    const config = {
+        'KOSPI': { bg: 'bg-blue-50 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', border: 'border-blue-100 dark:border-blue-800/50', dot: 'bg-blue-500', label: 'KOSPI' },
+        'KOSDAQ': { bg: 'bg-indigo-50 dark:bg-indigo-900/30', text: 'text-indigo-700 dark:text-indigo-300', border: 'border-indigo-100 dark:border-indigo-800/50', dot: 'bg-indigo-500', label: 'KOSDAQ' },
+        'Unlisted': { bg: 'bg-gray-50 dark:bg-gray-800/50', text: 'text-gray-500 dark:text-gray-400', border: 'border-gray-100 dark:border-gray-700/50', dot: 'bg-gray-400', label: lang === 'ko' ? '비상장' : 'Unlisted' },
+        'Global_Listed': { bg: 'bg-violet-50 dark:bg-violet-900/30', text: 'text-violet-700 dark:text-violet-300', border: 'border-violet-100 dark:border-violet-800/50', dot: 'bg-violet-500', label: 'Listed' },
+        'Global_Private': { bg: 'bg-gray-50 dark:bg-gray-800/50', text: 'text-gray-500 dark:text-gray-400', border: 'border-gray-100 dark:border-gray-700/50', dot: 'bg-gray-400', label: 'Private' }
+    }[status];
+
+    if (!config) return null;
+
+    return (
+        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border ${config.bg} ${config.text} ${config.border} shadow-sm transition-colors duration-300`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
+            {config.label}
+        </span>
+    );
+};
 
 export default function CompanyPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { t } = useLanguage();
+    const { language, t } = useLanguage();
+    const lang = language as 'ko' | 'en';
     const [rankings, setRankings] = useState<Record<string, number>>({});
+    const [searchQuery, setSearchQuery] = useState("");
+    const [companies, setCompanies] = useState<CompanyData[]>(allCompanies);
+    const [koreanMarketFilter, setKoreanMarketFilter] = useState<KoreanMarketFilter>('listed');
 
-    // Initialize state from URL param, default to 'korean'
-    // Using simple initialization; useEffect will handle sync
     const initialCategory = searchParams?.get('tab') === 'global' ? 'global' : 'korean';
     const [activeCategory, setActiveCategory] = useState<'korean' | 'global'>(initialCategory);
 
-    // Sync state if URL changes (e.g. back button)
     useEffect(() => {
         const tab = searchParams?.get('tab');
         if (tab === 'global' && activeCategory !== 'global') {
             setActiveCategory('global');
         } else if (tab !== 'global' && activeCategory !== 'korean') {
-            // If tab is missing or 'korean', switch to korean
             setActiveCategory('korean');
         }
     }, [searchParams, activeCategory]);
@@ -71,84 +114,204 @@ export default function CompanyPage() {
             .then(res => res.json())
             .then(data => setRankings(data))
             .catch(err => console.error(err));
+
+        const fetchCompanies = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('companies')
+                    .select('*')
+                    .order('name_ko', { ascending: true });
+
+                if (data) {
+                    const mapped: CompanyData[] = data.map((item: any) => ({
+                        id: item.id,
+                        name: { ko: item.name_ko, en: item.name_en },
+                        status: item.status as CompanyStatus,
+                        category: item.category as CompanyCategory
+                    }));
+                    setCompanies(mapped);
+                }
+            } catch (e) {
+                console.error('Failed to fetch companies', e);
+            }
+        };
+        fetchCompanies();
     }, []);
 
-    // Filter companies by category
-    const filteredCompanies = allCompanies
-        .filter(company => getCompanyCategory(company.name) === activeCategory)
-        .sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+    const filteredCompanies = companies
+        .filter((company) => {
+            if (company.category !== activeCategory) return false;
+
+            if (activeCategory === 'korean') {
+                const isListed = company.status === 'KOSPI' || company.status === 'KOSDAQ';
+                if (koreanMarketFilter === 'listed' && !isListed) return false;
+                if (koreanMarketFilter === 'unlisted' && company.status !== 'Unlisted') return false;
+            }
+
+            if (searchQuery === "") return true;
+            return (
+                company.name.en.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                company.name.ko.includes(searchQuery)
+            );
+        })
+        .sort((a, b) => a.name[lang].localeCompare(b.name[lang], lang === 'ko' ? 'ko' : 'en'));
+
+    const koreanCount = companies.filter(c => c.category === 'korean').length;
+    const globalCount = companies.filter(c => c.category === 'global').length;
+    const koreanListedCount = companies.filter(c => c.category === 'korean' && (c.status === 'KOSPI' || c.status === 'KOSDAQ')).length;
+    const koreanUnlistedCount = companies.filter(c => c.category === 'korean' && c.status === 'Unlisted').length;
 
     return (
-        <main className="min-h-screen bg-gray-50 p-6 md:p-12">
-            <div className="max-w-6xl mx-auto space-y-8">
-                {/* Header */}
-                <div className="flex flex-col gap-2">
-                    <Text className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
-                        {t('company_header')}
-                    </Text>
-                    <Text className="text-gray-500">
-                        {t('company_desc')}
-                    </Text>
+        <main className="min-h-screen bg-gray-50/50 dark:bg-gray-950 p-6 md:p-12 pb-24 transition-colors duration-300">
+            <div className="max-w-7xl mx-auto space-y-6">
+
+                {/* Premium Header Compact */}
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-lg animate-fade-in">
+                    <div className="relative z-10 flex flex-col md:flex-row items-center gap-5 px-6 py-5 md:px-8 md:py-6">
+                        <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-inner shrink-0">
+                            <Building2 className="w-7 h-7 text-blue-200" />
+                        </div>
+                        <div className="flex-1 space-y-1">
+                            <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white">
+                                {t('company_header')}
+                            </h2>
+                            <p className="text-slate-300 text-sm md:text-base font-light">
+                                {t('company_desc')}
+                            </p>
+                            <div className="flex flex-wrap items-center gap-2 pt-1">
+                                <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-100 text-[10px] font-semibold backdrop-blur-sm flex items-center gap-1">
+                                    <BarChart3 className="w-3 h-3" />
+                                    {companies.length} Companies Tracked
+                                </span>
+                                <span className="px-2.5 py-0.5 rounded-full bg-violet-500/20 border border-violet-400/30 text-violet-100 text-[10px] font-semibold backdrop-blur-sm flex items-center gap-1">
+                                    <Globe className="w-3 h-3" />
+                                    Global & Local Leaders
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {/* Decorative Elements */}
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
                 </div>
 
-                {/* Category Tabs */}
-                <div className="flex gap-2 border-b border-gray-200">
-                    <button
-                        onClick={() => handleCategoryChange('korean')}
-                        className={`px-6 py-3 font-semibold transition-all border-b-2 ${activeCategory === 'korean'
-                                ? 'border-blue-600 text-blue-600'
-                                : 'border-transparent text-gray-500 hover:text-gray-700'
-                            }`}
-                    >
-                        🇰🇷 한국 기업 ({COMPANY_CATEGORIES.korean.length})
-                    </button>
-                    <button
-                        onClick={() => handleCategoryChange('global')}
-                        className={`px-6 py-3 font-semibold transition-all border-b-2 ${activeCategory === 'global'
-                                ? 'border-blue-600 text-blue-600'
-                                : 'border-transparent text-gray-500 hover:text-gray-700'
-                            }`}
-                    >
-                        🌍 글로벌 기업 ({COMPANY_CATEGORIES.global.length})
-                    </button>
+                {/* Controls: Tabs & Search */}
+                <div className="flex flex-col md:flex-row gap-4 items-center justify-between sticky top-4 z-20">
+                    {/* Segmented Tab Control */}
+                    <div className="bg-white/80 dark:bg-gray-900/60 backdrop-blur-md p-1.5 rounded-xl border border-white/50 dark:border-gray-800 shadow-sm ring-1 ring-gray-200/50 dark:ring-gray-800 flex w-full md:w-auto">
+                        <button
+                            onClick={() => handleCategoryChange('korean')}
+                            className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2 ${activeCategory === 'korean'
+                                ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-md ring-1 ring-gray-100 dark:ring-gray-700'
+                                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200'
+                                }`}
+                        >
+                            <span>🇰🇷</span>
+                            {lang === 'ko' ? `한국 기업 (${koreanCount})` : `Korean (${koreanCount})`}
+                        </button>
+                        <button
+                            onClick={() => handleCategoryChange('global')}
+                            className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2 ${activeCategory === 'global'
+                                ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-md ring-1 ring-gray-100 dark:ring-gray-700'
+                                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200'
+                                }`}
+                        >
+                            <span>🌍</span>
+                            {lang === 'ko' ? `글로벌 기업 (${globalCount})` : `Global (${globalCount})`}
+                        </button>
+                    </div>
+
+                    {/* Search Bar */}
+                    <div className="relative w-full md:w-64 group bg-white/80 dark:bg-gray-900/60 backdrop-blur-md rounded-xl shadow-sm border border-white/50 dark:border-gray-800 ring-1 ring-gray-200/50 dark:ring-gray-800">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Search className="h-4 w-4 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                        </div>
+                        <input
+                            type="text"
+                            className="block w-full pl-10 pr-3 py-2.5 bg-transparent border-none rounded-xl text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                            placeholder={lang === 'ko' ? "기업명 검색..." : "Search companies..."}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
                 </div>
+
+                {activeCategory === 'korean' && (
+                    <div className="bg-white/80 dark:bg-gray-900/60 backdrop-blur-md p-1.5 rounded-xl border border-white/50 dark:border-gray-800 shadow-sm ring-1 ring-gray-200/50 dark:ring-gray-800 flex w-full md:w-fit">
+                        <button
+                            onClick={() => setKoreanMarketFilter('listed')}
+                            className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${koreanMarketFilter === 'listed'
+                                ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-md ring-1 ring-gray-100 dark:ring-gray-700'
+                                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200'
+                                }`}
+                        >
+                            {`KOSPI·KOSDAQ (${koreanListedCount})`}
+                        </button>
+                        <button
+                            onClick={() => setKoreanMarketFilter('unlisted')}
+                            className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${koreanMarketFilter === 'unlisted'
+                                ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-md ring-1 ring-gray-100 dark:ring-gray-700'
+                                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200'
+                                }`}
+                        >
+                            {lang === 'ko' ? `\uBE44\uC0C1\uC7A5 (${koreanUnlistedCount})` : `Unlisted (${koreanUnlistedCount})`}
+                        </button>
+                    </div>
+                )}
 
                 {/* Company Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                     {filteredCompanies.map((item) => {
-                        const rank = rankings[item.name];
+                        const companyNameKo = item.name.ko;
+                        const rank = rankings[companyNameKo];
                         const isHighlight = rank && rank <= 3;
-                        const isGlobal = activeCategory === 'global';
+                        const displayName = item.name[lang];
+
 
                         return (
-                            <Card
+                            <div
                                 key={item.id}
-                                className={`relative cursor-pointer transition-all text-center flex items-center justify-center min-h-[100px] overflow-visible rounded-xl group
-                                hover:shadow-lg hover:-translate-y-1 hover:ring-2 hover:ring-blue-100 bg-white
-                                ${isHighlight ? 'border border-purple-200 shadow-[0_0_15px_rgba(168,85,247,0.3)]' : 'border border-gray-200 shadow-sm'}
-                                ${isGlobal ? 'bg-gradient-to-br from-blue-50 to-indigo-50' : ''}
-                            `}
-                                onClick={() => router.push(`/analysis?company=${item.name}`)}
+                                onClick={() => router.push(`/analysis?company=${companyNameKo}`)}
+                                className={`group relative bg-white dark:bg-gray-900 rounded-xl p-4 border transition-all duration-300 cursor-pointer flex flex-col items-center justify-center gap-2 hover:bg-gray-50/50 dark:hover:bg-gray-800
+                                ${isHighlight
+                                        ? 'border-violet-100 dark:border-violet-900/30 ring-2 ring-violet-500/20 shadow-lg shadow-violet-500/10'
+                                        : 'border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-blue-100 dark:hover:border-blue-900/50'}
+                                `}
                             >
-                                {/* Pulsing Border Effect for Highlights */}
+                                {/* Highlight Effect */}
                                 {isHighlight && (
-                                    <div className="absolute inset-0 rounded-xl border-2 border-purple-500 animate-pulse pointer-events-none z-10"></div>
-                                )}
-
-                                {/* Global Badge */}
-                                {isGlobal && (
-                                    <div className="absolute top-2 right-2 bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full font-semibold">
-                                        Global
+                                    <div className="absolute top-2 right-2">
+                                        <span className="flex h-2 w-2">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-500"></span>
+                                        </span>
                                     </div>
                                 )}
 
-                                <Text className={`text-lg font-medium ${isHighlight ? 'text-purple-700 font-bold' : 'text-foreground'}`}>
-                                    {item.name}
-                                </Text>
-                            </Card>
+                                {/* Compact Content */}
+                                <div className="text-center w-full space-y-2">
+                                    <h3 className={`text-base font-bold truncate px-2 ${displayName.length > 8 ? 'text-sm' : ''} ${isHighlight ? 'text-violet-900 dark:text-violet-300' : 'text-gray-900 dark:text-gray-100 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors'}`}>
+                                        {displayName}
+                                    </h3>
+                                    <div className="flex justify-center">
+                                        <StatusBadge status={item.status} lang={lang} />
+                                    </div>
+                                </div>
+
+                                {isHighlight && (
+                                    <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-violet-500/20 pointer-events-none" />
+                                )}
+                            </div>
                         );
                     })}
                 </div>
+
+                {filteredCompanies.length === 0 && (
+                    <div className="text-center py-20 text-gray-400">
+                        <Globe className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                        <p>{lang === 'ko' ? "검색 결과가 없습니다." : "No companies found."}</p>
+                    </div>
+                )}
             </div>
         </main>
     );
